@@ -1,0 +1,59 @@
+# Midiastore: estratégia de produto 2027/2028
+
+Data da revisão: 03/11/2026. A marca comercial desejada é **Midiastore**. O identificador Android permanece `com.rdf112.sweep` e o namespace `com.rdf112.sweep` até validação do histórico de publicação e assinatura. A aplicação passou a exibir “Midiastore”; isso não muda a identidade de atualização.
+
+## Tese
+
+Ser um assistente local de armazenamento que explica o que ocupa espaço, encontra oportunidades verificáveis e deixa cada decisão destrutiva sob controle explícito da pessoa. A promessa não é “limpar tudo”; é mostrar evidência, impacto provável, cobertura e resultado confirmado.
+
+## Usuário prioritário
+
+Pessoas com armazenamento limitado, bibliotecas grandes de fotos/vídeos e pouca confiança em limpadores agressivos. Trabalho principal: entender o uso, localizar cópias exatas/itens grandes, revisar uma seleção e recuperar espaço sem perder um original.
+
+## Diferenciação proposta
+
+- Primeiro mostrar análise e cobertura; não afirmar que analisou todo o aparelho quando há acesso parcial, paginação incerta ou apenas uma página carregada.
+- Distinguir espaço potencial, preparado, autorizado, na Lixeira e efetivamente liberado.
+- Fornecer prévia, razão de recomendação, tamanho e tipo antes de cada ação.
+- Processar hashes e análise visual localmente, com concorrência limitada e cancelamento.
+- Manter o fluxo de seis etapas OaaS auditável e oferecer histórico local, sem telemetria de nomes/URIs.
+- Dar à versão gratuita utilidade real e nenhuma exclusão automática.
+
+## Decisões por etapa
+
+1. **Estabilização:** compilar/testar Debug e Release, fechar Wrapper, verificar integridade e permissões, remover avisos de Lint com justificativa e validar exclusão em dispositivos.
+2. **Núcleo:** biblioteca agregada por categorias, duplicatas SHA-256 abrangendo sessões/páginas com proteção de um original, revisão de mídias grandes/antigas e confirmação pós-operação.
+3. **Diferenciais:** Storage Forecast local apenas após histórico suficiente; depois similaridade visual como revisão assistida, nunca identidade nem exclusão automática.
+4. **Gestão de arquivos:** usar MediaStore para mídia e SAF para documentos/Downloads selecionados pelo usuário; não contornar scoped storage.
+5. **Automação:** relatórios e alertas opt-in via WorkManager; nenhuma limpeza automática de conteúdo pessoal.
+
+## Oportunidades pontuadas
+
+Notas de 0 a 100 por critério; para segurança e manutenção, nota alta representa risco/custo menores. Total ponderado calculado com os pesos da missão.
+
+| Oportunidade | Usuário 25% | Diferenciação 20% | Viabilidade 20% | Comercial 15% | Segurança 15% | Manutenção 5% | Total | Decisão |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Storage Forecast local e explicável | 21 | 15 | 18 | 9 | 14 | 5 | 82 | Prioridade; MVP após baseline |
+| Similaridade visual para revisão manual | 21 | 16 | 13 | 11 | 10 | 3 | 74 | Próxima etapa; protótipo medido |
+| Gerenciador de arquivos SAF | 20 | 8 | 15 | 10 | 11 | 4 | 68 | Candidata; delimitar tipos/acesso |
+| Backup em nuvem próprio | 20 | 7 | 7 | 12 | 7 | 1 | 54 | Backlog; custo, segurança e operação altos |
+| Exclusão automática de fotos semelhantes | 18 | 10 | 14 | 8 | 0 | 2 | 0 | Rejeitada por risco de perda irreversível |
+
+As notas são julgamento de produto, não medição de mercado. A pesquisa de concorrência e suas limitações está em [MARKET_INTELLIGENCE_2027.md](MARKET_INTELLIGENCE_2027.md).
+
+## Storage Forecast: requisitos de produto
+
+- Usar apenas amostras locais de `StatFs`, salvas no dispositivo e limitadas em quantidade.
+- Registrar amostras quando o app abre; não inferir frequência diária quando o usuário não abriu o app.
+- Não exibir previsão até haver pelo menos três amostras distribuídas por sete dias e capacidade comparável.
+- Mostrar taxa observada, intervalo e premissa; interromper previsão se houver queda de uso, troca de volume/capacidade ou dados insuficientes.
+- Sem rede, conta, analytics remoto ou exclusão automatizada.
+- Métrica de sucesso: proporção de previsões que permanecem dentro do intervalo publicado após 14/30 dias; se não houver validação, manter o recurso como experimental.
+
+## Monetização
+
+A análise e controles básicos de segurança ficam no plano gratuito. Pro pode oferecer análise em lote/volume, histórico local, exportação, agrupamento visual revisável e relatórios avançados, desde que os recursos existam e tenham custo marginal baixo. Não bloquear a visualização dos arquivos, desfazer a proteção do original ou cobrar por consentimento seguro. SKU/preços e estratégia detalhados em [REVENUE_AND_PRICING_STRATEGY.md](REVENUE_AND_PRICING_STRATEGY.md).
+
+## Limite de identidade
+
+A consulta pública da Play para `com.rdf112.sweep` retornou HTTP 404 em 03/11/2026. Isso não prova que nunca foi publicado: pode estar não listado, em teste ou removido. Não alterar `applicationId`, namespace, versionCode para release nem certificado sem AAB histórico e acesso autorizado à Play Console.
