@@ -104,16 +104,6 @@ kotlin {
     }
 }
 
-tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
-    doFirst {
-        if (!uploadSigningReady) {
-            throw GradleException(
-                "Release bloqueado: forneça keystore.properties localmente e o arquivo sweep-upload.jks correto."
-            )
-        }
-    }
-}
-
 dependencies {
     implementation(project(":domain"))
     implementation("androidx.core:core-ktx:1.16.0")
