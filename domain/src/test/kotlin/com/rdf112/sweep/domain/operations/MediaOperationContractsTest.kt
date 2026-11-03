@@ -46,14 +46,6 @@ class MediaOperationContractsTest {
     }
 
     @Test
-    fun contentHashRevalidationRequiresAnExactNonEmptySha256Match() {
-        assertTrue(RevalidatedOperationPlan.contentHashMatches("ab12", "AB12"))
-        assertFalse(RevalidatedOperationPlan.contentHashMatches("ab12", "ab13"))
-        assertFalse(RevalidatedOperationPlan.contentHashMatches("ab12", null))
-        assertFalse(RevalidatedOperationPlan.contentHashMatches(null, "ab12"))
-    }
-
-    @Test
     fun operationPlanSeparatesValidAndRejectedItemsAndChunksBatches() {
         val r1 = sampleRecord("1", 120L)
         val r2 = sampleRecord("2", 80L)

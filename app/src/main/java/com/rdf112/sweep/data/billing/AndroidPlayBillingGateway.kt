@@ -46,7 +46,7 @@ class AndroidPlayBillingGateway(context: Context) {
     private val isConnecting = AtomicBoolean(false)
 
     // Inicializa sempre em estado não concedido até que o Play Billing confirme na sessão atual (fail-closed).
-    private val _accessState = MutableStateFlow(ProAccessSummaryState.RECONCILIATION_REQUIRED)
+    private val _accessState = MutableStateFlow(ProAccessSummaryState.FREE_NO_ACTIVE_PURCHASE)
     val accessState: StateFlow<ProAccessSummaryState> = _accessState.asStateFlow()
 
     private val _catalog = MutableStateFlow<Map<String, PlayCatalogProductUi>>(emptyMap())
@@ -164,12 +164,13 @@ class AndroidPlayBillingGateway(context: Context) {
             )
         }
         for (unfetched in detailsResult.unfetchedProductList) {
-            fetchedDetails.remove(unfetched.productId)
-            next[unfetched.productId] = PlayCatalogProductUi(
-                productId = unfetched.productId,
-                formattedPrice = "",
-                isAvailable = false,
-            )
+            if (!fetchedDetails.containsKey(unfetched.productId)) {
+                next[unfetched.productId] = PlayCatalogProductUi(
+                    productId = unfetched.productId,
+                    formattedPrice = "",
+                    isAvailable = false,
+                )
+            }
         }
         _catalog.value = next
     }

@@ -8,4 +8,6 @@
     <color name="sweep_accent_amber">#F59E0B</color>
     <color name="sweep_text">#F8FAFC</color>
     <color name="sweep_muted">#94A3B8</color>
+    <color name="sweep_success">#10B981</color>
+    <color name="sweep_warning">#FBBF24</color>
 </resources>

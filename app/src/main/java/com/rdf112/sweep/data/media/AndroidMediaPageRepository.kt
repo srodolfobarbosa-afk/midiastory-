@@ -30,8 +30,6 @@ import com.rdf112.sweep.domain.repository.MediaPageRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
@@ -147,10 +145,10 @@ class AndroidMediaPageRepository(
         val granted = buildSet {
             listOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                MediaPermissionPolicy.READ_MEDIA_IMAGES,
-                MediaPermissionPolicy.READ_MEDIA_VIDEO,
-                MediaPermissionPolicy.READ_MEDIA_AUDIO,
-                MediaPermissionPolicy.READ_MEDIA_VISUAL_USER_SELECTED,
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
             ).filterTo(this) { isGranted(it) }
         }
         return MediaKind.entries.associateWith { kind ->
@@ -194,34 +192,14 @@ class AndroidMediaPageRepository(
         } else {
             emptyArray()
         }
-        val initialCursor = queryWithCancellation(collection, projection, createQueryArgs(request))
+        val cursor = queryWithCancellation(collection, projection, createQueryArgs(request))
             ?: return failedPage(request, PageIssueCode.NULL_CURSOR, inheritedIssues)
-
-        val initialExtras = runCatching { initialCursor.extras }.getOrNull()
-        val initialHonored = initialExtras
-            ?.getStringArray(ContentResolver.EXTRA_HONORED_ARGS)
-            ?.toSet()
-            .orEmpty()
-        val structuredPagingHonoredByProvider = setOf(
-            ContentResolver.QUERY_ARG_LIMIT,
-            ContentResolver.QUERY_ARG_OFFSET,
-            ContentResolver.QUERY_ARG_SORT_COLUMNS,
-            ContentResolver.QUERY_ARG_SORT_DIRECTION,
-        ).all { it in initialHonored }
-        val cursor = if (!structuredPagingHonoredByProvider) {
-            initialCursor.close()
-            queryWithCancellation(
-                collection,
-                projection,
-                args = null,
-                sortOrder = "${MediaStore.MediaColumns.DATE_MODIFIED} DESC, ${BaseColumns._ID} DESC",
-            ) ?: return failedPage(request, PageIssueCode.NULL_CURSOR, inheritedIssues)
-        } else {
-            initialCursor
-        }
 
         cursor.use { c ->
             val extras = runCatching { c.extras }.getOrNull()
+            val honored = extras?.getStringArray(ContentResolver.EXTRA_HONORED_ARGS)?.toSet().orEmpty()
+            val limitHonoredByProvider = ContentResolver.QUERY_ARG_LIMIT in honored &&
+                ContentResolver.QUERY_ARG_OFFSET in honored
 
             val rawTotal = if (extras != null && extras.containsKey(ContentResolver.EXTRA_TOTAL_COUNT)) {
                 runCatching { extras.getLong(ContentResolver.EXTRA_TOTAL_COUNT) }.getOrNull()
@@ -245,9 +223,9 @@ class AndroidMediaPageRepository(
                 return pagingUnsupported(request, inheritedIssues)
             }
 
-            // Providers that do not confirm pagination and ordering are queried without an offset,
-            // then paged locally so unreported provider behavior cannot skip rows twice.
-            if (!structuredPagingHonoredByProvider && request.offset > 0) {
+            // Se o provedor (como em alguns Samsung/Xiaomi) não honrar QUERY_ARG_OFFSET no Bundle,
+            // avançamos o cursor até request.offset de forma controlada para garantir a paginação real.
+            if (!limitHonoredByProvider && request.offset > 0) {
                 val targetPos = request.offset - 1
                 if (!c.moveToPosition(targetPos)) {
                     return MediaPage(
@@ -325,11 +303,7 @@ class AndroidMediaPageRepository(
             if (absoluteEnd > Int.MAX_VALUE.toLong()) {
                 return pagingUnsupported(request, issues)
             }
-            val effectiveTotal = totalCount ?: if (!structuredPagingHonoredByProvider) {
-                c.count.toLong().coerceAtLeast(absoluteEnd)
-            } else {
-                null
-            }
+            val effectiveTotal = totalCount ?: if (!limitHonoredByProvider) c.count.toLong().coerceAtLeast(absoluteEnd) else null
             val hasMore = when {
                 rowsRead == 0 -> false
                 effectiveTotal != null -> absoluteEnd < effectiveTotal
@@ -370,18 +344,13 @@ class AndroidMediaPageRepository(
     private suspend fun queryWithCancellation(
         uri: Uri,
         projection: Array<String>,
-        args: Bundle?,
-        sortOrder: String? = null,
+        args: Bundle,
     ): Cursor? = suspendCancellableCoroutine { continuation ->
         val signal = CancellationSignal()
         continuation.invokeOnCancellation { signal.cancel() }
         if (!continuation.isActive) return@suspendCancellableCoroutine
         try {
-            val cursor = if (args != null) {
-                resolver.query(uri, projection, args, signal)
-            } else {
-                resolver.query(uri, projection, null, null, sortOrder, signal)
-            }
+            val cursor = resolver.query(uri, projection, args, signal)
             continuation.resume(cursor) { _, value, _ -> value?.close() }
         } catch (cancelled: OperationCanceledException) {
             if (continuation.isActive) {
@@ -446,7 +415,7 @@ class AndroidMediaPageRepository(
      * exclusivamente para registros que possuem tamanho idêntico (> 0) na página atual, permitindo
      * comprovar duplicatas exatas sem falsos positivos.
      */
-    private suspend fun populateStreamingSha256ForSameSizeCandidates(records: List<MediaRecord>): List<MediaRecord> {
+    private fun populateStreamingSha256ForSameSizeCandidates(records: List<MediaRecord>): List<MediaRecord> {
         val candidateSizes = records
             .filter { it.sizeBytes > 0L }
             .groupBy { it.sizeBytes }
@@ -463,26 +432,19 @@ class AndroidMediaPageRepository(
         }
     }
 
-    private suspend fun computeStreamingSha256(uri: Uri): String? {
-        return try {
-            val digest = MessageDigest.getInstance("SHA-256")
-            val stream = resolver.openInputStream(uri) ?: return null
-            BufferedInputStream(stream, 8192).use { input ->
-                val buffer = ByteArray(8192)
-                while (true) {
-                    currentCoroutineContext().ensureActive()
-                    val read = input.read(buffer)
-                    if (read < 0) break
-                    if (read > 0) digest.update(buffer, 0, read)
-                }
+    private fun computeStreamingSha256(uri: Uri): String? = runCatching {
+        val digest = MessageDigest.getInstance("SHA-256")
+        val stream = resolver.openInputStream(uri) ?: return null
+        BufferedInputStream(stream, 8192).use { input ->
+            val buffer = ByteArray(8192)
+            var read = input.read(buffer)
+            while (read > 0) {
+                digest.update(buffer, 0, read)
+                read = input.read(buffer)
             }
-            digest.digest().joinToString("") { "%02x".format(it) }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
-        } catch (_: Exception) {
-            null
         }
-    }
+        digest.digest().joinToString("") { "%02x".format(it) }
+    }.getOrNull()
 }
 
 class NoMediaAccessException : IllegalStateException("Photo and video access has not been granted.")

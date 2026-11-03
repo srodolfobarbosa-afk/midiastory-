@@ -47,12 +47,11 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        // Atualização do app existente na Google Play: preserva com.rdf112.sweep
-        applicationId = "com.rdf112.sweep"
+        applicationId = "com.rdf112.midiastore"
         minSdk = 29
         targetSdk = 36
-        versionCode = 14
-        versionName = "2.1.1"
+        versionCode = 17
+        versionName = "2.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -101,6 +100,16 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
+tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
+    doFirst {
+        if (!uploadSigningReady) {
+            throw GradleException(
+                "Release bloqueado: forneça keystore.properties localmente e o arquivo sweep-upload.jks correto."
+            )
+        }
     }
 }
 

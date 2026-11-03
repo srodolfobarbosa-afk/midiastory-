@@ -5,4 +5,5 @@
 # Preserva classes de Billing e modelos de domínio
 -keep class com.android.vending.billing.** { *; }
 -keep class com.android.billingclient.api.** { *; }
+-keep class com.rdf112.sweep.** { *; }
 -keep class com.rdf112.sweep.domain.** { *; }

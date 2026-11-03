@@ -1,46 +1,44 @@
-# Relatório de validação — Midiastore 2.1.0 / VC13
+# Relatório de validação — Sweep v0.3
 
-Data: 03/11/2026
-
-Backup pré-alterações: `/workspaces/midiastore-pre-2027-audit-2026-11-03.tar.gz` (595 entries); SHA-256 `3447fb294a9748297c918438dc7c0d328a4f904a27141867afa4c0d5bb11dfdb`.
+Data: 31/10/2026
 
 ## Evidências concluídas nesta sessão
 
 | Verificação | Resultado | Escopo |
 |---|---|---|
-| `:domain:test` | Aprovada | 58 testes; 0 falhas/erros/ignorados |
-| `:app:testDebugUnitTest` | Aprovada | 7 testes; 0 falhas/erros |
-| `:app:lintDebug` | Concluída com warnings | Referências inlined e versões de dependências sinalizadas; não bloqueou o build |
-| `:app:assembleDebug` | Aprovada | APK Debug produzido |
-| `:app:assembleDebugAndroidTest` | Aprovada | APK instrumentado produzido; não significa execução em dispositivo |
-| Diagnósticos do editor nos arquivos tocados | Nenhum reportado | Não substitui build/execução Android |
+| Inspeção do ZIP-base e da árvore | Concluída | Comparação com a reconstrução v0.2 e a base Views |
+| Compilação de fontes Kotlin puras `:domain` com `kotlinc` 1.9.0 | Aprovada | Sintaxe/tipos do domínio; não equivale a Gradle/JUnit nem valida KGP 2.3.21 |
+| Smoke test Kotlin independente do domínio | Aprovado | Frescor de sessão, revisão desconhecida, mudança de volume, sobreposição, seleção por URI, limite e estados Billing; não é suíte JUnit |
+| Revisão estática do contrato de página | Concluída | Limites, offsets, estados e invariantes do domínio |
+| Revisão estática do adaptador MediaStore | Concluída | Ainda não executado em Android/ContentResolver real |
+| Revisão estática de sessão/volume/geração | Concluída | Sem prova de estabilidade transacional |
+| Revisão de UI/seleção | Concluída | Código Android ainda não compilado |
+| Verificação de tipos de `MediaScanViewModel.kt` com stubs mínimos de Lifecycle e coroutines | Aprovada | Não substitui compilação contra Lifecycle Android real nem build Gradle |
 
 ## Testes presentes no repositório
 
-- `:domain`: 58 testes executados e aprovados.
-- `app`: 7 testes JVM executados e aprovados; 4 testes instrumentados compilados, mas não executados em dispositivo.
+- `:domain`: 46 métodos de teste declarados (modelos de mídia, paginação/sessões, permissões, guarda de sequência, seleção e política pura Billing).
+- `app`: 5 testes JVM de ViewModel e 4 testes instrumentados (inicialização da Activity, paginação real de imagens/áudio e acesso visual parcial).
 
-Baseline executada em Codespace Ubuntu 24.04 em 03/11/2026 com Gradle 8.13, AGP 8.13.2, Kotlin 2.3.21, JDK 17.0.17, Android SDK Platform 36 e Build Tools 35.0.0. O SDK foi instalado em `/tmp/tmp.Pnk13LDOXN/android-sdk`; o command-line tools baixado foi verificado com SHA-1 publicado. O build completo terminou `BUILD SUCCESSFUL` em 5m20s, 82 tarefas. Foi emitido warning de SDK XML v4 não reconhecido integralmente pelo parser utilizado.
+A existência de arquivos `@Test` não significa que foram executados. Nesta sessão não foi possível executar Gradle/JUnit porque não há Gradle 8.13 instalado em cache e o download do wrapper em `services.gradle.org` falhou por resolução DNS. O Wrapper JAR presente tem hash oficial da linha 9.8.2, enquanto a distribuição solicitada é 8.13; essa divergência está registrada em `SUPPLY_CHAIN_CHECKS.md` e precisa ser fechada regenerando o JAR com Gradle 8.13. Também não há Android SDK Platform 36 / `android.jar` disponível neste ambiente para compilar o módulo Android.
 
 ## Não executado / não aprovado
 
-- `:app:compileReleaseKotlin`, `:app:lintRelease`, `:app:assembleRelease` e `:app:bundleRelease`.
-- `:app:connectedDebugAndroidTest`; nenhum emulador/aparelho foi provisionado nesta sessão.
+- `./gradlew :domain:test`
+- `:app:testDebugUnitTest`
+- `:app:lintDebug`
+- `:app:assembleDebug`
+- `:app:assembleDebugAndroidTest`
+- Execução instrumentada em emulador ou telefone
 - Query real em MediaStore e validação de `EXTRA_HONORED_ARGS`
 - Android 29/30/33/34/35/36 e teste real de cartão SD
 - Perfil de memória/bateria/tempo com biblioteca grande
 - Billing, restauração de compras e exportação Pro
-- Assinatura de release, instalação sobre a versão publicada ou submissão à Play Console
-
-Artefatos existentes: `app/build/outputs/apk/debug/app-debug.apk` e `app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk`. Não há APK Release nem AAB. As tarefas Release e a assinatura legítima ainda precisam ser avaliadas; nenhuma chave local está disponível.
-
-O código Android, os novos documentos e o arquivo ZIP original aparecem como não rastreados no único commit Git (`42dae12`, que contém o ZIP). Não foi criada branch, pois não há baseline de código rastreada para isolar uma branch útil. Nenhuma operação destrutiva de Git foi executada.
+- Assinatura de release, AAB, instalação por cima do app publicado ou submissão à Play Console
 
 ## Observações técnicas pendentes
 
-- Se o provider não confirmar `LIMIT`, `OFFSET` e ordenação em `EXTRA_HONORED_ARGS`, o adaptador consulta sem paginação e aplica offsets localmente. Isso evita depender dos extras para avançar, mas precisa de validação real nos providers/OEMs e pode reler muitos registros em páginas profundas. `IS_PENDING` e `IS_TRASHED` são filtrados localmente.
-- O agrupamento SHA-256 é limitado aos registros de uma única página visível; não é uma detecção global de duplicatas entre páginas/volumes.
-- A consulta de compra usa BillingClient local; SKUs e entitlement não foram verificados contra Play Console nem validados em backend.
+- O adaptador exige que o provedor declare honrados `LIMIT`, `OFFSET`, colunas/direção de sort e disponibilize `EXTRA_TOTAL_COUNT`. Não há SQL selection na consulta; `IS_PENDING` e `IS_TRASHED` são filtrados localmente após a leitura da página. Os offsets e o total usam contagem bruta do provider. Fabricantes/providers podem não fornecer o contrato; nesse caso a paginação será desabilitada para essa fonte.
 - `MediaPageSequenceGuard` retém somente as últimas oito páginas por fonte para detectar sobreposição; não é prova de snapshot transacional.
 - API 29 ou volumes com versão/geração indisponível permanecem `UNVERIFIABLE`.
 - A permissão parcial é informada como cobertura parcial.
@@ -48,10 +46,10 @@ O código Android, os novos documentos e o arquivo ZIP original aparecem como n�
 
 ## Como executar a validação completa
 
-Na raiz do projeto, com JDK 17+, Android SDK 36, Build Tools 35.0.0, licenças aceitas, rede disponível e pelo menos 4 GB livres:
+Na raiz do projeto, com JDK 17+, Android SDK 36, Build Tools 35.0.0, rede disponível e pelo menos 4 GB livres:
 
 ```bash
 bash scripts/prepare_and_test.sh
 ```
 
-Depois execute `bash scripts/run_instrumented_tests.sh` em um emulador/aparelho por cada nível de API acordado. Para Release, configure localmente a chave de upload que já corresponde à Play Console; não crie uma nova chave. Anexe logs completos, modelo/API, commit/ZIP SHA-256 e resultados. Não marque gate como aprovado se a tarefa foi ignorada ou não executada.
+Depois execute `bash scripts/run_instrumented_tests.sh` em um emulador/aparelho por cada nível de API acordado. Anexe logs completos, modelo do dispositivo/API, commit/ZIP SHA-256 e resultados. Não marque gate como aprovado se a tarefa foi ignorada ou não executada.

@@ -51,13 +51,13 @@ class StorageRingGaugeView(context: Context) : View(context) {
         textAlign = Paint.Align.CENTER
     }
 
-    var usedFraction: Float = 0f
+    var usedFraction: Float = 0.65f
         set(value) {
             field = value.coerceIn(0f, 1f)
             invalidate()
         }
 
-    var centerLabel: String = "--"
+    var centerLabel: String = "65%"
         set(value) {
             field = value
             invalidate()

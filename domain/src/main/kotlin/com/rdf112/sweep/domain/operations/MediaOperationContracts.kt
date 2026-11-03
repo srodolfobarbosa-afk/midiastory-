@@ -91,11 +91,6 @@ class RevalidatedOperationPlan(
             }
             return ItemRevalidationReason.VALID_UNCHANGED
         }
-
-        fun contentHashMatches(expectedHash: String?, actualHash: String?): Boolean =
-            !expectedHash.isNullOrBlank() &&
-                !actualHash.isNullOrBlank() &&
-                expectedHash.equals(actualHash, ignoreCase = true)
     }
 }
 

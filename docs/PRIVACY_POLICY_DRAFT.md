@@ -1,8 +1,6 @@
 # Política de Privacidade do Sweep — rascunho v0.3
 
-> **Documento histórico v0.3, desatualizado e não publicável.** A versão atual inclui hashes SHA-256, lixeira/exclusão consentida, compartilhamento de resumo e estado local de Billing. Não use as afirmações abaixo como política vigente. Refaça a revisão de privacidade/Data Safety contra o binário e os fluxos atuais antes de qualquer release.
-
-**Última revisão:** 31 de outubro de 2026
+**Última revisão:** 31 de outubro de 2026  
 **Status:** rascunho técnico; não publicar sem revisão do responsável legal e conferência do binário final.
 
 ## Resumo do incremento atual

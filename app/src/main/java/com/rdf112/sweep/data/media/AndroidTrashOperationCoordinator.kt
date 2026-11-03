@@ -16,13 +16,8 @@ import com.rdf112.sweep.domain.operations.RestoreReconciliationResult
 import com.rdf112.sweep.domain.operations.RevalidatedMediaItem
 import com.rdf112.sweep.domain.operations.RevalidatedOperationPlan
 import com.rdf112.sweep.domain.operations.TrashRecoveryLedger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import java.io.BufferedInputStream
-import java.security.MessageDigest
 
 /**
  * Coordenador Android para revalidação item a item, Lixeira oficial de 30 dias (`createTrashRequest(..., true)`),
@@ -64,7 +59,7 @@ class AndroidTrashOperationCoordinator(
         )
     }
 
-    private suspend fun revalidateSingleRecord(record: MediaRecord): ItemRevalidationReason {
+    private fun revalidateSingleRecord(record: MediaRecord): ItemRevalidationReason {
         val projection = arrayOf(
             BaseColumns._ID,
             MediaStore.MediaColumns.SIZE,
@@ -105,7 +100,7 @@ class AndroidTrashOperationCoordinator(
                 val actualPending = if (pendIdx >= 0 && !c.isNull(pendIdx)) c.getInt(pendIdx) else 0
                 val actualTrashed = if (trashIdx >= 0 && !c.isNull(trashIdx)) c.getInt(trashIdx) else 0
 
-                val snapshotReason = RevalidatedOperationPlan.isSnapshotUnchanged(
+                RevalidatedOperationPlan.isSnapshotUnchanged(
                     expectedSizeBytes = record.sizeBytes,
                     expectedMimeType = record.mimeType,
                     expectedDateModifiedSec = record.dateModifiedEpochSeconds,
@@ -115,40 +110,12 @@ class AndroidTrashOperationCoordinator(
                     actualIsPending = actualPending,
                     actualIsTrashed = actualTrashed,
                 )
-                if (snapshotReason != ItemRevalidationReason.VALID_UNCHANGED) return@use snapshotReason
-
-                val expectedHash = record.contentSha256?.takeIf(String::isNotBlank)
-                    ?: return@use ItemRevalidationReason.VALID_UNCHANGED
-                val actualHash = computeStreamingSha256(uri)
-                    ?: return@use ItemRevalidationReason.PROVIDER_ERROR
-                if (RevalidatedOperationPlan.contentHashMatches(expectedHash, actualHash)) {
-                    ItemRevalidationReason.VALID_UNCHANGED
-                } else {
-                    ItemRevalidationReason.MODIFIED_SINCE_SCAN
-                }
             }
         } catch (_: SecurityException) {
             ItemRevalidationReason.PERMISSION_DENIED
-        } catch (cancelled: CancellationException) {
-            throw cancelled
         } catch (_: Exception) {
             ItemRevalidationReason.PROVIDER_ERROR
         }
-    }
-
-    private suspend fun computeStreamingSha256(uri: Uri): String? {
-        val stream = resolver.openInputStream(uri) ?: return null
-        val digest = MessageDigest.getInstance("SHA-256")
-        BufferedInputStream(stream, 8192).use { input ->
-            val buffer = ByteArray(8192)
-            while (true) {
-                currentCoroutineContext().ensureActive()
-                val read = input.read(buffer)
-                if (read < 0) break
-                if (read > 0) digest.update(buffer, 0, read)
-            }
-        }
-        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     fun createTrashIntentSender(uriBatch: List<String>, moveToTrash: Boolean): IntentSender? {
@@ -202,20 +169,16 @@ class AndroidTrashOperationCoordinator(
             try {
                 val cursor = resolver.query(Uri.parse(rawUri), projection, args, null)
                 if (cursor == null) {
-                    ObservedMediaPostState.UNVERIFIED_ERROR
+                    ObservedMediaPostState.DELETED_OR_ABSENT
                 } else {
                     cursor.use { c ->
                         if (!c.moveToFirst()) {
                             ObservedMediaPostState.DELETED_OR_ABSENT
                         } else {
                             val idx = c.getColumnIndex(MediaStore.MediaColumns.IS_TRASHED)
-                            if (idx < 0 || c.isNull(idx)) {
-                                ObservedMediaPostState.UNVERIFIED_ERROR
-                            } else if (c.getInt(idx) == 1) {
-                                ObservedMediaPostState.IN_TRASH
-                            } else {
-                                ObservedMediaPostState.RESTORED_ACTIVE
-                            }
+                            val trashed = if (idx >= 0 && !c.isNull(idx)) c.getInt(idx) else 0
+                            if (trashed == 1) ObservedMediaPostState.IN_TRASH
+                            else ObservedMediaPostState.RESTORED_ACTIVE
                         }
                     }
                 }

@@ -1,28 +1,28 @@
-# Bloqueadores de release — Midiastore
+# Bloqueadores de release — Sweep
 
 Nenhum AAB de produção deve ser gerado ou submetido enquanto qualquer item P0 permanecer aberto.
 
 ## P0 — preservar os usuários existentes
 
 1. Receber/inspecionar o AAB de produção mais recente e a configuração Play Console; reconstrução atual não é o source histórico.
-2. Confirmar o maior `versionCode` efetivamente publicado. Esta build candidata configura `14`, mas isso não comprova o estado atual da Play Console.
+2. Confirmar o maior `versionCode` efetivamente publicado. `9` é apenas candidato com base na informação do proprietário.
 3. Confirmar `applicationId` e certificado de upload aceito.
 4. Identificar no app antigo os product IDs, purchase types, entitlement Pro, exportação de resumo e regras de acesso compradas.
-5. A política local mapeia e testa `PURCHASED=1`, `PENDING=2`, `UNSPECIFIED=0` e estados desconhecidos fail-closed. Ainda falta validar callbacks e estados reais da Play.
-6. A UI agora distingue reconciliação pendente de plano gratuito. Ainda faltam testes de timeout, rede indisponível e consulta real; nunca tratar falha de consulta como compra vazia.
-7. Processar callbacks/reconsulta de forma comprovadamente idempotente; validar productId/token/estado. O app cliente apenas verifica a presença dos campos de assinatura, não valida criptograficamente o token; falta validação segura apropriada antes de produção.
-8. Confirmar SKUs, tipos de compra, entitlement existente e exportação Pro na Play Console; testar compra/restauração/reembolso/expiração sem inventar produtos.
-9. A Lixeira e restauração parcial estão implementadas no código, mas não foram exercitadas em dispositivos; validar reconciliação e recuperação antes da publicação.
+5. Corrigir e testar o parser Billing: `PURCHASED=1`, `PENDING=2`, `UNSPECIFIED=0`, demais valores desconhecidos. Não conceder Pro para PENDING/UNSPECIFIED/UNKNOWN.
+6. Distinguir consulta sem compras de erro/timeout/rede indisponível. Consulta falha não é compra vazia nem revogação automática.
+7. Processar callbacks/reconsulta de forma idempotente; validar productId/token/estado; acknowledgement só após compra validada e apropriada.
+8. Restaurar entitlement existente e o benefício Pro de exportação de resumo, com testes de compra/restauração/reembolso/expiração. Não inventar SKUs ou produtos.
+9. Resolver recuperação parcial da Lixeira somente após a implementação da Lixeira ser retomada; referências não restauradas devem permanecer recuperáveis/reconciliáveis.
 10. Testar instalação/atualização sobre a versão atual e migração de dados/preferências.
 
 ## P0 — confiabilidade do código Android
 
 1. Fechar a divergência do Gradle Wrapper JAR 9.8.2 versus distribuição 8.13, regenerando o JAR com Gradle 8.13 e verificando o SHA-256 oficial.
-2. Baseline VC14 executada: testes domínio (58), testes JVM app (7), Lint Debug, APK Debug/APK instrumentado e Release compile/Lint/APK/AAB de validação passaram. Executar emulador/aparelho e rodar instrumentados; Lint ainda tem warnings.
+2. Executar `:domain:test`, testes de app, Lint, APK debug e compilação de teste instrumentado em ambiente Android suportado.
 3. Executar teste real do adaptador MediaStore e provar a forma de paginação em cada API/OEM compatível.
 4. Validar permissões total/parcial/negada, revogação, mídia removida, mudança de volume, cursor nulo, falha, cancelamento e grandes bibliotecas.
-5. Validar paginação, sessão, seleção, revalidação e operações destrutivas antes de qualquer release; o código atual já contém Lixeira e exclusão permanente por consentimento do Android.
-6. Testar revalidação SHA-256, resultado pós-operação, cancelamento e restauração parcial por item em aparelhos reais.
+5. Manter v0.3 somente leitura até a paginação, sessão, seleção e revalidação estarem aprovadas conforme a planta v1.9.
+6. Depois reintroduzir Lixeira/restore em lote separado, com consentimento do Android e testes por item.
 
 ## P0 — Play Console e assinatura
 
@@ -34,4 +34,4 @@ Nenhum AAB de produção deve ser gerado ou submetido enquanto qualquer item P0 
 
 ## Status
 
-**APROVADO PELO PROPRIETÁRIO PARA BUILD E ENTREGA.** Candidato `versionName=2.1.1`, `versionCode=14`. Isso não afirma assinatura de produção: os artefatos atuais são `VALIDATION-ONLY`, assinados com chave efêmera. Itens P0 de Play Console, certificado, Billing e testes em dispositivo permanecem pendentes; não publicar esses artefatos.
+Os itens acima permanecem abertos nesta revisão. Este ZIP é uma etapa de desenvolvimento v0.3, não um Release Candidate.

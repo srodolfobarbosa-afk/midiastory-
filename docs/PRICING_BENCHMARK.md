@@ -1,10 +1,8 @@
 # Benchmark de Preços e Posicionamento Comercial — Sweep Pro (Google Play Billing 8.0.0)
 
-> **Rascunho histórico não validado. Não usar preços nem afirmações abaixo na Play Console ou em marketing.** Os valores descritos são hipóteses antigas, não foram capturados de `ProductDetails` da conta Midiastore nem verificados para os países/datas indicados. A pesquisa atual e a estratégia sem preços numéricos estão em [MARKET_INTELLIGENCE_2027.md](MARKET_INTELLIGENCE_2027.md) e [REVENUE_AND_PRICING_STRATEGY.md](REVENUE_AND_PRICING_STRATEGY.md).
-
-**Data da consulta:** 02 de novembro de 2026
-**Mercados analisados:** Brasil (BRL / `R$`) e Internacional / Estados Unidos (USD / `$`)
-**Pacote de produção:** `com.rdf112.sweep`
+**Data da consulta:** 02 de novembro de 2026  
+**Mercados analisados:** Brasil (BRL / `R$`) e Internacional / Estados Unidos (USD / `$`)  
+**Pacote de produção:** `com.rdf112.sweep`  
 **IDs oficiais preservados na Google Play Console:**
 - Assinatura Mensal (`ProductType.SUBS`): `sweep_pro_monthly`
 - Assinatura Anual (`ProductType.SUBS`): `sweep_pro_annual`

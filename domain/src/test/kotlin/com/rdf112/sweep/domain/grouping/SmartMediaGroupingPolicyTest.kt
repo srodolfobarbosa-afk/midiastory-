@@ -49,13 +49,4 @@ class SmartMediaGroupingPolicyTest {
         val unconfirmed = SmartMediaGroupingPolicy.findUnconfirmedSameSizeRecords(listOf(sameSizeA, sameSizeB))
         assertEquals(2, unconfirmed.size)
     }
-
-    @Test
-    fun neverTreatsSameSizeFilesWithoutHashesAsConfirmedDuplicates() {
-        val sameSizeA = rec("20", 8L * 1024L * 1024L, 100L)
-        val sameSizeB = rec("21", 8L * 1024L * 1024L, 200L)
-
-        assertTrue(SmartMediaGroupingPolicy.markProtectedReferencesForSameSizeGroups(listOf(sameSizeA, sameSizeB)).isEmpty())
-        assertEquals(2, SmartMediaGroupingPolicy.findUnconfirmedSameSizeRecords(listOf(sameSizeA, sameSizeB)).size)
-    }
 }

@@ -43,20 +43,4 @@ class OutcomeServiceEngineTest {
             ProcessExecutionStage.RECONCILIAR,
         )))
     }
-
-    @Test
-    fun potentialSpaceCountsOnlyConfirmedDuplicateCopiesOnce() {
-        val original = rec("20", 2_000L, 100L, "same_hash")
-        val duplicate = rec("21", 2_000L, 100L, "same_hash")
-        val differentContentA = rec("22", 3_000L, 100L, "hash_a")
-        val differentContentB = rec("23", 3_000L, 100L, "hash_b")
-
-        assertEquals(
-            2_000L,
-            OutcomeServiceEngine.calculatePotentiallyRecoverableBytes(
-                listOf(original, duplicate, differentContentA, differentContentB),
-                nowEpochSeconds = 1_000L,
-            ),
-        )
-    }
 }

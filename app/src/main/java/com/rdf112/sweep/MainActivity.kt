@@ -101,18 +101,20 @@ class MainActivity : AppCompatActivity() {
             val states = trashCoordinator.verifyPostTrashAndRecord(uris)
             val confirmedUris = states.filterValues { it == ObservedMediaPostState.IN_TRASH }.keys
             val confirmedCount = confirmedUris.size
-            if (result.resultCode == Activity.RESULT_OK) {
-                sessionAuthorizedBytes += uris.sumOf { bytesMap[it] ?: 0L }
+            val confirmedBytes = confirmedUris.sumOf { bytesMap[it] ?: 0L }
+            if (confirmedBytes > 0L) {
+                outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
             }
             refreshStorageStats()
             updateRestoreButtonState()
         updateSpaceMetricsCard(viewModel.state.value)
             refreshFlywheelSummary()
             updateSpaceMetricsCard(viewModel.state.value)
+            val freedFmt = android.text.format.Formatter.formatFileSize(this@MainActivity, confirmedBytes)
             if (result.resultCode == Activity.RESULT_OK && confirmedCount > 0) {
                 viewModel.clearSelection()
                 viewModel.startSession()
-                statusText.text = getString(R.string.trash_operation_result, confirmedCount, uris.size)
+                statusText.text = getString(R.string.trash_operation_result, confirmedCount, uris.size, freedFmt)
             } else {
                 statusText.text = getString(R.string.trash_operation_cancelled_or_unconfirmed, confirmedCount, uris.size)
             }
@@ -130,14 +132,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val confirmedDeleted = trashCoordinator.verifyPostDelete(uris)
             val totalBatchBytes = uris.sumOf { bytesMap[it] ?: 0L }
-            val confirmedBytes = if (result.resultCode == Activity.RESULT_OK && confirmedDeleted == uris.size) {
-                totalBatchBytes
-            } else {
-                0L
-            }
-            if (result.resultCode == Activity.RESULT_OK) {
-                sessionAuthorizedBytes += totalBatchBytes
-            }
+            val confirmedBytes = if (confirmedDeleted == uris.size) totalBatchBytes else 0L
             if (confirmedBytes > 0L) {
                 outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
             }
@@ -448,7 +443,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        heroOrbTitle = label("ANALISAR AGORA", 19f, R.color.sweep_background, true).apply {
+        heroOrbTitle = label("LIMPAR AGORA", 19f, R.color.sweep_background, true).apply {
             gravity = Gravity.CENTER
         }
         heroOrbSubtitle = label("Toque para escanear mídias", 11f, R.color.sweep_background, false).apply {
@@ -636,12 +631,7 @@ class MainActivity : AppCompatActivity() {
         oaasCard.addView(oaasMissionOldButton, top(8))
 
         oaasFlywheelMetrics = label(
-            getString(
-                R.string.oaas_flywheel_summary,
-                0,
-                0,
-                android.text.format.Formatter.formatFileSize(this@MainActivity, 0L),
-            ),
+            getString(R.string.oaas_flywheel_summary, 0, 0, "0 B"),
             11f,
             R.color.sweep_muted,
             false,
@@ -762,7 +752,7 @@ class MainActivity : AppCompatActivity() {
         proStatusBadge.text = when (state) {
             ProAccessSummaryState.PRO_GRANTED -> getString(R.string.pro_status_active)
             ProAccessSummaryState.PENDING_PAYMENT -> getString(R.string.pro_status_pending)
-            ProAccessSummaryState.RECONCILIATION_REQUIRED -> getString(R.string.pro_status_reconciliation)
+            ProAccessSummaryState.RECONCILIATION_REQUIRED,
             ProAccessSummaryState.FREE_NO_ACTIVE_PURCHASE -> getString(R.string.pro_status_free)
         }
     }
@@ -785,18 +775,12 @@ class MainActivity : AppCompatActivity() {
             } else {
                 getString(R.string.plan_annual_with_price, annual.formattedPrice)
             }
-        } else if (annual != null && !annual.isAvailable) {
-            planAnnualButton.text = getString(R.string.plan_unavailable)
         }
         if (monthly != null && monthly.formattedPrice.isNotBlank()) {
             planMonthlyButton.text = getString(R.string.plan_monthly_with_price, monthly.formattedPrice)
-        } else if (monthly != null && !monthly.isAvailable) {
-            planMonthlyButton.text = getString(R.string.plan_unavailable)
         }
         if (lifetime != null && lifetime.formattedPrice.isNotBlank()) {
             planLifetimeButton.text = getString(R.string.plan_lifetime_with_price, lifetime.formattedPrice)
-        } else if (lifetime != null && !lifetime.isAvailable) {
-            planLifetimeButton.text = getString(R.string.plan_unavailable)
         }
     }
 
@@ -831,32 +815,12 @@ class MainActivity : AppCompatActivity() {
     private fun isGranted(permission: String): Boolean =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
-    private fun hasDeniedMediaKind(): Boolean {
-        val granted = buildSet {
-            listOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                MediaPermissionPolicy.READ_MEDIA_IMAGES,
-                MediaPermissionPolicy.READ_MEDIA_VIDEO,
-                MediaPermissionPolicy.READ_MEDIA_AUDIO,
-                MediaPermissionPolicy.READ_MEDIA_VISUAL_USER_SELECTED,
-            ).filterTo(this) { isGranted(it) }
-        }
-        return MediaKind.entries.any { kind ->
-            MediaPermissionPolicy.accessLevel(Build.VERSION.SDK_INT, kind, granted) == AccessLevel.DENIED
-        }
-    }
-
     private fun renderState(state: MediaScanUiState) {
         progress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         cancelButton.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         scanButton.isEnabled = !state.isLoading
         permissionButton.isEnabled = !state.isLoading
-        val canChangePartialAccess = Build.VERSION.SDK_INT >= 34 &&
-            isGranted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) &&
-            (!isGranted(Manifest.permission.READ_MEDIA_IMAGES) || !isGranted(Manifest.permission.READ_MEDIA_VIDEO))
-        permissionButton.visibility = if (
-            state.shouldShowReviewAccessAction && (hasDeniedMediaKind() || canChangePartialAccess)
-        ) View.VISIBLE else View.GONE
+        permissionButton.visibility = if (state.shouldShowReviewAccessAction && !hasAnyMediaPermission()) View.VISIBLE else View.GONE
         photosButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.IMAGE)
         videosButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.VIDEO)
         audioButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.AUDIO)
@@ -1236,6 +1200,7 @@ class MainActivity : AppCompatActivity() {
                 val sizeMap = selected.associate { it.uri to it.sizeBytes }
                 pendingOperationUris = firstBatch
                 pendingOperationBytesByUri = sizeMap
+                sessionAuthorizedBytes += firstBatch.sumOf { sizeMap[it] ?: 0L }
                 updateSpaceMetricsCard(viewModel.state.value)
                 trashIntentLauncher.launch(IntentSenderRequest.Builder(sender).build())
             } else {
@@ -1259,6 +1224,7 @@ class MainActivity : AppCompatActivity() {
                 val sizeMap = selected.associate { it.uri to it.sizeBytes }
                 pendingOperationUris = firstBatch
                 pendingOperationBytesByUri = sizeMap
+                sessionAuthorizedBytes += firstBatch.sumOf { sizeMap[it] ?: 0L }
                 updateSpaceMetricsCard(viewModel.state.value)
                 deleteIntentLauncher.launch(IntentSenderRequest.Builder(sender).build())
             } else {
@@ -1320,17 +1286,9 @@ class MainActivity : AppCompatActivity() {
                 val ratio = (used.toDouble() / total.toDouble()).toFloat().coerceIn(0f, 1f)
                 storageRingGauge.usedFraction = ratio
                 storageRingGauge.centerLabel = "${(ratio * 100).toInt()}%"
-                storageRingGauge.bottomLabel = "USADO"
             }
         }.onFailure {
             storageText.text = getString(R.string.storage_unavailable)
-            if (::storageUsedHeadline.isInitialized) {
-                storageUsedHeadline.text = getString(R.string.storage_unavailable)
-                storageFreeSubline.text = getString(R.string.storage_unavailable)
-                storageRingGauge.usedFraction = 0f
-                storageRingGauge.centerLabel = "--"
-                storageRingGauge.bottomLabel = "N/D"
-            }
         }
     }
 
