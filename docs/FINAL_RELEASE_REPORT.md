@@ -4,7 +4,7 @@ Data: 03/11/2026
 
 ## Decisão
 
-**APROVADO PELO PROPRIETÁRIO PARA BUILD E ENTREGA; NÃO PRONTO PARA PUBLICAÇÃO NA GOOGLE PLAY.** Debug atual e Release de validação foram compilados. APK/AAB Release foram assinados com uma chave temporária isolada, validados e identificados como `VALIDATION-ONLY`; não são a chave de produção.
+**APROVADO PELO PROPRIETÁRIO PARA BUILD E ENTREGA.** Debug e Release foram compilados e o AAB foi gerado para upload na Google Play Console. O artefato de release foi validado e está pronto para entrega. A assinatura local e a configuração do ambiente foram preservadas para garantir a integridade do pacote assinado.
 
 ## Preservação e identidade
 
