@@ -1,37 +1,52 @@
-# Bloqueadores de release — Sweep
+# Bloqueadores de release — Midiastore
 
-Nenhum AAB de produção deve ser gerado ou submetido enquanto qualquer item P0 permanecer aberto.
+**Estado: BLOQUEADO.** Não gerar nem submeter AAB de produção enquanto os gates P0 abaixo não estiverem fechados.
 
-## P0 — preservar os usuários existentes
+## Identidade e continuidade de atualização
 
-1. Receber/inspecionar o AAB de produção mais recente e a configuração Play Console; reconstrução atual não é o source histórico.
-2. Confirmar o maior `versionCode` efetivamente publicado. `9` é apenas candidato com base na informação do proprietário.
-3. Confirmar `applicationId` e certificado de upload aceito.
-4. Identificar no app antigo os product IDs, purchase types, entitlement Pro, exportação de resumo e regras de acesso compradas.
-5. Corrigir e testar o parser Billing: `PURCHASED=1`, `PENDING=2`, `UNSPECIFIED=0`, demais valores desconhecidos. Não conceder Pro para PENDING/UNSPECIFIED/UNKNOWN.
-6. Distinguir consulta sem compras de erro/timeout/rede indisponível. Consulta falha não é compra vazia nem revogação automática.
-7. Processar callbacks/reconsulta de forma idempotente; validar productId/token/estado; acknowledgement só após compra validada e apropriada.
-8. Restaurar entitlement existente e o benefício Pro de exportação de resumo, com testes de compra/restauração/reembolso/expiração. Não inventar SKUs ou produtos.
-9. Resolver recuperação parcial da Lixeira somente após a implementação da Lixeira ser retomada; referências não restauradas devem permanecer recuperáveis/reconciliáveis.
-10. Testar instalação/atualização sobre a versão atual e migração de dados/preferências.
+1. O proprietário confirmou o listing de teste interno `Midiastore — com.rdf112.midiastore`.
+2. O código atual configura `applicationId=com.rdf112.midiastore`, `versionCode=17`, `versionName=2.2.1`; esses valores não provam qual foi o maior versionCode efetivamente publicado.
+3. Confirmar na Play Console o maior versionCode, o package do listing, a chave de upload aceita e Play App Signing.
+4. Não alterar Application ID, versionCode, versionName ou certificado sem aprovação do proprietário.
+5. O source histórico que gerou o AAB publicado ainda não foi recuperado; a reconstrução não pode ser declarada byte-a-byte equivalente.
 
-## P0 — confiabilidade do código Android
+## P0 — confiabilidade e segurança de limpeza
 
-1. Fechar a divergência do Gradle Wrapper JAR 9.8.2 versus distribuição 8.13, regenerando o JAR com Gradle 8.13 e verificando o SHA-256 oficial.
-2. Executar `:domain:test`, testes de app, Lint, APK debug e compilação de teste instrumentado em ambiente Android suportado.
-3. Executar teste real do adaptador MediaStore e provar a forma de paginação em cada API/OEM compatível.
-4. Validar permissões total/parcial/negada, revogação, mídia removida, mudança de volume, cursor nulo, falha, cancelamento e grandes bibliotecas.
-5. Manter v0.3 somente leitura até a paginação, sessão, seleção e revalidação estarem aprovadas conforme a planta v1.9.
-6. Depois reintroduzir Lixeira/restore em lote separado, com consentimento do Android e testes por item.
+1. Obter CI verde no commit mais recente da PR #3: testes de domínio, JVM, Lint, build Debug e testes instrumentados.
+2. Investigar o teste instrumentado MediaStore que falhou no emulador Android 15; não mascarar erro de provider, permissão ou processo.
+3. Executar MediaStore em Android 29, 30, 33, 34, 35 e 36 e dispositivos representativos (Pixel/AOSP, Samsung, Xiaomi/Motorola).
+4. Testar permissão total, parcial, negada, revogada e áudio independente; verificar se a tela de gerenciar acesso aparece corretamente.
+5. Testar paginação com listas grandes, offsets, ordem estável, cursor nulo, falha do provider, mudanças de volume, cancelamento e mudanças de geração.
+6. A nova varredura global percorre tipos, volumes e páginas acessíveis; deve provar cobertura, respeitar os limites e reportar parcial quando um source falhar.
+7. Para duplicatas, só SHA-256 completo, não vazio e idêntico comprova conteúdo igual. Se a cobertura global for parcial, nenhuma duplicata pode ser pré-selecionada para exclusão.
+8. Revalidar cada URI imediatamente antes da operação e validar resultado por item depois da confirmação do Android.
+9. Mover para Lixeira não é espaço liberado. Só exclusão permanente confirmada pode alimentar a métrica de bytes liberados.
+10. Resolver a compatibilidade de limpeza Android 10/API29 ou reavaliar minSdk com estudo de impacto sobre usuários existentes. Não anunciar suporte de limpeza em API 29 enquanto estiver bloqueado.
+11. Executar testes de TalkBack, fonte ampliada, contraste, rotação, telas pequenas, tablet/dobrável, memória, bateria e ANR.
 
-## P0 — Play Console e assinatura
+## P0 — Billing e recebimento
 
-1. Verificar chave de upload e Play App Signing; não criar JKS por tentativa.
-2. Validar o manifesto mesclado, permissões, targetSdk, dependências/SDKs e AAB final.
-3. Publicar/revisar política de privacidade e preencher Data safety com base no binário final.
-4. Justificar permissões de fotos/vídeos na Play Console para a função principal; não assumir aprovação.
-5. Realizar teste interno/fechado e cumprir exigências específicas da conta.
+1. Verificar na Play Console se existem e estão ativos os IDs e tipos atualmente configurados no código:
+   - `sweep_pro_monthly` — SUBS
+   - `sweep_pro_annual` — SUBS
+   - `sweep_pro_lifetime` — INAPP
+2. Verificar ofertas-base, offerToken, países, preços, status de ativação e contas de license tester.
+3. Implementar verificação confiável do purchaseToken pela Google Play Developer API/backend antes de liberar Pro em produção.
+4. Tratar compras pendentes, canceladas, restauradas, reembolsadas, expiradas, repetidas e falhas de rede; processamento e acknowledgement devem ser idempotentes.
+5. Preservar entitlement de usuários que já compraram em versões anteriores.
+6. Testar a jornada real de compra pelo link de teste interno. A configuração financeira/recebimento da conta, informada pelo proprietário como habilitada em 03/11/2026, não comprova que os produtos in-app estejam ativos ou testados.
 
-## Status
+## P0 — assinatura, política e publicação
 
-Os itens acima permanecem abertos nesta revisão. Este ZIP é uma etapa de desenvolvimento v0.3, não um Release Candidate.
+1. Não criar um novo JKS por tentativa. Usar somente a chave de upload legítima aceita pela Play Console ou fluxo oficial de redefinição.
+2. Validar manifesto mesclado, permissões de mídia, targetSdk, dependências e SDK declarations.
+3. Revisar política de privacidade e Data Safety com base no binário, SDKs e fluxos reais (incluindo exportação via ACTION_SEND e Billing).
+4. Verificar exigências de acesso amplo a fotos/vídeos e elegibilidade da permissão para a função principal do app.
+5. Gerar AAB assinado apenas após todos os gates e inspecionar package, versionCode, certificado e conteúdo do bundle.
+6. Passar por teste interno/fechado com testadores reais antes de produção.
+
+## Regra de produto
+
+Não anunciar detecção de fotos semelhantes, blur/baixa qualidade, compressão, limpeza de cache privado de outros apps, limpeza de RAM, aumento de velocidade, histórico permanente ou gerenciador completo de documentos enquanto esses recursos não estiverem implementados e testados.
+
+A PR #3 é uma etapa de recuperação, não um release candidate.
