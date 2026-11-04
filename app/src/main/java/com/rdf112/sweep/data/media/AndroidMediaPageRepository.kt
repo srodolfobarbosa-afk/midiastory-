@@ -32,6 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import java.io.BufferedInputStream
 import java.security.MessageDigest
 import java.util.UUID
@@ -415,7 +417,7 @@ class AndroidMediaPageRepository(
      * exclusivamente para registros que possuem tamanho idêntico (> 0) na página atual, permitindo
      * comprovar duplicatas exatas sem falsos positivos.
      */
-    private fun populateStreamingSha256ForSameSizeCandidates(records: List<MediaRecord>): List<MediaRecord> {
+    private suspend fun populateStreamingSha256ForSameSizeCandidates(records: List<MediaRecord>): List<MediaRecord> {
         val candidateSizes = records
             .filter { it.sizeBytes > 0L }
             .groupBy { it.sizeBytes }
@@ -432,19 +434,29 @@ class AndroidMediaPageRepository(
         }
     }
 
-    private fun computeStreamingSha256(uri: Uri): String? = runCatching {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val stream = resolver.openInputStream(uri) ?: return null
-        BufferedInputStream(stream, 8192).use { input ->
-            val buffer = ByteArray(8192)
-            var read = input.read(buffer)
-            while (read > 0) {
-                digest.update(buffer, 0, read)
-                read = input.read(buffer)
+    override suspend fun computeSha256(uri: String): String? =
+        computeStreamingSha256(Uri.parse(uri))
+
+    private suspend fun computeStreamingSha256(uri: Uri): String? {
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            val stream = resolver.openInputStream(uri) ?: return null
+            BufferedInputStream(stream, 8192).use { input ->
+                val buffer = ByteArray(8192)
+                while (true) {
+                    currentCoroutineContext().ensureActive()
+                    val read = input.read(buffer)
+                    if (read < 0) break
+                    if (read > 0) digest.update(buffer, 0, read)
+                }
             }
+            digest.digest().joinToString("") { "%02x".format(it) }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
         }
-        digest.digest().joinToString("") { "%02x".format(it) }
-    }.getOrNull()
+    }
 }
 
 class NoMediaAccessException : IllegalStateException("Photo and video access has not been granted.")
