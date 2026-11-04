@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Storage under your control.</string>
-    <string name="hero_title">You state the outcome. Sweep prepares the work.</string>
+    <string name="hero_title">You state the outcome. Midiastore prepares the work.</string>
     <string name="hero_subtitle">Analyze media locally, verify exact duplicates by content (SHA-256) with original reference protection, and authorize via official Android dialogs.</string>
     <string name="storage_title">DEVICE STORAGE</string>
     <string name="storage_note">Real measurement via StatFs. No files are removed without explicit confirmation in the official Android dialog.</string>
@@ -76,9 +76,9 @@ Total: %3$s</string>
     <string name="unnamed_file">Unnamed file</string>
     <string name="date_unavailable">Date not provided</string>
     <string name="size_unavailable">Size unavailable</string>
-    <string name="pro_card_title">SWEEP PRO</string>
+    <string name="pro_card_title">MIDIASTORE PRO</string>
     <string name="pro_status_free">Current plan: Free · Live prices loaded from Google Play</string>
-    <string name="pro_status_active">Midiastore Pro Active and Verified on Google Play</string>
+    <string name="pro_status_active">Midiastore Pro active</string>
     <string name="pro_status_pending">Purchase pending confirmation on Google Play</string>
     <string name="pro_card_subtitle">Extra features and report exports.</string>
     <string name="plan_annual_default">Midiastore Pro Annual · Check price on Google Play</string>
@@ -92,7 +92,7 @@ Total: %3$s</string>
     <string name="restoring_purchases_status">Reconciling active purchases with Google Play Billing…</string>
     <string name="manage_subscriptions_button">Manage subscriptions on Google Play Store</string>
     <string name="privacy_title">PRIVACY</string>
-    <string name="privacy_body">Sweep processes photos, videos, audio, and SHA-256 hashes strictly on your device. No files, filenames, or URIs are sent to external servers.</string>
+    <string name="privacy_body">Photos, videos, and audio are analyzed on your device. A report leaves Midiastore only when you choose to export or share it. Purchases are processed by Google Play.</string>
     <string name="selection_limit_reached">500-item batch safety limit reached.</string>
     <string name="item_not_selectable">Protected original reference: preserved to prevent data loss.</string>
     <string name="warn_partial_access">Partial access granted by user via Android picker.</string>
@@ -102,14 +102,14 @@ Total: %3$s</string>
     <string name="page_content_changed">Volume content changed during scan. Start a new session.</string>
     <string name="oaas_card_title">QUICK MISSIONS</string>
     <string name="oaas_card_headline">Choose what you want to find.</string>
-    <string name="oaas_card_subtitle">Sweep analyzes the files. You review and authorize every action.</string>
+    <string name="oaas_card_subtitle">Midiastore analyzes the files. You review and authorize every action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, Sweep will check the media you have allowed…</string>
-    <string name="oaas_mission_large">Find large files (>10 MB) on this page</string>
-    <string name="oaas_mission_duplicates">Find exact duplicates on this page</string>
-    <string name="oaas_mission_old">Find older files (>30 days) on this page</string>
+    <string name="oaas_starting_scan_first">First, Midiastore will check the media you have allowed…</string>
+    <string name="oaas_mission_large">Find large files (>10 MB) in your library</string>
+    <string name="oaas_mission_duplicates">Find exact duplicates in your library</string>
+    <string name="oaas_mission_old">Find older files (>30 days) in your library</string>
     <string name="oaas_plan_ready_status">Found: %1$d item(s), totaling %2$s. %3$d original(s) protected; %4$d item(s) unconfirmed.</string>
-    <string name="oaas_plan_empty_status">No eligible items on this page. Move to another page; the full library has not been scanned.</string>
+    <string name="oaas_plan_empty_status">No eligible items were found in this scan.</string>
     <string name="oaas_flywheel_summary">History on this device: %1$d analyses prepared · %2$d items reviewed · %3$s deleted and confirmed</string>
     <string name="oaas_custom_goal_hint">What else would you like to find?</string>
     <string name="oaas_custom_goal_submit">Save suggestion</string>
