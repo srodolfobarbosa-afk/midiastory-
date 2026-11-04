@@ -156,11 +156,17 @@ class MainActivity : AppCompatActivity() {
         val bytesMap = pendingOperationBytesByUri
         pendingOperationBytesByUri = emptyMap()
         lifecycleScope.launch {
-            val confirmedDeleted = trashCoordinator.verifyPostDelete(uris)
+            val verifiedDeletedUris = if (result.resultCode == Activity.RESULT_OK) {
+                trashCoordinator.verifyPostDeleteUris(uris)
+            } else {
+                emptySet()
+            }
+            val confirmedDeleted = verifiedDeletedUris.size
             val totalBatchBytes = uris.sumOf { bytesMap[it] ?: 0L }
-            val confirmedBytes = if (
-                result.resultCode == Activity.RESULT_OK && confirmedDeleted == uris.size
-            ) totalBatchBytes else 0L
+            val confirmedBytes = verifiedDeletedUris.fold(0L) { total, uri ->
+                val itemBytes = (bytesMap[uri] ?: 0L).coerceAtLeast(0L)
+                if (Long.MAX_VALUE - total < itemBytes) Long.MAX_VALUE else total + itemBytes
+            }
             if (result.resultCode == Activity.RESULT_OK) {
                 sessionAuthorizedBytes += totalBatchBytes
             }
