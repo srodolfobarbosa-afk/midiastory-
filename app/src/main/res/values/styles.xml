@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Sweep" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Midiastore" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/sweep_primary</item>
         <item name="colorOnPrimary">@color/sweep_background</item>
         <item name="android:colorAccent">@color/sweep_primary</item>
