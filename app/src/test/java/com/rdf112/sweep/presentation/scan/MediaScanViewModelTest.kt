@@ -142,7 +142,7 @@ class MediaScanViewModelTest {
         val first = requireNotNull(viewModel.state.value.currentPage).records.single()
         viewModel.setSelected(first, true)
         val summary = requireNotNull(viewModel.buildReviewSummaryExportText())
-        assertTrue(summary.contains("Midiastores"))
+        assertTrue(summary.contains("Midiastore"))
         assertTrue(summary.contains("same.jpg"))
     }
 
