@@ -41,9 +41,9 @@ object SmartMediaGroupingPolicy {
     }
 
     /**
-     * Agrupa registros que possuem o mesmo tamanho em bytes (> 0) e, quando houver hash SHA-256,
-     * exige comprovação de conteúdo idêntico.
-     * Rejeita falsos positivos (mesmo tamanho com SHA-256 divergente) e protege 1 referência original por grupo.
+     * Confirma duplicatas somente quando o tamanho é maior que zero e os hashes SHA-256
+     * não vazios são idênticos. Mesmo tamanho sem hash nunca é prova de conteúdo igual.
+     * Protege uma referência original por grupo confirmado.
      */
     fun markProtectedReferencesForSameSizeGroups(records: List<MediaRecord>): List<MediaRecord> {
         val bySize = records.filter { it.sizeBytes > 0L }.groupBy { it.sizeBytes }
