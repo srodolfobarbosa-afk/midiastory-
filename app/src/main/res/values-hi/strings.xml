@@ -62,4 +62,5 @@
     <string name="storage_free_subline">इस डिवाइस पर %1$s खाली</string>
     <string name="exact_copy_badge"> · सटीक कॉपी</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
+    <string name="api29_delete_notice">Android 10 पर Android हर फ़ाइल के लिए अलग अनुमति माँग सकता है। हर सिस्टम अनुरोध की समीक्षा करें।</string>
 </resources>
