@@ -80,6 +80,9 @@ jobs:
       - name: Restore the owner upload key to runner temp
         env:
           SWEEP_KEYSTORE_BASE64: ${{ secrets.SWEEP_KEYSTORE_BASE64 }}
+          MIDIASTORE_RELEASE_APPROVED: ${{ secrets.MIDIASTORE_RELEASE_APPROVED }}
+          MIDIASTORE_CONFIRMED_VERSION_CODE: ${{ secrets.MIDIASTORE_CONFIRMED_VERSION_CODE }}
+          MIDIASTORE_EXPECTED_CERT_SHA256: ${{ secrets.MIDIASTORE_EXPECTED_CERT_SHA256 }}
         run: |
           set -euo pipefail
           test -n "$SWEEP_KEYSTORE_BASE64"
@@ -92,7 +95,9 @@ jobs:
           SWEEP_STORE_PASSWORD: ${{ secrets.SWEEP_STORE_PASSWORD }}
           SWEEP_KEY_ALIAS: ${{ secrets.SWEEP_KEY_ALIAS }}
           SWEEP_KEY_PASSWORD: ${{ secrets.SWEEP_KEY_PASSWORD }}
-          SWEEP_EXPECTED_CERT_SHA256: ${{ secrets.SWEEP_EXPECTED_CERT_SHA256 }}
+          MIDIASTORE_RELEASE_APPROVED: ${{ secrets.MIDIASTORE_RELEASE_APPROVED }}
+          MIDIASTORE_CONFIRMED_VERSION_CODE: ${{ secrets.MIDIASTORE_CONFIRMED_VERSION_CODE }}
+          MIDIASTORE_EXPECTED_CERT_SHA256: ${{ secrets.MIDIASTORE_EXPECTED_CERT_SHA256 }}
         run: bash scripts/build_signed_aab.sh
       - uses: actions/upload-artifact@v4
         with:
