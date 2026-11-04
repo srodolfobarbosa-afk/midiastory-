@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Storage under your control.</string>
-    <string name="hero_title">See what's filling your phone.</string>
+    <string name="hero_title">See what\'s filling your phone.</string>
     <string name="hero_subtitle">Find large files and exact copies. Review every suggestion before changing anything.</string>
     <string name="storage_title">PHONE STORAGE</string>
     <string name="storage_note">Storage use is measured on this device. Nothing changes without your confirmation.</string>
@@ -15,7 +15,7 @@ Total: %3$s</string>
     <string name="ready_status">Ready. 100% local processing with original reference protection.</string>
     <string name="permission_denied">Permission not granted. No media was queried.</string>
     <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
-    <string name="starting_scan">Checking the media you've allowed…</string>
+    <string name="starting_scan">Checking the media you\'ve allowed…</string>
     <string name="loading_page">Reading your files…</string>
     <string name="page_ready">Files loaded.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
@@ -104,7 +104,7 @@ Total: %3$s</string>
     <string name="oaas_card_headline">What would you like to find?</string>
     <string name="oaas_card_subtitle">Your media stays on this device. Review results and approve every action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we'll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">Find exact copies</string>
     <string name="oaas_mission_old">Find files older than 30 days</string>
