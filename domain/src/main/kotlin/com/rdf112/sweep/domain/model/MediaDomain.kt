@@ -17,6 +17,20 @@ enum class ScanIssueCode {
     RESULT_LIMIT_REACHED,
 }
 
+data class DuplicateReferenceSnapshot(
+    val uri: String,
+    val sizeBytes: Long,
+    val mimeType: String?,
+    val dateModifiedEpochSeconds: Long?,
+    val sha256: String,
+) {
+    init {
+        require(uri.startsWith("content://")) { "uri must use the content:// scheme" }
+        require(sizeBytes > 0L) { "duplicate reference size must be positive" }
+        require(sha256.matches(Regex("^[a-fA-F0-9]{64}$"))) { "sha256 must be a complete SHA-256 digest" }
+    }
+}
+
 data class MediaRecord(
     val uri: String,
     val volumeName: String,
@@ -28,11 +42,17 @@ data class MediaRecord(
     val isProtected: Boolean = false,
     val isSelectable: Boolean = true,
     val contentSha256: String? = null,
+    /** Exact original retained when this record is proven to be a duplicate. */
+    val duplicateReferenceSnapshot: DuplicateReferenceSnapshot? = null,
 ) {
     init {
         require(uri.startsWith("content://")) { "uri must use the content:// scheme" }
         require(volumeName.isNotBlank()) { "volumeName must not be empty" }
         require(sizeBytes >= 0) { "sizeBytes must be non-negative" }
+        duplicateReferenceSnapshot?.let { reference ->
+            require(reference.uri != uri) { "a duplicate cannot reference itself as its original" }
+            require(reference.sizeBytes == sizeBytes) { "duplicate and original sizes must match" }
+        }
     }
 }
 

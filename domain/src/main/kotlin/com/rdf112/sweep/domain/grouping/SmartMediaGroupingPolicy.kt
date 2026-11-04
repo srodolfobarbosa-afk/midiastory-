@@ -1,6 +1,7 @@
 package com.rdf112.sweep.domain.grouping
 
 import com.rdf112.sweep.domain.model.MediaRecord
+import com.rdf112.sweep.domain.model.DuplicateReferenceSnapshot
 
 enum class SmartFilterMode {
     ALL_ITEMS,
@@ -85,11 +86,20 @@ object SmartMediaGroupingPolicy {
             compareBy<MediaRecord> { it.dateModifiedEpochSeconds ?: Long.MAX_VALUE }
                 .thenBy { it.uri }
         )
+        val original = sorted.first()
+        val originalHash = original.contentSha256?.takeIf(String::isNotBlank)?.lowercase() ?: return
+        val reference = DuplicateReferenceSnapshot(
+            uri = original.uri,
+            sizeBytes = original.sizeBytes,
+            mimeType = original.mimeType,
+            dateModifiedEpochSeconds = original.dateModifiedEpochSeconds,
+            sha256 = originalHash,
+        )
         sorted.forEachIndexed { index, item ->
             if (index == 0) {
-                out += item.copy(isProtected = true, isSelectable = false)
+                out += item.copy(isProtected = true, isSelectable = false, duplicateReferenceSnapshot = null)
             } else {
-                out += item
+                out += item.copy(duplicateReferenceSnapshot = reference)
             }
         }
     }

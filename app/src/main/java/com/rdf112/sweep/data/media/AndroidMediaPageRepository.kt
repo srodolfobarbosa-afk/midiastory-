@@ -443,7 +443,11 @@ class AndroidMediaPageRepository(
                 } else {
                     val allowedBytes = minOf(PAGE_HASH_MAX_FILE_BYTES, remainingPageBudget)
                     pageBytesHashed += record.sizeBytes
-                    val hash = computeStreamingSha256(Uri.parse(record.uri), maxBytes = allowedBytes)
+                    val hash = computeStreamingSha256(
+                        Uri.parse(record.uri),
+                        maxBytes = allowedBytes,
+                        expectedBytes = record.sizeBytes,
+                    )
                     if (hash != null) record.copy(contentSha256 = hash) else record
                 }
             }
@@ -458,9 +462,15 @@ class AndroidMediaPageRepository(
             computeStreamingSha256(Uri.parse(uri), maxBytes)
         }
 
+    override suspend fun computeSha256(uri: String, maxBytes: Long, expectedBytes: Long): String? =
+        withContext(Dispatchers.IO) {
+            computeStreamingSha256(Uri.parse(uri), maxBytes, expectedBytes)
+        }
+
     private suspend fun computeStreamingSha256(
         uri: Uri,
         maxBytes: Long = GLOBAL_HASH_MAX_FILE_BYTES,
+        expectedBytes: Long? = null,
     ): String? {
         require(maxBytes > 0L) { "maxBytes must be positive" }
         return try {
@@ -480,6 +490,7 @@ class AndroidMediaPageRepository(
                     }
                 }
             }
+            if (expectedBytes != null && bytesRead != expectedBytes) return null
             digest.digest().joinToString("") { "%02x".format(it) }
         } catch (cancelled: CancellationException) {
             throw cancelled

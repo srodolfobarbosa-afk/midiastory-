@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import com.rdf112.sweep.domain.model.MediaRecord
+import com.rdf112.sweep.domain.repository.MediaPageRepository
 import com.rdf112.sweep.domain.operations.ItemRevalidationReason
 import com.rdf112.sweep.domain.operations.MediaOperationMode
 import com.rdf112.sweep.domain.operations.ObservedMediaPostState
@@ -28,6 +29,7 @@ class AndroidTrashOperationCoordinator(
     private val resolver: ContentResolver = context.contentResolver,
 ) {
     private val appContext = context.applicationContext
+    private val hashRepository: MediaPageRepository = AndroidMediaPageRepository(appContext, resolver)
     private val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun supportsSystemTrash(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
@@ -45,13 +47,14 @@ class AndroidTrashOperationCoordinator(
         selectedRecords: Collection<MediaRecord>,
         mode: MediaOperationMode = MediaOperationMode.MOVE_TO_TRASH,
     ): RevalidatedOperationPlan = withContext(Dispatchers.IO) {
-        val evaluated = selectedRecords.map { record ->
-            if (!record.isSelectable || record.isProtected) {
-                RevalidatedMediaItem(record, ItemRevalidationReason.PROTECTED_OR_INELIGIBLE)
+        val evaluated = ArrayList<RevalidatedMediaItem>(selectedRecords.size)
+        for (record in selectedRecords) {
+            val reason = if (!record.isSelectable || record.isProtected) {
+                ItemRevalidationReason.PROTECTED_OR_INELIGIBLE
             } else {
-                val reason = revalidateSingleRecord(record)
-                RevalidatedMediaItem(record, reason)
+                revalidateSingleRecord(record)
             }
+            evaluated += RevalidatedMediaItem(record, reason)
         }
         RevalidatedOperationPlan(
             mode = mode,
@@ -59,7 +62,58 @@ class AndroidTrashOperationCoordinator(
         )
     }
 
-    private fun revalidateSingleRecord(record: MediaRecord): ItemRevalidationReason {
+    private suspend fun revalidateSingleRecord(record: MediaRecord): ItemRevalidationReason {
+        val candidateMetadata = revalidateMetadataSnapshot(
+            uriString = record.uri,
+            expectedSizeBytes = record.sizeBytes,
+            expectedMimeType = record.mimeType,
+            expectedDateModifiedSec = record.dateModifiedEpochSeconds,
+        )
+        if (candidateMetadata != ItemRevalidationReason.VALID_UNCHANGED) return candidateMetadata
+
+        val reference = record.duplicateReferenceSnapshot ?: return ItemRevalidationReason.VALID_UNCHANGED
+        val expectedHash = record.contentSha256?.takeIf(String::isNotBlank)?.lowercase()
+            ?: return ItemRevalidationReason.DUPLICATE_HASH_UNVERIFIABLE
+        if (!expectedHash.equals(reference.sha256, ignoreCase = true)) {
+            return ItemRevalidationReason.DUPLICATE_CONTENT_CHANGED
+        }
+        if (record.sizeBytes > MAX_DUPLICATE_REVALIDATION_BYTES) {
+            return ItemRevalidationReason.DUPLICATE_HASH_UNVERIFIABLE
+        }
+
+        val originalMetadata = revalidateMetadataSnapshot(
+            uriString = reference.uri,
+            expectedSizeBytes = reference.sizeBytes,
+            expectedMimeType = reference.mimeType,
+            expectedDateModifiedSec = reference.dateModifiedEpochSeconds,
+        )
+        if (originalMetadata != ItemRevalidationReason.VALID_UNCHANGED) {
+            return ItemRevalidationReason.ORIGINAL_REFERENCE_CHANGED
+        }
+
+        val candidateHash = hashRepository.computeSha256(
+            record.uri,
+            maxBytes = record.sizeBytes,
+            expectedBytes = record.sizeBytes,
+        )?.lowercase() ?: return ItemRevalidationReason.DUPLICATE_HASH_UNVERIFIABLE
+        val originalHash = hashRepository.computeSha256(
+            reference.uri,
+            maxBytes = reference.sizeBytes,
+            expectedBytes = reference.sizeBytes,
+        )?.lowercase() ?: return ItemRevalidationReason.DUPLICATE_HASH_UNVERIFIABLE
+
+        if (candidateHash != expectedHash || originalHash != expectedHash) {
+            return ItemRevalidationReason.DUPLICATE_CONTENT_CHANGED
+        }
+        return ItemRevalidationReason.VALID_UNCHANGED
+    }
+
+    private fun revalidateMetadataSnapshot(
+        uriString: String,
+        expectedSizeBytes: Long,
+        expectedMimeType: String?,
+        expectedDateModifiedSec: Long?,
+    ): ItemRevalidationReason {
         val projection = arrayOf(
             BaseColumns._ID,
             MediaStore.MediaColumns.SIZE,
@@ -72,7 +126,7 @@ class AndroidTrashOperationCoordinator(
             emptyArray()
         }
         return try {
-            val uri = Uri.parse(record.uri)
+            val uri = Uri.parse(uriString)
             val args = Bundle().apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
@@ -101,9 +155,9 @@ class AndroidTrashOperationCoordinator(
                 val actualTrashed = if (trashIdx >= 0 && !c.isNull(trashIdx)) c.getInt(trashIdx) else 0
 
                 RevalidatedOperationPlan.isSnapshotUnchanged(
-                    expectedSizeBytes = record.sizeBytes,
-                    expectedMimeType = record.mimeType,
-                    expectedDateModifiedSec = record.dateModifiedEpochSeconds,
+                    expectedSizeBytes = expectedSizeBytes,
+                    expectedMimeType = expectedMimeType,
+                    expectedDateModifiedSec = expectedDateModifiedSec,
                     actualSizeBytes = actualSize,
                     actualMimeType = actualMime,
                     actualDateModifiedSec = actualMod,
@@ -189,6 +243,7 @@ class AndroidTrashOperationCoordinator(
     }
 
     companion object {
+        private const val MAX_DUPLICATE_REVALIDATION_BYTES = 2L * 1024L * 1024L * 1024L
         private const val PREFS_NAME = "sweep_trash_recovery_prefs"
         private const val KEY_LAST_TRASH_URIS = "last_trash_uris"
     }

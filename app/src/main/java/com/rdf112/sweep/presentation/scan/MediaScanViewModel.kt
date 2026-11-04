@@ -505,6 +505,7 @@ class MediaScanViewModel(
                                             SWEEP_GLOBAL_DUPLICATE_HASH_MAX_FILE_BYTES,
                                             SWEEP_GLOBAL_DUPLICATE_HASH_BUDGET_BYTES - (bytesHashed - record.sizeBytes),
                                         ),
+                                        expectedBytes = record.sizeBytes,
                                     )
                                     if (hash.isNullOrBlank()) {
                                         coverageComplete = false
@@ -651,8 +652,13 @@ class MediaScanViewModel(
             current.selection.records.firstOrNull { it.uri == record.uri } ?: return
         } else {
             val visibleRecord = current.currentPage?.records?.firstOrNull { it.uri == record.uri } ?: return
-            if (visibleRecord != record) return
-            visibleRecord
+            val expectedVisibleRecord = visibleRecord.copy(
+                isProtected = record.isProtected,
+                isSelectable = record.isSelectable,
+                duplicateReferenceSnapshot = record.duplicateReferenceSnapshot,
+            )
+            if (expectedVisibleRecord != record) return
+            record
         }
         val update = current.selection.setSelected(candidate, selected)
         when (update) {

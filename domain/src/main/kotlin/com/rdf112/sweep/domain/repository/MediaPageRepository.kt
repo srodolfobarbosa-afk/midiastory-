@@ -25,4 +25,11 @@ interface MediaPageRepository {
         require(maxBytes > 0L) { "maxBytes must be positive" }
         return computeSha256(uri)
     }
+
+    /** Computes SHA-256 only when the stream contains exactly the expected MediaStore byte count. */
+    suspend fun computeSha256(uri: String, maxBytes: Long, expectedBytes: Long): String? {
+        require(maxBytes > 0L) { "maxBytes must be positive" }
+        require(expectedBytes > 0L && expectedBytes <= maxBytes) { "expectedBytes must fit the hash budget" }
+        return computeSha256(uri, maxBytes)
+    }
 }
