@@ -4,7 +4,7 @@
 
 O projeto contém dois módulos Gradle (`:app` Android e `:domain` Kotlin/JVM), UI Android Views com quatro seções em `MainActivity`, `MediaScanViewModel` com `StateFlow`, regras puras para paginação/seleção/agrupamento/OaaS/Billing e adaptadores Android para MediaStore, operações de mídia, telemetria local e Google Play Billing. A Activity ainda é proprietária da navegação e de grande parte da composição/renderização; não é uma arquitetura de features isoladas.
 
-A baseline Debug executou com Gradle 8.13, AGP 8.13.2, Kotlin 2.3.21, JDK 17 e Android SDK 36. Não há evidência de build Release assinado ou teste em dispositivo. O source ZIP contém um único commit rastreado; os módulos extraídos são arquivos não rastreados.
+A configuração atual usa Gradle 8.13, JDK 17, Android SDK 36 e applicationId com.rdf112.midiastore. A baseline Debug de 03/11 pertence a uma revisão anterior; a branch de recuperação ainda precisa de CI verde, teste instrumentado e validação em aparelho. Não declarar Release assinado ou publicado.
 
 ## Direção
 
@@ -41,7 +41,7 @@ Não criar módulos Gradle vazios agora. Primeiro estabilizar contratos, testes 
 
 ## Decisões de plataforma
 
-- Preservar `applicationId`/namespace `com.rdf112.sweep`; nome visível pode ser Midiastore. Confirmar histórico/certificado na Play Console antes de release.
+- Preservar `applicationId=com.rdf112.midiastore`, confirmado pelo proprietário na ficha de teste interno. O namespace técnico continua `com.rdf112.sweep`; não confundir namespace com package de instalação. Confirmar maior versionCode e certificado na Play Console antes do Release.
 - `minSdk 29`, `targetSdk 36`, `compileSdk 36`, Java 17; consultar Play target policy a cada release e testar API 37 antes da migração.
 - Nada de root, ADB, Shizuku, `MANAGE_EXTERNAL_STORAGE` ou acesso privado de terceiros como requisito do MVP.
 - Não adicionar Room, WorkManager, LiteRT ou MediaPipe sem um caso de uso aprovado e benchmark.
