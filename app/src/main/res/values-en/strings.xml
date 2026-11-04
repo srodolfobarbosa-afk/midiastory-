@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sweep</string>
+    <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Storage under your control.</string>
     <string name="hero_title">You state the outcome. Sweep prepares the work.</string>
     <string name="hero_subtitle">Analyze media locally, verify exact duplicates by content (SHA-256) with original reference protection, and authorize via official Android dialogs.</string>
@@ -62,9 +62,9 @@ Total: %3$s</string>
     <string name="delete_operation_result">Deleted and verified: %1$d of %2$d item(s) (%3$s freed).</string>
     <string name="restore_operation_result">6. TRACK · Verified recovery: %1$d restored · %2$d pending.</string>
     <string name="export_review_summary">Export report (Pro)</string>
-    <string name="export_review_subject">OaaS Review Report — Sweep</string>
+    <string name="export_review_subject">OaaS Review Report — Midiastore</string>
     <string name="billing_pending_message">Purchase pending confirmation in Google Play. Pro access unlocks once confirmed.</string>
-    <string name="billing_pro_required_message">Check Sweep Pro plans in the Pro tab to unlock audited report exports.</string>
+    <string name="billing_pro_required_message">Check Midiastore Pro plans in the Pro tab to unlock audited report exports.</string>
     <string name="clear_review">Cancel proposal / Clear selection</string>
     <string name="remove_review_item">Remove</string>
     <string name="more_review_items">%1$d more item(s) in review proposal.</string>
@@ -78,16 +78,16 @@ Total: %3$s</string>
     <string name="size_unavailable">Size unavailable</string>
     <string name="pro_card_title">SWEEP PRO</string>
     <string name="pro_status_free">Current plan: Free · Live prices loaded from Google Play</string>
-    <string name="pro_status_active">Sweep Pro Active and Verified on Google Play</string>
+    <string name="pro_status_active">Midiastore Pro Active and Verified on Google Play</string>
     <string name="pro_status_pending">Purchase pending confirmation on Google Play</string>
     <string name="pro_card_subtitle">Extra features and report exports.</string>
-    <string name="plan_annual_default">Sweep Pro Annual · Check price on Google Play</string>
-    <string name="plan_annual_with_price">Sweep Pro Annual · %1$s/year</string>
-    <string name="plan_annual_with_price_and_discount">Sweep Pro Annual (-%2$d%% real savings) · %1$s/year</string>
-    <string name="plan_monthly_default">Sweep Pro Monthly · Check price on Google Play</string>
-    <string name="plan_monthly_with_price">Sweep Pro Monthly · %1$s/month</string>
-    <string name="plan_lifetime_default">Sweep Pro Lifetime (One-Time) · Check on Google Play</string>
-    <string name="plan_lifetime_with_price">Sweep Pro Lifetime (One-Time) · %1$s</string>
+    <string name="plan_annual_default">Midiastore Pro Annual · Check price on Google Play</string>
+    <string name="plan_annual_with_price">Midiastore Pro Annual · %1$s/year</string>
+    <string name="plan_annual_with_price_and_discount">Midiastore Pro Annual (-%2$d%% real savings) · %1$s/year</string>
+    <string name="plan_monthly_default">Midiastore Pro Monthly · Check price on Google Play</string>
+    <string name="plan_monthly_with_price">Midiastore Pro Monthly · %1$s/month</string>
+    <string name="plan_lifetime_default">Midiastore Pro Lifetime (One-Time) · Check on Google Play</string>
+    <string name="plan_lifetime_with_price">Midiastore Pro Lifetime (One-Time) · %1$s</string>
     <string name="restore_purchases_button">Restore purchases</string>
     <string name="restoring_purchases_status">Reconciling active purchases with Google Play Billing…</string>
     <string name="manage_subscriptions_button">Manage subscriptions on Google Play Store</string>
