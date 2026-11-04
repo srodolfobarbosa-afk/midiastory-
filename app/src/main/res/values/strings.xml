@@ -149,11 +149,4 @@ Total: %3$s</string>
     <string name="exact_copy_badge"> · Exact copy</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
 
-    <string name="nav_home">Home</string><string name="nav_files">Files</string><string name="nav_missions">Cleanup</string><string name="nav_pro">Pro</string>
-    <string name="analyze_now">CHECK MY STORAGE</string><string name="tap_to_scan_media">Tap to check your files</string>
-    <string name="quick_actions_title">QUICK ACTIONS</string><string name="quick_actions_subtitle">Choose what you want to find:</string>
-    <string name="quick_find_large">Find large files (over 10 MB)</string><string name="quick_find_duplicates">Find exact copies</string>
-    <string name="files_count_in_tab">%1$d files ready in Files</string><string name="tap_to_scan_media_types">Tap to check photos, videos and audio</string>
-    <string name="storage_used_of_total">%1$s used of %2$s</string><string name="storage_free_subline">%1$s free on this device</string>
-    <string name="exact_copy_badge"> · Exact copy</string><string name="media_metadata_line">%1$s · %2$s%3$s</string>
 </resources>
