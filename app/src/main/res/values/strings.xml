@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sweep</string>
+    <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Armazenamento sob seu controle.</string>
-    <string name="hero_title">Você diz o resultado. O Sweep prepara o trabalho.</string>
+    <string name="hero_title">Você diz o resultado. O Midiastore prepara o trabalho.</string>
     <string name="hero_subtitle">Analise mídias localmente, identifique duplicatas exatas por conteúdo (SHA-256) com proteção do original e autorize no fluxo oficial do Android.</string>
     <string name="storage_title">ARMAZENAMENTO DO DISPOSITIVO</string>
     <string name="storage_note">Medição real via StatFs. Nenhum arquivo é removido sem confirmação explícita no diálogo oficial do Android.</string>
@@ -62,9 +62,9 @@ Total: %3$s</string>
     <string name="delete_operation_result">Excluídos e verificados: %1$d de %2$d item(ns) (%3$s liberados).</string>
     <string name="restore_operation_result">6. ACOMPANHAR · Recuperação comprovada: %1$d restaurado(s) · %2$d pendente(s).</string>
     <string name="export_review_summary">Exportar relatório (Pro)</string>
-    <string name="export_review_subject">Relatório de Revisão OaaS — Sweep</string>
+    <string name="export_review_subject">Relatório de Revisão OaaS — Midiastore</string>
     <string name="billing_pending_message">Compra pendente de confirmação na Google Play. O acesso Pro será liberado assim que confirmada.</string>
-    <string name="billing_pro_required_message">Consulte os planos Sweep Pro na aba Planos Pro para desbloquear a exportação de relatórios auditados.</string>
+    <string name="billing_pro_required_message">Consulte os planos Midiastore Pro na aba Planos Pro para desbloquear a exportação de relatórios auditados.</string>
     <string name="clear_review">Cancelar proposta / Limpar seleção</string>
     <string name="remove_review_item">Remover</string>
     <string name="more_review_items">Mais %1$d item(ns) na proposta de revisão.</string>
@@ -78,21 +78,21 @@ Total: %3$s</string>
     <string name="size_unavailable">Tamanho indisponível</string>
     <string name="pro_card_title">SWEEP PRO</string>
     <string name="pro_status_free">Plano atual: Gratuito · Preços reais obtidos diretamente da Google Play</string>
-    <string name="pro_status_active">Sweep Pro Ativo e Verificado na Google Play</string>
+    <string name="pro_status_active">Midiastore Pro Ativo e Verificado na Google Play</string>
     <string name="pro_status_pending">Compra pendente de confirmação na Google Play</string>
     <string name="pro_card_subtitle">Recursos extras e exportação de relatórios.</string>
-    <string name="plan_annual_default">Sweep Pro Anual · Consultar preço na Google Play</string>
-    <string name="plan_annual_with_price">Sweep Pro Anual · %1$s/ano</string>
-    <string name="plan_annual_with_price_and_discount">Sweep Pro Anual (-%2$d%% de economia real) · %1$s/ano</string>
-    <string name="plan_monthly_default">Sweep Pro Mensal · Consultar preço na Google Play</string>
-    <string name="plan_monthly_with_price">Sweep Pro Mensal · %1$s/mês</string>
-    <string name="plan_lifetime_default">Sweep Pro Vitalício (Compra Única) · Consultar na Google Play</string>
-    <string name="plan_lifetime_with_price">Sweep Pro Vitalício (Compra Única) · %1$s</string>
+    <string name="plan_annual_default">Midiastore Pro Anual · Consultar preço na Google Play</string>
+    <string name="plan_annual_with_price">Midiastore Pro Anual · %1$s/ano</string>
+    <string name="plan_annual_with_price_and_discount">Midiastore Pro Anual (-%2$d%% de economia real) · %1$s/ano</string>
+    <string name="plan_monthly_default">Midiastore Pro Mensal · Consultar preço na Google Play</string>
+    <string name="plan_monthly_with_price">Midiastore Pro Mensal · %1$s/mês</string>
+    <string name="plan_lifetime_default">Midiastore Pro Vitalício (Compra Única) · Consultar na Google Play</string>
+    <string name="plan_lifetime_with_price">Midiastore Pro Vitalício (Compra Única) · %1$s</string>
     <string name="restore_purchases_button">Restaurar compras</string>
     <string name="restoring_purchases_status">Reconciliando compras ativas junto ao Google Play Billing…</string>
     <string name="manage_subscriptions_button">Gerenciar assinaturas na Google Play Store</string>
     <string name="privacy_title">PRIVACIDADE</string>
-    <string name="privacy_body">O Sweep processa fotos, vídeos, áudios e hashes SHA-256 exclusivamente no seu dispositivo. Nenhum arquivo, nome de arquivo ou URI é enviado para servidores externos.</string>
+    <string name="privacy_body">O Midiastore processa fotos, vídeos, áudios e hashes SHA-256 exclusivamente no seu dispositivo. Nenhum arquivo, nome de arquivo ou URI é enviado para servidores externos.</string>
     <string name="selection_limit_reached">Limite de segurança de 500 itens por lote atingido.</string>
     <string name="item_not_selectable">Referência original protegida: este item é preservado para evitar perda de dados.</string>
     <string name="warn_partial_access">Acesso parcial concedido pelo usuário no seletor do Android.</string>
@@ -102,7 +102,7 @@ Total: %3$s</string>
     <string name="page_content_changed">O conteúdo do volume mudou durante a leitura. Inicie uma nova sessão.</string>
     <string name="oaas_card_title">MISSÕES RÁPIDAS</string>
     <string name="oaas_card_headline">Escolha o que deseja encontrar.</string>
-    <string name="oaas_card_subtitle">O Sweep analisa os arquivos. Você revisa e autoriza qualquer ação.</string>
+    <string name="oaas_card_subtitle">O Midiastore analisa os arquivos. Você revisa e autoriza qualquer ação.</string>
     <string name="oaas_pipeline_idle">Escolha uma análise para começar.</string>
     <string name="oaas_starting_scan_first">Primeiro, o Sweep vai consultar as mídias às quais você deu acesso…</string>
     <string name="oaas_mission_large">Encontrar arquivos grandes (>10 MB) nesta página</string>
