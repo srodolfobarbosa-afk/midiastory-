@@ -428,15 +428,24 @@ class AndroidMediaPageRepository(
             .filterValues { it.size >= 2 }
             .keys
         if (candidateSizes.isEmpty()) return records
+        var pageBytesHashed = 0L
         return records.map { record ->
-            if (record.sizeBytes in candidateSizes) {
-                val hash = computeStreamingSha256(
-                    Uri.parse(record.uri),
-                    maxBytes = GLOBAL_HASH_MAX_FILE_BYTES,
-                )
-                if (hash != null) record.copy(contentSha256 = hash) else record
-            } else {
+            if (record.sizeBytes !in candidateSizes) {
                 record
+            } else {
+                val remainingPageBudget = PAGE_HASH_BUDGET_BYTES - pageBytesHashed
+                if (
+                    record.sizeBytes <= 0L ||
+                    record.sizeBytes > PAGE_HASH_MAX_FILE_BYTES ||
+                    record.sizeBytes > remainingPageBudget
+                ) {
+                    record
+                } else {
+                    val allowedBytes = minOf(PAGE_HASH_MAX_FILE_BYTES, remainingPageBudget)
+                    pageBytesHashed += record.sizeBytes
+                    val hash = computeStreamingSha256(Uri.parse(record.uri), maxBytes = allowedBytes)
+                    if (hash != null) record.copy(contentSha256 = hash) else record
+                }
             }
         }
     }
@@ -481,6 +490,8 @@ class AndroidMediaPageRepository(
 
     companion object {
         private const val GLOBAL_HASH_MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
+        private const val PAGE_HASH_MAX_FILE_BYTES = 512L * 1024L * 1024L
+        private const val PAGE_HASH_BUDGET_BYTES = 1024L * 1024L * 1024L
     }
 }
 
