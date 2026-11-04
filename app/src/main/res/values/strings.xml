@@ -124,4 +124,11 @@ Total: %3$s</string>
     <string name="billing_launch_not_ready">A Google Play ainda não carregou esse plano. Verifique sua conexão, aguarde alguns segundos e tente novamente.</string>
     <string name="billing_flow_started">A confirmação de compra foi aberta na Google Play. A cobrança ainda precisa ser confirmada.</string>
     <string name="oaas_mission_scan_failed">Não foi possível concluir a análise. Confira as permissões e tente novamente.</string>
+    <string name="oaas_global_scan_progress">Analisando todas as mídias autorizadas… %1$d páginas · %2$d arquivos verificados · %3$d/%4$d fontes</string>
+    <string name="oaas_global_scan_result_complete">Análise completa: %1$d arquivos verificados em %2$d páginas. Preparados para revisão: %3$d (%4$s). Originais preservados: %5$d.</string>
+    <string name="oaas_global_scan_result_partial">Análise parcial: %1$d arquivos verificados em %2$d páginas. Preparados: %3$d (%4$s). %5$d aviso(s). Algumas fontes não puderam ser verificadas.</string>
+    <string name="oaas_global_scan_result_empty">Análise concluída: nenhum item elegível encontrado em %1$d arquivos verificados. %2$d aviso(s).</string>
+    <string name="oaas_global_scan_cancelled">Análise cancelada. Nenhum arquivo foi alterado.</string>
+    <string name="oaas_global_scan_failed">Não foi possível concluir a análise global. Nenhum arquivo foi alterado.</string>
+    <string name="oaas_global_scan_limit">Limite de segurança atingido. O resultado é parcial; reduza a biblioteca ou execute uma missão mais específica.</string>
 </resources>
