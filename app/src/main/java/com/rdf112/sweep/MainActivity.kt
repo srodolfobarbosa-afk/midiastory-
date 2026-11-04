@@ -46,6 +46,7 @@ import com.rdf112.sweep.data.billing.AndroidPlayBillingGateway
 import com.rdf112.sweep.data.billing.PlayCatalogProductUi
 import com.rdf112.sweep.data.media.AndroidMediaPageRepository
 import com.rdf112.sweep.data.media.AndroidTrashOperationCoordinator
+import com.rdf112.sweep.data.media.Api29DeleteAttempt
 import com.rdf112.sweep.data.oaas.AndroidOutcomeTelemetryStore
 import com.rdf112.sweep.domain.billing.BillingStatePolicy
 import com.rdf112.sweep.domain.billing.ProAccessSummaryState
@@ -127,6 +128,24 @@ class MainActivity : AppCompatActivity() {
     private val deleteIntentLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
+        val api29Uri = pendingApi29ConsentUri
+        if (api29Uri != null) {
+            pendingApi29ConsentUri = null
+            lifecycleScope.launch {
+                if (result.resultCode == Activity.RESULT_OK) {
+                    when (trashCoordinator.deleteApi29Item(api29Uri)) {
+                        Api29DeleteAttempt.Deleted -> pendingApi29DeletedUris += api29Uri
+                        else -> pendingApi29RejectedCount++
+                    }
+                    pendingApi29DeleteQueue.remove(api29Uri)
+                } else {
+                    pendingApi29RejectedCount++
+                    pendingApi29DeleteQueue.clear()
+                }
+                continueApi29DeleteBatch()
+            }
+            return@registerForActivityResult
+        }
         val uris = pendingOperationUris
         pendingOperationUris = emptyList()
         if (uris.isEmpty()) return@registerForActivityResult
@@ -179,6 +198,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var outcomeTelemetry: AndroidOutcomeTelemetryStore
     private var pendingOperationUris: List<String> = emptyList()
     private var pendingOperationBytesByUri: Map<String, Long> = emptyMap()
+    private val pendingApi29DeleteQueue = mutableListOf<String>()
+    private val pendingApi29DeletedUris = mutableListOf<String>()
+    private var pendingApi29ConsentUri: String? = null
+    private var pendingApi29BytesByUri: Map<String, Long> = emptyMap()
+    private var pendingApi29TotalCount: Int = 0
+    private var pendingApi29RejectedCount: Int = 0
     private var sessionAuthorizedBytes: Long = 0L
     private lateinit var spaceMetricsText: TextView
     private lateinit var radarConsentCheckBox: CheckBox
@@ -1187,7 +1212,7 @@ class MainActivity : AppCompatActivity() {
         }
         val hasSelection = selected.isNotEmpty() && !state.isLoading
         moveToTrashButton.isEnabled = hasSelection && trashCoordinator.supportsSystemTrash()
-        permanentDeleteButton.isEnabled = hasSelection && trashCoordinator.supportsSystemTrash()
+        permanentDeleteButton.isEnabled = hasSelection && trashCoordinator.supportsPermanentDelete()
         exportSelectionButton.isEnabled = hasSelection
         clearSelectionButton.isEnabled = hasSelection
         updateRestoreButtonState()
@@ -1350,12 +1375,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestPermanentDeleteSelected() {
         val selected = viewModel.state.value.selection.records
-        if (selected.isEmpty() || !trashCoordinator.supportsSystemTrash()) return
+        if (selected.isEmpty() || !trashCoordinator.supportsPermanentDelete()) return
         lifecycleScope.launch {
             val plan = trashCoordinator.prepareAndRevalidatePlan(selected, MediaOperationMode.PERMANENT_DELETE)
             val firstBatch = plan.uriBatches.firstOrNull()
             if (firstBatch.isNullOrEmpty()) {
                 statusText.text = getString(R.string.revalidation_none_eligible, plan.rejectedItems.size)
+                return@launch
+            }
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                pendingApi29DeleteQueue.clear()
+                pendingApi29DeleteQueue.addAll(firstBatch)
+                pendingApi29DeletedUris.clear()
+                pendingApi29BytesByUri = selected.associate { it.uri to it.sizeBytes }
+                pendingApi29TotalCount = firstBatch.size
+                pendingApi29RejectedCount = 0
+                statusText.text = getString(R.string.api29_delete_notice)
+                continueApi29DeleteBatch()
                 return@launch
             }
             val sender = trashCoordinator.createPermanentDeleteIntentSender(firstBatch)
@@ -1369,6 +1405,57 @@ class MainActivity : AppCompatActivity() {
                 statusText.text = getString(R.string.page_failed)
             }
         }
+    }
+
+    /** Android 10 has no batch delete request; each protected item uses the official recoverable consent flow. */
+    private fun continueApi29DeleteBatch() {
+        lifecycleScope.launch {
+            while (pendingApi29DeleteQueue.isNotEmpty()) {
+                val uri = pendingApi29DeleteQueue.first()
+                when (val attempt = trashCoordinator.deleteApi29Item(uri)) {
+                    Api29DeleteAttempt.Deleted -> {
+                        pendingApi29DeletedUris += uri
+                        pendingApi29DeleteQueue.removeAt(0)
+                    }
+                    is Api29DeleteAttempt.ConsentRequired -> {
+                        pendingApi29ConsentUri = uri
+                        deleteIntentLauncher.launch(IntentSenderRequest.Builder(attempt.intentSender).build())
+                        return@launch
+                    }
+                    Api29DeleteAttempt.NotDeleted -> {
+                        pendingApi29RejectedCount++
+                        pendingApi29DeleteQueue.removeAt(0)
+                    }
+                }
+            }
+            finishApi29DeleteBatch()
+        }
+    }
+
+    private suspend fun finishApi29DeleteBatch() {
+        val attempted = pendingApi29TotalCount
+        val verifiedUris = trashCoordinator.verifyPostDeleteUris(pendingApi29DeletedUris)
+        val confirmedBytes = verifiedUris.sumOf { pendingApi29BytesByUri[it] ?: 0L }
+        if (confirmedBytes > 0L) outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
+        refreshStorageStats()
+        refreshFlywheelSummary()
+        updateSpaceMetricsCard(viewModel.state.value)
+        val freedFmt = android.text.format.Formatter.formatFileSize(this, confirmedBytes)
+        if (verifiedUris.isNotEmpty()) {
+            viewModel.clearSelection()
+            viewModel.startSession()
+        }
+        statusText.text = getString(
+            R.string.delete_operation_result,
+            verifiedUris.size,
+            attempted,
+            freedFmt,
+        )
+        pendingApi29DeleteQueue.clear()
+        pendingApi29DeletedUris.clear()
+        pendingApi29BytesByUri = emptyMap()
+        pendingApi29TotalCount = 0
+        pendingApi29RejectedCount = 0
     }
 
     private fun requestRestoreFromTrash() {
