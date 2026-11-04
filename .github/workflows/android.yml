@@ -57,27 +57,6 @@ jobs:
           emulator-boot-timeout: 600
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
           script: |
-            set -eu
-            adb wait-for-device
-
-            # Avoid calling Android Settings before emulator boot has completed.
-            boot_completed=""
-            attempt=0
-            while [ "$attempt" -lt 90 ]; do
-              boot_completed="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
-              if [ "$boot_completed" = "1" ]; then
-                break
-              fi
-              attempt=$((attempt + 1))
-              sleep 2
-            done
-
-            if [ "$boot_completed" != "1" ]; then
-              echo "Android emulator did not report boot completion." >&2
-              adb devices -l
-              exit 1
-            fi
-
             ./gradlew --no-daemon :app:connectedDebugAndroidTest
       - name: Print instrumented test failure details
         if: failure()
