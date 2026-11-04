@@ -814,7 +814,11 @@ class MainActivity : AppCompatActivity() {
     private fun requestPlanPurchase(productId: String) {
         val launched = billingGateway.launchPurchaseFlow(this, productId)
         statusText.text = getString(
-            if (launched) R.string.billing_flow_started else R.string.billing_launch_not_ready
+            when {
+                launched -> R.string.billing_flow_started
+                !billingGateway.securePurchaseVerificationAvailable() -> R.string.billing_secure_verification_unavailable
+                else -> R.string.billing_launch_not_ready
+            }
         )
     }
 
@@ -1394,7 +1398,13 @@ class MainActivity : AppCompatActivity() {
                 switchTab(AppTab.PRO)
                 val launched = billingGateway.launchPurchaseFlow(this, BillingStatePolicy.PRODUCT_ANNUAL)
                 if (!launched) {
-                    statusText.text = getString(R.string.billing_pro_required_message)
+                    statusText.text = getString(
+                        if (!billingGateway.securePurchaseVerificationAvailable()) {
+                            R.string.billing_secure_verification_unavailable
+                        } else {
+                            R.string.billing_pro_required_message
+                        }
+                    )
                 }
             }
         }

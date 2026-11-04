@@ -54,7 +54,7 @@ class BillingStatePolicyTest {
             purchaseToken = "tok-4",
             rawPlayState = 4,
             isAcknowledged = true,
-            signaturePresentAndValid = true,
+            verifiedByTrustedBackend = true,
         )
         assertEquals(
             ProAccessSummaryState.RECONCILIATION_REQUIRED,
@@ -73,7 +73,7 @@ class BillingStatePolicyTest {
             purchaseToken = "tok-1",
             rawPlayState = 1,
             isAcknowledged = true,
-            signaturePresentAndValid = false,
+            verifiedByTrustedBackend = false,
         )
         assertEquals(
             ProAccessSummaryState.RECONCILIATION_REQUIRED,
@@ -84,7 +84,7 @@ class BillingStatePolicyTest {
             purchaseToken = "tok-1",
             rawPlayState = 1,
             isAcknowledged = true,
-            signaturePresentAndValid = true,
+            verifiedByTrustedBackend = true,
         )
         assertEquals(
             ProAccessSummaryState.PRO_GRANTED,

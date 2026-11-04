@@ -2,7 +2,6 @@ package com.rdf112.sweep.data.billing
 
 import android.app.Activity
 import android.content.Context
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClientStateListener
@@ -16,9 +15,7 @@ import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsResult
 import com.android.billingclient.api.QueryPurchasesParams
 import com.rdf112.sweep.domain.billing.BillingStatePolicy
-import com.rdf112.sweep.domain.billing.EntitlementDecision
 import com.rdf112.sweep.domain.billing.EvaluatedPurchaseRecord
-import com.rdf112.sweep.domain.billing.PlayPurchaseState
 import com.rdf112.sweep.domain.billing.ProAccessSummaryState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,7 +36,8 @@ data class PlayCatalogProductUi(
  * - Inicia fluxo oficial via `launchBillingFlow`.
  * - Não concede acesso a partir de preferências legadas (`is_pro` ignorado na inicialização).
  * - Exige `PURCHASED = 1`, produto na allowlist (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`),
- *   `purchaseToken` não vazio e assinatura da Google Play presente (`purchase.signature` e `originalJson` não vazios).
+ *   `purchaseToken` não vazio e verificação de token no backend antes de liberar Pro ou confirmar compra.
+ * - Sem backend implantado e configurado, novas compras ficam bloqueadas e o entitlement permanece fechado.
  */
 class AndroidPlayBillingGateway(context: Context) {
     private val appContext = context.applicationContext
@@ -56,13 +54,7 @@ class AndroidPlayBillingGateway(context: Context) {
 
     private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
         when (billingResult.responseCode) {
-            BillingResponseCode.OK -> {
-                if (!purchases.isNullOrEmpty()) {
-                    applyPurchases(subsOk = true, inAppOk = true, purchases = purchases)
-                } else {
-                    refreshExistingPurchases()
-                }
-            }
+            BillingResponseCode.OK -> refreshExistingPurchases()
             BillingResponseCode.ITEM_ALREADY_OWNED -> refreshExistingPurchases()
             else -> Unit
         }
@@ -175,7 +167,11 @@ class AndroidPlayBillingGateway(context: Context) {
         _catalog.value = next
     }
 
+    /** Purchase flow is unavailable until a trusted Google Play token-verification backend is configured. */
+    fun securePurchaseVerificationAvailable(): Boolean = PURCHASE_VERIFICATION_BACKEND_CONFIGURED
+
     fun launchPurchaseFlow(activity: Activity, productId: String = BillingStatePolicy.PRODUCT_ANNUAL): Boolean {
+        if (!PURCHASE_VERIFICATION_BACKEND_CONFIGURED) return false
         if (!billingClient.isReady || productId !in BillingStatePolicy.RECOVERED_PLAY_PRODUCT_IDS) {
             startAndReconcile()
             return false
@@ -221,10 +217,8 @@ class AndroidPlayBillingGateway(context: Context) {
     }
 
     private fun applyPurchases(subsOk: Boolean, inAppOk: Boolean, purchases: List<Purchase>) {
+        // BillingClient fields alone are not server-side token verification.
         val evaluatedRecords = purchases.flatMap { purchase ->
-            val hasPlaySignature = purchase.signature.isNotBlank() &&
-                purchase.originalJson.isNotBlank() &&
-                purchase.packageName == appContext.packageName
             val products = purchase.products.ifEmpty { listOf<String?>(null) }
             products.map { productId ->
                 EvaluatedPurchaseRecord(
@@ -232,29 +226,8 @@ class AndroidPlayBillingGateway(context: Context) {
                     purchaseToken = purchase.purchaseToken,
                     rawPlayState = purchase.purchaseState,
                     isAcknowledged = purchase.isAcknowledged,
-                    signaturePresentAndValid = hasPlaySignature,
+                    verifiedByTrustedBackend = false,
                 )
-            }
-        }
-
-        for (purchase in purchases) {
-            val hasPlaySignature = purchase.signature.isNotBlank() &&
-                purchase.originalJson.isNotBlank() &&
-                purchase.packageName == appContext.packageName
-            val state = PlayPurchaseState.fromPlayValue(purchase.purchaseState)
-            val eligible = hasPlaySignature && purchase.products.any { productId ->
-                BillingStatePolicy.evaluate(
-                    state = state,
-                    productId = productId,
-                    purchaseToken = purchase.purchaseToken,
-                    verification = com.rdf112.sweep.domain.billing.PurchaseVerification.VERIFIED,
-                ) == EntitlementDecision.GRANT
-            }
-            if (eligible && !purchase.isAcknowledged) {
-                val ackParams = AcknowledgePurchaseParams.newBuilder()
-                    .setPurchaseToken(purchase.purchaseToken)
-                    .build()
-                billingClient.acknowledgePurchase(ackParams) { }
             }
         }
 
@@ -263,6 +236,11 @@ class AndroidPlayBillingGateway(context: Context) {
             inAppQuerySucceeded = inAppOk,
             purchases = evaluatedRecords,
         )
+    }
+
+    companion object {
+        // Intentionally false until a trusted verification backend is deployed and tested.
+        private const val PURCHASE_VERIFICATION_BACKEND_CONFIGURED = false
     }
 
     fun endConnection() {

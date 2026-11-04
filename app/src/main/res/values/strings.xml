@@ -122,6 +122,7 @@ Total: %3$s</string>
     <string name="pro_status_reconciliation">Verificando compras na Google Play…</string>
     <string name="plan_unavailable">Plano indisponível no momento</string>
     <string name="billing_launch_not_ready">A Google Play ainda não carregou esse plano. Verifique sua conexão, aguarde alguns segundos e tente novamente.</string>
+    <string name="billing_secure_verification_unavailable">As compras Pro estão temporariamente indisponíveis. Estamos protegendo sua compra enquanto a validação segura do Google Play é configurada. Nenhuma cobrança foi iniciada.</string>
     <string name="billing_flow_started">A confirmação de compra foi aberta na Google Play. A cobrança ainda precisa ser confirmada.</string>
     <string name="oaas_mission_scan_failed">Não foi possível concluir a análise. Confira as permissões e tente novamente.</string>
     <string name="oaas_global_scan_progress">Analisando todas as mídias autorizadas… %1$d páginas · %2$d arquivos verificados · %3$d/%4$d fontes</string>

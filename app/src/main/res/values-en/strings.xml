@@ -122,6 +122,7 @@ Total: %3$s</string>
     <string name="pro_status_reconciliation">Checking purchases with Google Play…</string>
     <string name="plan_unavailable">Plan currently unavailable</string>
     <string name="billing_launch_not_ready">Google Play has not loaded this plan yet. Check your connection, wait a few seconds, and try again.</string>
+    <string name="billing_secure_verification_unavailable">Pro purchases are temporarily unavailable while secure Google Play purchase verification is being configured. No charge was started.</string>
     <string name="billing_flow_started">Purchase confirmation opened in Google Play. The charge is not confirmed yet.</string>
     <string name="oaas_mission_scan_failed">The scan could not be completed. Check permissions and try again.</string>
     <string name="oaas_global_scan_progress">Scanning all authorized media… %1$d pages · %2$d files checked · %3$d/%4$d sources</string>

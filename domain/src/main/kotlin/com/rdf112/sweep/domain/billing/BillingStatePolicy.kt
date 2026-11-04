@@ -25,10 +25,11 @@ data class EvaluatedPurchaseRecord(
     val purchaseToken: String?,
     val rawPlayState: Int,
     val isAcknowledged: Boolean,
-    val signaturePresentAndValid: Boolean,
+    /** True only after a trusted server verifies this exact purchase token with Google Play. */
+    val verifiedByTrustedBackend: Boolean,
 ) {
     val verification: PurchaseVerification
-        get() = if (signaturePresentAndValid) PurchaseVerification.VERIFIED else PurchaseVerification.NOT_VERIFIED
+        get() = if (verifiedByTrustedBackend) PurchaseVerification.VERIFIED else PurchaseVerification.NOT_VERIFIED
 }
 
 enum class ProAccessSummaryState {
