@@ -149,4 +149,5 @@ Total: %3$s</string>
     <string name="exact_copy_badge"> · Cópia exata</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
 
+    <string name="api29_delete_notice">No Android 10, o Android pode pedir autorização para cada arquivo. Confira cada solicitação do sistema.</string>
 </resources>
