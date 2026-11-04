@@ -187,6 +187,23 @@ class MediaScanViewModelTest {
     }
 
     @Test
+    fun globalDuplicateMissionDoesNotPrepareDeletionWhenAnySourceIsUnverified() = runTest {
+        val repository = GlobalMissionFakeRepository(failVideoSource = true)
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        val plan = requireNotNull(progress.plan)
+        assertTrue(!progress.coverageComplete)
+        assertTrue(plan.autoSelectedRecords.isEmpty())
+        assertTrue(viewModel.state.value.selection.isEmpty)
+    }
+
+    @Test
     fun globalMissionCanRemoveASelectedRecordThatIsNotOnTheCurrentPage() = runTest {
         val repository = GlobalMissionFakeRepository()
         val viewModel = MediaScanViewModel(repository)
