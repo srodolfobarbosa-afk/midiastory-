@@ -245,7 +245,7 @@ class MediaScanViewModel(
         if (selected.isEmpty()) return null
         val totalBytes = current.selection.totalBytesOrNull() ?: 0L
         return buildString {
-            appendLine("Midiastores — Resumo de Revisão de Mídias")
+            appendLine("Midiastore — Resumo de Revisão de Mídias")
             appendLine("Itens selecionados: ${selected.size}")
             appendLine("Bytes somados: $totalBytes")
             appendLine("---")
