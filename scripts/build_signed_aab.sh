@@ -20,9 +20,9 @@ printf '\n=== MIDIastore — RELEASE CONTROLADO ===\n'
 [[ "${MIDIASTORE_RELEASE_APPROVED:-}" == "YES" ]] || fail \
   "MIDIASTORE_RELEASE_APPROVED deve ser YES em segredo protegido do environment play-release."
 
-CONFIRMED_VERSION_CODE="${MIDIASTORE_CONFIRMED_VERSION_CODE:-}"
-[[ "$CONFIRMED_VERSION_CODE" =~ ^[1-9][0-9]*$ ]] || fail \
-  "MIDIASTORE_CONFIRMED_VERSION_CODE precisa conter o maior versionCode confirmado na Play Console."
+MAX_PUBLISHED_VERSION_CODE="${MIDIASTORE_MAX_PUBLISHED_VERSION_CODE:-}"
+[[ "$MAX_PUBLISHED_VERSION_CODE" =~ ^[0-9]+$ ]] || fail \
+  "MIDIASTORE_MAX_PUBLISHED_VERSION_CODE precisa conter o maior versionCode já publicado na Play Console (0 se ainda não houve publicação)."
 
 EXPECTED_CERT_SHA256="${MIDIASTORE_EXPECTED_CERT_SHA256:-}"
 [[ -n "$EXPECTED_CERT_SHA256" ]] || fail \
@@ -33,8 +33,10 @@ SOURCE_VERSION_CODE="$(sed -nE 's/^[[:space:]]*versionCode[[:space:]]*=[[:space:
 
 [[ "$SOURCE_PACKAGE" == "$EXPECTED_PACKAGE" ]] || fail \
   "applicationId no source é '$SOURCE_PACKAGE'; esperado '$EXPECTED_PACKAGE'. Nenhum arquivo foi alterado."
-[[ "$SOURCE_VERSION_CODE" == "$CONFIRMED_VERSION_CODE" ]] || fail \
-  "versionCode no source ($SOURCE_VERSION_CODE) difere do maior versionCode confirmado ($CONFIRMED_VERSION_CODE)."
+[[ "$SOURCE_VERSION_CODE" =~ ^[1-9][0-9]*$ ]] || fail \
+  "Não foi possível ler um versionCode válido do source."
+(( SOURCE_VERSION_CODE > MAX_PUBLISHED_VERSION_CODE )) || fail \
+  "versionCode do source ($SOURCE_VERSION_CODE) precisa ser MAIOR que o maior já publicado ($MAX_PUBLISHED_VERSION_CODE). Atualize o versionCode e rode os testes novamente."
 
 # 2. Exigir keystore restaurado pelo workflow ou informado explicitamente no ambiente local.
 STORE_FILE="${SWEEP_STORE_FILE:-}"
