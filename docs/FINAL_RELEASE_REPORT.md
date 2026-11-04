@@ -65,7 +65,7 @@ Secrets requeridos pelo workflow:
 - SWEEP_KEY_ALIAS
 - SWEEP_KEY_PASSWORD
 - MIDIASTORE_RELEASE_APPROVED = YES
-- MIDIASTORE_CONFIRMED_VERSION_CODE
+- MIDIASTORE_MAX_PUBLISHED_VERSION_CODE (maior versionCode já publicado; o source precisa ser estritamente maior)
 - MIDIASTORE_EXPECTED_CERT_SHA256
 
 Não criar chave temporária nem inserir credenciais privadas no ZIP, APK, repositório ou chat.
