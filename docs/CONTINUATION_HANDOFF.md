@@ -52,6 +52,13 @@ Atualizado: 04/11/2026
 - Certificado de upload e maior versionCode publicado ainda precisam de confirmação da Play Console.
 - Nenhum AAB desta branch está aprovado para publicação.
 
+## Artefatos de teste
+
+- O workflow exporta `midiastore-debug-apk-api29` e `midiastore-debug-apk-api35` com SHA-256, quando os jobs chegam ao upload.
+- O APK Debug usa o package `com.rdf112.midiastore.debug` por causa de `applicationIdSuffix = ".debug"`. Ele serve para validar interface e funções locais e pode coexistir com a instalação do Play.
+- O APK Debug não valida compras Google Play e não substitui a instalação assinada do listing `com.rdf112.midiastore`. Para testar Billing, é necessário AAB assinado com a chave de upload oficial, enviado à faixa de teste interno/fechado.
+- Não pedir ao testador para repetir a avaliação do link antigo antes de instalar uma build nova desta branch.
+
 ## Como validar no Codespaces
 
 Confirme que está na branch de recuperação:
