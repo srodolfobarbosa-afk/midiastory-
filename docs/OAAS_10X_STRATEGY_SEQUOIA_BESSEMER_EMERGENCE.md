@@ -23,6 +23,6 @@ Inspirado na pergunta central de avaliação de processos (*"As pessoas são pag
 
 - **10x Velocidade**: Em vez de marcar dezenas de checkboxes manualmente, 1 toque na Missão OaaS filtra, protege originais e preenche todo o lote de revisão.
 - **10x Custo**: Processamento 100% *on-device* (custo marginal de servidor próximo de zero), permitindo planos acessíveis pelos meios de pagamento que a Google Play disponibiliza para cada país e produto (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`).
-- **10x Capacidade**: Arquitetura paginada que analisa bibliotecas de qualquer tamanho mais múltiplos volumes externos/SD Card.
+- **10x Capacidade**: Arquitetura paginada que percorre os tipos e volumes acessíveis com limites de segurança. Bibliotecas maiores que os limites definidos produzem resultado parcial, não uma alegação de cobertura total.
 - **10x Qualidade e Segurança**: Proteção de uma referência original por grupo de hash confirmado. A Lixeira oficial é usada a partir do Android 11; limpeza API29 continua pendente.
 - **10x Disponibilidade**: A leitura e a análise de mídia ocorrem no dispositivo e podem ser canceladas. Billing exige conexão com Google Play; a limpeza API29 ainda não está disponível.
