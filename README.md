@@ -1,113 +1,104 @@
-# Sweep — v0.3 Paginação incremental (base de atualização 1.1.1)
+# Midiastore — Android storage manager
 
-**Estado:** incremento técnico de desenvolvimento, somente leitura. Este ZIP não é um Release Candidate e não deve ser enviado à Google Play.
+**Status:** development / recovery. This repository is not a release candidate and must not be submitted to Google Play until all P0 gates in `docs/RELEASE_BLOCKERS.md` are closed.
 
-## Identidade candidata
+## Confirmed application identity
 
-| Campo | Valor |
-|---|---|
-| `applicationId` | `com.rdf112.sweep` |
-| `versionCode` | `9` (proposto com base na informação do proprietário de que o último publicado é 8) |
-| `versionName` | `1.1.1` (proposto) |
-| `minSdk` | `29` |
-| `compileSdk` / `targetSdk` | `36` / `36` |
-| Java/Kotlin JVM target | `17` |
+| Field | Current source configuration | Evidence / qualification |
+|---|---|---|
+| Commercial name | Midiastore | Owner confirmed the Play Console listing name |
+| Google Play package | `com.rdf112.midiastore` | Owner supplied the listing with this package on 04/11/2026 |
+| Android namespace | `com.rdf112.sweep` | Internal Kotlin/R namespace; do not confuse it with applicationId |
+| versionCode | `17` | Current source value only; the highest version already published must still be checked in Play Console |
+| versionName | `2.2.1` | Current source value only |
+| minSdk / targetSdk | `29` / `36` | Current source configuration |
+| compileSdk | `36` | Current source configuration |
+| Java / Kotlin JVM | `17` | Current source configuration |
+| Billing Library | `8.0.0` | Current dependency; product activation and live purchase have not been verified |
 
-Confirme pacote, versionCode mais alto e certificado de upload na Play Console antes de qualquer submissão. A configuração do código não comprova o estado atual da conta.
+The source project retains the legacy `com.rdf112.sweep` namespace and resource names for compatibility with the reconstructed code. The installable application identity is `com.rdf112.midiastore`. Do not change `applicationId`, signing certificate, versionCode or Play listing without the owner's explicit approval.
 
-## Fidelidade à aplicação publicada
+The owner reports that the financial/payment profile was enabled on 03/11/2026. This does **not** by itself prove that the three in-app products are active, correctly typed, available in Brazil, or tested through Google Play Billing.
 
-O fonte histórico que gerou o AAB de produção não foi recuperado. Este é um projeto reconstruído para desenvolvimento, usando o `applicationId` conhecido e os requisitos documentados. Não afirmar equivalência completa com o aplicativo já instalado.
+## Current engineering branch
 
-O AAB beta previamente analisado indicava Billing Library 8.0.0. A planta técnica registra um possível erro no parser de estado de compra e um problema na recuperação de itens da Lixeira. Esta revisão ainda **não** contém BillingClient, catálogo de produtos, entitlement, fluxo Pro ou recuperação de compras. O código puro `BillingStatePolicy` serve apenas para testar a interpretação fail-closed dos estados 0/1/2/valores desconhecidos; não está conectado ao aplicativo e os IDs de produto nos testes são fixtures fictícias.
+- Working branch: `fix/p0-sweep-permissions-missions-billing`
+- Review: [PR #3](https://github.com/srodolfobarbosa-afk/midiastory-/pull/3)
+- Recovery issue: [Issue #2](https://github.com/srodolfobarbosa-afk/midiastory-/issues/2)
+- Do not merge directly into `main`.
+- Do not create a new signing key or upload a temporary certificate.
+- Do not submit a release AAB while any P0 blocker remains open.
 
-## O que o incremento v0.3 implementa
+## Architecture and current behavior
 
-- Projeto Android Views; não migra a interface para Compose.
-- Tela de análise e revisão em português e inglês.
-- Leitura informativa de espaço do armazenamento interno via `StatFs`.
-- Consulta somente de fotos, vídeos e áudio acessíveis pelo MediaStore.
-- Enumeração de volumes externos expostos por MediaStore, incluindo armazenamento removível quando o provedor/dispositivo o disponibiliza.
-- Consultas estruturadas e limitadas a 100 registros por página, com navegação incremental. O domínio permite pedidos de até 500, mas a interface usa 100.
-- Ordenação determinística por data de modificação e ID como desempate (ambos descendentes, por limitação da direção única da API estruturada; desvio da sugestão `_ID ASC` documentado).
-- Verificação de `EXTRA_HONORED_ARGS`, `EXTRA_TOTAL_COUNT` e tamanho real do cursor. Se o provedor não comprovar os argumentos de paginação/ordenação ou retornar uma página incoerente, o aplicativo interrompe a navegação dessa fonte em vez de apresentar uma lista como completa. `IS_PENDING` e `IS_TRASHED` são filtrados localmente após a consulta; offsets e total referem-se às linhas brutas do provider.
-- Detecção limitada de páginas sobrepostas ou conteúdo alterado para offsets já vistos.
-- Sessão com permissões, conjunto de volumes, versão e geração por volume. Mudança observada invalida a sessão; marcador ausente/indisponível é `UNVERIFIABLE`, não “estável”.
-- `CancellationSignal` ligado ao cancelamento da consulta MediaStore.
-- Acesso parcial no Android 14+ é mostrado como cobertura parcial para imagens/vídeos; áudio usa a permissão granular independente `READ_MEDIA_AUDIO` no Android 13+.
-- Miniaturas carregadas sob demanda para a página atual, com no máximo quatro operações de leitura simultâneas e sinal de cancelamento.
-- Seleção local de até 500 URIs apenas para revisão; o ledger é limitado e não oferece operação de exclusão.
-- Histórico de navegação limitado às últimas 50 páginas.
-- Nenhuma ação de Lixeira, exclusão permanente, limpeza de cache de terceiros ou Billing nesta etapa.
+The Android application uses native Android Views and the MediaStore APIs. The application can query photos, videos and audio exposed by MediaStore, one bounded page at a time (100 rows in the UI). It tracks permissions, storage volumes and source revision markers where Android exposes them. On Android 14 and later, selected-photo/video access is reported as partial coverage.
 
-## Delimitação de produto
+The recovery branch adds a global mission scanner that iterates through accessible media kinds, volumes and MediaStore pages. It is cancelable and has explicit safety limits for row counts and duplicate-candidate memory. It reports partial coverage when a permission, provider, revision check or safety limit prevents a complete scan. Exact duplicates are only confirmed when non-empty SHA-256 hashes match. If global duplicate coverage is partial, the scanner does not auto-select duplicate files for deletion.
 
-Esta fatia cumpre a direção da planta v1.9 para paginação incremental e revisão somente leitura. Ainda não implementa duplicatas SHA-256, imagens semelhantes, análise de arquivos Downloads/documentos via SAF, histórico persistente, exportação Pro ou tarefas agendadas.
+Large-file and old-media missions prepare review candidates. A result is not a deletion: the user must review the selection and approve the Android system consent flow. The review/operation code revalidates each URI before requesting an operation.
 
-Não afirmar que o telefone está “limpo”, que bytes foram liberados ou que uma página representa toda a biblioteca quando o acesso for parcial, a geração não puder ser verificada ou o provedor não confirmar a paginação. A tela informa somente o conteúdo da página e os avisos de cobertura.
+### Known platform limits
 
-## Ferramentas declaradas
+- The trash/delete request coordinator uses the official MediaStore consent request APIs available from Android 11/API 30. The current implementation disables those operations on Android 10/API 29 even though minSdk is 29. This must be resolved before claiming API 29 cleanup support.
+- Moving a file to the Android trash is not counted as freed storage. Space is credited only after permanent deletion is confirmed by the provider.
+- MediaStore does not cover every arbitrary document or Downloads location. Generic documents require a user-selected Storage Access Framework workflow; that is not implemented yet.
+- The app does not clean private caches belonging to other apps, boost RAM, cool the device, or accelerate the CPU.
+- Similar-photo detection, blur/quality detection, video compression and persistent storage history are not implemented.
 
-| Componente | Versão configurada |
-|---|---:|
-| Android Gradle Plugin | 8.13.2 |
-| Kotlin Gradle Plugin | 2.3.21 |
-| Gradle Wrapper | 8.13 |
-| JDK | 17 ou superior |
-| Android SDK Platform | 36 |
-| Android Build Tools | 35.0.0 requerido pelo script de validação |
+## Monetization state
 
-A combinação foi escolhida dentro das faixas de compatibilidade publicadas para AGP, Gradle e Kotlin. Isso não substitui a execução do build sobre este ZIP.
+The source integrates Google Play Billing Client and currently queries these product IDs:
 
-## Estrutura principal
+- `sweep_pro_monthly` — subscription
+- `sweep_pro_annual` — subscription
+- `sweep_pro_lifetime` — one-time product
 
-```text
-Sweep/
-├── app/
-│   └── src/
-│       ├── main/
-│       │   ├── java/com/rdf112/sweep/
-│       │   │   ├── MainActivity.kt
-│       │   │   ├── data/media/AndroidMediaPageRepository.kt
-│       │   │   └── presentation/scan/MediaScanViewModel.kt
-│       │   ├── res/values/                 # Português
-│       │   └── res/values-en/              # Inglês
-│       └── androidTest/
-├── domain/
-│   └── src/
-│       ├── main/kotlin/com/rdf112/sweep/domain/
-│       │   ├── model/
-│       │   ├── paging/
-│       │   ├── repository/
-│       │   ├── selection/
-│       │   └── billing/                    # Política pura; não é Billing integrado
-│       └── test/
-├── docs/
-├── scripts/prepare_and_test.sh
-├── scripts/run_instrumented_tests.sh
-├── gradle/wrapper/
-├── gradlew
-└── gradlew.bat
-```
+These IDs and purchase types are source configuration, not proof of activation in the Play Console. The current client checks the presence of the Play purchase signature/JSON fields but does not perform cryptographic token validation through a trusted backend. Do not represent local entitlement as production-grade purchase verification. Real catalog queries, test purchases, pending/cancelled/restored purchases, acknowledgement and subscription lifecycle must be tested before selling Pro.
 
-## Como validar em um ambiente Android
+## Build and verification
 
-Requisitos: JDK 17+, pelo menos 4 GB livres no volume do projeto, Android SDK Platform 36 e Build Tools 35.0.0, licenças aceitas e conectividade para obter Gradle/dependências na primeira execução.
+Requirements:
 
-Na raiz extraída:
+- JDK 17
+- Gradle Wrapper 8.13
+- Android SDK Platform 36
+- Android Build Tools 35.0.0
+- Network access on the first run to download Gradle and dependencies
+
+Debug/unit verification:
 
 ```bash
-bash scripts/prepare_and_test.sh
+./gradlew --no-daemon \
+  :domain:test \
+  :app:testDebugUnitTest \
+  :app:lintDebug \
+  :app:assembleDebug \
+  :app:assembleDebugAndroidTest
 ```
 
-O script executa `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug` e `:app:assembleDebugAndroidTest`. Não apaga caches nem arquivos do usuário. O APK debug e o APK de testes não são artefatos de produção.
+Instrumented tests require a connected Android device or emulator:
 
-Com um emulador ou telefone autorizado conectado via `adb`, execute também `bash scripts/run_instrumented_tests.sh` para rodar `:app:connectedDebugAndroidTest`. Repita em cada API da matriz (29, 30, 33, 34, 35 e 36) e registre modelo/API e logs; um único aparelho não cobre a matriz.
+```bash
+./gradlew --no-daemon :app:connectedDebugAndroidTest
+```
 
-Se o ambiente não tiver rede, Gradle Wrapper/cache ou SDK completo, a execução falhará antes de concluir o gate. Registre a saída completa; não interprete um passo ignorado como teste aprovado.
+In GitHub Codespaces, use the branch listed above. The `main` branch still contains an old machine-specific `org.gradle.java.home` value; the recovery branch removes it and uses the JDK selected by the environment. A local PowerShell prompt reporting `adb: no devices/emulators found` means no Android device or emulator is connected; it is not an application test result.
 
-## Assinatura e publicação
+The CI workflow builds Debug, runs unit tests and Lint, then runs instrumented tests on an Android 35 emulator. A green build is necessary but not sufficient: physical-device permission, MediaStore, cleanup, Billing, accessibility and OEM tests are still required.
 
-`bundleRelease` e `assembleRelease` são bloqueados até que `keystore.properties` e o JKS correto estejam configurados localmente. O ZIP inclui somente `keystore.properties.example`, sem senha ou chave. Não crie outro JKS por tentativa. Compare o certificado com a chave de upload aceita pela Play Console.
+## Signing and release
 
-Antes de um release real, ainda são necessários: código histórico/artefato publicado para comparação de regressão; recuperação e teste de Billing/Pro; testes Gradle e Lint aprovados; teste instrumentado no emulador/aparelho; testes de MediaStore nos níveis de API e fabricantes suportados; revisão de acessibilidade/performance; política de privacidade e Data safety alinhados; AAB assinado e inspecionado; teste interno/fechado e aprovação da conta.
+Release tasks are intentionally blocked unless the legitimate upload keystore and matching credentials are provided. Never generate a replacement JKS by guessing. The certificate must match the upload certificate accepted by Play App Signing.
+
+Before a release:
+
+1. Confirm the highest published versionCode and package in Play Console.
+2. Confirm the upload certificate.
+3. Verify real product IDs, product types, offers and country availability.
+4. Finish purchase-token validation and entitlement reconciliation.
+5. Test permissions, global scanning, safe cleanup and restore on real devices.
+6. Pass unit, lint, emulator and representative physical-device tests.
+7. Verify privacy policy, Data Safety, manifest and SDK declarations against the final binary.
+8. Generate and inspect a correctly signed AAB, then use internal/closed testing before production.
+
+A successful Debug build or an emulator run does not make the app production-ready.
