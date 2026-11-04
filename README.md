@@ -1,4 +1,11 @@
-# Midiastore — Android storage manager
+# Midiastore — Pro phone cleaner & storage analyzer
+
+## Posicionamento e modelo comercial confirmados: Pro + Freemium
+
+O Midiastore será um **limpador inteligente de celular (phone cleaner)** com apresentação premium. O plano gratuito inclui análise das mídias acessíveis, localização de arquivos grandes e cópias exatas, revisão manual e limpeza com confirmação do Android. O benefício Pro já implementado no cliente é exportar o resumo da seleção revisada. Histórico avançado, previsão de armazenamento e análise visual continuam no roadmap; não devem ser anunciados como recursos disponíveis.
+
+Novas compras Pro permanecem desativadas até que a validação segura de purchaseToken por backend/Google Play Developer API esteja implementada e testada. Segurança, proteção do original e consentimento do Android permanecem gratuitos.
+
 
 **Status:** development / recovery. This repository is not a release candidate and must not be submitted to Google Play until all P0 gates in `docs/RELEASE_BLOCKERS.md` are closed.
 

@@ -4,7 +4,7 @@ Data da revisão: 03/11/2026. A marca comercial e a ficha de teste interno confi
 
 ## Tese
 
-Ser um assistente local de armazenamento que explica o que ocupa espaço, encontra oportunidades verificáveis e deixa cada decisão destrutiva sob controle explícito da pessoa. A promessa não é “limpar tudo”; é mostrar evidência, impacto provável, cobertura e resultado confirmado.
+Ser um **limpador inteligente de celular (phone cleaner) com posicionamento Pro**: explicar o que ocupa espaço, encontrar oportunidades verificáveis e deixar cada decisão destrutiva sob controle explícito da pessoa. A promessa não é “limpar tudo”; é mostrar evidência, impacto provável, cobertura e resultado confirmado.
 
 ## Usuário prioritário
 
@@ -50,9 +50,9 @@ As notas são julgamento de produto, não medição de mercado. A pesquisa de co
 - Sem rede, conta, analytics remoto ou exclusão automatizada.
 - Métrica de sucesso: proporção de previsões que permanecem dentro do intervalo publicado após 14/30 dias; se não houver validação, manter o recurso como experimental.
 
-## Monetização
+## Monetização — decisão confirmada: Freemium
 
-A análise e controles básicos de segurança ficam no plano gratuito. Pro pode oferecer análise em lote/volume, histórico local, exportação, agrupamento visual revisável e relatórios avançados, desde que os recursos existam e tenham custo marginal baixo. Não bloquear a visualização dos arquivos, desfazer a proteção do original ou cobrar por consentimento seguro. SKU/preços e estratégia detalhados em [REVENUE_AND_PRICING_STRATEGY.md](REVENUE_AND_PRICING_STRATEGY.md).
+O plano gratuito mantém análise de fotos, vídeos e áudios acessíveis, localização de arquivos grandes e cópias exatas, revisão manual, proteção do original e limpeza com consentimento oficial do Android. O benefício Pro já presente no código é exportar o resumo da seleção revisada. Histórico avançado, previsão de armazenamento e agrupamento visual permanecem no roadmap, não como funcionalidades disponíveis. Nunca cobrar por segurança, proteção do original, revisão ou consentimento. SKUs e estado do Billing estão detalhados em [REVENUE_AND_PRICING_STRATEGY.md](REVENUE_AND_PRICING_STRATEGY.md).
 
 ## Limite de identidade
 

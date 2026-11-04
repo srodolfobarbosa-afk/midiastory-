@@ -47,7 +47,7 @@ Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/
 | Exclusão permanente | API 29+ implementada na branch | API29 usa RecoverableSecurityException por URI; API30+ usa createDeleteRequest; estado posterior é consultado | Fluxo API29 recém-implementado e ainda sem validação em emulador/aparelho; API30+ também requer QA de aceitação/cancelamento/parcial | Testar API29 aceitar/cancelar/itens próprios e de outros apps; testar API30+ aceitar/cancelar/parcial |
 | Recuperação da Lixeira | Implementada parcialmente | Ledger local de URIs e createTrashRequest(moveToTrash=false) | Ainda sem prova instrumentada de restore parcial entre OEMs | Testar restore de lote e URIs que falham |
 | Espaço liberado | Corrigido parcialmente | Mover para Lixeira não é registrado como liberado; exclusão só contabiliza URIs ausentes confirmadas após resultado OK | Ainda precisa confrontar com delta de StatFs real; consultas podem ter atraso de provider | Medir antes/depois em telefone real |
-| Medidor storage | Parcial | StatFs em `/data` | Não é distribuição por categoria nem necessariamente armazenamento removível total | Renomear indicador e validar cartões SD |
+| Medidor storage | Parcial, origem corrigida no commit `d32bb92` | `StatFs` no armazenamento compartilhado principal via `Environment.getExternalStorageDirectory()` | O medidor não soma cartão SD nem outros volumes; volumes adicionais aparecem separadamente em Arquivos quando acessíveis | Validar em aparelhos físicos e comparar com Configurações do Android |
 | Histórico de análise | Ausente | Há histórico de paginação em memória, ledger da Lixeira e telemetria local separados | Não existe histórico persistente de sessões com snapshots por categoria | Implementar Storage History depois de P0 |
 | SAF / Downloads / Documentos | Ausente | Não há fluxo de pasta selecionada via SAF | MediaStore não representa todo arquivo do usuário | Adicionar SAF opt-in e testes de árvore URI |
 | WorkManager / agendamento | Ausente | Sem worker funcional | Sem alertas ou limpeza agendada | Planejar só após estabilidade; nunca limpeza automática |
@@ -61,7 +61,7 @@ Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/
 | Feedback de compra | Melhorado na branch | Botões mostram quando o fluxo não inicia; status diferencia reconciliação de plano gratuito | Precisa teste de todos os estados Billing e falhas de rede | Testar conexão, indisponível, cancelado, pending e owned |
 | Segurança do entitlement | Não pronto para produção | Cliente verifica presença de assinatura e JSON, package e estado | Não valida criptograficamente purchaseToken em backend/API confiável; risco de entitlement falsificado | Implementar backend confiável e reconciliação idempotente |
 | Pro / restore | Parcial | Consulta compras e faz acknowledge se elegível localmente | Não testado em reembolso, expiração, cancelamento, troca de plano e migração de usuário | Ciclo completo com licença Play |
-| Exportação Pro | Parcial | ACTION_SEND exporta resumo da seleção atual | Não prova análise completa; é share-sheet e o usuário escolhe destino | Atualizar disclosure e testar Pro real |
+| Exportação Pro | Implementada no cliente; comercialização bloqueada | ACTION_SEND exporta o resumo da seleção revisada somente com entitlement Pro verificado | Novas compras permanecem desativadas até validação de purchaseToken por backend confiável | Configurar backend, testar entitlement e compartilhar relatório em aparelho |
 | Recebimento financeiro | Informado pelo proprietário como habilitado em 03/11/2026 | Perfil financeiro da conta está destravado segundo o proprietário | Isso não confirma produtos in-app ativos ou compra testada | Conferir produtos e executar compra de teste no listing |
 
 ## UX, identidade e política
@@ -73,6 +73,10 @@ Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/
 | Navegação | Parcial | HOME, FILES, OAAS, PRO | Conteúdo ainda pode parecer complexo; não há estudo usability com testador | Teste guiado com 3 usuários sem assistência |
 | Acessibilidade | Não verificada | Views e MaterialButtons | TalkBack, contraste, hit targets, escala de fonte ainda não passaram QA | Testes manuais e automated accessibility scan |
 | Privacidade / Data Safety | Draft técnico | Documento revisto para não afirmar respostas definitivas | Revisão depende do binário final, Billing, ACTION_SEND e SDKs | Auditoria do manifesto e formulário Play final |
+
+## Decisão comercial atual
+
+O posicionamento aprovado é limpador de celular com apresentação Pro e modelo Freemium. Análise, revisão manual, proteção do original e limpeza com confirmação continuam gratuitos. O benefício Pro implementado é a exportação do resumo da seleção revisada. Histórico, previsão de armazenamento e análise visual não são funcionalidades disponíveis.
 
 ## Alegações proibidas até validação
 

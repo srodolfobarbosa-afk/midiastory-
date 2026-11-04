@@ -2,6 +2,10 @@
 
 Data: 04/11/2026. Não há dados internos de conversão, churn ou custos por usuário. O proprietário informou que habilitou o perfil financeiro em 03/11/2026; catálogo de produtos, ativação, preços e vendas in-app ainda não foram verificados.
 
+## Decisão confirmada pelo proprietário: Pro + Freemium (04/11/2026)
+
+O produto é um limpador de celular com posicionamento premium. O plano Free deve entregar utilidade real: análise local das mídias acessíveis, arquivos grandes, cópias exatas, revisão manual e limpeza segura com confirmação do Android. Pro monetiza conveniência e relatórios, não segurança. No código atual, exportar o resumo da seleção revisada é o benefício pago implementado; histórico avançado, previsão e análise visual ainda não devem ser anunciados como disponíveis. Novas compras seguem pausadas até que a validação segura de purchaseToken esteja configurada e testada.
+
 ## Modelo inicial
 
 | Free | Pro (hipótese a testar) |
