@@ -44,7 +44,7 @@ jobs:
         run: >-
           ./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug
           :app:assembleDebug :app:assembleDebugAndroidTest
-      - name: Run instrumented tests on Android 35 emulator
+      - name: Run instrumented tests on Android API${{ matrix.api-level }} emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
@@ -94,7 +94,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-test-reports
+          name: android-test-reports-api${{ matrix.api-level }}
           path: |
             app/build/test-results/testDebugUnitTest/
             app/build/reports/tests/testDebugUnitTest/
