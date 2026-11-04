@@ -48,7 +48,7 @@ Nenhum teste de compra real, restore/reembolso/expiração, limpeza em aparelho 
 1. CI verde no HEAD exato da PR #3, incluindo teste instrumentado Android 35.
 2. Diagnóstico e correção do teste MediaStore instrumentado.
 3. Provar varredura global e fail-closed em datasets grandes.
-4. Resolver limpeza API29 ou reavaliar minSdk com estudo de impacto.
+4. Validar o fluxo recém-implementado de exclusão permanente API29 via RecoverableSecurityException em emulador e aparelho físico; Lixeira/restauração permanecem API30+.
 5. Confirmar SKUs, tipos, ofertas, países e preços no Play Console.
 6. Implementar validação de purchaseToken por backend confiável / Google Play Developer API.
 7. Testar billing completo com license testers.
