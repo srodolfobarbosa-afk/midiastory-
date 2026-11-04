@@ -38,6 +38,8 @@ const val SWEEP_PAGE_HISTORY_LIMIT = 50
 const val SWEEP_GLOBAL_SCAN_MAX_ROWS = 250_000
 const val SWEEP_GLOBAL_DUPLICATE_CANDIDATES_LIMIT = 20_000
 const val SWEEP_GLOBAL_UNIQUE_SIZE_LIMIT = 100_000
+const val SWEEP_GLOBAL_DUPLICATE_HASH_MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
+const val SWEEP_GLOBAL_DUPLICATE_HASH_BUDGET_BYTES = 10L * 1024L * 1024L * 1024L
 
 enum class ScanUiStatus {
     IDLE,
@@ -323,6 +325,7 @@ class MediaScanViewModel(
                             volumeName = volume,
                             offset = offset,
                             pageSize = SWEEP_PAGE_SIZE,
+                            hashSameSizeCandidates = false,
                         )
                         val page = repository.loadPage(session, request)
                         coroutineContext.ensureActive()
@@ -474,11 +477,29 @@ class MediaScanViewModel(
                             emptyList()
                         } else {
                             val hashed = ArrayList<MediaRecord>(candidateRows)
-                            for (group in groups) {
+                            var bytesHashed = 0L
+                            var hashBudgetReached = false
+                            duplicateHashLoop@ for (group in groups) {
                                 for (record in group) {
                                     coroutineContext.ensureActive()
-                                    val hash = record.contentSha256?.takeIf(String::isNotBlank)
-                                        ?: repository.computeSha256(record.uri)
+                                    val existingHash = record.contentSha256?.takeIf(String::isNotBlank)
+                                    if (existingHash != null) {
+                                        hashed += record.copy(contentSha256 = existingHash)
+                                        continue
+                                    }
+                                    if (
+                                        record.sizeBytes <= 0L ||
+                                        record.sizeBytes > SWEEP_GLOBAL_DUPLICATE_HASH_MAX_FILE_BYTES ||
+                                        record.sizeBytes > SWEEP_GLOBAL_DUPLICATE_HASH_BUDGET_BYTES - bytesHashed
+                                    ) {
+                                        coverageComplete = false
+                                        warningCount++
+                                        safetyLimitReached = true
+                                        hashBudgetReached = true
+                                        break@duplicateHashLoop
+                                    }
+                                    bytesHashed += record.sizeBytes
+                                    val hash = repository.computeSha256(record.uri)
                                     if (hash.isNullOrBlank()) {
                                         coverageComplete = false
                                         warningCount++
@@ -487,6 +508,10 @@ class MediaScanViewModel(
                                         hashed += record.copy(contentSha256 = hash)
                                     }
                                 }
+                            }
+                            if (hashBudgetReached) {
+                                // Partial hashing can never produce an automatic duplicate cleanup proposal.
+                                coverageComplete = false
                             }
                             hashed
                         }
