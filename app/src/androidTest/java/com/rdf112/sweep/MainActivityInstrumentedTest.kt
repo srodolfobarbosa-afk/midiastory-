@@ -1,8 +1,18 @@
 package com.rdf112.sweep
 
+import android.content.ContentValues
+import android.content.Context
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.rdf112.sweep.data.media.AndroidTrashOperationCoordinator
+import com.rdf112.sweep.data.media.Api29DeleteAttempt
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -17,4 +27,35 @@ class MainActivityInstrumentedTest {
             }
         }
     }
+    @Test
+    fun android10CanDeleteOwnedMediaAndVerifyTheResult() {
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q) return
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val resolver = context.contentResolver
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "midiastore-api29-${System.nanoTime()}.jpg")
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/MidiastoreTest")
+        }
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            ?: throw AssertionError("MediaStore did not create the API29 test image")
+
+        try {
+            resolver.openOutputStream(uri)?.use { it.write(byteArrayOf(0x01, 0x02, 0x03, 0x04)) }
+                ?: throw AssertionError("MediaStore did not open the test image")
+            val coordinator = AndroidTrashOperationCoordinator(context)
+            assertTrue(coordinator.supportsPermanentDelete())
+            assertEquals(Api29DeleteAttempt.Deleted, runBlocking {
+                coordinator.deleteApi29Item(uri.toString())
+            })
+            val verified = runBlocking {
+                coordinator.verifyPostDeleteUris(listOf(uri.toString()))
+            }
+            assertTrue("Deleted URI must be absent from MediaStore", uri.toString() in verified)
+        } finally {
+            resolver.delete(uri, null, null)
+        }
+    }
+
 }
