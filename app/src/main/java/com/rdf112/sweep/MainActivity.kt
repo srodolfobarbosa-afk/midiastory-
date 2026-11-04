@@ -85,7 +85,11 @@ class MainActivity : AppCompatActivity() {
             viewModel.startSession()
             switchTab(AppTab.FILES)
         } else {
+            pendingOutcomeMission = null
             statusText.text = getString(R.string.permission_denied)
+            if (::oaasPipelineStatus.isInitialized) {
+                oaasPipelineStatus.text = getString(R.string.oaas_mission_scan_failed)
+            }
         }
     }
 
@@ -175,6 +179,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var spaceMetricsText: TextView
     private lateinit var radarConsentCheckBox: CheckBox
     private var activeTab: AppTab = AppTab.HOME
+    private var pendingOutcomeMission: DesiredOutcomeMission? = null
 
     // Containers das 4 Abas
     private lateinit var homeSection: LinearLayout
@@ -211,6 +216,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var volumeSpinner: Spinner
     private lateinit var scanButton: MaterialButton
     private lateinit var permissionButton: MaterialButton
+    private lateinit var filesPermissionButton: MaterialButton
     private lateinit var cancelButton: MaterialButton
     private lateinit var previousButton: MaterialButton
     private lateinit var nextButton: MaterialButton
@@ -380,7 +386,7 @@ class MainActivity : AppCompatActivity() {
         }
         navHomeBtn = navTabButton("Início") { switchTab(AppTab.HOME) }
         navFilesBtn = navTabButton("Arquivos") { switchTab(AppTab.FILES) }
-        navOaasBtn = navTabButton("Missões 10x") { switchTab(AppTab.OAAS) }
+        navOaasBtn = navTabButton("Missões") { switchTab(AppTab.OAAS) }
         navProBtn = navTabButton("Planos Pro") { switchTab(AppTab.PRO) }
 
         bottomNav.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
@@ -519,15 +525,15 @@ class MainActivity : AppCompatActivity() {
         val filterRow1 = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
         filterAllButton = button(getString(R.string.filter_all)) { viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS) }
         filterLargeButton = button(getString(R.string.filter_large_10mb)) { viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB) }
-        filterRow1.addView(filterAllButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
-        filterRow1.addView(filterLargeButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4) })
+        filterRow1.addView(filterAllButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginEnd = dp(4) })
+        filterRow1.addView(filterLargeButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginStart = dp(4) })
         controls.addView(filterRow1, bottom(6))
 
         val filterRow2 = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
         filterDuplicatesButton = button(getString(R.string.filter_same_size)) { viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES) }
         filterOldButton = button(getString(R.string.filter_older_30d)) { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }
-        filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
-        filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4) })
+        filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginEnd = dp(4) })
+        filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginStart = dp(4) })
         controls.addView(filterRow2, bottom(12))
 
         controls.addView(label(getString(R.string.volume_title), 11f, R.color.sweep_muted, true), bottom(4))
@@ -543,6 +549,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         controls.addView(volumeSpinner, LinearLayout.LayoutParams(-1, dp(48)))
+        filesPermissionButton = button(getString(R.string.permission_continue)) {
+            requestMediaPermissions()
+        }.apply {
+            visibility = View.GONE
+        }
+        controls.addView(filesPermissionButton, top(8))
         addView(wrap(controls), bottom(14))
 
         val resultsCard = card()
@@ -689,7 +701,7 @@ class MainActivity : AppCompatActivity() {
         proCard.addView(label(getString(R.string.pro_card_subtitle), 13f, R.color.sweep_muted, false), top(6))
 
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
-            billingGateway.launchPurchaseFlow(this@MainActivity, BillingStatePolicy.PRODUCT_ANNUAL)
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
         }.apply {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
@@ -697,12 +709,12 @@ class MainActivity : AppCompatActivity() {
         proCard.addView(planAnnualButton, top(14))
 
         planMonthlyButton = button(getString(R.string.plan_monthly_default)) {
-            billingGateway.launchPurchaseFlow(this@MainActivity, BillingStatePolicy.PRODUCT_MONTHLY)
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
         }
         proCard.addView(planMonthlyButton, top(8))
 
         planLifetimeButton = button(getString(R.string.plan_lifetime_default)) {
-            billingGateway.launchPurchaseFlow(this@MainActivity, BillingStatePolicy.PRODUCT_LIFETIME)
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
         }
         proCard.addView(planLifetimeButton, top(8))
 
@@ -752,7 +764,7 @@ class MainActivity : AppCompatActivity() {
         proStatusBadge.text = when (state) {
             ProAccessSummaryState.PRO_GRANTED -> getString(R.string.pro_status_active)
             ProAccessSummaryState.PENDING_PAYMENT -> getString(R.string.pro_status_pending)
-            ProAccessSummaryState.RECONCILIATION_REQUIRED,
+            ProAccessSummaryState.RECONCILIATION_REQUIRED -> getString(R.string.pro_status_reconciliation)
             ProAccessSummaryState.FREE_NO_ACTIVE_PURCHASE -> getString(R.string.pro_status_free)
         }
     }
@@ -775,13 +787,26 @@ class MainActivity : AppCompatActivity() {
             } else {
                 getString(R.string.plan_annual_with_price, annual.formattedPrice)
             }
+        } else if (annual != null && !annual.isAvailable) {
+            planAnnualButton.text = getString(R.string.plan_unavailable)
         }
         if (monthly != null && monthly.formattedPrice.isNotBlank()) {
             planMonthlyButton.text = getString(R.string.plan_monthly_with_price, monthly.formattedPrice)
+        } else if (monthly != null && !monthly.isAvailable) {
+            planMonthlyButton.text = getString(R.string.plan_unavailable)
         }
         if (lifetime != null && lifetime.formattedPrice.isNotBlank()) {
             planLifetimeButton.text = getString(R.string.plan_lifetime_with_price, lifetime.formattedPrice)
+        } else if (lifetime != null && !lifetime.isAvailable) {
+            planLifetimeButton.text = getString(R.string.plan_unavailable)
         }
+    }
+
+    private fun requestPlanPurchase(productId: String) {
+        val launched = billingGateway.launchPurchaseFlow(this, productId)
+        statusText.text = getString(
+            if (launched) R.string.billing_flow_started else R.string.billing_launch_not_ready
+        )
     }
 
     private fun openPlayStoreSubscriptions() {
@@ -815,12 +840,35 @@ class MainActivity : AppCompatActivity() {
     private fun isGranted(permission: String): Boolean =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
+    private fun hasDeniedMediaKind(): Boolean {
+        val granted = buildSet {
+            listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                MediaPermissionPolicy.READ_MEDIA_IMAGES,
+                MediaPermissionPolicy.READ_MEDIA_VIDEO,
+                MediaPermissionPolicy.READ_MEDIA_AUDIO,
+                MediaPermissionPolicy.READ_MEDIA_VISUAL_USER_SELECTED,
+            ).filterTo(this) { isGranted(it) }
+        }
+        return MediaKind.entries.any { kind ->
+            MediaPermissionPolicy.accessLevel(Build.VERSION.SDK_INT, kind, granted) == AccessLevel.DENIED
+        }
+    }
+
     private fun renderState(state: MediaScanUiState) {
         progress.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         cancelButton.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         scanButton.isEnabled = !state.isLoading
         permissionButton.isEnabled = !state.isLoading
-        permissionButton.visibility = if (state.shouldShowReviewAccessAction && !hasAnyMediaPermission()) View.VISIBLE else View.GONE
+        val canChangePartialVisualAccess = Build.VERSION.SDK_INT >= 34 &&
+            isGranted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) &&
+            (!isGranted(MediaPermissionPolicy.READ_MEDIA_IMAGES) ||
+                !isGranted(MediaPermissionPolicy.READ_MEDIA_VIDEO))
+        val shouldReviewPermissions = state.shouldShowReviewAccessAction &&
+            (hasDeniedMediaKind() || canChangePartialVisualAccess)
+        permissionButton.visibility = if (shouldReviewPermissions) View.VISIBLE else View.GONE
+        filesPermissionButton.visibility = if (shouldReviewPermissions) View.VISIBLE else View.GONE
+        filesPermissionButton.isEnabled = !state.isLoading
         photosButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.IMAGE)
         videosButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.VIDEO)
         audioButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.AUDIO)
@@ -886,6 +934,30 @@ class MainActivity : AppCompatActivity() {
         updatePage(state)
         updateReview(state)
         updateVisibleCheckboxes(state)
+        resumePendingOutcomeMission(state)
+    }
+
+    private fun resumePendingOutcomeMission(state: MediaScanUiState) {
+        val mission = pendingOutcomeMission ?: return
+        if (state.isLoading) return
+
+        if (state.currentPage != null && state.status in setOf(ScanUiStatus.READY, ScanUiStatus.PARTIAL)) {
+            pendingOutcomeMission = null
+            runOutcomeMission(mission)
+            return
+        }
+
+        if (state.status in setOf(
+                ScanUiStatus.FAILED,
+                ScanUiStatus.PAGING_UNSUPPORTED,
+                ScanUiStatus.NO_ACCESS,
+                ScanUiStatus.SESSION_STALE,
+                ScanUiStatus.CANCELLED,
+            )
+        ) {
+            pendingOutcomeMission = null
+            oaasPipelineStatus.text = getString(R.string.oaas_mission_scan_failed)
+        }
     }
 
     private fun isKindAccessible(state: MediaScanUiState, kind: MediaKind): Boolean {
@@ -1124,11 +1196,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun runOutcomeMission(mission: DesiredOutcomeMission) {
         val currentState = viewModel.state.value
-        if (currentState.currentPage == null) {
-            startScanOrRequestAccess()
+        if (currentState.isLoading || currentState.currentPage == null) {
+            pendingOutcomeMission = mission
+            if (!currentState.isLoading) startScanOrRequestAccess()
             oaasPipelineStatus.text = getString(R.string.oaas_starting_scan_first)
             return
         }
+        pendingOutcomeMission = null
         val plan = viewModel.executeOutcomeMission(mission) ?: return
         outcomeTelemetry.recordMissionRequested(mission, plan.autoSelectedRecords.size)
         refreshFlywheelSummary()
