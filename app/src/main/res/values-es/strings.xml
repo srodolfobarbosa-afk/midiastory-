@@ -62,4 +62,5 @@
     <string name="storage_free_subline">%1$s libres en este dispositivo</string>
     <string name="exact_copy_badge"> · Copia exacta</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
+    <string name="api29_delete_notice">En Android 10, Android puede pedir permiso para cada archivo. Revisa cada solicitud del sistema.</string>
 </resources>
