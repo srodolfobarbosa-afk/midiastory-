@@ -499,7 +499,13 @@ class MediaScanViewModel(
                                         break@duplicateHashLoop
                                     }
                                     bytesHashed += record.sizeBytes
-                                    val hash = repository.computeSha256(record.uri)
+                                    val hash = repository.computeSha256(
+                                        record.uri,
+                                        maxBytes = minOf(
+                                            SWEEP_GLOBAL_DUPLICATE_HASH_MAX_FILE_BYTES,
+                                            SWEEP_GLOBAL_DUPLICATE_HASH_BUDGET_BYTES - (bytesHashed - record.sizeBytes),
+                                        ),
+                                    )
                                     if (hash.isNullOrBlank()) {
                                         coverageComplete = false
                                         warningCount++
