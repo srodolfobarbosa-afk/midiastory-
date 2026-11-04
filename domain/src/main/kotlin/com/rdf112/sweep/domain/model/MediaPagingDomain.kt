@@ -9,6 +9,8 @@ data class MediaPageRequest(
     val volumeName: String,
     val offset: Int,
     val pageSize: Int = DEFAULT_PAGE_SIZE,
+    /** Skip per-page duplicate hashing when a global mission will hash cross-page groups. */
+    val hashSameSizeCandidates: Boolean = true,
 ) {
     init {
         require(sessionId.isNotBlank()) { "sessionId must not be blank" }
