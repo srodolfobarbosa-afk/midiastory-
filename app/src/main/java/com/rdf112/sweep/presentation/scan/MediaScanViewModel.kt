@@ -285,7 +285,8 @@ class MediaScanViewModel(
 
                 // For exact duplicates, retain one record per observed size and expand only repeated sizes.
                 // A hard cap prevents an extremely large library from exhausting application memory.
-                val firstBySize = LinkedHashMap<Long, MutableList<MediaRecord>>()
+                val firstBySize = LinkedHashMap<Long, MediaRecord>()
+                val duplicateGroups = LinkedHashMap<Long, MutableList<MediaRecord>>()
                 var duplicateCandidateRows = 0
 
                 fun publishProgress(message: String? = null) {
@@ -390,24 +391,31 @@ class MediaScanViewModel(
                                     }
                                 }
                                 DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> {
-                                    val bucket = firstBySize[record.sizeBytes]
-                                    if (bucket == null) {
-                                        if (firstBySize.size >= SWEEP_GLOBAL_UNIQUE_SIZE_LIMIT) {
-                                            safetyLimitReached = true
-                                            coverageComplete = false
-                                            warningCount++
-                                            break
-                                        }
-                                        firstBySize[record.sizeBytes] = mutableListOf(record)
-                                    } else {
-                                        bucket += record
+                                    if (record.sizeBytes <= 0L) continue
+                                    val duplicateBucket = duplicateGroups[record.sizeBytes]
+                                    if (duplicateBucket != null) {
+                                        duplicateBucket += record
                                         duplicateCandidateRows++
-                                        if (duplicateCandidateRows > SWEEP_GLOBAL_DUPLICATE_CANDIDATES_LIMIT) {
-                                            safetyLimitReached = true
-                                            coverageComplete = false
-                                            warningCount++
-                                            break
+                                    } else {
+                                        val firstRecord = firstBySize.remove(record.sizeBytes)
+                                        if (firstRecord != null) {
+                                            duplicateGroups[record.sizeBytes] = mutableListOf(firstRecord, record)
+                                            duplicateCandidateRows++
+                                        } else {
+                                            if (firstBySize.size + duplicateGroups.size >= SWEEP_GLOBAL_UNIQUE_SIZE_LIMIT) {
+                                                safetyLimitReached = true
+                                                coverageComplete = false
+                                                warningCount++
+                                                break
+                                            }
+                                            firstBySize[record.sizeBytes] = record
                                         }
+                                    }
+                                    if (duplicateCandidateRows > SWEEP_GLOBAL_DUPLICATE_CANDIDATES_LIMIT) {
+                                        safetyLimitReached = true
+                                        coverageComplete = false
+                                        warningCount++
+                                        break
                                     }
                                 }
                             }
@@ -458,7 +466,7 @@ class MediaScanViewModel(
                     DesiredOutcomeMission.FREE_MAX_SPACE_NOW,
                     DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D -> rankedCandidates
                     DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> {
-                        val groups = firstBySize.values.filter { it.size >= 2 }
+                        val groups = duplicateGroups.values
                         val candidateRows = groups.sumOf { it.size }
                         if (candidateRows > SWEEP_GLOBAL_DUPLICATE_CANDIDATES_LIMIT) {
                             coverageComplete = false
