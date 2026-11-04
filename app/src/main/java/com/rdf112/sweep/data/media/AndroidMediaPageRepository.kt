@@ -312,7 +312,11 @@ class AndroidMediaPageRepository(
                 else -> rowsRead == request.pageSize
             }
             val nextOffset = if (hasMore) absoluteEnd.toInt() else null
-            val enrichedRecords = populateStreamingSha256ForSameSizeCandidates(records)
+            val enrichedRecords = if (request.hashSameSizeCandidates) {
+                populateStreamingSha256ForSameSizeCandidates(records)
+            } else {
+                records
+            }
             return MediaPage(
                 request = request,
                 records = enrichedRecords,
