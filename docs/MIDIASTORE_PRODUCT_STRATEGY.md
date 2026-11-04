@@ -1,6 +1,6 @@
 # Midiastore: estratégia de produto 2027/2028
 
-Data da revisão: 03/11/2026. A marca comercial desejada é **Midiastore**. O identificador Android permanece `com.rdf112.sweep` e o namespace `com.rdf112.sweep` até validação do histórico de publicação e assinatura. A aplicação passou a exibir “Midiastore”; isso não muda a identidade de atualização.
+Data da revisão: 03/11/2026. A marca comercial e a ficha de teste interno confirmada pelo proprietário são **Midiastore**, package `com.rdf112.midiastore`. O namespace técnico e as pastas Kotlin permanecem `com.rdf112.sweep` como legado de implementação. Não alterar `applicationId`, versionCode ou assinatura sem verificar Play Console.
 
 ## Tese
 
@@ -56,4 +56,4 @@ A análise e controles básicos de segurança ficam no plano gratuito. Pro pode 
 
 ## Limite de identidade
 
-A consulta pública da Play para `com.rdf112.sweep` retornou HTTP 404 em 03/11/2026. Isso não prova que nunca foi publicado: pode estar não listado, em teste ou removido. Não alterar `applicationId`, namespace, versionCode para release nem certificado sem AAB histórico e acesso autorizado à Play Console.
+O proprietário mostrou o listing de teste interno `Midiastore — com.rdf112.midiastore`. A consulta pública de `com.rdf112.sweep` não determina o estado desse listing. Maior versionCode publicado e certificado de upload ainda precisam ser conferidos na Play Console. O código histórico do AAB de produção não foi recuperado.
