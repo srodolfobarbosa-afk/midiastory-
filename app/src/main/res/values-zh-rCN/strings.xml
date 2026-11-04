@@ -62,4 +62,5 @@
     <string name="storage_free_subline">此设备剩余 %1$s</string>
     <string name="exact_copy_badge"> · 完全相同的副本</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
+    <string name="api29_delete_notice">在 Android 10 上，系统可能会逐个文件请求授权。请检查每条系统确认提示。</string>
 </resources>
