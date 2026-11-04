@@ -39,7 +39,7 @@ Large-file and old-media missions prepare review candidates. A result is not a d
 
 ### Known platform limits
 
-- The trash/delete request coordinator uses the official MediaStore consent request APIs available from Android 11/API 30. The current implementation disables those operations on Android 10/API 29 even though minSdk is 29. This must be resolved before claiming API 29 cleanup support.
+- The recovery branch now enables permanent deletion on Android 10/API 29 through RecoverableSecurityException and the system consent screen, one URI at a time. This implementation still requires API29 emulator and physical-device validation. Android 10 does not expose the same batch Trash/restore APIs; Trash/restore remain API30+.
 - Moving a file to the Android trash is not counted as freed storage. Space is credited only after permanent deletion is confirmed by the provider.
 - MediaStore does not cover every arbitrary document or Downloads location. Generic documents require a user-selected Storage Access Framework workflow; that is not implemented yet.
 - The app does not clean private caches belonging to other apps, boost RAM, cool the device, or accelerate the CPU.
