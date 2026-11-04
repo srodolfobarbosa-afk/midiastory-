@@ -34,7 +34,7 @@ Atualizado: 04/11/2026
 9. Arquivos do mesmo tamanho sem SHA-256 confirmado não são classificados como duplicatas.
 10. Resposta nula do MediaStore não é interpretada como prova de exclusão.
 11. Arquivos movidos para a Lixeira não são contabilizados como espaço liberado; exclusão só credita bytes após confirmação.
-12. Adicionada uma varredura global cancelável por categorias, volumes e páginas. Duplicatas entre páginas são comparadas via SHA-256 em streaming. Se a cobertura global for parcial, duplicatas não são pré-selecionadas para exclusão.
+12. Adicionada uma varredura global cancelável por categorias, volumes e páginas. Duplicatas entre páginas são comparadas via SHA-256 em streaming. Limites: 2 GiB por arquivo e 10 GiB de hash por missão; hashing normal de página: 512 MiB por arquivo e 1 GiB por página. Se qualquer limite ou fonte não verificada for atingido, a cobertura é parcial e duplicatas não são pré-selecionadas para exclusão.
 13. Acrescentados testes de domínio/VM para duplicatas entre páginas e para bloquear seleção automática em cobertura incompleta.
 14. CI agora tenta executar testes instrumentados em emulador Android 35 e guardar relatórios JVM/Android para diagnóstico.
 
