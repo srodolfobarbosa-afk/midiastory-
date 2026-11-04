@@ -110,3 +110,18 @@ Não começar do zero, não descartar código já existente e não confundir doc
 - Localização: PT-BR/EN/fallback 152 chaves; outros seis idiomas 63/152 cada (534 faltantes).
 - Pesquisa de mercado e tecnologia atualizada; nenhum código de terceiros foi incorporado.
 - Manter PR #3 em Draft; não mergear, publicar ou gerar release assinado sem gates concluídos.
+
+## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+
+- Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
+- PR #3: aberta, Draft, base `main`, não merged.
+- `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
+- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
+- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+
+## Jornada principal Phone Cleaner — atualização de 04/11/2026
+
+A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
+
+A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.

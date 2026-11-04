@@ -116,3 +116,18 @@ Notas internas de 0 a 100; pesos: valor usuário 25, diferenciação 20, viabili
 A partir do commit 34df33f0, o botão principal e textos da home usam linguagem “Analisar meu celular / Scan my phone” e explicam que a pessoa verá o que ocupa espaço e escolherá o que limpar. Os commits posteriores 7e515c66 e d23268b4 atualizam apenas documentos de mercado, tecnologia, arquitetura, roadmap, segurança, qualidade e continuidade; não alteram a lógica do aplicativo.
 
 Assim, a última versão funcional do código permanece 34df33f0. A ponta da branch pode avançar com documentação sem que isso represente novas mudanças no binário. O CI deve confirmar o HEAD exato da branch.
+
+## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+
+- Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
+- PR #3: aberta, Draft, base `main`, não merged.
+- `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
+- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
+- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+
+## Jornada principal Phone Cleaner — atualização de 04/11/2026
+
+A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
+
+A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.

@@ -59,3 +59,12 @@ A PR #3 é uma etapa de recuperação, não um release candidate.
 - O medidor mede o armazenamento compartilhado primário; não somar SD/USB sem enumeração/validação própria.
 - PT-BR/EN/fallback: 152 strings; seis outros idiomas: 63/152 cada; 534 traduções pendentes.
 - O workflow do código antes das atualizações documentais estava queued; o estado do CI precisa ser reconsultado no HEAD exato após a atualização.
+
+## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+
+- Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
+- PR #3: aberta, Draft, base `main`, não merged.
+- `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
+- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
+- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.

@@ -79,3 +79,18 @@ O repositório está em recuperação controlada. O próximo marco é CI verde, 
 O posicionamento confirmado é Phone Cleaner com modelo Freemium. O cartão principal de armazenamento foi corrigido para medir o volume compartilhado primário. Quatro testes de domínio foram adicionados, mas ainda dependem de execução no CI. A pesquisa de mercado e tecnologia reforça que o diferenciador deve ser confiança, clareza de cobertura e prova de recuperação real, não a quantidade de ferramentas.
 
 A PR #3 permanece Draft, sem merge. O workflow do HEAD documentado anteriormente estava queued; não declarar build aprovado. Nenhum AAB assinado ou publicação foi produzido.
+
+## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+
+- Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
+- PR #3: aberta, Draft, base `main`, não merged.
+- `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
+- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
+- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+
+## Jornada principal Phone Cleaner — atualização de 04/11/2026
+
+A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
+
+A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.

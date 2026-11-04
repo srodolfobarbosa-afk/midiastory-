@@ -181,3 +181,12 @@ Esta mudança remove a dependência do serviço Settings no início do job; não
 A ação circular principal da Home agora chama a missão global de encontrar arquivos grandes em todas as categorias/volumes acessíveis, em vez de abrir somente a primeira página de fotos na aba Arquivos. Quando falta permissão, a seleção da missão é preservada; após o callback de permissão, a navegação retorna à aba Limpeza para mostrar o progresso da missão.
 
 A ação secundária foi renomeada para Abrir arquivos/Browse files, deixando claro que ela abre a navegação paginada por mídia. Um teste instrumentado verifica que a ação principal global está presente e clicável. A execução do teste continua dependente do workflow atual.
+
+## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+
+- Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
+- PR #3: aberta, Draft, base `main`, não merged.
+- `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
+- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
+- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.

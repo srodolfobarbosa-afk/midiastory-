@@ -95,3 +95,9 @@ A presença de código não é aprovação. Cada funcionalidade precisa de teste
 ## Direção de produto confirmada — 04/11/2026
 
 O primeiro release é um Phone Cleaner, com apresentação Pro e modelo Freemium. Análise essencial, revisão, proteção do original e consentimento do Android permanecem gratuitos. O benefício Pro atualmente implementado é exportar o resumo da seleção revisada. Não apresentar o app como gerenciador universal nem anunciar recursos de roadmap como disponíveis.
+
+## Jornada principal Phone Cleaner — atualização de 04/11/2026
+
+A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
+
+A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.
