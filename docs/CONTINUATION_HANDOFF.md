@@ -37,6 +37,7 @@ Atualizado: 04/11/2026
 12. Adicionada uma varredura global cancelável por categorias, volumes e páginas. Duplicatas entre páginas são comparadas via SHA-256 em streaming. Limites: 2 GiB por arquivo e 10 GiB de hash por missão; hashing normal de página: 512 MiB por arquivo e 1 GiB por página. Se qualquer limite ou fonte não verificada for atingido, a cobertura é parcial e duplicatas não são pré-selecionadas para exclusão.
 13. Acrescentados testes de domínio/VM para duplicatas entre páginas e para bloquear seleção automática em cobertura incompleta.
 14. CI agora tenta executar testes instrumentados em emulador Android 35 e guardar relatórios JVM/Android para diagnóstico.
+15. Implementado caminho de exclusão permanente no Android 10/API29 usando RecoverableSecurityException e consentimento oficial do sistema por URI. A verificação pós-exclusão consulta cada URI; bytes só são creditados para itens comprovadamente ausentes. Lixeira/restauração continuam API30+.
 
 ## Limites que continuam abertos
 
