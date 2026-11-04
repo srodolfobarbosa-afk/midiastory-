@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-expected_api="\${SWEEP_EXPECTED_API_LEVEL:-}"
+expected_api="$SWEEP_EXPECTED_API_LEVEL"
 if [[ ! "$expected_api" =~ ^[0-9]+$ ]]; then
   echo "SWEEP_EXPECTED_API_LEVEL must be set to the matrix Android API level." >&2
   exit 2
