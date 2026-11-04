@@ -1,5 +1,6 @@
 package com.rdf112.sweep.data.media
 
+import android.app.RecoverableSecurityException
 import android.content.ContentResolver
 import android.content.Context
 import android.content.IntentSender
@@ -24,6 +25,12 @@ import kotlinx.coroutines.withContext
  * Coordenador Android para revalidação item a item, Lixeira oficial de 30 dias (`createTrashRequest(..., true)`),
  * Exclusão Permanente (`createDeleteRequest`) e Restauração com reconciliação parcial (`createTrashRequest(..., false)`).
  */
+sealed interface Api29DeleteAttempt {
+    data object Deleted : Api29DeleteAttempt
+    data class ConsentRequired(val intentSender: IntentSender) : Api29DeleteAttempt
+    data object NotDeleted : Api29DeleteAttempt
+}
+
 class AndroidTrashOperationCoordinator(
     context: Context,
     private val resolver: ContentResolver = context.contentResolver,
@@ -33,6 +40,27 @@ class AndroidTrashOperationCoordinator(
     private val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun supportsSystemTrash(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
+    /** Android 10 supports permanent deletion through RecoverableSecurityException consent. */
+    fun supportsPermanentDelete(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+    /**
+     * Attempts one API 29 deletion. If the provider requires user consent, the caller must launch
+     * the returned system IntentSender and retry this same URI only after RESULT_OK.
+     */
+    suspend fun deleteApi29Item(uriString: String): Api29DeleteAttempt = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q) {
+            return@withContext Api29DeleteAttempt.NotDeleted
+        }
+        try {
+            val deletedRows = resolver.delete(Uri.parse(uriString), null, null)
+            if (deletedRows > 0) Api29DeleteAttempt.Deleted else Api29DeleteAttempt.NotDeleted
+        } catch (recoverable: RecoverableSecurityException) {
+            Api29DeleteAttempt.ConsentRequired(recoverable.userAction.actionIntent.intentSender)
+        } catch (_: Exception) {
+            Api29DeleteAttempt.NotDeleted
+        }
+    }
 
     fun loadPersistedTrashLedger(): TrashRecoveryLedger {
         val stored = prefs.getStringSet(KEY_LAST_TRASH_URIS, emptySet()).orEmpty()
@@ -196,11 +224,15 @@ class AndroidTrashOperationCoordinator(
             states
         }
 
-    suspend fun verifyPostDelete(targetUris: Collection<String>): Int =
+    suspend fun verifyPostDeleteUris(targetUris: Collection<String>): Set<String> =
         withContext(Dispatchers.IO) {
-            val states = inspectPostOperationStates(targetUris)
-            states.values.count { it == ObservedMediaPostState.DELETED_OR_ABSENT }
+            inspectPostOperationStates(targetUris)
+                .filterValues { it == ObservedMediaPostState.DELETED_OR_ABSENT }
+                .keys
         }
+
+    suspend fun verifyPostDelete(targetUris: Collection<String>): Int =
+        verifyPostDeleteUris(targetUris).size
 
     suspend fun verifyPostRestoreAndReconcile(): RestoreReconciliationResult =
         withContext(Dispatchers.IO) {
@@ -212,6 +244,23 @@ class AndroidTrashOperationCoordinator(
         }
 
     private fun inspectPostOperationStates(uris: Collection<String>): Map<String, ObservedMediaPostState> {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            return uris.associateWith { rawUri ->
+                try {
+                    val cursor = resolver.query(Uri.parse(rawUri), arrayOf(BaseColumns._ID), null, null, null)
+                    if (cursor == null) {
+                        ObservedMediaPostState.UNVERIFIED_ERROR
+                    } else {
+                        cursor.use { c ->
+                            if (c.moveToFirst()) ObservedMediaPostState.RESTORED_ACTIVE
+                            else ObservedMediaPostState.DELETED_OR_ABSENT
+                        }
+                    }
+                } catch (_: Exception) {
+                    ObservedMediaPostState.UNVERIFIED_ERROR
+                }
+            }
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             return uris.associateWith { ObservedMediaPostState.UNVERIFIED_ERROR }
         }
