@@ -62,4 +62,5 @@
     <string name="storage_free_subline">この端末の空き容量 %1$s</string>
     <string name="exact_copy_badge"> · 完全なコピー</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
+    <string name="api29_delete_notice">Android 10 では、ファイルごとにシステムの許可が求められる場合があります。各確認画面を確認してください。</string>
 </resources>
