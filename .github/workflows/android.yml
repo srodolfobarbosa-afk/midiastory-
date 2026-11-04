@@ -60,18 +60,19 @@ jobs:
             set -eu
             adb wait-for-device
 
-            # Do not call the Android settings service during early emulator boot.
-            # Earlier API 35 runs failed with "Failure calling service settings: Broken pipe".
+            # Avoid calling Android Settings before emulator boot has completed.
             boot_completed=""
-            for attempt in $(seq 1 90); do
+            attempt=0
+            while [ "$attempt" -lt 90 ]; do
               boot_completed="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
-              if [[ "$boot_completed" == "1" ]]; then
+              if [ "$boot_completed" = "1" ]; then
                 break
               fi
+              attempt=$((attempt + 1))
               sleep 2
             done
 
-            if [[ "$boot_completed" != "1" ]]; then
+            if [ "$boot_completed" != "1" ]; then
               echo "Android emulator did not report boot completion." >&2
               adb devices -l
               exit 1
