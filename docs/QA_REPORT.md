@@ -40,7 +40,7 @@ Ver PR #3 e docs/FEATURE_IMPLEMENTATION_MATRIX.md para detalhes. Incluem varredu
 
 - CI verde no HEAD exato, inclusive instrumentação MediaStore Android 35.
 - Teste de MediaStore sem falhas em emulador e aparelhos físicos.
-- API29 cleanup ou minSdk reavaliada.
+- Exclusão permanente API29 via RecoverableSecurityException implementada na branch, ainda pendente de validação em emulador e aparelho; Lixeira/restauração API30+.
 - Produtos Billing ativados e testados na Play Console.
 - PurchaseToken validado em backend seguro.
 - Maior versionCode e certificado de upload confirmados.
