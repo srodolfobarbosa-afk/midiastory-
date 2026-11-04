@@ -430,7 +430,10 @@ class AndroidMediaPageRepository(
         if (candidateSizes.isEmpty()) return records
         return records.map { record ->
             if (record.sizeBytes in candidateSizes) {
-                val hash = computeStreamingSha256(Uri.parse(record.uri))
+                val hash = computeStreamingSha256(
+                    Uri.parse(record.uri),
+                    maxBytes = GLOBAL_HASH_MAX_FILE_BYTES,
+                )
                 if (hash != null) record.copy(contentSha256 = hash) else record
             } else {
                 record
@@ -439,21 +442,33 @@ class AndroidMediaPageRepository(
     }
 
     override suspend fun computeSha256(uri: String): String? =
+        computeSha256(uri, GLOBAL_HASH_MAX_FILE_BYTES)
+
+    override suspend fun computeSha256(uri: String, maxBytes: Long): String? =
         withContext(Dispatchers.IO) {
-            computeStreamingSha256(Uri.parse(uri))
+            computeStreamingSha256(Uri.parse(uri), maxBytes)
         }
 
-    private suspend fun computeStreamingSha256(uri: Uri): String? {
+    private suspend fun computeStreamingSha256(
+        uri: Uri,
+        maxBytes: Long = GLOBAL_HASH_MAX_FILE_BYTES,
+    ): String? {
+        require(maxBytes > 0L) { "maxBytes must be positive" }
         return try {
             val digest = MessageDigest.getInstance("SHA-256")
             val stream = resolver.openInputStream(uri) ?: return null
             BufferedInputStream(stream, 8192).use { input ->
                 val buffer = ByteArray(8192)
+                var bytesRead = 0L
                 while (true) {
                     currentCoroutineContext().ensureActive()
                     val read = input.read(buffer)
                     if (read < 0) break
-                    if (read > 0) digest.update(buffer, 0, read)
+                    if (read > 0) {
+                        if (read.toLong() > maxBytes - bytesRead) return null
+                        bytesRead += read.toLong()
+                        digest.update(buffer, 0, read)
+                    }
                 }
             }
             digest.digest().joinToString("") { "%02x".format(it) }
@@ -462,6 +477,11 @@ class AndroidMediaPageRepository(
         } catch (_: Exception) {
             null
         }
+    }
+}
+
+    companion object {
+        private const val GLOBAL_HASH_MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
     }
 }
 
