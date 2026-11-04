@@ -44,10 +44,20 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
+          target: google_apis
           arch: x86_64
           profile: pixel_2
+          cores: 4
+          ram-size: 4096M
+          heap-size: 512M
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
           disable-animations: true
           script: |
+            adb wait-for-device
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
             ./gradlew --no-daemon :app:connectedDebugAndroidTest
       - name: Print instrumented test failure details
         if: failure()
