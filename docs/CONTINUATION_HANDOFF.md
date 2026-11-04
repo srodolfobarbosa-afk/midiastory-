@@ -1,106 +1,94 @@
-# MIDIastore — PONTO DE CONTINUIDADE
+# Midiastore — CONTINUIDADE DO PROJETO
 
-Data: 03/11/2026
+Atualizado: 04/11/2026
 
-## Identificação do projeto
+## Identidade correta
 
-Nome comercial: Midiastore
-Projeto técnico legado: Sweep
-ApplicationId: com.rdf112.sweep
-VersionName: 2.1.1
-VersionCode: 14
-Target SDK: 36
+- Nome comercial e listing: **Midiastore**.
+- Package/Application ID: `com.rdf112.midiastore`.
+- O proprietário confirmou o package olhando a ficha de teste interno da Play Console.
+- Namespace e pastas Kotlin ainda usam `com.rdf112.sweep`; isso é legado técnico e não altera o Application ID.
+- `versionCode=17` e `versionName=2.2.1` são os valores atualmente configurados no código-fonte. Ainda é obrigatório conferir o maior versionCode publicado na Play Console.
+- minSdk 29, targetSdk 36, compileSdk 36, JDK 17 e Gradle 8.13.
+- O proprietário informa que habilitou o perfil financeiro/recebimento em 03/11/2026. Isso não confirma cadastro ou ativação dos produtos de Billing.
 
-## Estado do Git
+## Branch e revisão de trabalho
 
-Branch: feature/midiastore-2027-release-consolidation
-Commit anterior: 1ffab4c
+- Branch de recuperação: `fix/p0-sweep-permissions-missions-billing`.
+- PR em rascunho: https://github.com/srodolfobarbosa-afk/midiastory-/pull/3
+- Issue de recuperação: https://github.com/srodolfobarbosa-afk/midiastory-/issues/2
+- Base da PR: `main`.
+- Não fazer merge nem publicar sem autorização do proprietário.
+- Não alterar Application ID, versionCode ou certificado de assinatura sem confirmação explícita.
 
-## Estado técnico confirmado
+## Trabalho já realizado nesta branch
 
-- Compilação Debug executada com sucesso na última validação.
-- 58 testes de domínio aprovados.
-- 7 testes JVM do aplicativo aprovados.
-- Lint Debug executado.
-- APK Debug gerado.
-- APK AndroidTest compilado.
-- Release VC14/2.1.1 compilado anteriormente para validação.
-- AAB validado com bundletool.
-- APK validado com apksigner.
-- AAB verificado com jarsigner.
+1. Removido o caminho fixo `org.gradle.java.home=/usr/lib/jvm/java-17-openjdk-amd64`, permitindo que Gradle utilize o JDK definido pelo ambiente (JAVA_HOME).
+2. Alinhada a marca visível e o ícone interno com Midiastore.
+3. Ajustado o teste instrumentado para o Application ID atual `com.rdf112.midiastore.debug`.
+4. Criada ação de revisão de permissões parciais Android 14+ também na aba Arquivos.
+5. Missão clicada antes da primeira leitura passa a ser retomada depois que a primeira página carrega.
+6. Os botões de plano exibem mensagem quando o Billing não consegue iniciar o fluxo.
+7. O estado de reconciliação do Billing não é apresentado como plano gratuito.
+8. Filtros com texto cortado tiveram altura aumentada; vários rótulos técnicos foram simplificados.
+9. Arquivos do mesmo tamanho sem SHA-256 confirmado não são classificados como duplicatas.
+10. Resposta nula do MediaStore não é interpretada como prova de exclusão.
+11. Arquivos movidos para a Lixeira não são contabilizados como espaço liberado; exclusão só credita bytes após confirmação.
+12. Adicionada uma varredura global cancelável por categorias, volumes e páginas. Duplicatas entre páginas são comparadas via SHA-256 em streaming. Se a cobertura global for parcial, duplicatas não são pré-selecionadas para exclusão.
+13. Acrescentados testes de domínio/VM para duplicatas entre páginas e para bloquear seleção automática em cobertura incompleta.
+14. CI agora tenta executar testes instrumentados em emulador Android 35 e guardar relatórios JVM/Android para diagnóstico.
 
-## ATENÇÃO: ASSINATURA
+## Limites que continuam abertos
 
-Os artefatos Release de validação utilizam certificado temporário.
+- A varredura global e as novas alterações ainda precisam de CI verde no commit mais recente.
+- O primeiro teste instrumentado do MediaStore falhou no emulador Android 15 e necessita de diagnóstico; não assumir que é apenas instabilidade do emulador.
+- Limpeza continua desabilitada em Android 10/API 29, apesar de minSdk 29.
+- O BillingClient está integrado no código, mas os SKUs e ofertas não foram validados na Play Console.
+- O cliente não valida criptograficamente o purchaseToken através de backend confiável. Não anunciar o entitlement como verificação de produção.
+- Nenhum teste de compra real, assinatura, restauração, reembolso ou expiração foi concluído.
+- Não há validação física em Samsung, Xiaomi, Motorola ou cartão SD.
+- Histórico persistente de varreduras, Downloads/documentos via SAF, similaridade visual e compressão não estão implementados.
+- Certificado de upload e maior versionCode publicado ainda precisam de confirmação da Play Console.
+- Nenhum AAB desta branch está aprovado para publicação.
 
-Eles NÃO estão autorizados para publicação ou atualização na Google Play.
+## Como validar no Codespaces
 
-A última tentativa de bundleRelease foi bloqueada corretamente porque faltam:
+Confirme que está na branch de recuperação:
 
-- keystore.properties
-- sweep-upload.jks legítimo
+```bash
+git status --short --branch
+git switch fix/p0-sweep-permissions-missions-billing
+git pull --ff-only
+```
 
-Investigar Play App Signing e obter a chave de upload legítima ou solicitar redefinição, se aplicável.
+O comando de build:
 
-Não inventar nem substituir a chave de produção.
+```bash
+./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleDebugAndroidTest
+```
 
-## Artefatos de validação
+Com emulador/telefone conectado:
 
-APK: Midiastore-2.1.1-VC14-VALIDATION-ONLY.apk
-SHA-256: 8b6ba0de35871776144a672fa348e9f3540abfcfb1bf2e2c1e13edb07795666e
+```bash
+./gradlew --no-daemon :app:connectedDebugAndroidTest
+```
 
-AAB: Midiastore-2.1.1-VC14-VALIDATION-ONLY.aab
-SHA-256: aa09330939b0b4c8a6046920849e663ec4a55d371075228ff019e043256b7116
+Se o Codespace estiver em `main`, o `gradle.properties` antigo pode continuar apontando para um JDK inexistente. A correção está nesta branch, não na main.
 
-Os artefatos VALIDATION-ONLY são ignorados pelo Git.
-Podem ser regenerados a partir do código-fonte.
+No computador Windows, `adb: no devices/emulators found` indica que nenhum Android está conectado. Ative Depuração USB e autorize o computador, ou inicie um emulador no Android Studio. Não é evidência de falha do aplicativo.
 
-## Trabalho já realizado
+## Próximas prioridades
 
-- Auditoria inicial.
-- Correções de segurança de duplicatas.
-- Revalidação SHA-256.
-- Melhorias no MediaStore.
-- Proteção contra exclusões não confirmadas.
-- Correções de permissões.
-- Melhorias de Billing e estados de interface.
-- Identidade comercial Midiastore nas strings.
-- Documentação de mercado e arquitetura.
-- Pesquisa de tecnologias open source.
-- Matriz de funcionalidades.
-- Scripts de build e validação.
-- Workflow GitHub Actions.
-- Preparação de release VC14.
+1. Concluir CI e resolver falhas reais de teste.
+2. Executar teste MediaStore em APIs 29, 30, 33, 34, 35 e 36 e dispositivos de fabricantes diferentes.
+3. Corrigir limpeza/API29 ou reavaliar minSdk mediante impacto nos usuários existentes.
+4. Validar o catálogo de Billing, purchase tokens e entitlement seguro.
+5. Adicionar histórico local persistente de análises e reconciliação.
+6. Reestruturar a interface para fluxo de uma ação principal e navegação clara.
+7. Revisar acessibilidade, escalas de fonte, TalkBack, orientação e tablets.
+8. Confirmar package, versionCode e upload certificate no Play Console.
+9. Só então gerar Release/AAB assinado pela chave legítima e publicar primeiro em teste interno.
 
-## Próximas tarefas prioritárias
+## Regra de trabalho
 
-1. Verificar se o último estado documental está commitado.
-2. Executar novamente a compilação Debug.
-3. Corrigir warnings relevantes do Lint.
-4. Implementar detecção global de duplicatas em toda a biblioteca.
-5. Testar segurança de exclusão em dispositivo real.
-6. Desenvolver inteligência visual de mídia.
-7. Desenvolver Storage History.
-8. Melhorar o gerenciamento de arquivos.
-9. Validar Billing e SKUs reais.
-10. Resolver assinatura oficial.
-11. Gerar APK e AAB definitivos.
-12. Preparar publicação na Google Play.
-
-## Regras para o próximo colaborador
-
-- Não começar o projeto do zero.
-- Não descartar alterações anteriores.
-- Ler este documento antes de modificar o código.
-- Ler docs/FEATURE_IMPLEMENTATION_MATRIX.md.
-- Ler docs/RELEASE_BLOCKERS.md.
-- Preservar applicationId e identidade técnica.
-- Não publicar artefatos assinados com certificado temporário.
-- Priorizar código funcional e testes.
-- Investigar alternativas quando encontrar bloqueios.
-- Não ficar limitado à criação de relatórios.
-
-## Objetivo
-
-Concluir o Midiastore como produto Android completo, seguro,
-competitivo e comercializável para 2027/2028.
+Não começar do zero, não descartar código já existente e não confundir documentação, código compilável e funcionalidade comprovada. Cada funcionalidade precisa de teste e evidência. Nunca dizer que a biblioteca foi limpa, que o espaço foi liberado ou que uma compra foi validada sem confirmação técnica do resultado.
