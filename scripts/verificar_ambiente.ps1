@@ -17,7 +17,10 @@ $sdk = $env:ANDROID_SDK_ROOT
 if ([string]::IsNullOrWhiteSpace($sdk)) { $sdk = $env:ANDROID_HOME }
 if ([string]::IsNullOrWhiteSpace($sdk) -and (Test-Path ".\local.properties")) {
     $line = Get-Content ".\local.properties" | Where-Object { $_ -match '^sdk\.dir=' } | Select-Object -First 1
-    if ($line) { $sdk = ($line -replace '^sdk\.dir=', '').Replace('\:', ':').Replace('\\', '\') }
+    if ($line) {
+        $sdk = $line.Substring($line.IndexOf('=') + 1)
+        $sdk = $sdk.Replace('\:', ':').Replace('\\', '\')
+    }
 }
 if ([string]::IsNullOrWhiteSpace($sdk) -or -not (Test-Path (Join-Path $sdk "platform-tools"))) {
     Write-Host "AVISO: Android SDK não detectado. Configure ANDROID_SDK_ROOT ou local.properties." -ForegroundColor Yellow
