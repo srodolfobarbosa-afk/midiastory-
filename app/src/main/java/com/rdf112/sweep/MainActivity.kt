@@ -392,7 +392,7 @@ class MainActivity : AppCompatActivity() {
         navHomeBtn = navTabButton("Início") { switchTab(AppTab.HOME) }
         navFilesBtn = navTabButton("Arquivos") { switchTab(AppTab.FILES) }
         navOaasBtn = navTabButton("Missões") { switchTab(AppTab.OAAS) }
-        navProBtn = navTabButton("Planos Pro") { switchTab(AppTab.PRO) }
+        navProBtn = navTabButton("Pro") { switchTab(AppTab.PRO) }
 
         bottomNav.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
         bottomNav.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
@@ -454,7 +454,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        heroOrbTitle = label("LIMPAR AGORA", 19f, R.color.sweep_background, true).apply {
+        heroOrbTitle = label("ANALISAR AGORA", 19f, R.color.sweep_background, true).apply {
             gravity = Gravity.CENTER
         }
         heroOrbSubtitle = label("Toque para escanear mídias", 11f, R.color.sweep_background, false).apply {
@@ -473,9 +473,9 @@ class MainActivity : AppCompatActivity() {
         // Atalhos rápidos de Missões OaaS na Home
         val quickMissionsCard = card()
         quickMissionsCard.addView(label("EXECUÇÃO RÁPIDA (1 TOQUE)", 11f, R.color.sweep_primary_glow, true))
-        quickMissionsCard.addView(label("Escolha o resultado desejado e o Midiastores prepara tudo para você:", 12f, R.color.sweep_muted, false), top(4))
+        quickMissionsCard.addView(label("Escolha o que deseja encontrar:", 12f, R.color.sweep_muted, false), top(4))
 
-        val quickLargeBtn = button("Liberar espaço dos maiores arquivos (>10 MB)") {
+        val quickLargeBtn = button("Encontrar arquivos grandes (>10 MB)") {
             switchTab(AppTab.OAAS)
             runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
         }.apply {
@@ -484,7 +484,7 @@ class MainActivity : AppCompatActivity() {
         }
         quickMissionsCard.addView(quickLargeBtn, top(10))
 
-        val quickDupBtn = button("Separar cópias de mesmo tamanho (Original protegido)") {
+        val quickDupBtn = button("Encontrar duplicatas exatas") {
             switchTab(AppTab.OAAS)
             runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
         }
@@ -628,7 +628,6 @@ class MainActivity : AppCompatActivity() {
 
         oaasMissionLargeButton = button(getString(R.string.oaas_mission_large)) {
             runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
-            switchTab(AppTab.FILES)
         }.apply {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
@@ -637,13 +636,11 @@ class MainActivity : AppCompatActivity() {
 
         oaasMissionDuplicatesButton = button(getString(R.string.oaas_mission_duplicates)) {
             runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
-            switchTab(AppTab.FILES)
         }
         oaasCard.addView(oaasMissionDuplicatesButton, top(8))
 
         oaasMissionOldButton = button(getString(R.string.oaas_mission_old)) {
             runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
-            switchTab(AppTab.FILES)
         }
         oaasCard.addView(oaasMissionOldButton, top(8))
 
