@@ -43,7 +43,7 @@ Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/
 | Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
 |---|---|---|---|---|
 | Seleção e revisão | Implementada parcialmente | Selection ledger limitado a 500 URIs; revisão por URI; permite remover seleção de missão global | A lista e o preview ainda precisam ser testados com múltiplas páginas e 500 itens | Instrumentação de seleção e telas pequenas |
-| Lixeira Android | API 30+ no source | Usa consentimento oficial MediaStore e revalidação | API29 permanece bloqueada, apesar de minSdk29 | Implementar fluxo recuperável permitido em API29 ou rever minSdk com impacto |
+| Lixeira Android | API 30+ no source | Usa consentimento oficial MediaStore e revalidação | Android 10 não possui o mesmo fluxo batch de Lixeira | Testar mover/restaurar em API30+ e manter a limitação explícita |
 | Exclusão permanente | API 30+ no source | Usa createDeleteRequest e consulta estado posterior | Não testado em aparelho; consentimento parcial/cancelamento requer QA | Testar aceitar, cancelar, parcial, provider error |
 | Recuperação da Lixeira | Implementada parcialmente | Ledger local de URIs e createTrashRequest(moveToTrash=false) | Ainda sem prova instrumentada de restore parcial entre OEMs | Testar restore de lote e URIs que falham |
 | Espaço liberado | Corrigido parcialmente | Mover para Lixeira não é registrado como liberado; exclusão só contabiliza URIs ausentes confirmadas após resultado OK | Ainda precisa confrontar com delta de StatFs real; consultas podem ter atraso de provider | Medir antes/depois em telefone real |
