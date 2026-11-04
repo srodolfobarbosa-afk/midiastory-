@@ -105,20 +105,19 @@ class MainActivity : AppCompatActivity() {
             val states = trashCoordinator.verifyPostTrashAndRecord(uris)
             val confirmedUris = states.filterValues { it == ObservedMediaPostState.IN_TRASH }.keys
             val confirmedCount = confirmedUris.size
-            val confirmedBytes = confirmedUris.sumOf { bytesMap[it] ?: 0L }
-            if (confirmedBytes > 0L) {
-                outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
-            }
+            val authorizedBytes = if (result.resultCode == Activity.RESULT_OK) {
+                uris.sumOf { bytesMap[it] ?: 0L }
+            } else 0L
+            if (authorizedBytes > 0L) sessionAuthorizedBytes += authorizedBytes
             refreshStorageStats()
             updateRestoreButtonState()
         updateSpaceMetricsCard(viewModel.state.value)
             refreshFlywheelSummary()
             updateSpaceMetricsCard(viewModel.state.value)
-            val freedFmt = android.text.format.Formatter.formatFileSize(this@MainActivity, confirmedBytes)
             if (result.resultCode == Activity.RESULT_OK && confirmedCount > 0) {
                 viewModel.clearSelection()
                 viewModel.startSession()
-                statusText.text = getString(R.string.trash_operation_result, confirmedCount, uris.size, freedFmt)
+                statusText.text = getString(R.string.trash_operation_result, confirmedCount, uris.size)
             } else {
                 statusText.text = getString(R.string.trash_operation_cancelled_or_unconfirmed, confirmedCount, uris.size)
             }
@@ -136,7 +135,12 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val confirmedDeleted = trashCoordinator.verifyPostDelete(uris)
             val totalBatchBytes = uris.sumOf { bytesMap[it] ?: 0L }
-            val confirmedBytes = if (confirmedDeleted == uris.size) totalBatchBytes else 0L
+            val confirmedBytes = if (
+                result.resultCode == Activity.RESULT_OK && confirmedDeleted == uris.size
+            ) totalBatchBytes else 0L
+            if (result.resultCode == Activity.RESULT_OK) {
+                sessionAuthorizedBytes += totalBatchBytes
+            }
             if (confirmedBytes > 0L) {
                 outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
             }
@@ -1274,7 +1278,6 @@ class MainActivity : AppCompatActivity() {
                 val sizeMap = selected.associate { it.uri to it.sizeBytes }
                 pendingOperationUris = firstBatch
                 pendingOperationBytesByUri = sizeMap
-                sessionAuthorizedBytes += firstBatch.sumOf { sizeMap[it] ?: 0L }
                 updateSpaceMetricsCard(viewModel.state.value)
                 trashIntentLauncher.launch(IntentSenderRequest.Builder(sender).build())
             } else {
@@ -1298,7 +1301,6 @@ class MainActivity : AppCompatActivity() {
                 val sizeMap = selected.associate { it.uri to it.sizeBytes }
                 pendingOperationUris = firstBatch
                 pendingOperationBytesByUri = sizeMap
-                sessionAuthorizedBytes += firstBatch.sumOf { sizeMap[it] ?: 0L }
                 updateSpaceMetricsCard(viewModel.state.value)
                 deleteIntentLauncher.launch(IntentSenderRequest.Builder(sender).build())
             } else {
