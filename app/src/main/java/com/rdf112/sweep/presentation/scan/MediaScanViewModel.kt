@@ -23,6 +23,8 @@ import com.rdf112.sweep.domain.selection.MediaSelectionLedger
 import com.rdf112.sweep.domain.selection.SelectionUpdate
 import com.rdf112.sweep.domain.repository.MediaPageRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -102,6 +104,7 @@ data class MediaScanUiState(
 /** Orchestrates bounded pages and URI-based selection; no Activity or Android Context is retained. */
 class MediaScanViewModel(
     private val repository: MediaPageRepository,
+    private val missionDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(MediaScanUiState())
     val state: StateFlow<MediaScanUiState> = mutableState.asStateFlow()
@@ -250,7 +253,7 @@ class MediaScanViewModel(
             missionProgress = GlobalMissionProgress(mission = mission),
         )
 
-        missionJob = viewModelScope.launch {
+        missionJob = viewModelScope.launch(missionDispatcher) {
             try {
                 val session = startingState.session ?: repository.createSession()
                 coroutineContext.ensureActive()
