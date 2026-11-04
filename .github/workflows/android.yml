@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: midiastore-android-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify-debug:
     runs-on: ubuntu-latest
@@ -41,13 +45,18 @@ jobs:
         shell: bash
         run: |
           set +e
-          find app/build/outputs/androidTest-results app/build/reports/androidTests -type f \\( -name '*.xml' -o -name '*.txt' -o -name '*.html' \\) -print -exec sed -n '1,260p' {} \\;
+          for file in $(find app/build/test-results/testDebugUnitTest app/build/outputs/androidTest-results app/build/reports/androidTests -type f -name '*.xml' 2>/dev/null); do
+            echo "===== $file ====="
+            sed -n '1,260p' "$file"
+          done
       - name: Upload Android test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: android-test-reports
           path: |
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/tests/testDebugUnitTest/
             app/build/outputs/androidTest-results/
             app/build/reports/androidTests/
           if-no-files-found: warn
