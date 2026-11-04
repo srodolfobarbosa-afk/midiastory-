@@ -44,7 +44,7 @@ You are working on the Android app **Midiastore**. Read this file and `README.md
 - MediaStore repository for Images, Video and Audio by available volume.
 - Bounded 100-item page UI, with paging/session revision checks.
 - Recovery branch includes a cancellable scan across accessible kinds, volumes and pages.
-- Global scanner safety bounds: 250,000 rows, 20,000 repeated-size duplicate candidate rows, 100,000 unique size buckets, 2 GiB maximum per duplicate file hash and 10 GiB total global hash I/O. Page-level duplicate hashing is capped at 512 MiB per file and 1 GiB per page.
+- Global scanner safety bounds: 250,000 rows, 20,000 repeated-size duplicate candidate rows, 100,000 unique size buckets, 2 GiB maximum per duplicate file hash and 10 GiB total global hash I/O. Global missions disable page-level duplicate hashing and hash each candidate once. Normal Files-page duplicate hashing is capped at 512 MiB per file and 1 GiB per page.
 - Global scanner uses streaming SHA-256 for exact duplicate groups and fail-closed duplicate selection under partial coverage.
 - The Android 10/API29 cleanup path is not yet implemented. API 30+ uses official MediaStore trash/delete consent requests.
 - Billing dependency is Google Play Billing KTX 8.0.0. Source product IDs are `sweep_pro_monthly` (SUBS), `sweep_pro_annual` (SUBS), and `sweep_pro_lifetime` (INAPP); these are not verified as active products in Play Console.
