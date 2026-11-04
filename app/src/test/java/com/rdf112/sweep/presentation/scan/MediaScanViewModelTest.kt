@@ -204,6 +204,27 @@ class MediaScanViewModelTest {
     }
 
     @Test
+    fun globalDuplicateMissionStopsAtHashBudgetAndDoesNotSelectAnyFiles() = runTest {
+        val repository = GlobalMissionFakeRepository(
+            imageRecordCount = 6,
+            imageFileSizeBytes = 2L * 1024L * 1024L * 1024L,
+        )
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        val plan = requireNotNull(progress.plan)
+        assertTrue(!progress.coverageComplete)
+        assertTrue(plan.autoSelectedRecords.isEmpty())
+        assertTrue(viewModel.state.value.selection.isEmpty)
+        assertTrue(progress.warningCount > 0)
+    }
+
+    @Test
     fun globalMissionCanRemoveASelectedRecordThatIsNotOnTheCurrentPage() = runTest {
         val repository = GlobalMissionFakeRepository()
         val viewModel = MediaScanViewModel(repository)
@@ -220,6 +241,8 @@ class MediaScanViewModelTest {
 
     private class GlobalMissionFakeRepository(
         private val failVideoSource: Boolean = false,
+        private val imageRecordCount: Int = 2,
+        private val imageFileSizeBytes: Long = 12L * 1024L * 1024L,
     ) : MediaPageRepository {
         private val volume = "external_primary"
         private val access = mapOf(
@@ -273,17 +296,20 @@ class MediaScanViewModelTest {
                 )
             }
 
-            val id = when (request.offset) {
-                0 -> "first"
-                1 -> "second"
-                else -> return MediaPage(
+            if (request.offset !in 0 until imageRecordCount) {
+                return MediaPage(
                     request = request,
                     records = emptyList(),
                     rowsRead = 0,
-                    providerTotalCount = 2L,
+                    providerTotalCount = imageRecordCount.toLong(),
                     nextOffset = null,
                     outcome = MediaPageOutcome.END_OF_SOURCE,
                 )
+            }
+            val id = when (request.offset) {
+                0 -> "first"
+                1 -> "second"
+                else -> "image-${request.offset}"
             }
             val record = MediaRecord(
                 uri = "content://media/$volume/images/$id",
@@ -291,15 +317,15 @@ class MediaScanViewModelTest {
                 kind = MediaKind.IMAGE,
                 displayName = "$id.jpg",
                 mimeType = "image/jpeg",
-                sizeBytes = 12L * 1024L * 1024L,
+                sizeBytes = imageFileSizeBytes,
                 dateModifiedEpochSeconds = 100L + request.offset,
             )
-            val more = request.offset == 0
+            val more = request.offset < imageRecordCount - 1
             return MediaPage(
                 request = request,
                 records = listOf(record),
                 rowsRead = 1,
-                providerTotalCount = 2L,
+                providerTotalCount = imageRecordCount.toLong(),
                 nextOffset = if (more) request.offset + 1 else null,
                 outcome = if (more) MediaPageOutcome.MORE_AVAILABLE else MediaPageOutcome.END_OF_SOURCE,
             )
