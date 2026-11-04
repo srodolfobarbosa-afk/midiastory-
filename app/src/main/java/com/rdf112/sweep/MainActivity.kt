@@ -215,6 +215,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultSummary: TextView
     private lateinit var proStatusBadge: TextView
     private lateinit var oaasPipelineStatus: TextView
+    private lateinit var oaasCancelMissionButton: MaterialButton
     private lateinit var oaasFlywheelMetrics: TextView
     private lateinit var recordsContainer: LinearLayout
     private lateinit var selectedContainer: LinearLayout
@@ -625,6 +626,12 @@ class MainActivity : AppCompatActivity() {
         oaasCard.addView(label(getString(R.string.oaas_card_subtitle), 12f, R.color.sweep_muted, false), top(4))
         oaasPipelineStatus = label(getString(R.string.oaas_pipeline_idle), 12f, R.color.sweep_primary_glow, true)
         oaasCard.addView(oaasPipelineStatus, top(10))
+        oaasCancelMissionButton = button(getString(R.string.cancel_scan)) {
+            viewModel.cancelLoading()
+        }.apply {
+            visibility = View.GONE
+        }
+        oaasCard.addView(oaasCancelMissionButton, top(8))
 
         oaasMissionLargeButton = button(getString(R.string.oaas_mission_large)) {
             runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
@@ -876,6 +883,11 @@ class MainActivity : AppCompatActivity() {
         audioButton.isEnabled = !state.isLoading && isKindAccessible(state, MediaKind.AUDIO)
         filterAllButton.isEnabled = !state.isLoading
         filterLargeButton.isEnabled = !state.isLoading
+        oaasMissionLargeButton.isEnabled = !state.isLoading
+        oaasMissionDuplicatesButton.isEnabled = !state.isLoading
+        oaasMissionOldButton.isEnabled = !state.isLoading
+        oaasCancelMissionButton.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+        oaasCancelMissionButton.isEnabled = state.isLoading
         filterDuplicatesButton.isEnabled = !state.isLoading
         filterOldButton.isEnabled = !state.isLoading
         previousButton.isEnabled = state.canLoadPrevious
