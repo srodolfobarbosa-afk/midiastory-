@@ -18,6 +18,7 @@ jobs:
   verify-debug:
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         api-level: [29, 35]
     runs-on: ubuntu-latest
@@ -51,7 +52,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_2
-          cores: 4
+          cores: 2
           ram-size: 4096M
           heap-size: 512M
           emulator-boot-timeout: 600

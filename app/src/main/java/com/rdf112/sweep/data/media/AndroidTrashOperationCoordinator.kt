@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 sealed interface Api29DeleteAttempt {
     data object Deleted : Api29DeleteAttempt
     data class ConsentRequired(val intentSender: IntentSender) : Api29DeleteAttempt
-    data object NotDeleted : Api29DeleteAttempt
+    data class NotDeleted(val reason: String) : Api29DeleteAttempt
 }
 
 class AndroidTrashOperationCoordinator(
@@ -49,19 +49,26 @@ class AndroidTrashOperationCoordinator(
      * the returned system IntentSender and retry this same URI only after RESULT_OK.
      */
     suspend fun deleteApi29Item(record: MediaRecord): Api29DeleteAttempt = withContext(Dispatchers.IO) {
-        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q ||
-            !record.isSelectable || record.isProtected ||
-            revalidateSingleRecord(record) != ItemRevalidationReason.VALID_UNCHANGED
-        ) {
-            return@withContext Api29DeleteAttempt.NotDeleted
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q || !record.isSelectable || record.isProtected) {
+            return@withContext Api29DeleteAttempt.NotDeleted("unsupported_api_or_ineligible")
+        }
+        val revalidation = revalidateSingleRecord(record)
+        if (revalidation != ItemRevalidationReason.VALID_UNCHANGED) {
+            return@withContext Api29DeleteAttempt.NotDeleted("revalidation_${revalidation.name.lowercase()}")
         }
         try {
             val deletedRows = resolver.delete(Uri.parse(record.uri), null, null)
-            if (deletedRows > 0) Api29DeleteAttempt.Deleted else Api29DeleteAttempt.NotDeleted
+            if (deletedRows > 0) {
+                Api29DeleteAttempt.Deleted
+            } else {
+                Api29DeleteAttempt.NotDeleted("delete_returned_zero")
+            }
         } catch (recoverable: RecoverableSecurityException) {
             Api29DeleteAttempt.ConsentRequired(recoverable.userAction.actionIntent.intentSender)
-        } catch (_: Exception) {
-            Api29DeleteAttempt.NotDeleted
+        } catch (_: SecurityException) {
+            Api29DeleteAttempt.NotDeleted("security_exception")
+        } catch (error: Exception) {
+            Api29DeleteAttempt.NotDeleted("provider_exception_${error.javaClass.simpleName}")
         }
     }
 

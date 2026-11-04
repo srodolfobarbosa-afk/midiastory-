@@ -103,10 +103,10 @@ class MediaStorePagingInstrumentedTest {
 
         val resolver = context.contentResolver
         val collection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        val fileName = "sweep_audio_paging_test_${UUID.randomUUID()}.mp3"
+        val fileName = "sweep_audio_paging_test_${UUID.randomUUID()}.wav"
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-            put(MediaStore.MediaColumns.MIME_TYPE, "audio/mpeg")
+            put(MediaStore.MediaColumns.MIME_TYPE, "audio/wav")
             put(MediaStore.MediaColumns.RELATIVE_PATH, "Music/SweepInstrumentation/")
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
@@ -114,7 +114,7 @@ class MediaStorePagingInstrumentedTest {
 
         try {
             resolver.openOutputStream(insertedUri, "w").use { output ->
-                requireNotNull(output).write(byteArrayOf(0x49, 0x44, 0x33, 0x04))
+                requireNotNull(output).write(createValidPcmWaveFixture())
             }
             val publish = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
             assertTrue(resolver.update(insertedUri, publish, null, null) >= 1)
@@ -148,6 +148,34 @@ class MediaStorePagingInstrumentedTest {
         } finally {
             resolver.delete(insertedUri, null, null)
         }
+    }
+
+    private fun createValidPcmWaveFixture(): ByteArray {
+        val sampleRate = 8_000
+        val channels = 1
+        val bitsPerSample = 16
+        val pcmBytes = ByteArray(1_600) // 100 ms of valid silent PCM audio
+        val byteRate = sampleRate * channels * bitsPerSample / 8
+        val blockAlign = channels * bitsPerSample / 8
+        return java.nio.ByteBuffer.allocate(44 + pcmBytes.size)
+            .order(java.nio.ByteOrder.LITTLE_ENDIAN)
+            .apply {
+                put("RIFF".toByteArray(Charsets.US_ASCII))
+                putInt(36 + pcmBytes.size)
+                put("WAVE".toByteArray(Charsets.US_ASCII))
+                put("fmt ".toByteArray(Charsets.US_ASCII))
+                putInt(16)
+                putShort(1) // PCM
+                putShort(channels.toShort())
+                putInt(sampleRate)
+                putInt(byteRate)
+                putShort(blockAlign.toShort())
+                putShort(bitsPerSample.toShort())
+                put("data".toByteArray(Charsets.US_ASCII))
+                putInt(pcmBytes.size)
+                put(pcmBytes)
+            }
+            .array()
     }
 
     @Test

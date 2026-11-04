@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
                 if (result.resultCode == Activity.RESULT_OK) {
                     val record = pendingApi29RecordsByUri[api29Uri]
                     val retry = record?.let { trashCoordinator.deleteApi29Item(it) }
-                        ?: Api29DeleteAttempt.NotDeleted
+                        ?: Api29DeleteAttempt.NotDeleted("record_missing")
                     when (retry) {
                         Api29DeleteAttempt.Deleted -> pendingApi29DeletedUris += api29Uri
                         else -> pendingApi29RejectedCount++
@@ -1441,7 +1441,7 @@ class MainActivity : AppCompatActivity() {
                 val uri = pendingApi29DeleteQueue.first()
                 val record = pendingApi29RecordsByUri[uri]
                 val attempt = record?.let { trashCoordinator.deleteApi29Item(it) }
-                    ?: Api29DeleteAttempt.NotDeleted
+                    ?: Api29DeleteAttempt.NotDeleted("record_missing")
                 when (attempt) {
                     Api29DeleteAttempt.Deleted -> {
                         pendingApi29DeletedUris += uri
@@ -1452,7 +1452,7 @@ class MainActivity : AppCompatActivity() {
                         deleteIntentLauncher.launch(IntentSenderRequest.Builder(attempt.intentSender).build())
                         return@launch
                     }
-                    Api29DeleteAttempt.NotDeleted -> {
+                    is Api29DeleteAttempt.NotDeleted -> {
                         pendingApi29RejectedCount++
                         pendingApi29DeleteQueue.removeAt(0)
                     }
