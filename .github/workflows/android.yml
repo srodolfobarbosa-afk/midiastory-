@@ -27,6 +27,15 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+      - name: Validate release script and package guards
+        shell: bash
+        run: |
+          bash -n scripts/build_signed_aab.sh
+          grep -Fq 'applicationId = "com.rdf112.midiastore"' app/build.gradle.kts
+          if grep -RInE 'applicationId[[:space:]]*=.*com\\.rdf112\\.sweep|Set-Content.*applicationId' --include='*.ps1' scripts COMPILAR_TUDO_WINDOWS.ps1; then
+            echo "Unsafe legacy package mutation found in Windows scripts." >&2
+            exit 1
+          fi
       - name: Test and build Debug
         run: >-
           ./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug
