@@ -68,7 +68,7 @@ Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/
 
 | Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
 |---|---|---|---|---|
-| Textos PT/EN | Simplificados na branch | Rótulos menos técnicos, resultados por página e estados de missão global | Ainda precisa revisão linguística e layouts em resolução real | Screenshots de telefone pequeno e fonte 1.3x/1.5x |
+| Idiomas / localização | Parcial | PT-BR e EN completos (148/148 strings); ES, FR, DE, HI, JA e ZH-CN têm 63/148 strings e usam fallback em inglês para as restantes | Não declarar suporte multilíngue completo até traduzir e revisar todas as strings; layouts RTL e variantes regionais não foram validados | Completar traduções, validar placeholders e testar idioma do sistema em aparelhos reais |
 | Marca Midiastore | Alinhada na branch | app_name, topbar M e strings comerciais | Ícone do launcher já era M/check; precisa instalar e validar launcher em OEMs | Verificar Android 12–16, adaptive icon |
 | Navegação | Parcial | HOME, FILES, OAAS, PRO | Conteúdo ainda pode parecer complexo; não há estudo usability com testador | Teste guiado com 3 usuários sem assistência |
 | Acessibilidade | Não verificada | Views e MaterialButtons | TalkBack, contraste, hit targets, escala de fonte ainda não passaram QA | Testes manuais e automated accessibility scan |
