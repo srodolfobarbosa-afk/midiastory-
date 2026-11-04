@@ -68,7 +68,7 @@ Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/
 
 | Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
 |---|---|---|---|---|
-| Idiomas / localização | Parcial | PT-BR e EN completos (148/148 strings); ES, FR, DE, HI, JA e ZH-CN têm 63/148 strings e usam fallback em inglês para as restantes | Não declarar suporte multilíngue completo até traduzir e revisar todas as strings; layouts RTL e variantes regionais não foram validados | Completar traduções, validar placeholders e testar idioma do sistema em aparelhos reais |
+| Idiomas / localização | Parcial | PT-BR, EN e fallback completos (152/152 strings); ES, FR, DE, HI, JA e ZH-CN têm 63/152 strings e usam fallback em inglês para as restantes | Faltam 89 chaves por idioma (534 no total); layouts RTL e variantes regionais não foram validados | Completar traduções, validar placeholders e testar idioma do sistema em aparelhos reais |
 | Marca Midiastore | Alinhada na branch | app_name, topbar M e strings comerciais | Ícone do launcher já era M/check; precisa instalar e validar launcher em OEMs | Verificar Android 12–16, adaptive icon |
 | Navegação | Parcial | HOME, FILES, OAAS, PRO | Conteúdo ainda pode parecer complexo; não há estudo usability com testador | Teste guiado com 3 usuários sem assistência |
 | Acessibilidade | Não verificada | Views e MaterialButtons | TalkBack, contraste, hit targets, escala de fonte ainda não passaram QA | Testes manuais e automated accessibility scan |
@@ -91,3 +91,7 @@ O posicionamento aprovado é limpador de celular com apresentação Pro e modelo
 ## Critério global
 
 A presença de código não é aprovação. Cada funcionalidade precisa de teste em CI, teste instrumentado quando aplicável e, para APIs MediaStore/Billing/limpeza, confirmação em dispositivos físicos representativos. A PR #3 é recuperação em desenvolvimento, não um Release Candidate.
+
+## Direção de produto confirmada — 04/11/2026
+
+O primeiro release é um Phone Cleaner, com apresentação Pro e modelo Freemium. Análise essencial, revisão, proteção do original e consentimento do Android permanecem gratuitos. O benefício Pro atualmente implementado é exportar o resumo da seleção revisada. Não apresentar o app como gerenciador universal nem anunciar recursos de roadmap como disponíveis.

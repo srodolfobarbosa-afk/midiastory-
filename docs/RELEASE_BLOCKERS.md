@@ -50,3 +50,12 @@
 Não anunciar detecção de fotos semelhantes, blur/baixa qualidade, compressão, limpeza de cache privado de outros apps, limpeza de RAM, aumento de velocidade, histórico permanente ou gerenciador completo de documentos enquanto esses recursos não estiverem implementados e testados.
 
 A PR #3 é uma etapa de recuperação, não um release candidate.
+
+## Decisão de produto e atualização de execução — 04/11/2026
+
+- Produto inicial: Phone Cleaner / limpador inteligente de celular, não gerenciador universal.
+- Modelo: Freemium; análise, revisão, proteção de original e limpeza segura permanecem gratuitas. Exportação do resumo revisado é o benefício Pro atualmente implementado.
+- Compra Pro permanece bloqueada até verificação segura de purchaseToken por backend confiável.
+- O medidor mede o armazenamento compartilhado primário; não somar SD/USB sem enumeração/validação própria.
+- PT-BR/EN/fallback: 152 strings; seis outros idiomas: 63/152 cada; 534 traduções pendentes.
+- O workflow do código antes das atualizações documentais estava queued; o estado do CI precisa ser reconsultado no HEAD exato após a atualização.

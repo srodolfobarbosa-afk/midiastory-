@@ -110,3 +110,9 @@ Notas internas de 0 a 100; pesos: valor usuário 25, diferenciação 20, viabili
 - [Android 14 partial photo access](https://developer.android.com/about/versions/14/changes/partial-photo-video-access)
 - [Storage Access Framework](https://developer.android.com/guide/topics/providers/document-provider)
 - [WorkManager releases](https://developer.android.com/jetpack/androidx/releases/work)
+
+## Nota de atualização documental — 04/11/2026
+
+A partir do commit 34df33f0, o botão principal e textos da home usam linguagem “Analisar meu celular / Scan my phone” e explicam que a pessoa verá o que ocupa espaço e escolherá o que limpar. Os commits posteriores 7e515c66 e d23268b4 atualizam apenas documentos de mercado, tecnologia, arquitetura, roadmap, segurança, qualidade e continuidade; não alteram a lógica do aplicativo.
+
+Assim, a última versão funcional do código permanece 34df33f0. A ponta da branch pode avançar com documentação sem que isso represente novas mudanças no binário. O CI deve confirmar o HEAD exato da branch.

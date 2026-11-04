@@ -100,3 +100,13 @@ No computador Windows, `adb: no devices/emulators found` indica que nenhum Andro
 ## Regra de trabalho
 
 Não começar do zero, não descartar código já existente e não confundir documentação, código compilável e funcionalidade comprovada. Cada funcionalidade precisa de teste e evidência. Nunca dizer que a biblioteca foi limpa, que o espaço foi liberado ou que uma compra foi validada sem confirmação técnica do resultado.
+
+## Continuidade — 04/11/2026
+
+- Posicionamento confirmado: Phone Cleaner / limpador inteligente de celular.
+- Modelo comercial: Freemium com benefício Pro de exportação de relatório, único já implementado no cliente.
+- Medidor: armazenamento compartilhado primário, não espaço privado /data; SD/USB não somados automaticamente.
+- Testes novos: quatro casos para StorageUsageCalculator, aguardando CI.
+- Localização: PT-BR/EN/fallback 152 chaves; outros seis idiomas 63/152 cada (534 faltantes).
+- Pesquisa de mercado e tecnologia atualizada; nenhum código de terceiros foi incorporado.
+- Manter PR #3 em Draft; não mergear, publicar ou gerar release assinado sem gates concluídos.
