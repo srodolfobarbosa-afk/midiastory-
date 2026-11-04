@@ -812,7 +812,7 @@ class MediaScanViewModel(
             if (!modelClass.isAssignableFrom(MediaScanViewModel::class.java)) {
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
-            return MediaScanViewModel(repository) as T
+            return MediaScanViewModel(repository, missionDispatcher = Dispatchers.Default) as T
         }
     }
 }
