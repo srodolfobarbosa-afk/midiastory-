@@ -184,6 +184,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var radarConsentCheckBox: CheckBox
     private var activeTab: AppTab = AppTab.HOME
     private var pendingOutcomeMission: DesiredOutcomeMission? = null
+    private var lastRecordedMissionProgress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress? = null
 
     // Containers das 4 Abas
     private lateinit var homeSection: LinearLayout
@@ -938,6 +939,7 @@ class MainActivity : AppCompatActivity() {
         updatePage(state)
         updateReview(state)
         updateVisibleCheckboxes(state)
+        renderMissionProgress(state.missionProgress)
         resumePendingOutcomeMission(state)
     }
 
@@ -1198,30 +1200,68 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun renderMissionProgress(progress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress?) {
+        progress ?: return
+        if (progress.isRunning) {
+            oaasPipelineStatus.text = getString(
+                R.string.oaas_global_scan_progress,
+                progress.pagesProcessed,
+                progress.recordsExamined,
+                progress.sourcesProcessed,
+                progress.sourceCount,
+            )
+            return
+        }
+
+        val plan = progress.plan
+        if (plan == null) {
+            oaasPipelineStatus.text = when (progress.message) {
+                "cancelled" -> getString(R.string.oaas_global_scan_cancelled)
+                "safety_limit_reached" -> getString(R.string.oaas_global_scan_limit)
+                "session_stale" -> getString(R.string.session_stale)
+                else -> getString(R.string.oaas_global_scan_failed)
+            }
+            return
+        }
+
+        if (progress !== lastRecordedMissionProgress) {
+            outcomeTelemetry.recordMissionRequested(progress.mission, plan.autoSelectedRecords.size)
+            lastRecordedMissionProgress = progress
+            refreshFlywheelSummary()
+        }
+
+        val formattedBytes = android.text.format.Formatter.formatFileSize(this, plan.estimatedDeliverableBytes)
+        oaasPipelineStatus.text = if (plan.isReadyToDeliver) {
+            getString(
+                if (progress.coverageComplete) R.string.oaas_global_scan_result_complete
+                else R.string.oaas_global_scan_result_partial,
+                progress.recordsExamined,
+                progress.pagesProcessed,
+                plan.autoSelectedRecords.size,
+                formattedBytes,
+                if (progress.coverageComplete) plan.protectedReferencesKept
+                else progress.warningCount,
+            )
+        } else {
+            getString(
+                R.string.oaas_global_scan_result_empty,
+                progress.recordsExamined,
+                progress.warningCount,
+            )
+        }
+    }
+
     private fun runOutcomeMission(mission: DesiredOutcomeMission) {
         val currentState = viewModel.state.value
-        if (currentState.isLoading || currentState.currentPage == null) {
+        if (currentState.session == null || currentState.isLoading) {
             pendingOutcomeMission = mission
             if (!currentState.isLoading) startScanOrRequestAccess()
             oaasPipelineStatus.text = getString(R.string.oaas_starting_scan_first)
             return
         }
         pendingOutcomeMission = null
-        val plan = viewModel.executeOutcomeMission(mission) ?: return
-        outcomeTelemetry.recordMissionRequested(mission, plan.autoSelectedRecords.size)
-        refreshFlywheelSummary()
-        val formattedBytes = android.text.format.Formatter.formatFileSize(this, plan.estimatedDeliverableBytes)
-        oaasPipelineStatus.text = if (plan.isReadyToDeliver) {
-            getString(
-                R.string.oaas_plan_ready_status,
-                plan.autoSelectedRecords.size,
-                formattedBytes,
-                plan.protectedReferencesKept,
-                plan.unconfirmedRecordsCount,
-            )
-        } else {
-            getString(R.string.oaas_plan_empty_status)
-        }
+        lastRecordedMissionProgress = null
+        viewModel.executeGlobalOutcomeMission(mission)
     }
 
     private fun refreshFlywheelSummary() {
