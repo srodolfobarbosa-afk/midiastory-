@@ -390,10 +390,10 @@ class MainActivity : AppCompatActivity() {
             setBackgroundColor(color(R.color.sweep_surface))
             setPadding(dp(10), dp(8), dp(10), dp(10))
         }
-        navHomeBtn = navTabButton("Início") { switchTab(AppTab.HOME) }
-        navFilesBtn = navTabButton("Arquivos") { switchTab(AppTab.FILES) }
-        navOaasBtn = navTabButton("Missões") { switchTab(AppTab.OAAS) }
-        navProBtn = navTabButton("Pro") { switchTab(AppTab.PRO) }
+        navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
+        navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
+        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
+        navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
 
         bottomNav.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
         bottomNav.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
@@ -455,10 +455,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        heroOrbTitle = label("ANALISAR AGORA", 19f, R.color.sweep_background, true).apply {
+        heroOrbTitle = label(getString(R.string.analyze_now), 19f, R.color.sweep_background, true).apply {
             gravity = Gravity.CENTER
         }
-        heroOrbSubtitle = label("Toque para escanear mídias", 11f, R.color.sweep_background, false).apply {
+        heroOrbSubtitle = label(getString(R.string.tap_to_scan_media), 11f, R.color.sweep_background, false).apply {
             gravity = Gravity.CENTER
         }
         heroOrbButton.addView(heroOrbTitle)
@@ -473,10 +473,10 @@ class MainActivity : AppCompatActivity() {
 
         // Atalhos rápidos de Missões OaaS na Home
         val quickMissionsCard = card()
-        quickMissionsCard.addView(label("EXECUÇÃO RÁPIDA (1 TOQUE)", 11f, R.color.sweep_primary_glow, true))
-        quickMissionsCard.addView(label("Escolha o que deseja encontrar:", 12f, R.color.sweep_muted, false), top(4))
+        quickMissionsCard.addView(label(getString(R.string.quick_actions_title), 11f, R.color.sweep_primary_glow, true))
+        quickMissionsCard.addView(label(getString(R.string.quick_actions_subtitle), 12f, R.color.sweep_muted, false), top(4))
 
-        val quickLargeBtn = button("Encontrar arquivos grandes (>10 MB)") {
+        val quickLargeBtn = button(getString(R.string.quick_find_large)) {
             switchTab(AppTab.OAAS)
             runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
         }.apply {
@@ -485,7 +485,7 @@ class MainActivity : AppCompatActivity() {
         }
         quickMissionsCard.addView(quickLargeBtn, top(10))
 
-        val quickDupBtn = button("Encontrar duplicatas exatas") {
+        val quickDupBtn = button(getString(R.string.quick_find_duplicates)) {
             switchTab(AppTab.OAAS)
             runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
         }
@@ -901,9 +901,9 @@ class MainActivity : AppCompatActivity() {
         heroOrbSubtitle.text = if (state.isLoading) {
             getString(R.string.loading_page)
         } else if (countInPage > 0) {
-            "$countInPage mídias prontas na aba Arquivos"
+            getString(R.string.files_count_in_tab, countInPage)
         } else {
-            "Toque para escanear fotos, vídeos e áudios"
+            getString(R.string.tap_to_scan_media_types)
         }
 
         val defaultStatus = when (state.status) {
@@ -1106,8 +1106,8 @@ class MainActivity : AppCompatActivity() {
         val date = record.dateModifiedEpochSeconds?.let {
             DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(it * 1000L))
         } ?: getString(R.string.date_unavailable)
-        val shaBadge = record.contentSha256?.take(10)?.let { " - SHA-256: ${it}..." }.orEmpty()
-        details.addView(label("${displayVolumeName(record.volumeName)} - $date$shaBadge", 10f, R.color.sweep_muted, false), top(2))
+        val shaBadge = if (record.contentSha256 != null) getString(R.string.exact_copy_badge) else ""
+        details.addView(label(getString(R.string.media_metadata_line, displayVolumeName(record.volumeName), date, shaBadge), 10f, R.color.sweep_muted, false), top(2))
         row.addView(details, LinearLayout.LayoutParams(0, -2, 1f))
 
         val check = CheckBox(this).apply {
@@ -1421,8 +1421,8 @@ class MainActivity : AppCompatActivity() {
             val totalFmt = android.text.format.Formatter.formatFileSize(this, total)
             storageText.text = getString(R.string.storage_measurement, usedFmt, freeFmt, totalFmt)
             if (::storageUsedHeadline.isInitialized) {
-                storageUsedHeadline.text = "$usedFmt de $totalFmt"
-                storageFreeSubline.text = "$freeFmt livres neste aparelho"
+                storageUsedHeadline.text = getString(R.string.storage_used_of_total, usedFmt, totalFmt)
+                storageFreeSubline.text = getString(R.string.storage_free_subline, freeFmt)
                 val ratio = (used.toDouble() / total.toDouble()).toFloat().coerceIn(0f, 1f)
                 storageRingGauge.usedFraction = ratio
                 storageRingGauge.centerLabel = "${(ratio * 100).toInt()}%"

@@ -2,10 +2,10 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Storage under your control.</string>
-    <string name="hero_title">You state the outcome. Midiastore prepares the work.</string>
-    <string name="hero_subtitle">Analyze media locally, verify exact duplicates by content (SHA-256) with original reference protection, and authorize via official Android dialogs.</string>
-    <string name="storage_title">INTERNAL STORAGE</string>
-    <string name="storage_note">Real measurement via StatFs. No files are removed without explicit confirmation in the official Android dialog.</string>
+    <string name="hero_title">See what's filling your phone.</string>
+    <string name="hero_subtitle">Find large files and exact copies. Review every suggestion before changing anything.</string>
+    <string name="storage_title">PHONE STORAGE</string>
+    <string name="storage_note">Storage use is measured on this device. Nothing changes without your confirmation.</string>
     <string name="storage_unavailable">Storage statistics are unavailable on this device.</string>
     <string name="storage_measurement">%1$s used · %2$s free
 Total: %3$s</string>
@@ -15,32 +15,32 @@ Total: %3$s</string>
     <string name="ready_status">Ready. 100% local processing with original reference protection.</string>
     <string name="permission_denied">Permission not granted. No media was queried.</string>
     <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
-    <string name="starting_scan">1. SEARCH · Starting MediaStore scan session…</string>
-    <string name="loading_page">1. SEARCH · Querying media batch and verifying SHA-256 hashes…</string>
-    <string name="page_ready">2. VERIFY · Batch analyzed and verified.</string>
+    <string name="starting_scan">Checking the media you've allowed…</string>
+    <string name="loading_page">Reading your files…</string>
+    <string name="page_ready">Files loaded.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
-    <string name="partial_results">Partial scan: check coverage warnings below.</string>
+    <string name="partial_results">Some files could not be checked. Review the coverage notes.</string>
     <string name="page_failed">Recoverable error querying this page. Please retry.</string>
     <string name="pagination_unsupported">Provider did not confirm all paging parameters. Partial results.</string>
     <string name="session_stale">Library or permissions changed. Start a new scan.</string>
     <string name="scan_cancelled_readonly">Scan cancelled. No files were modified.</string>
-    <string name="media_kind_title">MEDIA CATEGORY</string>
+    <string name="media_kind_title">FILE TYPE</string>
     <string name="photos_tab">Photos</string>
     <string name="audio_tab">Audio</string>
     <string name="videos_tab">Videos</string>
     <string name="smart_filter_title">FILTER FILES</string>
-    <string name="filter_all">All in batch</string>
-    <string name="filter_large_10mb">Large (&gt;10 MB)</string>
-    <string name="filter_same_size">Exact duplicates</string>
-    <string name="filter_older_30d">Older (&gt;30 days)</string>
+    <string name="filter_all">All files</string>
+    <string name="filter_large_10mb">Large (over 10 MB)</string>
+    <string name="filter_same_size">Exact copies</string>
+    <string name="filter_older_30d">Older than 30 days</string>
     <string name="smart_filter_empty_in_page">No files on this page match the filter. Move to another page to check more files.</string>
     <string name="protected_reference_badge">Protected original</string>
     <string name="volume_title">STORAGE</string>
     <string name="internal_volume">Primary shared storage</string>
     <string name="external_volume">External volume · %1$s</string>
-    <string name="results_title">FILES FOUND ON THIS PAGE</string>
+    <string name="results_title">FILES FOUND</string>
     <string name="not_scanned">No page scanned</string>
-    <string name="page_results_hint">Up to 100 files are shown per page. Use Next page to continue.</string>
+    <string name="page_results_hint">Up to 100 files are shown at a time. Continue to see more.</string>
     <string name="page_range">Records %1$d–%2$d %3$s</string>
     <string name="of_total">of %1$d reported by provider</string>
     <string name="empty_page_not_device">No visible files on this page.</string>
@@ -49,20 +49,20 @@ Total: %3$s</string>
     <string name="page_no_visible_rows">Provider rows read, but omitted by system state filters (pending/trashed).</string>
     <string name="previous_page">Previous page</string>
     <string name="next_page">Next page</string>
-    <string name="review_title">REVIEW BEFORE CLEANING</string>
+    <string name="review_title">REVIEW BEFORE CLEANUP</string>
     <string name="nothing_selected">No items prepared for review.</string>
-    <string name="review_readonly_note">Review the items. Android will ask for confirmation before moving or deleting any file.</string>
+    <string name="review_readonly_note">Choose what to remove. Android will ask you to confirm before anything is deleted.</string>
     <string name="review_count_and_size">%1$d item(s) prepared for review · %2$s</string>
     <string name="move_to_trash_button">Move to trash</string>
     <string name="permanent_delete_button">Delete permanently</string>
-    <string name="restore_trash_button">Restore trash items (%1$d)</string>
+    <string name="restore_trash_button">Restore from trash (%1$d)</string>
     <string name="revalidation_none_eligible">No selected items passed pre-execution revalidation (%1$d modified or protected).</string>
     <string name="trash_operation_result">Moved to trash: %1$d of %2$d item(s). These files may continue using storage until permanently deleted.</string>
     <string name="trash_operation_cancelled_or_unconfirmed">Operation cancelled or partial: %1$d of %2$d confirmed in Trash.</string>
     <string name="delete_operation_result">Deleted and verified: %1$d of %2$d item(s) (%3$s freed).</string>
-    <string name="restore_operation_result">6. TRACK · Verified recovery: %1$d restored · %2$d pending.</string>
+    <string name="restore_operation_result">Restored and verified: %1$d item(s) · %2$d still pending.</string>
     <string name="export_review_summary">Export report (Pro)</string>
-    <string name="export_review_subject">OaaS Review Report — Midiastore</string>
+    <string name="export_review_subject">Midiastore review report</string>
     <string name="billing_pending_message">Purchase pending confirmation in Google Play. Pro access unlocks once confirmed.</string>
     <string name="billing_pro_required_message">Check Midiastore Pro plans in the Pro tab to unlock audited report exports.</string>
     <string name="clear_review">Cancel proposal / Clear selection</string>
@@ -100,14 +100,14 @@ Total: %3$s</string>
     <string name="warn_invalid_rows">Incomplete provider records were safely ignored.</string>
     <string name="issue_summary_line">%1$s: %2$s (%3$d occurrence(s) across %4$d volume(s))</string>
     <string name="page_content_changed">Volume content changed during scan. Start a new session.</string>
-    <string name="oaas_card_title">STORAGE ANALYSIS</string>
+    <string name="oaas_card_title">SMART CLEANUP</string>
     <string name="oaas_card_headline">What would you like to find?</string>
-    <string name="oaas_card_subtitle">Midiastore analyzes the media you allow. You review the results and authorize every action.</string>
+    <string name="oaas_card_subtitle">Your media stays on this device. Review results and approve every action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, Midiastore will check the media you have allowed…</string>
-    <string name="oaas_mission_large">Find large files (>10 MB)</string>
-    <string name="oaas_mission_duplicates">Find exact duplicates</string>
-    <string name="oaas_mission_old">Find older files (>30 days)</string>
+    <string name="oaas_starting_scan_first">First, we'll check the media you allowed.</string>
+    <string name="oaas_mission_large">Find large files (over 10 MB)</string>
+    <string name="oaas_mission_duplicates">Find exact copies</string>
+    <string name="oaas_mission_old">Find files older than 30 days</string>
     <string name="oaas_plan_ready_status">Found: %1$d item(s), totaling %2$s. %3$d original(s) protected; %4$d item(s) unconfirmed.</string>
     <string name="oaas_plan_empty_status">No eligible items were found in this scan.</string>
     <string name="oaas_flywheel_summary">History on this device: %1$d analyses prepared · %2$d items reviewed · %3$s deleted and confirmed</string>
@@ -125,11 +125,35 @@ Total: %3$s</string>
     <string name="billing_secure_verification_unavailable">Pro purchases are temporarily unavailable while secure Google Play purchase verification is being configured. No charge was started.</string>
     <string name="billing_flow_started">Purchase confirmation opened in Google Play. The charge is not confirmed yet.</string>
     <string name="oaas_mission_scan_failed">The scan could not be completed. Check permissions and try again.</string>
-    <string name="oaas_global_scan_progress">Scanning all authorized media… %1$d pages · %2$d files checked · %3$d/%4$d sources</string>
-    <string name="oaas_global_scan_result_complete">Complete scan: %1$d files across %2$d pages. Ready to review: %3$d (%4$s). Originals preserved: %5$d. Open Files to review.</string>
-    <string name="oaas_global_scan_result_partial">Partial scan: %1$d files across %2$d pages. Ready to review: %3$d (%4$s). %5$d warning(s). Open Files to review the results.</string>
-    <string name="oaas_global_scan_result_empty">Scan complete: no eligible items among %1$d checked files. %2$d warning(s).</string>
-    <string name="oaas_global_scan_cancelled">Scan cancelled. No files were changed.</string>
-    <string name="oaas_global_scan_failed">The global scan could not be completed. No files were changed.</string>
-    <string name="oaas_global_scan_limit">Safety limit reached. Results are partial; narrow the library or run a more specific mission.</string>
+    <string name="oaas_global_scan_progress">Checking your files… %1$d pages · %2$d files · %3$d/%4$d sources</string>
+    <string name="oaas_global_scan_result_complete">Complete check: %1$d files across %2$d pages. Ready to review: %3$d (%4$s). Originals kept safe: %5$d. Open Files to review.</string>
+    <string name="oaas_global_scan_result_partial">Partial check: %1$d files across %2$d pages. Ready to review: %3$d (%4$s). %5$d warning(s). Open Files to review.</string>
+    <string name="oaas_global_scan_result_empty">Check complete: no eligible items among %1$d files. %2$d warning(s).</string>
+    <string name="oaas_global_scan_cancelled">Check cancelled. No files were changed.</string>
+    <string name="oaas_global_scan_failed">The check could not be completed. No files were changed.</string>
+    <string name="oaas_global_scan_limit">Safety limit reached. Results are partial. Narrow the search or try a more specific check.</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_files">Files</string>
+    <string name="nav_missions">Cleanup</string>
+    <string name="nav_pro">Pro</string>
+    <string name="analyze_now">CHECK MY STORAGE</string>
+    <string name="tap_to_scan_media">Tap to check your files</string>
+    <string name="quick_actions_title">QUICK ACTIONS</string>
+    <string name="quick_actions_subtitle">Choose what you want to find:</string>
+    <string name="quick_find_large">Find large files (over 10 MB)</string>
+    <string name="quick_find_duplicates">Find exact copies</string>
+    <string name="files_count_in_tab">%1$d files ready in Files</string>
+    <string name="tap_to_scan_media_types">Tap to check photos, videos and audio</string>
+    <string name="storage_used_of_total">%1$s used of %2$s</string>
+    <string name="storage_free_subline">%1$s free on this device</string>
+    <string name="exact_copy_badge"> · Exact copy</string>
+    <string name="media_metadata_line">%1$s · %2$s%3$s</string>
+
+    <string name="nav_home">Home</string><string name="nav_files">Files</string><string name="nav_missions">Cleanup</string><string name="nav_pro">Pro</string>
+    <string name="analyze_now">CHECK MY STORAGE</string><string name="tap_to_scan_media">Tap to check your files</string>
+    <string name="quick_actions_title">QUICK ACTIONS</string><string name="quick_actions_subtitle">Choose what you want to find:</string>
+    <string name="quick_find_large">Find large files (over 10 MB)</string><string name="quick_find_duplicates">Find exact copies</string>
+    <string name="files_count_in_tab">%1$d files ready in Files</string><string name="tap_to_scan_media_types">Tap to check photos, videos and audio</string>
+    <string name="storage_used_of_total">%1$s used of %2$s</string><string name="storage_free_subline">%1$s free on this device</string>
+    <string name="exact_copy_badge"> · Exact copy</string><string name="media_metadata_line">%1$s · %2$s%3$s</string>
 </resources>
