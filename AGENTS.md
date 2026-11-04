@@ -46,7 +46,7 @@ You are working on the Android app **Midiastore**. Read this file and `README.md
 - Recovery branch includes a cancellable scan across accessible kinds, volumes and pages.
 - Global scanner safety bounds: 250,000 rows, 20,000 repeated-size duplicate candidate rows, 100,000 unique size buckets, 2 GiB maximum per duplicate file hash and 10 GiB total global hash I/O. Global missions disable page-level duplicate hashing and hash each candidate once. Normal Files-page duplicate hashing is capped at 512 MiB per file and 1 GiB per page.
 - Global scanner uses streaming SHA-256 for exact duplicate groups and fail-closed duplicate selection under partial coverage.
-- The Android 10/API29 cleanup path is not yet implemented. API 30+ uses official MediaStore trash/delete consent requests.
+- Android 10/API29 permanent deletion now uses RecoverableSecurityException and the official per-item system consent flow; this new path is not yet validated on an API29 emulator or physical device. Trash/restore remain API30+.
 - Billing dependency is Google Play Billing KTX 8.0.0. Source product IDs are `sweep_pro_monthly` (SUBS), `sweep_pro_annual` (SUBS), and `sweep_pro_lifetime` (INAPP); these are not verified as active products in Play Console.
 - The client currently checks purchase state and signature/JSON field presence but has no cryptographic purchase-token verification service.
 
