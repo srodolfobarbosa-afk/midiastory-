@@ -109,3 +109,8 @@ Before a release:
 8. Generate and inspect a correctly signed AAB, then use internal/closed testing before production.
 
 A successful Debug build or an emulator run does not make the app production-ready.
+
+
+## Trust, privacy and store-readiness requirements
+
+The product guardrails, audit-report requirements, permission principles and current CI evidence are maintained in [`docs/PRODUCT_TRUST_AND_PRIVACY.md`](docs/PRODUCT_TRUST_AND_PRIVACY.md). Treat this as an engineering gate, not a claim that Play review or release readiness has been achieved.
