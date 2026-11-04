@@ -9,7 +9,7 @@ fi
 
 diagnostics_dir="app/build/ci-diagnostics"
 mkdir -p "$diagnostics_dir"
-serial="$(adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" { print $1; exit }')"
+serial=""
 
 capture_diagnostics() {
   local reason="$1"
@@ -23,28 +23,34 @@ capture_diagnostics() {
   fi
 }
 
-if [[ -z "$serial" ]]; then
-  capture_diagnostics "No booted emulator is visible to ADB."
-  exit 1
-fi
-
 ready=false
 api=""
 boot=""
 package_service=""
 activity_service=""
 for attempt in $(seq 1 90); do
-  state="$(adb -s "$serial" get-state 2>/dev/null || true)"
-  api="$(adb -s "$serial" shell getprop ro.build.version.sdk 2>/dev/null | tr -d '\r' || true)"
-  boot="$(adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
-  package_service="$(adb -s "$serial" shell service check package 2>&1 || true)"
-  activity_service="$(adb -s "$serial" shell service check activity 2>&1 || true)"
+  if [[ -z "$serial" ]]; then
+    serial="$(adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" { print $1; exit }' || true)"
+  fi
+  if [[ -n "$serial" ]]; then
+    state="$(adb -s "$serial" get-state 2>/dev/null || true)"
+    api="$(adb -s "$serial" shell getprop ro.build.version.sdk 2>/dev/null | tr -d '\r' || true)"
+    boot="$(adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+    package_service="$(adb -s "$serial" shell service check package 2>&1 || true)"
+    activity_service="$(adb -s "$serial" shell service check activity 2>&1 || true)"
+  else
+    state=""
+    api=""
+    boot=""
+    package_service=""
+    activity_service=""
+  fi
 
   if [[ "$state" == "device" &&
         "$api" == "$expected_api" &&
         "$boot" == "1" &&
-        "$package_service" == *found* &&
-        "$activity_service" == *found* ]]; then
+        "$package_service" == *": found"* &&
+        "$activity_service" == *": found"* ]]; then
     ready=true
     break
   fi
