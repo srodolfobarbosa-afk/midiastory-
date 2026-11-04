@@ -169,3 +169,9 @@ O script valida package e versionCode do source, fingerprint do JKS, assinatura 
 - PT-BR/EN/fallback têm 152 chaves; DE/ES/FR/HI/JA/ZH-CN têm 63/152 cada. Faltam 89 por locale, 534 no total.
 - Nenhum teste instrumentado/API29/API35 ou teste físico do HEAD atual foi aprovado.
 - Estado permanece NÃO PRONTO PARA RELEASE.
+
+## Mitigação do boot do emulador — 04/11/2026
+
+O workflow foi ajustado para não chamar o serviço Android Settings durante o boot do emulador. A configuração anterior usava disable-animations e três comandos adb shell settings; o CI já havia registrado "Failure calling service settings: Broken pipe (32)" antes dos testes instrumentados. Agora a etapa aguarda sys.boot_completed por até 180 segundos, com repetição tolerante a falhas transitórias, e só então executa connectedDebugAndroidTest.
+
+Esta mudança remove a dependência do serviço Settings no início do job; não é evidência de que a instrumentação passou. O próximo resultado precisa ser lido no SHA exato e deve incluir a execução real dos testes API29 e API35.
