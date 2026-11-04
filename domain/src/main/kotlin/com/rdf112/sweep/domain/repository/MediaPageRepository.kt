@@ -10,4 +10,10 @@ interface MediaPageRepository {
     suspend fun createSession(): MediaScanSession
     suspend fun loadPage(session: MediaScanSession, request: MediaPageRequest): MediaPage
     suspend fun assessSession(session: MediaScanSession): SessionFreshness
+
+    /**
+     * Computes a content hash from a content:// URI using bounded streaming I/O.
+     * The default returns null for repositories that cannot read binary content.
+     */
+    suspend fun computeSha256(uri: String): String? = null
 }
