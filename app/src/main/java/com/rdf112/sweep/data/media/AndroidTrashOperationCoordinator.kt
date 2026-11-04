@@ -48,12 +48,15 @@ class AndroidTrashOperationCoordinator(
      * Attempts one API 29 deletion. If the provider requires user consent, the caller must launch
      * the returned system IntentSender and retry this same URI only after RESULT_OK.
      */
-    suspend fun deleteApi29Item(uriString: String): Api29DeleteAttempt = withContext(Dispatchers.IO) {
-        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q) {
+    suspend fun deleteApi29Item(record: MediaRecord): Api29DeleteAttempt = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q ||
+            !record.isSelectable || record.isProtected ||
+            revalidateSingleRecord(record) != ItemRevalidationReason.VALID_UNCHANGED
+        ) {
             return@withContext Api29DeleteAttempt.NotDeleted
         }
         try {
-            val deletedRows = resolver.delete(Uri.parse(uriString), null, null)
+            val deletedRows = resolver.delete(Uri.parse(record.uri), null, null)
             if (deletedRows > 0) Api29DeleteAttempt.Deleted else Api29DeleteAttempt.NotDeleted
         } catch (recoverable: RecoverableSecurityException) {
             Api29DeleteAttempt.ConsentRequired(recoverable.userAction.actionIntent.intentSender)
