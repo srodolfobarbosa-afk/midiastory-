@@ -1106,7 +1106,11 @@ class MainActivity : AppCompatActivity() {
         val date = record.dateModifiedEpochSeconds?.let {
             DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(it * 1000L))
         } ?: getString(R.string.date_unavailable)
-        val shaBadge = if (record.contentSha256 != null) getString(R.string.exact_copy_badge) else ""
+        val shaBadge = if (record.isProtected || record.duplicateReferenceSnapshot != null) {
+            getString(R.string.exact_copy_badge)
+        } else {
+            ""
+        }
         details.addView(label(getString(R.string.media_metadata_line, displayVolumeName(record.volumeName), date, shaBadge), 10f, R.color.sweep_muted, false), top(2))
         row.addView(details, LinearLayout.LayoutParams(0, -2, 1f))
 

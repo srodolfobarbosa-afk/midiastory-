@@ -262,7 +262,7 @@ class MediaScanViewModelTest {
         override suspend fun assessSession(session: MediaScanSession): SessionFreshness =
             SessionFreshness.REVISION_UNCHANGED
 
-        override suspend fun computeSha256(uri: String): String? = "sha256-identical"
+        override suspend fun computeSha256(uri: String): String? = "f".repeat(64)
 
         override suspend fun loadPage(
             session: MediaScanSession,

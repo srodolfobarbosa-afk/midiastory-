@@ -21,9 +21,9 @@ class SmartMediaGroupingPolicyTest {
 
     @Test
     fun filtersLargeFilesAndProtectsOneReferenceInSameSizeGroups() {
-        val r1 = rec("1", 15L * 1024L * 1024L, 100L, "aa11")
-        val r2 = rec("2", 15L * 1024L * 1024L, 200L, "aa11")
-        val r3 = rec("3", 500L, 300L, "bb22")
+        val r1 = rec("1", 15L * 1024L * 1024L, 100L, "a".repeat(64))
+        val r2 = rec("2", 15L * 1024L * 1024L, 200L, "a".repeat(64))
+        val r3 = rec("3", 500L, 300L, "b".repeat(64))
 
         val large = SmartMediaGroupingPolicy.applyFilter(listOf(r1, r2, r3), SmartFilterMode.LARGE_FILES_10MB, 1000L)
         assertEquals(2, large.size)
@@ -36,6 +36,10 @@ class SmartMediaGroupingPolicyTest {
         assertFalse(protectedItem.isSelectable)
         assertFalse(selectableDuplicate.isProtected)
         assertTrue(selectableDuplicate.isSelectable)
+        val originalSnapshot = requireNotNull(selectableDuplicate.duplicateReferenceSnapshot)
+        assertEquals(r1.uri, originalSnapshot.uri)
+        assertEquals("a".repeat(64), originalSnapshot.sha256)
+        assertTrue(protectedItem.duplicateReferenceSnapshot == null)
     }
 
     @Test
@@ -67,7 +71,7 @@ class SmartMediaGroupingPolicyTest {
 
     @Test
     fun oneMissingHashCannotBeGroupedAsAnExactDuplicate() {
-        val hashed = rec("30", 8L * 1024L * 1024L, 100L, "same_hash")
+        val hashed = rec("30", 8L * 1024L * 1024L, 100L, "c".repeat(64))
         val missingHash = rec("31", 8L * 1024L * 1024L, 200L)
 
         val confirmed = SmartMediaGroupingPolicy.markProtectedReferencesForSameSizeGroups(

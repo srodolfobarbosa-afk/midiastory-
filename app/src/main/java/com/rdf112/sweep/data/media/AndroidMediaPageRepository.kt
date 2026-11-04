@@ -476,9 +476,9 @@ class AndroidMediaPageRepository(
         return try {
             val digest = MessageDigest.getInstance("SHA-256")
             val stream = resolver.openInputStream(uri) ?: return null
+            var bytesRead = 0L
             BufferedInputStream(stream, 8192).use { input ->
                 val buffer = ByteArray(8192)
-                var bytesRead = 0L
                 while (true) {
                     currentCoroutineContext().ensureActive()
                     val read = input.read(buffer)
