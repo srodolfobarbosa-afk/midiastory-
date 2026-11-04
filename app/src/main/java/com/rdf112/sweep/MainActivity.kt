@@ -133,7 +133,10 @@ class MainActivity : AppCompatActivity() {
             pendingApi29ConsentUri = null
             lifecycleScope.launch {
                 if (result.resultCode == Activity.RESULT_OK) {
-                    when (trashCoordinator.deleteApi29Item(api29Uri)) {
+                    val record = pendingApi29RecordsByUri[api29Uri]
+                    val retry = record?.let { trashCoordinator.deleteApi29Item(it) }
+                        ?: Api29DeleteAttempt.NotDeleted
+                    when (retry) {
                         Api29DeleteAttempt.Deleted -> pendingApi29DeletedUris += api29Uri
                         else -> pendingApi29RejectedCount++
                     }
@@ -202,6 +205,7 @@ class MainActivity : AppCompatActivity() {
     private val pendingApi29DeletedUris = mutableListOf<String>()
     private var pendingApi29ConsentUri: String? = null
     private var pendingApi29BytesByUri: Map<String, Long> = emptyMap()
+    private var pendingApi29RecordsByUri: Map<String, MediaRecord> = emptyMap()
     private var pendingApi29TotalCount: Int = 0
     private var pendingApi29RejectedCount: Int = 0
     private var sessionAuthorizedBytes: Long = 0L
@@ -1388,6 +1392,7 @@ class MainActivity : AppCompatActivity() {
                 pendingApi29DeleteQueue.addAll(firstBatch)
                 pendingApi29DeletedUris.clear()
                 pendingApi29BytesByUri = selected.associate { it.uri to it.sizeBytes }
+                pendingApi29RecordsByUri = selected.associateBy { it.uri }
                 pendingApi29TotalCount = firstBatch.size
                 pendingApi29RejectedCount = 0
                 statusText.text = getString(R.string.api29_delete_notice)
@@ -1412,7 +1417,10 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             while (pendingApi29DeleteQueue.isNotEmpty()) {
                 val uri = pendingApi29DeleteQueue.first()
-                when (val attempt = trashCoordinator.deleteApi29Item(uri)) {
+                val record = pendingApi29RecordsByUri[uri]
+                val attempt = record?.let { trashCoordinator.deleteApi29Item(it) }
+                    ?: Api29DeleteAttempt.NotDeleted
+                when (attempt) {
                     Api29DeleteAttempt.Deleted -> {
                         pendingApi29DeletedUris += uri
                         pendingApi29DeleteQueue.removeAt(0)
@@ -1454,6 +1462,7 @@ class MainActivity : AppCompatActivity() {
         pendingApi29DeleteQueue.clear()
         pendingApi29DeletedUris.clear()
         pendingApi29BytesByUri = emptyMap()
+        pendingApi29RecordsByUri = emptyMap()
         pendingApi29TotalCount = 0
         pendingApi29RejectedCount = 0
     }
