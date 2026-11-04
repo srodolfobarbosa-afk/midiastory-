@@ -1231,19 +1231,24 @@ class MainActivity : AppCompatActivity() {
         }
 
         val formattedBytes = android.text.format.Formatter.formatFileSize(this, plan.estimatedDeliverableBytes)
-        oaasPipelineStatus.text = if (plan.isReadyToDeliver) {
-            getString(
-                if (progress.coverageComplete) R.string.oaas_global_scan_result_complete
-                else R.string.oaas_global_scan_result_partial,
+        oaasPipelineStatus.text = when {
+            plan.isReadyToDeliver && progress.coverageComplete -> getString(
+                R.string.oaas_global_scan_result_complete,
                 progress.recordsExamined,
                 progress.pagesProcessed,
                 plan.autoSelectedRecords.size,
                 formattedBytes,
-                if (progress.coverageComplete) plan.protectedReferencesKept
-                else progress.warningCount,
+                plan.protectedReferencesKept,
             )
-        } else {
-            getString(
+            plan.isReadyToDeliver || !progress.coverageComplete -> getString(
+                R.string.oaas_global_scan_result_partial,
+                progress.recordsExamined,
+                progress.pagesProcessed,
+                plan.autoSelectedRecords.size,
+                formattedBytes,
+                progress.warningCount,
+            )
+            else -> getString(
                 R.string.oaas_global_scan_result_empty,
                 progress.recordsExamined,
                 progress.warningCount,
