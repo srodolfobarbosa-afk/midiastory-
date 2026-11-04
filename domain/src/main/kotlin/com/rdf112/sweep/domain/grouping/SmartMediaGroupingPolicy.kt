@@ -50,17 +50,12 @@ object SmartMediaGroupingPolicy {
         val result = ArrayList<MediaRecord>()
         for ((_, sizeGroup) in bySize) {
             if (sizeGroup.size < 2) continue
-            val anyHasHash = sizeGroup.any { !it.contentSha256.isNullOrBlank() }
-            if (anyHasHash) {
-                val confirmedSubgroups = sizeGroup
-                    .filter { !it.contentSha256.isNullOrBlank() }
-                    .groupBy { it.contentSha256!!.lowercase() }
-                for ((_, hashGroup) in confirmedSubgroups) {
-                    if (hashGroup.size < 2) continue
-                    appendProtectedGroup(hashGroup, result)
-                }
-            } else {
-                appendProtectedGroup(sizeGroup, result)
+            val confirmedSubgroups = sizeGroup
+                .filter { !it.contentSha256.isNullOrBlank() }
+                .groupBy { it.contentSha256!!.lowercase() }
+            for ((_, hashGroup) in confirmedSubgroups) {
+                if (hashGroup.size < 2) continue
+                appendProtectedGroup(hashGroup, result)
             }
         }
         return result.sortedByDescending { it.sizeBytes }
