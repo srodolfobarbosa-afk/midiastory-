@@ -27,6 +27,14 @@ jobs:
         run: >-
           ./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug
           :app:assembleDebug :app:assembleDebugAndroidTest
+      - name: Run instrumented tests on Android 35 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: ./gradlew --no-daemon :app:connectedDebugAndroidTest
 
   signed-release:
     if: github.event_name == 'workflow_dispatch'
