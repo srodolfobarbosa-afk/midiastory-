@@ -71,9 +71,32 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+  windows-script-validation:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell build and QA scripts
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path . -Recurse -File -Filter '*.ps1' |
+            Where-Object { $_.FullName -notmatch '[\\/](build|\.gradle|\.git)[\\/]' }
+          if (-not $files) { throw "No PowerShell scripts were found." }
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $file.FullName, [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Format-List | Out-String | Write-Host
+              throw "PowerShell syntax error in $($file.FullName)"
+            }
+            Write-Host "OK: $($file.FullName)"
+          }
+
   signed-release:
     if: github.event_name == 'workflow_dispatch'
-    needs: verify-debug
+    needs: [verify-debug, windows-script-validation]
     runs-on: ubuntu-latest
     environment: play-release
     steps:
