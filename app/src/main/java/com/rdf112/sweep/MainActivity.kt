@@ -59,6 +59,7 @@ import com.rdf112.sweep.domain.oaas.DesiredOutcomeMission
 import com.rdf112.sweep.domain.operations.MediaOperationMode
 import com.rdf112.sweep.domain.operations.ObservedMediaPostState
 import com.rdf112.sweep.domain.permissions.MediaPermissionPolicy
+import com.rdf112.sweep.domain.storage.StorageUsageCalculator
 import com.rdf112.sweep.presentation.scan.MediaScanUiState
 import com.rdf112.sweep.presentation.scan.MediaScanViewModel
 import com.rdf112.sweep.presentation.scan.ScanUiStatus
@@ -443,7 +444,9 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        storageRingGauge = StorageRingGaugeView(this@MainActivity)
+        storageRingGauge = StorageRingGaugeView(this@MainActivity).apply {
+            bottomLabel = getString(R.string.storage_ring_used)
+        }
         gaugeRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(116), dp(116)).apply { marginEnd = dp(14) })
 
         val gaugeInfo = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
@@ -458,6 +461,7 @@ class MainActivity : AppCompatActivity() {
         gaugeInfo.addView(storageText)
         gaugeRow.addView(gaugeInfo, LinearLayout.LayoutParams(0, -2, 1f))
         gaugeCard.addView(gaugeRow)
+        gaugeCard.addView(label(getString(R.string.storage_note), 10f, R.color.sweep_muted, false), top(8))
         gaugeCard.addView(label(getString(R.string.space_accounting_title), 10f, R.color.sweep_primary_glow, true), top(14))
         spaceMetricsText = label(
             getString(R.string.space_metrics_summary, "0 B", "0 B", "0 B", "0 B"),
@@ -737,6 +741,8 @@ class MainActivity : AppCompatActivity() {
         proStatusBadge = label(getString(R.string.pro_status_free), 17f, R.color.sweep_text, true)
         proCard.addView(proStatusBadge, top(6))
         proCard.addView(label(getString(R.string.pro_card_subtitle), 13f, R.color.sweep_muted, false), top(6))
+        proCard.addView(label(getString(R.string.pro_free_included), 12f, R.color.sweep_text, false), top(12))
+        proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.sweep_accent_amber, false), top(10))
 
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
@@ -744,17 +750,23 @@ class MainActivity : AppCompatActivity() {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
         }
+        planAnnualButton.isEnabled = billingGateway.securePurchaseVerificationAvailable()
         proCard.addView(planAnnualButton, top(14))
 
         planMonthlyButton = button(getString(R.string.plan_monthly_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
         }
+        planMonthlyButton.isEnabled = billingGateway.securePurchaseVerificationAvailable()
         proCard.addView(planMonthlyButton, top(8))
 
         planLifetimeButton = button(getString(R.string.plan_lifetime_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
         }
+        planLifetimeButton.isEnabled = billingGateway.securePurchaseVerificationAvailable()
         proCard.addView(planLifetimeButton, top(8))
+        if (!billingGateway.securePurchaseVerificationAvailable()) {
+            proCard.addView(label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false), top(12))
+        }
 
         restorePurchasesButton = button(getString(R.string.restore_purchases_button)) {
             billingGateway.startAndReconcile()
@@ -812,6 +824,10 @@ class MainActivity : AppCompatActivity() {
         val annual = catalog[BillingStatePolicy.PRODUCT_ANNUAL]
         val monthly = catalog[BillingStatePolicy.PRODUCT_MONTHLY]
         val lifetime = catalog[BillingStatePolicy.PRODUCT_LIFETIME]
+        val canPurchase = billingGateway.securePurchaseVerificationAvailable()
+        planAnnualButton.isEnabled = canPurchase && annual?.isAvailable == true
+        planMonthlyButton.isEnabled = canPurchase && monthly?.isAvailable == true
+        planLifetimeButton.isEnabled = canPurchase && lifetime?.isAvailable == true
 
         if (annual != null && annual.formattedPrice.isNotBlank()) {
             val realDiscount = BillingStatePolicy.calculateRealAnnualDiscountPercent(
@@ -1510,25 +1526,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun refreshStorageStats() {
         runCatching {
-            val stat = StatFs(Environment.getDataDirectory().absolutePath)
-            val total = stat.totalBytes.coerceAtLeast(1L)
-            val free = stat.availableBytes.coerceAtLeast(0L)
-            val used = (total - free).coerceAtLeast(0L)
-            val usedFmt = android.text.format.Formatter.formatFileSize(this, used)
-            val freeFmt = android.text.format.Formatter.formatFileSize(this, free)
-            val totalFmt = android.text.format.Formatter.formatFileSize(this, total)
+            // Measure primary shared storage, where user media is normally stored, rather than app-private /data.
+            val primarySharedStorage = Environment.getExternalStorageDirectory()
+            val stat = StatFs(primarySharedStorage.absolutePath)
+            val usage = StorageUsageCalculator.from(
+                totalBytes = stat.totalBytes,
+                availableBytes = stat.availableBytes,
+            ) ?: error("Primary shared-storage statistics are unavailable.")
+
+            val usedFmt = android.text.format.Formatter.formatFileSize(this, usage.usedBytes)
+            val freeFmt = android.text.format.Formatter.formatFileSize(this, usage.availableBytes)
+            val totalFmt = android.text.format.Formatter.formatFileSize(this, usage.totalBytes)
             storageText.text = getString(R.string.storage_measurement, usedFmt, freeFmt, totalFmt)
             if (::storageUsedHeadline.isInitialized) {
                 storageUsedHeadline.text = getString(R.string.storage_used_of_total, usedFmt, totalFmt)
                 storageFreeSubline.text = getString(R.string.storage_free_subline, freeFmt)
-                val ratio = (used.toDouble() / total.toDouble()).toFloat().coerceIn(0f, 1f)
-                storageRingGauge.usedFraction = ratio
-                storageRingGauge.centerLabel = "${(ratio * 100).toInt()}%"
+                storageRingGauge.usedFraction = usage.usedFraction.toFloat()
+                storageRingGauge.centerLabel = "${usage.usedPercent}%"
             }
         }.onFailure {
             storageText.text = getString(R.string.storage_unavailable)
+            if (::storageUsedHeadline.isInitialized) {
+                storageUsedHeadline.text = getString(R.string.storage_unavailable)
+                storageFreeSubline.text = ""
+                storageRingGauge.usedFraction = 0f
+                storageRingGauge.centerLabel = "—"
+            }
         }
     }
 

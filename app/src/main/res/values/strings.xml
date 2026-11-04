@@ -4,8 +4,8 @@
     <string name="brand_tagline">A cleaner phone. More space back.</string>
     <string name="hero_title">Free up space on your phone.</string>
     <string name="hero_subtitle">Find large files and duplicate copies. Review everything before cleanup. Your media is analyzed on your device.</string>
-    <string name="storage_title">PHONE STORAGE</string>
-    <string name="storage_note">Storage use is measured on this device. Nothing changes without your confirmation.</string>
+    <string name="storage_title">PRIMARY SHARED STORAGE</string>
+    <string name="storage_note">Measures your primary shared storage. Other volumes appear in Files when accessible.</string>
     <string name="storage_unavailable">Storage statistics are unavailable on this device.</string>
     <string name="storage_measurement">%1$s used · %2$s free
 Total: %3$s</string>
@@ -77,10 +77,14 @@ Total: %3$s</string>
     <string name="date_unavailable">Date not provided</string>
     <string name="size_unavailable">Size unavailable</string>
     <string name="pro_card_title">MIDIASTORE PRO</string>
-    <string name="pro_status_free">Current plan: Free · Live prices loaded from Google Play</string>
+    <string name="pro_status_free">Current plan: Free · Essential analysis and safe cleanup included.</string>
     <string name="pro_status_active">Midiastore Pro active</string>
     <string name="pro_status_pending">Purchase pending confirmation on Google Play</string>
-    <string name="pro_card_subtitle">Extra features and report exports.</string>
+    <string name="pro_card_subtitle">Core analysis and safe cleanup stay free. Pro adds review-report export.</string>
+    <string name="pro_free_included">FREE · Analyze photos, videos, audio, large files and exact copies. Review and confirm before cleanup.</string>
+    <string name="pro_paid_included">PRO · Export a summary of your reviewed selection to save or share. Safety features remain free.</string>
+    <string name="pro_purchase_unavailable_notice">New Pro purchases are paused until secure Google Play verification is ready. The app will not start a charge right now.</string>
+    <string name="storage_ring_used">USED</string>
     <string name="plan_annual_default">Midiastore Pro Annual · Check price on Google Play</string>
     <string name="plan_annual_with_price">Midiastore Pro Annual · %1$s/year</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro Annual (-%2$d%% real savings) · %1$s/year</string>
