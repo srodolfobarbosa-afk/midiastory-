@@ -9,7 +9,7 @@
     <string name="storage_unavailable">Estatísticas de armazenamento indisponíveis neste dispositivo.</string>
     <string name="storage_measurement">%1$s usados · %2$s livres
 Total: %3$s</string>
-    <string name="scan_button">Analisar meu celular</string>
+    <string name="scan_button">Abrir arquivos</string>
     <string name="permission_continue">Gerenciar permissões de mídia</string>
     <string name="cancel_scan">Cancelar varredura</string>
     <string name="ready_status">Pronto. Processamento 100% local e com proteção de referência original.</string>
@@ -147,7 +147,7 @@ Total: %3$s</string>
     <string name="quick_find_large">Encontrar arquivos grandes (mais de 10 MB)</string>
     <string name="quick_find_duplicates">Encontrar cópias exatas</string>
     <string name="files_count_in_tab">Encontrados: %1$d arquivos nesta página</string>
-    <string name="tap_to_scan_media_types">Analise fotos, vídeos e áudios.</string>
+    <string name="tap_to_scan_media_types">Explore fotos, vídeos e áudios.</string>
     <string name="storage_used_of_total">%1$s usados de %2$s</string>
     <string name="storage_free_subline">%1$s livres neste aparelho</string>
     <string name="exact_copy_badge"> · Cópia exata</string>

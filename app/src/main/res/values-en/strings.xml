@@ -9,7 +9,7 @@
     <string name="storage_unavailable">Storage statistics are unavailable on this device.</string>
     <string name="storage_measurement">%1$s used · %2$s free
 Total: %3$s</string>
-    <string name="scan_button">Scan my phone</string>
+    <string name="scan_button">Browse files</string>
     <string name="permission_continue">Manage media permissions</string>
     <string name="cancel_scan">Cancel scan</string>
     <string name="ready_status">Ready. 100% local processing with original reference protection.</string>
@@ -147,7 +147,7 @@ Total: %3$s</string>
     <string name="quick_find_large">Find large files (over 10 MB)</string>
     <string name="quick_find_duplicates">Find exact copies</string>
     <string name="files_count_in_tab">Found: %1$d files on this page</string>
-    <string name="tap_to_scan_media_types">Scan photos, videos and audio.</string>
+    <string name="tap_to_scan_media_types">Browse photos, videos, and audio.</string>
     <string name="storage_used_of_total">%1$s used of %2$s</string>
     <string name="storage_free_subline">%1$s free on this device</string>
     <string name="exact_copy_badge"> · Exact copy</string>

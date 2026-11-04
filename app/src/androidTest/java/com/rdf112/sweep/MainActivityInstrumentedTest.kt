@@ -14,6 +14,7 @@ import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaRecord
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +27,10 @@ class MainActivityInstrumentedTest {
             scenario.onActivity { activity ->
                 assertEquals("Midiastore", activity.getString(R.string.app_name))
                 assertEquals("com.rdf112.midiastore.debug", activity.packageName)
+                val primaryAction = activity.window.decorView
+                    .findViewWithTag<android.view.View>("primary_phone_cleaner_action")
+                assertNotNull("Home must expose the global cleaner action", primaryAction)
+                assertTrue("Primary cleaner action must be clickable", primaryAction.isClickable)
             }
         }
     }

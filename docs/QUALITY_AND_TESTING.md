@@ -175,3 +175,9 @@ O script valida package e versionCode do source, fingerprint do JKS, assinatura 
 O workflow foi ajustado para não chamar o serviço Android Settings durante o boot do emulador. A configuração anterior usava disable-animations e três comandos adb shell settings; o CI já havia registrado "Failure calling service settings: Broken pipe (32)" antes dos testes instrumentados. Agora a etapa aguarda sys.boot_completed por até 180 segundos, com repetição tolerante a falhas transitórias, e só então executa connectedDebugAndroidTest.
 
 Esta mudança remove a dependência do serviço Settings no início do job; não é evidência de que a instrumentação passou. O próximo resultado precisa ser lido no SHA exato e deve incluir a execução real dos testes API29 e API35.
+
+## Jornada principal do Phone Cleaner — ajuste de 04/11/2026
+
+A ação circular principal da Home agora chama a missão global de encontrar arquivos grandes em todas as categorias/volumes acessíveis, em vez de abrir somente a primeira página de fotos na aba Arquivos. Quando falta permissão, a seleção da missão é preservada; após o callback de permissão, a navegação retorna à aba Limpeza para mostrar o progresso da missão.
+
+A ação secundária foi renomeada para Abrir arquivos/Browse files, deixando claro que ela abre a navegação paginada por mídia. Um teste instrumentado verifica que a ação principal global está presente e clicável. A execução do teste continua dependente do workflow atual.

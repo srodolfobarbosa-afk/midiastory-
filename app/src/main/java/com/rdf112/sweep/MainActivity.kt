@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (hasAnyMediaPermission()) {
             viewModel.startSession()
-            switchTab(AppTab.FILES)
+            switchTab(if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
         } else {
             pendingOutcomeMission = null
             statusText.text = getString(R.string.permission_denied)
@@ -479,13 +479,10 @@ class MainActivity : AppCompatActivity() {
             background = circleGlowBackground(color(R.color.sweep_primary), color(R.color.sweep_surface_alt))
             isClickable = true
             isFocusable = true
+            tag = "primary_phone_cleaner_action"
             setOnClickListener {
-                if (hasAnyMediaPermission()) {
-                    viewModel.startSession()
-                    switchTab(AppTab.FILES)
-                } else {
-                    requestMediaPermissions()
-                }
+                switchTab(AppTab.OAAS)
+                runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
             }
         }
         heroOrbTitle = label(getString(R.string.analyze_now), 19f, R.color.sweep_background, true).apply {
