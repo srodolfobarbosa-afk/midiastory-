@@ -6,7 +6,7 @@
 
 1. O proprietário confirmou o listing de teste interno `Midiastore — com.rdf112.midiastore`.
 2. O código atual configura `applicationId=com.rdf112.midiastore`, `versionCode=17`, `versionName=2.2.1`; esses valores não provam qual foi o maior versionCode efetivamente publicado.
-3. Confirmar na Play Console o maior versionCode, o package do listing, a chave de upload aceita e Play App Signing.
+3. Confirmar na Play Console o maior versionCode já publicado, o package do listing, a chave de upload aceita e Play App Signing. O próximo versionCode do source precisa ser estritamente maior que esse máximo.
 4. Não alterar Application ID, versionCode, versionName ou certificado sem aprovação do proprietário.
 5. O source histórico que gerou o AAB publicado ainda não foi recuperado; a reconstrução não pode ser declarada byte-a-byte equivalente.
 
