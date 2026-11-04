@@ -57,3 +57,11 @@ O plano gratuito mantém análise de fotos, vídeos e áudios acessíveis, local
 ## Limite de identidade
 
 O proprietário mostrou o listing de teste interno `Midiastore — com.rdf112.midiastore`. A consulta pública de `com.rdf112.sweep` não determina o estado desse listing. Maior versionCode publicado e certificado de upload ainda precisam ser conferidos na Play Console. O código histórico do AAB de produção não foi recuperado.
+
+## Direção do primeiro lançamento — Phone Cleaner + Pro Freemium
+
+A identidade para o consumidor é **limpador inteligente de celular (Phone Cleaner)**. “Gerenciamento de armazenamento” é uma capacidade interna. A promessa é encontrar o que ocupa espaço, identificar o que pode ser removido, proteger o original e confirmar o espaço efetivamente recuperado.
+
+O primeiro lançamento não será um gerenciador universal, antivírus, RAM booster, CPU cooler, limpador de cache privado de outros apps nem coleção de ferramentas. Downloads/documentos via SAF, Storage Forecast, similaridade visual e automação são extensões futuras, condicionadas à estabilização e à validação de demanda.
+
+O modelo Freemium mantém o núcleo seguro gratuito. Pro deve monetizar conveniência e relatórios; o benefício pago já presente no cliente é exportação do resumo revisado. Compra permanece bloqueada até validação confiável de purchaseToken e confirmação do catálogo/offerings na Play Console.

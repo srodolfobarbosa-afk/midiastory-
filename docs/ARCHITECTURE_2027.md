@@ -49,3 +49,11 @@ Não criar módulos Gradle vazios agora. Primeiro estabilizar contratos, testes 
 ## Gatilhos de modularização
 
 Extrair feature do `:app` quando pelo menos dois sinais ocorrerem: equipe independente, ciclo de release separado, API de domínio estável, redução demonstrável do grafo de dependências/tempo de build ou testes de feature isoláveis. Manter no domínio puro aquilo que pode ser testado sem Android.
+
+## Atualização de arquitetura — 04/11/2026
+
+O medidor principal consulta agora o armazenamento compartilhado primário, não a partição privada /data. O cálculo está isolado em StorageUsageCalculator com quatro testes unitários; isso não significa que SD/USB estejam incluídos. Apresentar volumes adicionais separadamente quando forem enumerados e acessíveis.
+
+O projeto permanece com dois módulos Gradle: app e domain. A MainActivity ainda concentra navegação, renderização e operações; não criar módulos vazios. Depois de obter baseline CI verde, refatorar em passos pequenos, extraindo contratos/estado e mantendo o domínio sem Android. Não fazer reescrita arquitetural antes de resolver scanner/MediaStore e instrumentação.
+
+A promessa comercial passa a Phone Cleaner; armazenamento/MediaStore continuam como domínio técnico. Downloads/documentos usam SAF, se adicionados; não adicionar MANAGE_EXTERNAL_STORAGE sem prova de que MediaStore/SAF não atendem ao recurso central.
