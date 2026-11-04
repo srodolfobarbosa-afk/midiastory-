@@ -435,7 +435,9 @@ class AndroidMediaPageRepository(
     }
 
     override suspend fun computeSha256(uri: String): String? =
-        computeStreamingSha256(Uri.parse(uri))
+        withContext(Dispatchers.IO) {
+            computeStreamingSha256(Uri.parse(uri))
+        }
 
     private suspend fun computeStreamingSha256(uri: Uri): String? {
         return try {
