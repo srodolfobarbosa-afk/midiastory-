@@ -122,4 +122,9 @@ Total: %3$s</string>
 • Preparado para revisão: %2$s
 • Autorizado pelo usuário: %3$s
 • Efetivamente liberado (comprovado): %4$s</string>
+    <string name="pro_status_reconciliation">Verificando compras na Google Play…</string>
+    <string name="plan_unavailable">Plano indisponível no momento</string>
+    <string name="billing_launch_not_ready">A Google Play ainda não carregou esse plano. Verifique sua conexão, aguarde alguns segundos e tente novamente.</string>
+    <string name="billing_flow_started">A confirmação de compra foi aberta na Google Play. A cobrança ainda precisa ser confirmada.</string>
+    <string name="oaas_mission_scan_failed">Não foi possível concluir a análise. Confira as permissões e tente novamente.</string>
 </resources>
