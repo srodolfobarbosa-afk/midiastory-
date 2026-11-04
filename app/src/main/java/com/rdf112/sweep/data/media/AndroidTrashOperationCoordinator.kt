@@ -169,7 +169,7 @@ class AndroidTrashOperationCoordinator(
             try {
                 val cursor = resolver.query(Uri.parse(rawUri), projection, args, null)
                 if (cursor == null) {
-                    ObservedMediaPostState.DELETED_OR_ABSENT
+                    ObservedMediaPostState.UNVERIFIED_ERROR
                 } else {
                     cursor.use { c ->
                         if (!c.moveToFirst()) {
