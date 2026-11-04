@@ -49,4 +49,31 @@ class SmartMediaGroupingPolicyTest {
         val unconfirmed = SmartMediaGroupingPolicy.findUnconfirmedSameSizeRecords(listOf(sameSizeA, sameSizeB))
         assertEquals(2, unconfirmed.size)
     }
+    @Test
+    fun neverTreatsSameSizeFilesWithoutSha256AsConfirmedDuplicates() {
+        val sameSizeA = rec("20", 8L * 1024L * 1024L, 100L)
+        val sameSizeB = rec("21", 8L * 1024L * 1024L, 200L)
+
+        val confirmed = SmartMediaGroupingPolicy.markProtectedReferencesForSameSizeGroups(
+            listOf(sameSizeA, sameSizeB)
+        )
+        assertTrue(confirmed.isEmpty(), "Mesmo tamanho sem SHA-256 não confirma duplicidade")
+
+        val unconfirmed = SmartMediaGroupingPolicy.findUnconfirmedSameSizeRecords(
+            listOf(sameSizeA, sameSizeB)
+        )
+        assertEquals(2, unconfirmed.size)
+    }
+
+    @Test
+    fun oneMissingHashCannotBeGroupedAsAnExactDuplicate() {
+        val hashed = rec("30", 8L * 1024L * 1024L, 100L, "same_hash")
+        val missingHash = rec("31", 8L * 1024L * 1024L, 200L)
+
+        val confirmed = SmartMediaGroupingPolicy.markProtectedReferencesForSameSizeGroups(
+            listOf(hashed, missingHash)
+        )
+        assertTrue(confirmed.isEmpty())
+    }
+
 }
