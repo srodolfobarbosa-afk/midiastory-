@@ -310,14 +310,14 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // 1. TOP APP BAR MODERNA (Logo M + Nome Midiastores + Pílula Seja Pro)
+        // 1. TOP APP BAR MODERNA (Logo M + Nome Midiastore + Pílula Seja Pro)
         val topBar = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(20), dp(14), dp(20), dp(10))
         }
         val mark = TextView(this).apply {
-            text = "S"
+            text = "M"
             textSize = 20f
             typeface = Typeface.DEFAULT_BOLD
             gravity = Gravity.CENTER
