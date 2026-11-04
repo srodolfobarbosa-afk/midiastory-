@@ -34,7 +34,24 @@ jobs:
           arch: x86_64
           profile: pixel_2
           disable-animations: true
-          script: ./gradlew --no-daemon :app:connectedDebugAndroidTest
+          script: |
+            ./gradlew --no-daemon :app:connectedDebugAndroidTest
+      - name: Print instrumented test failure details
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          find app/build/outputs/androidTest-results app/build/reports/androidTests -type f \\( -name '*.xml' -o -name '*.txt' -o -name '*.html' \\) -print -exec sed -n '1,260p' {} \\;
+      - name: Upload Android test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports
+          path: |
+            app/build/outputs/androidTest-results/
+            app/build/reports/androidTests/
+          if-no-files-found: warn
+          retention-days: 7
 
   signed-release:
     if: github.event_name == 'workflow_dispatch'
