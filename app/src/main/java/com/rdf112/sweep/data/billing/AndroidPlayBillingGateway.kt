@@ -46,7 +46,7 @@ class AndroidPlayBillingGateway(context: Context) {
     private val isConnecting = AtomicBoolean(false)
 
     // Inicializa sempre em estado não concedido até que o Play Billing confirme na sessão atual (fail-closed).
-    private val _accessState = MutableStateFlow(ProAccessSummaryState.FREE_NO_ACTIVE_PURCHASE)
+    private val _accessState = MutableStateFlow(ProAccessSummaryState.RECONCILIATION_REQUIRED)
     val accessState: StateFlow<ProAccessSummaryState> = _accessState.asStateFlow()
 
     private val _catalog = MutableStateFlow<Map<String, PlayCatalogProductUi>>(emptyMap())
