@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
-    <string name="brand_tagline">Armazenamento sob seu controle.</string>
-    <string name="hero_title">Veja o que está ocupando espaço no seu celular.</string>
-    <string name="hero_subtitle">Encontre arquivos grandes e cópias exatas. Confira cada sugestão antes de alterar qualquer coisa.</string>
+    <string name="brand_tagline">Seu celular mais leve. Seu espaço de volta.</string>
+    <string name="hero_title">Recupere espaço no seu celular.</string>
+    <string name="hero_subtitle">Encontre arquivos grandes e cópias repetidas. Revise tudo antes de limpar. Suas mídias são analisadas no próprio aparelho.</string>
     <string name="storage_title">ARMAZENAMENTO DO CELULAR</string>
     <string name="storage_note">O uso do armazenamento é medido neste aparelho. Nada muda sem sua confirmação.</string>
     <string name="storage_unavailable">Estatísticas de armazenamento indisponíveis neste dispositivo.</string>
     <string name="storage_measurement">%1$s usados · %2$s livres
 Total: %3$s</string>
-    <string name="scan_button">Consultar mídias autorizadas</string>
+    <string name="scan_button">Analisar meu celular</string>
     <string name="permission_continue">Gerenciar permissões de mídia</string>
     <string name="cancel_scan">Cancelar varredura</string>
     <string name="ready_status">Pronto. Processamento 100% local e com proteção de referência original.</string>
@@ -100,9 +100,9 @@ Total: %3$s</string>
     <string name="warn_invalid_rows">Registros incompletos do provedor foram ignorados com segurança.</string>
     <string name="issue_summary_line">%1$s: %2$s (%3$d ocorrência(s) em %4$d volume(s))</string>
     <string name="page_content_changed">O conteúdo do volume mudou durante a leitura. Inicie uma nova sessão.</string>
-    <string name="oaas_card_title">LIMPEZA INTELIGENTE</string>
-    <string name="oaas_card_headline">O que você deseja encontrar?</string>
-    <string name="oaas_card_subtitle">Suas mídias permanecem neste aparelho. Confira os resultados e aprove cada ação.</string>
+    <string name="oaas_card_title">LIMPEZA DO CELULAR</string>
+    <string name="oaas_card_headline">O que está ocupando espaço?</string>
+    <string name="oaas_card_subtitle">Encontre o que pode ser removido com segurança. Você revisa e confirma cada limpeza.</string>
     <string name="oaas_pipeline_idle">Escolha uma análise para começar.</string>
     <string name="oaas_starting_scan_first">Primeiro, vamos verificar as mídias que você autorizou.</string>
     <string name="oaas_mission_large">Encontrar arquivos grandes (mais de 10 MB)</string>
