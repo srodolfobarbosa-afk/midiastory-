@@ -47,6 +47,8 @@ jobs:
           :app:assembleDebug :app:assembleDebugAndroidTest
       - name: Run instrumented tests on Android API${{ matrix.api-level }} emulator
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          SWEEP_EXPECTED_API_LEVEL: ${{ matrix.api-level }}
         with:
           api-level: ${{ matrix.api-level }}
           target: google_apis
@@ -57,17 +59,17 @@ jobs:
           heap-size: 512M
           emulator-boot-timeout: 600
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
-          script: |
-            ./gradlew --no-daemon :app:connectedDebugAndroidTest
+          script: bash scripts/ci/run_android_instrumented_tests.sh
       - name: Print instrumented test failure details
         if: failure()
         shell: bash
         run: |
           set +e
-          for file in $(find app/build/test-results/testDebugUnitTest app/build/outputs/androidTest-results app/build/reports/androidTests -type f -name '*.xml' 2>/dev/null); do
-            echo "===== $file ====="
-            sed -n '1,260p' "$file"
-          done
+          find app/build/test-results/testDebugUnitTest app/build/outputs/androidTest-results app/build/reports/androidTests app/build/ci-diagnostics -type f -name '*.xml' -print0 2>/dev/null |
+            while IFS= read -r -d '' file; do
+              echo "===== $file ====="
+              sed -n '1,260p' "$file"
+            done
       - name: Generate Debug APK checksum
         if: always()
         shell: bash
@@ -96,6 +98,7 @@ jobs:
             app/build/reports/tests/testDebugUnitTest/
             app/build/outputs/androidTest-results/
             app/build/reports/androidTests/
+            app/build/ci-diagnostics/
           if-no-files-found: warn
           retention-days: 7
 
