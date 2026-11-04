@@ -21,7 +21,7 @@
 7. Para duplicatas, só SHA-256 completo, não vazio e idêntico comprova conteúdo igual. Se a cobertura global for parcial, nenhuma duplicata pode ser pré-selecionada para exclusão.
 8. Revalidar cada URI imediatamente antes da operação e validar resultado por item depois da confirmação do Android.
 9. Mover para Lixeira não é espaço liberado. Só exclusão permanente confirmada pode alimentar a métrica de bytes liberados.
-10. Resolver a compatibilidade de limpeza Android 10/API29 ou reavaliar minSdk com estudo de impacto sobre usuários existentes. Não anunciar suporte de limpeza em API 29 enquanto estiver bloqueado.
+10. Validar em emulador API29 e aparelho físico o novo fluxo de exclusão permanente via RecoverableSecurityException (aceitar, cancelar, URI própria, URI de outro app e verificação pós-operação). Lixeira/restauração permanecem API30+; não anunciar essas duas funções para API29.
 11. Executar testes de TalkBack, fonte ampliada, contraste, rotação, telas pequenas, tablet/dobrável, memória, bateria e ANR.
 
 ## P0 — Billing e recebimento
