@@ -512,11 +512,23 @@ class MediaScanViewModel(
                     warningCount++
                 }
 
-                val plan = OutcomeServiceEngine.buildAutomatedOutcomePlan(
+                val generatedPlan = OutcomeServiceEngine.buildAutomatedOutcomePlan(
                     mission = mission,
                     pageRecords = missionRecords,
                     nowEpochSeconds = nowEpochSeconds,
                 )
+                // A duplicate group cannot safely choose the original unless every accessible
+                // source was scanned and every relevant hash was verified.
+                val plan = if (
+                    mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES && !coverageComplete
+                ) {
+                    generatedPlan.copy(
+                        autoSelectedRecords = emptyList(),
+                        estimatedDeliverableBytes = 0L,
+                    )
+                } else {
+                    generatedPlan
+                }
                 var nextLedger = MediaSelectionLedger.empty()
                 for (record in plan.autoSelectedRecords) {
                     val update = nextLedger.setSelected(record, true)
@@ -632,7 +644,9 @@ class MediaScanViewModel(
 
     /** Called from Activity.onResume; API 29 is explicitly unverifiable, not assumed stable. */
     fun checkSessionFreshness() {
-        val session = mutableState.value.session ?: return
+        val currentState = mutableState.value
+        if (currentState.isLoading && currentState.missionProgress?.isRunning == true) return
+        val session = currentState.session ?: return
         // Android does not expose a stable, complete snapshot of the user-selected media set.
         // After the app resumes, discard partial-access pages and their review selection rather
         // than assuming the same subset is still authorized.
