@@ -1,39 +1,89 @@
-# Matriz de Implementação de Funcionalidades
+# Matriz de Implementação de Funcionalidades — Midiastore
 
-Auditoria estática do source atual em 03/11/2026. A baseline Debug anterior passou, mas as alterações finais de strings/branding ainda não foram recompiladas; Release e execução em dispositivo não estão verificadas.
+Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/11/2026. Esta matriz distingue código presente, testes executados e validação real em aparelho. Uma implementação no source não significa que o recurso foi aprovado para produção.
 
-| Área | Estado | Evidência no código | Limite / diferença da promessa | Próxima validação |
+## Identidade e release
+
+| Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
 |---|---|---|---|---|
-| Identidade exibida | Implementada parcialmente | `app_name` e strings PT/EN mostram Midiastore | Pacote/namespace seguem Sweep legado; listing pública 404 não comprova status/identidade atual da Play | Recompilar; confirmar console/certificado com proprietário |
-| Medidor de armazenamento | Implementada parcialmente | `MainActivity.refreshStorageStats()` usa `StatFs` em `/data` | Não é distribuição por categoria nem necessariamente o armazenamento total removível; sem histórico | Dispositivo com volumes diferentes; validar rótulo/denominador |
-| Categorias de mídia | Implementada parcialmente | `AndroidMediaPageRepository` consulta Images/Video/Audio por volume | Apenas tipos MediaStore, uma categoria/volume/página por vez; não cobre Downloads/documentos genéricos | Verificar cobertura e permissões em API/OEM |
-| Paginação MediaStore | Implementada parcialmente | limite 100; extras HonoredArgs; fallback consulta ordenada e pagina localmente; sequence guard | Fallback pode reler a biblioteca em offsets profundos; cursor/provider não forma snapshot transacional | Cursor real em provider AOSP/Samsung/Motorola/Xiaomi e biblioteca grande |
-| Permissões | Implementada parcialmente | política para API 29–36; permissões granulares e selected access Android 14+ | Solicita as três categorias no mesmo fluxo; política de target API37 ainda não validada | Fluxos denied/partial/revoked por API, Photo Picker vs acesso amplo |
-| Arquivos grandes | Implementada parcialmente | filtro `>=10 MB` em `SmartMediaGroupingPolicy` | Aplica à página visível, não à biblioteca completa; bytes são oportunidades, não automaticamente espaço recuperável | Cobrir todas as páginas/volumes e não duplicar contagem |
-| Duplicatas SHA-256 exatas | Implementada parcialmente | hash streaming 8 KiB para candidatos de mesmo tamanho na página; protege referência; revalida antes de operação | Detecção limitada aos registros da página atual; não acha pares em páginas/volumes diferentes; custo de hash candidato não medido | Scanner global em lotes com persistência/retomada, testes de milhares de registros |
-| Proteção do original | Implementada parcialmente | `SmartMediaGroupingPolicy` protege uma referência por grupo confirmado | Só para subgrupo encontrado na página atual; não garante grupo global | Teste entre páginas, arquivos mudando, original removido |
-| Similaridade visual / dHash / pHash / SSIM | Ausente | Nenhuma implementação no source | Documento apenas recomenda avaliação; nenhuma classificação ou preview visual | Dataset local consentido, acurácia/falsos positivos e benchmark |
-| Capturas de tela / qualidade de foto | Ausente | Nenhuma classificação detectada | Copy de Pro descreve funções que não existem | Implementar apenas após benchmark; nunca excluir automaticamente |
-| Vídeos: duração/resolução/codec | Ausente/parcial | MIME/tamanho/data e miniatura estão disponíveis | Não há extração consistente de duração/resolução nem oportunidade de compressão | MediaMetadataRetriever em ContentResolver e teste de codec/OEM |
-| Revisão/seleção | Implementada parcialmente | seleção local e preview/miniaturas; limite 500 URIs | seleção não agrega todas as páginas; não é uma sessão completa de biblioteca | Filtros, estado vazio, fonte grande, TalkBack e tablets |
-| Lixeira e exclusão | Implementada parcialmente | API 30+ requests oficiais, revalidação e verificação posterior | API29 não executa; cancelamento/parcial/revalidação sem instrumentação; Lixeira não libera bytes imediatamente | Instrumented accept/cancel/partial, desaparecimento e reconciliação |
-| Espaço efetivamente liberado | Implementada parcialmente | accounting registra exclusão só após aceite e URIs confirmados ausentes | `StatFs` é amostrado após operação e falha do storage pode atrasar atualização; sem comparação de delta real como prova extra | Validar variação StatFs e divergências provider/OEM |
-| Histórico de varredura | Ausente | histórico de paginação é memória da sessão; ledger da Lixeira e telemetria são distintos | Não existe histórico persistente de análises por data/categoria | Storage History local com retenção/cota e teste de migração |
-| Storage Forecast | Apenas documentada | requisitos em `MIDIASTORE_PRODUCT_STRATEGY.md` | Sem amostras, algoritmo ou UI | Não exibir até mínimo de três amostras em sete dias e validação |
-| Gerenciador de arquivos SAF | Ausente | nenhum `DocumentsContract`, SAF ou picker de árvore | Sem Downloads/documentos, pesquisa/ordenação/renomeação/movimentação | Adicionar somente workflows via SAF selecionados e testar permissões |
-| Automação/WorkManager | Ausente | nenhuma dependência/worker detectado | Não há alertas periódicos ou relatório semanal | Priorizar análise opt-in, nunca limpeza automática |
-| Quatro abas | Implementadas parcialmente | seções HOME/FILES/OAAS/PRO conectadas via `switchTab()` | Presença e navegação não foram testadas em aparelho; conteúdo das abas usa dados de página atual | Instrumented navegação, telas pequenas, tablet/dobrável e TalkBack |
-| Billing/SKUs | Implementado parcialmente | BillingClient consulta produtos e compras, inicia flow e reconcilia states | IDs/tipos não confirmados na Play Console; assinatura não é verificada criptograficamente; nenhum backend; compra real não testada | Confirmar console, validar token com API/back-end e testar ciclo completo |
-| Exportação Pro | Implementada parcialmente | `ACTION_SEND` abre chooser para resumo da seleção | Resumo reflete seleção corrente, não análise completa; entitlement local inseguro para produção | Privacy disclosure e entitlement de confiança |
-| Storage History | Ausente | nenhum modelo/repositório de snapshot | Não existe histórico gráfico/nem previsões | Implementar depois de baseline e cobertura de capacidade |
-| Debug | Implementada e compilada na baseline anterior | APK gerado no caminho em `QUALITY_AND_TESTING.md` | Nome e strings de permissão foram alterados depois do build | Recompilar estado atual |
-| Release/AAB | Bloqueada | task `bundleRelease` falhou com mensagem de assinatura ausente | Sem keystore legítimo; nunca gerar substituto | Configurar secrets com proprietário e verificar certificado |
+| Marca / listing | Atualizada na branch | `app_name=Midiastore`, textos PT/EN e marca M na barra superior | Código só foi alterado nesta branch; ainda precisa recompilar e confirmar visual em aparelho | Screenshots reais em telefone pequeno e fonte ampliada |
+| Application ID | Confirmado pelo proprietário | Listing de teste interno fornecida: `com.rdf112.midiastore`; build.gradle usa mesmo ID | Maior versionCode e upload certificate não foram conferidos na Play Console | Confirmar versionCode máximo e certificado |
+| Namespace interno | Legado, preservado | `namespace=com.rdf112.sweep` | Nomes de pacote, cores e classes continuam Sweep; isso não muda applicationId | Manter compatibilidade ou planejar refactor separado |
+| Versionamento | Configuração atual | `versionCode=17`, `versionName=2.2.1` | São valores do source; não provam valor efetivamente publicado | Consultar Play Console |
+| Debug / unit / Lint | Aguardando confirmação do último HEAD | CI executa `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug` e `:app:assembleDebugAndroidTest` | Houve falhas de teste em commits intermediários; os workflows mais recentes estão sendo reexecutados | Verificar o commit mais recente no CI |
+| Instrumentação Android | Não aprovada | Workflow executa `:app:connectedDebugAndroidTest` em emulador Android 35 e salva relatórios | O primeiro teste MediaStore falhou no emulador API35; causa ainda não está diagnosticada; no PC do proprietário não havia dispositivo conectado | Ler XML/JUnit mais recente, corrigir e repetir |
 
-## Claims a corrigir antes de marketing/Play
+## Leitura e cobertura
 
-- Não anunciar “encontra duplicatas na biblioteca inteira” até buscar e reconciliar todas as páginas e volumes.
-- “SHA-256” atual significa comparação completa entre candidatos da página; não é classificação visual.
-- “storage real” atual é a leitura `StatFs` do diretório de dados, sem atribuição por categoria.
-- Não anunciar detecção de screenshots, blur, baixa qualidade, metadados avançados de vídeo, organização de documentos, Storage Forecast ou automação: estão ausentes.
-- “zero arquivos enviados” deve considerar o relatório compartilhado via `ACTION_SEND` e tráfego do Billing; atualizar política/UX e Data Safety com o binário final.
-- “Pro ativo/verificado” não deve ser comunicado como validação segura até haver confiança de entitlement apropriada.
+| Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
+|---|---|---|---|---|
+| Fotos, vídeos e áudio | Implementado | `AndroidMediaPageRepository` consulta collections MediaStore por tipo e volume | Não cobre arbitrariamente qualquer documento/Downloads | Testar permissões, volume interno e SD em aparelhos |
+| Permissões granulares | Implementado parcialmente | Política Android 29–36; IMAGE/VIDEO/AUDIO; selected visual access Android 14+ | A solicitação inicial pede os três tipos; Android target 37 e possíveis mudanças futuras não foram validados | Testar denied/full/partial/revoked por API |
+| Gerenciar acesso parcial | Corrigido na branch | Ação de rever permissões aparece quando há acesso parcial e também na aba Arquivos | Ainda não validado manualmente em Pixel/Samsung | Teste Android 14+ selecionando e ampliando fotos/vídeos |
+| Paginação | Implementado, em validação | Página limitada a 100; args HonoredArgs, offset, fallback controlado, sequência guard | Alguns providers podem não honrar offset/sort; paginação não forma snapshot transacional | Testar AOSP, Samsung, Motorola, Xiaomi e biblioteca grande |
+| Revisão da sessão | Implementado parcialmente | Permissões, volumes e revision markers são revalidados | Android/API29 ou provider sem generation pode resultar em UNVERIFIABLE | Validar alteração de mídia e revogação durante a leitura |
+| Cancelamento | Implementado | CancellationSignal no MediaStore e cancelamento de coroutine no hash streaming/global scan | Precisa de teste real com biblioteca grande e no meio de hash | Cancelar após 1, 10 e 100 páginas |
+
+## Missões globais
+
+| Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
+|---|---|---|---|---|
+| Scanner global | Implementado na branch, ainda não aprovado por CI | `MediaScanViewModel.executeGlobalOutcomeMission()` percorre tipos acessíveis, volumes e páginas | Limites de segurança: 250.000 linhas, 20.000 candidatos duplicados, 100.000 tamanhos distintos; atingir limite significa parcial | CI e testes de volume alto; perfil de memória/bateria |
+| Progresso da missão | Implementado na branch | Contadores de páginas, registros e fontes são expostos via `GlobalMissionProgress` | UI precisa de teste de layout, cancelamento, acessibilidade e estados vazios | Verificar missão completa, parcial, cancelada e falha |
+| Arquivos grandes | Implementado globalmente na branch | Limite >=10 MB; mantém até 500 candidatos de maior tamanho por missão | Resultado não significa espaço automaticamente recuperável; exige revisão | Dataset de arquivos de tamanhos variados e comparação da ordem |
+| Mídias antigas | Implementado globalmente na branch | Filtro >=30 dias sobre todos os pages acessíveis | Data de modificação pode estar ausente; resultado então não é elegível | Testar datas ausentes e limites de 30 dias |
+| Duplicatas exatas | Implementado globalmente na branch | Mapa de tamanhos entre páginas/volumes; SHA-256 completo e streaming via repositório | Hash consome I/O/tempo; limite de candidatos interrompe cobertura | Testar pares em páginas, categorias e volumes diferentes |
+| Proteção do original | Fail-closed na branch | Grupo de hash idêntico preserva uma referência; cobertura global parcial bloqueia pré-seleção de duplicatas | Precisa provar que nenhum falso positivo chega à seleção em erros de leitura/hash | Testes de hash ausente, misto, divergente e provider parcial |
+| Similaridade visual / pHash / embeddings | Ausente | Nenhuma implementação funcional | Não confundir com SHA-256; é outro produto técnico | Só desenvolver com dataset e avaliação de falsos positivos |
+| Screenshots, blur, baixa qualidade | Ausente | Nenhuma classificação em source | Não anunciar na Play nem no paywall | Roadmap após P0 |
+| Vídeos: duração/resolução/codec | Ausente/parcial | Metadados básicos MIME, tamanho, data e miniatura | Não existe análise consistente de duração, codec ou compressão | MediaMetadataRetriever + testes OEM |
+
+## Revisão, limpeza e storage
+
+| Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
+|---|---|---|---|---|
+| Seleção e revisão | Implementada parcialmente | Selection ledger limitado a 500 URIs; revisão por URI; permite remover seleção de missão global | A lista e o preview ainda precisam ser testados com múltiplas páginas e 500 itens | Instrumentação de seleção e telas pequenas |
+| Lixeira Android | API 30+ no source | Usa consentimento oficial MediaStore e revalidação | API29 permanece bloqueada, apesar de minSdk29 | Implementar fluxo recuperável permitido em API29 ou rever minSdk com impacto |
+| Exclusão permanente | API 30+ no source | Usa createDeleteRequest e consulta estado posterior | Não testado em aparelho; consentimento parcial/cancelamento requer QA | Testar aceitar, cancelar, parcial, provider error |
+| Recuperação da Lixeira | Implementada parcialmente | Ledger local de URIs e createTrashRequest(moveToTrash=false) | Ainda sem prova instrumentada de restore parcial entre OEMs | Testar restore de lote e URIs que falham |
+| Espaço liberado | Corrigido parcialmente | Mover para Lixeira não é registrado como liberado; exclusão só contabiliza URIs ausentes confirmadas após resultado OK | Ainda precisa confrontar com delta de StatFs real; consultas podem ter atraso de provider | Medir antes/depois em telefone real |
+| Medidor storage | Parcial | StatFs em `/data` | Não é distribuição por categoria nem necessariamente armazenamento removível total | Renomear indicador e validar cartões SD |
+| Histórico de análise | Ausente | Há histórico de paginação em memória, ledger da Lixeira e telemetria local separados | Não existe histórico persistente de sessões com snapshots por categoria | Implementar Storage History depois de P0 |
+| SAF / Downloads / Documentos | Ausente | Não há fluxo de pasta selecionada via SAF | MediaStore não representa todo arquivo do usuário | Adicionar SAF opt-in e testes de árvore URI |
+| WorkManager / agendamento | Ausente | Sem worker funcional | Sem alertas ou limpeza agendada | Planejar só após estabilidade; nunca limpeza automática |
+
+## Monetização
+
+| Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
+|---|---|---|---|---|
+| BillingClient | Integrado no source | Billing KTX 8.0.0 consulta catálogo e purchases, inicia fluxo e tenta reconhecer compras | Não houve compra real nem validação Play Console | Teste com license testers |
+| SKUs | Presentes no source | `sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime` | Não confirmar ativação/ofertas/país/moeda sem Play Console | Verificar IDs, purchase type, base plans e offers |
+| Feedback de compra | Melhorado na branch | Botões mostram quando o fluxo não inicia; status diferencia reconciliação de plano gratuito | Precisa teste de todos os estados Billing e falhas de rede | Testar conexão, indisponível, cancelado, pending e owned |
+| Segurança do entitlement | Não pronto para produção | Cliente verifica presença de assinatura e JSON, package e estado | Não valida criptograficamente purchaseToken em backend/API confiável; risco de entitlement falsificado | Implementar backend confiável e reconciliação idempotente |
+| Pro / restore | Parcial | Consulta compras e faz acknowledge se elegível localmente | Não testado em reembolso, expiração, cancelamento, troca de plano e migração de usuário | Ciclo completo com licença Play |
+| Exportação Pro | Parcial | ACTION_SEND exporta resumo da seleção atual | Não prova análise completa; é share-sheet e o usuário escolhe destino | Atualizar disclosure e testar Pro real |
+| Recebimento financeiro | Informado pelo proprietário como habilitado em 03/11/2026 | Perfil financeiro da conta está destravado segundo o proprietário | Isso não confirma produtos in-app ativos ou compra testada | Conferir produtos e executar compra de teste no listing |
+
+## UX, identidade e política
+
+| Área | Estado | Evidência atual | Pendência / limite | Próxima validação |
+|---|---|---|---|---|
+| Textos PT/EN | Simplificados na branch | Rótulos menos técnicos, resultados por página e estados de missão global | Ainda precisa revisão linguística e layouts em resolução real | Screenshots de telefone pequeno e fonte 1.3x/1.5x |
+| Marca Midiastore | Alinhada na branch | app_name, topbar M e strings comerciais | Ícone do launcher já era M/check; precisa instalar e validar launcher em OEMs | Verificar Android 12–16, adaptive icon |
+| Navegação | Parcial | HOME, FILES, OAAS, PRO | Conteúdo ainda pode parecer complexo; não há estudo usability com testador | Teste guiado com 3 usuários sem assistência |
+| Acessibilidade | Não verificada | Views e MaterialButtons | TalkBack, contraste, hit targets, escala de fonte ainda não passaram QA | Testes manuais e automated accessibility scan |
+| Privacidade / Data Safety | Draft técnico | Documento revisto para não afirmar respostas definitivas | Revisão depende do binário final, Billing, ACTION_SEND e SDKs | Auditoria do manifesto e formulário Play final |
+
+## Alegações proibidas até validação
+
+- Não anunciar “limpa o telefone inteiro” quando acesso for parcial ou a cobertura global for incompleta.
+- Não anunciar duplicatas confirmadas se SHA-256 estiver ausente ou divergente.
+- Não dizer que mover para Lixeira liberou espaço.
+- Não anunciar suporte de limpeza Android 10 enquanto API29 estiver bloqueada.
+- Não anunciar Pro “verificado” sem validação confiável do purchaseToken.
+- Não anunciar fotos semelhantes, blur, qualidade, compressão, limpeza de cache privado de apps, aumento de RAM, resfriamento, aceleração, organização SAF ou Storage Forecast enquanto não existirem e passarem testes.
+- Não considerar BUILD SUCCESSFUL como evidência de UX, operação de arquivo ou compra real.
+
+## Critério global
+
+A presença de código não é aprovação. Cada funcionalidade precisa de teste em CI, teste instrumentado quando aplicável e, para APIs MediaStore/Billing/limpeza, confirmação em dispositivos físicos representativos. A PR #3 é recuperação em desenvolvimento, não um Release Candidate.
