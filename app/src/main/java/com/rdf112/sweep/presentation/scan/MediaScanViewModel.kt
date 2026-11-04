@@ -280,6 +280,7 @@ class MediaScanViewModel(
                 var sourcesProcessed = 0
                 var fatalStaleness = false
                 var safetyLimitReached = false
+                var pagingEvidenceUnverified = false
                 val sequenceGuards = mutableMapOf<Pair<MediaKind, String>, MediaPageSequenceGuard>()
 
                 // For large/old missions, retain only the highest-impact 500 candidates.
@@ -335,6 +336,13 @@ class MediaScanViewModel(
                         if (page.issues.isNotEmpty()) {
                             warningCount += page.issues.size
                             coverageComplete = false
+                        }
+                        if (page.issues.any {
+                                it.code == com.rdf112.sweep.domain.model.PageIssueCode.PAGING_ARGS_UNVERIFIED ||
+                                    it.code == com.rdf112.sweep.domain.model.PageIssueCode.PAGING_UNSUPPORTED
+                            }
+                        ) {
+                            pagingEvidenceUnverified = true
                         }
 
                         when (page.outcome) {
@@ -600,7 +608,11 @@ class MediaScanViewModel(
                         plan = plan,
                         coverageComplete = coverageComplete,
                         warningCount = warningCount,
-                        message = if (safetyLimitReached) "safety_limit_reached" else null,
+                        message = when {
+                            safetyLimitReached -> "safety_limit_reached"
+                            pagingEvidenceUnverified -> "paging_args_unverified"
+                            else -> null
+                        },
                     ),
                 )
             } catch (cancelled: CancellationException) {

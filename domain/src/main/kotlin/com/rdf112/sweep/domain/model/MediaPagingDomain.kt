@@ -26,6 +26,30 @@ data class MediaPageRequest(
     }
 }
 
+/**
+ * Records what the MediaStore provider explicitly confirms about page and sort arguments.
+ * Missing EXTRA_HONORED_ARGS is unknown evidence, not proof that the provider ignored them.
+ */
+data class MediaPagingEvidence(
+    val honoredArgsReported: Boolean,
+    val limitHonored: Boolean,
+    val offsetHonored: Boolean,
+    val sortColumnsHonored: Boolean,
+    val sortDirectionHonored: Boolean,
+) {
+    val isFullyHonored: Boolean
+        get() = honoredArgsReported && limitHonored && offsetHonored &&
+            sortColumnsHonored && sortDirectionHonored
+
+    /** Safe only when the provider explicitly says both LIMIT and OFFSET are ignored. */
+    val canUseCursorOffsetFallback: Boolean
+        get() = honoredArgsReported && !limitHonored && !offsetHonored
+
+    /** We can advance only when OFFSET is confirmed or a full cursor fallback is confirmed. */
+    val canAdvanceToNextOffset: Boolean
+        get() = offsetHonored || canUseCursorOffsetFallback
+}
+
 enum class MediaPageOutcome {
     MORE_AVAILABLE,
     END_OF_SOURCE,
@@ -40,6 +64,7 @@ enum class PageIssueCode {
     NULL_CURSOR,
     INVALID_ROW,
     PAGING_UNSUPPORTED,
+    PAGING_ARGS_UNVERIFIED,
     SESSION_STALE,
     ACCESS_CHANGED,
     VOLUME_CHANGED,

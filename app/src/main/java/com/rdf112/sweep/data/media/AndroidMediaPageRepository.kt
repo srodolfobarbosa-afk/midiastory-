@@ -19,6 +19,7 @@ import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaPage
 import com.rdf112.sweep.domain.model.MediaPageOutcome
 import com.rdf112.sweep.domain.model.MediaPageRequest
+import com.rdf112.sweep.domain.model.MediaPagingEvidence
 import com.rdf112.sweep.domain.model.MediaRecord
 import com.rdf112.sweep.domain.model.MediaScanSession
 import com.rdf112.sweep.domain.model.MediaSourceRevision
@@ -199,9 +200,23 @@ class AndroidMediaPageRepository(
 
         cursor.use { c ->
             val extras = runCatching { c.extras }.getOrNull()
+            val honoredArgsReported = extras?.containsKey(ContentResolver.EXTRA_HONORED_ARGS) == true
             val honored = extras?.getStringArray(ContentResolver.EXTRA_HONORED_ARGS)?.toSet().orEmpty()
-            val limitHonoredByProvider = ContentResolver.QUERY_ARG_LIMIT in honored &&
-                ContentResolver.QUERY_ARG_OFFSET in honored
+            val pagingEvidence = MediaPagingEvidence(
+                honoredArgsReported = honoredArgsReported,
+                limitHonored = ContentResolver.QUERY_ARG_LIMIT in honored,
+                offsetHonored = ContentResolver.QUERY_ARG_OFFSET in honored,
+                sortColumnsHonored = ContentResolver.QUERY_ARG_SORT_COLUMNS in honored,
+                sortDirectionHonored = ContentResolver.QUERY_ARG_SORT_DIRECTION in honored,
+            )
+            val issues = inheritedIssues.toMutableList()
+            if (!pagingEvidence.isFullyHonored) {
+                issues += PageIssue(
+                    PageIssueCode.PAGING_ARGS_UNVERIFIED,
+                    kind = request.kind,
+                    volumeName = request.volumeName,
+                )
+            }
 
             val rawTotal = if (extras != null && extras.containsKey(ContentResolver.EXTRA_TOTAL_COUNT)) {
                 runCatching { extras.getLong(ContentResolver.EXTRA_TOTAL_COUNT) }.getOrNull()
@@ -222,12 +237,17 @@ class AndroidMediaPageRepository(
                 -1
             }
             if (idColumn < 0 || sizeColumn < 0 || mimeColumn < 0) {
-                return pagingUnsupported(request, inheritedIssues)
+                return pagingUnsupported(request, issues)
             }
 
-            // Se o provedor (como em alguns Samsung/Xiaomi) não honrar QUERY_ARG_OFFSET no Bundle,
-            // avançamos o cursor até request.offset de forma controlada para garantir a paginação real.
-            if (!limitHonoredByProvider && request.offset > 0) {
+            if (request.offset > 0 && !pagingEvidence.canAdvanceToNextOffset) {
+                // The provider did not confirm OFFSET support and did not expose an unbounded
+                // cursor. Stop rather than risk skipping or duplicating rows.
+                return pagingUnsupported(request, issues)
+            }
+            if (request.offset > 0 && pagingEvidence.canUseCursorOffsetFallback) {
+                // Cursor fallback is safe only when the provider explicitly reports LIMIT and
+                // OFFSET as ignored; otherwise the query may already have applied OFFSET.
                 val targetPos = request.offset - 1
                 if (!c.moveToPosition(targetPos)) {
                     return MediaPage(
@@ -237,7 +257,7 @@ class AndroidMediaPageRepository(
                         providerTotalCount = totalCount ?: c.count.toLong().coerceAtLeast(0L),
                         nextOffset = null,
                         outcome = MediaPageOutcome.END_OF_SOURCE,
-                        issues = inheritedIssues,
+                        issues = issues,
                         observedRowKeys = emptyList(),
                     )
                 }
@@ -245,7 +265,6 @@ class AndroidMediaPageRepository(
 
             val records = ArrayList<MediaRecord>(request.pageSize)
             val observedRowKeys = ArrayList<String>(request.pageSize)
-            val issues = inheritedIssues.toMutableList()
             val ids = HashSet<Long>(request.pageSize)
             var rowsRead = 0
 
@@ -305,10 +324,15 @@ class AndroidMediaPageRepository(
             if (absoluteEnd > Int.MAX_VALUE.toLong()) {
                 return pagingUnsupported(request, issues)
             }
-            val effectiveTotal = totalCount ?: if (!limitHonoredByProvider) c.count.toLong().coerceAtLeast(absoluteEnd) else null
+            val effectiveTotal = totalCount ?: if (pagingEvidence.canUseCursorOffsetFallback) {
+                c.count.toLong().coerceAtLeast(absoluteEnd)
+            } else {
+                null
+            }
             val hasMore = when {
                 rowsRead == 0 -> false
-                effectiveTotal != null -> absoluteEnd < effectiveTotal
+                totalCount != null -> absoluteEnd < totalCount
+                pagingEvidence.canUseCursorOffsetFallback -> absoluteEnd < c.count.toLong()
                 else -> rowsRead == request.pageSize
             }
             val nextOffset = if (hasMore) absoluteEnd.toInt() else null

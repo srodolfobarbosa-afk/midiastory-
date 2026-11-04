@@ -967,6 +967,7 @@ class MainActivity : AppCompatActivity() {
             "page_content_changed" -> getString(R.string.page_content_changed)
             "partial_access_requires_refresh" -> getString(R.string.partial_access_requires_refresh)
             "revision_unverifiable" -> getString(R.string.warn_revision_unverifiable)
+            "paging_args_unverified" -> getString(R.string.warn_paging_args_unverified)
             else -> if (state.status == ScanUiStatus.PARTIAL) {
                 val details = state.currentPage?.issues.orEmpty()
                     .groupBy { (it.kind ?: state.selectedKind) to it.code }
@@ -974,6 +975,8 @@ class MainActivity : AppCompatActivity() {
                         val (kind, code) = key
                         val base = when (code) {
                             com.rdf112.sweep.domain.model.PageIssueCode.REVISION_UNVERIFIABLE -> getString(R.string.warn_revision_unverifiable)
+                            com.rdf112.sweep.domain.model.PageIssueCode.PAGING_ARGS_UNVERIFIED -> getString(R.string.warn_paging_args_unverified)
+                            com.rdf112.sweep.domain.model.PageIssueCode.PAGING_UNSUPPORTED -> getString(R.string.pagination_unsupported)
                             com.rdf112.sweep.domain.model.PageIssueCode.PARTIAL_ACCESS -> getString(R.string.warn_partial_access)
                             com.rdf112.sweep.domain.model.PageIssueCode.INVALID_ROW -> getString(R.string.warn_invalid_rows)
                             else -> null
@@ -1290,7 +1293,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val formattedBytes = android.text.format.Formatter.formatFileSize(this, plan.estimatedDeliverableBytes)
-        oaasPipelineStatus.text = when {
+        val resultMessage = when {
             plan.isReadyToDeliver && progress.coverageComplete -> getString(
                 R.string.oaas_global_scan_result_complete,
                 progress.recordsExamined,
@@ -1313,6 +1316,12 @@ class MainActivity : AppCompatActivity() {
                 progress.warningCount,
             )
         }
+        val coverageNote = when (progress.message) {
+            "paging_args_unverified" -> getString(R.string.warn_paging_args_unverified)
+            "safety_limit_reached" -> getString(R.string.oaas_global_scan_limit)
+            else -> null
+        }
+        oaasPipelineStatus.text = listOfNotNull(resultMessage, coverageNote).joinToString("\n")
     }
 
     private fun runOutcomeMission(mission: DesiredOutcomeMission) {

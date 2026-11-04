@@ -101,6 +101,7 @@ Total: %3$s</string>
     <string name="item_not_selectable">Referência original protegida: este item é preservado para evitar perda de dados.</string>
     <string name="warn_partial_access">Acesso parcial concedido pelo usuário no seletor do Android.</string>
     <string name="warn_revision_unverifiable">Revisão do volume não verificável nesta versão do sistema.</string>
+    <string name="warn_paging_args_unverified">O Android não confirmou todas as configurações de paginação e ordenação. O resultado é parcial e não comprova que toda a biblioteca foi verificada.</string>
     <string name="warn_invalid_rows">Registros incompletos do provedor foram ignorados com segurança.</string>
     <string name="issue_summary_line">%1$s: %2$s (%3$d ocorrência(s) em %4$d volume(s))</string>
     <string name="page_content_changed">O conteúdo do volume mudou durante a leitura. Inicie uma nova sessão.</string>

@@ -187,6 +187,23 @@ class MediaScanViewModelTest {
     }
 
     @Test
+    fun globalMissionReportsUnverifiedPagingAndKeepsCoveragePartial() = runTest {
+        val repository = GlobalMissionFakeRepository(unverifiedPagingArgs = true)
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        assertTrue(!progress.coverageComplete)
+        assertEquals("paging_args_unverified", progress.message)
+        assertEquals(ScanUiStatus.PARTIAL, viewModel.state.value.status)
+        assertTrue(progress.warningCount > 0)
+    }
+
+    @Test
     fun globalDuplicateMissionDoesNotPrepareDeletionWhenAnySourceIsUnverified() = runTest {
         val repository = GlobalMissionFakeRepository(failVideoSource = true)
         val viewModel = MediaScanViewModel(repository)
@@ -241,6 +258,7 @@ class MediaScanViewModelTest {
 
     private class GlobalMissionFakeRepository(
         private val failVideoSource: Boolean = false,
+        private val unverifiedPagingArgs: Boolean = false,
         private val imageRecordCount: Int = 2,
         private val imageFileSizeBytes: Long = 12L * 1024L * 1024L,
     ) : MediaPageRepository {
@@ -328,6 +346,15 @@ class MediaScanViewModelTest {
                 providerTotalCount = imageRecordCount.toLong(),
                 nextOffset = if (more) request.offset + 1 else null,
                 outcome = if (more) MediaPageOutcome.MORE_AVAILABLE else MediaPageOutcome.END_OF_SOURCE,
+                issues = if (unverifiedPagingArgs) {
+                    listOf(
+                        com.rdf112.sweep.domain.model.PageIssue(
+                            com.rdf112.sweep.domain.model.PageIssueCode.PAGING_ARGS_UNVERIFIED,
+                            request.kind,
+                            request.volumeName,
+                        )
+                    )
+                } else emptyList(),
             )
         }
     }

@@ -101,6 +101,7 @@ Total: %3$s</string>
     <string name="item_not_selectable">Protected original reference: preserved to prevent data loss.</string>
     <string name="warn_partial_access">Partial access granted by user via Android picker.</string>
     <string name="warn_revision_unverifiable">Volume revision unverifiable on this Android version.</string>
+    <string name="warn_paging_args_unverified">Android did not confirm all scan paging and sort settings. Results are partial and do not prove the whole library was checked.</string>
     <string name="warn_invalid_rows">Incomplete provider records were safely ignored.</string>
     <string name="issue_summary_line">%1$s: %2$s (%3$d occurrence(s) across %4$d volume(s))</string>
     <string name="page_content_changed">Volume content changed during scan. Start a new session.</string>
