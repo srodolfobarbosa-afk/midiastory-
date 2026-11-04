@@ -24,13 +24,13 @@
 
 ## 2. Recomendação de Preços para a Google Play Console (Midiastore Pro)
 
-Para posicionar o **Sweep** de forma competitiva frente ao [Avast Cleanup](https://play.google.com/store/apps/details?id=com.avast.android.cleaner) e ao [CCleaner Android](https://play.google.com/store/apps/details?id=com.piriform.ccleaner), entregando **zero anúncios**, **análise de mídia no dispositivo** e **motor OaaS de 6 etapas com proteção SHA-256 de originais**:
+Para posicionar o **Midiastore** de forma competitiva frente ao [Avast Cleanup](https://play.google.com/store/apps/details?id=com.avast.android.cleaner) e ao [CCleaner Android](https://play.google.com/store/apps/details?id=com.piriform.ccleaner), entregando **sem anúncios intrusivos (meta comercial a validar no release)**, **análise de mídia no dispositivo** e **análise local de mídia e revisão segura de duplicatas exatas por SHA-256 (sujeitas à validação final)**:
 
 | Produto na Play Console | ID do Produto (`productId`) | Tipo no Billing 8.0.0 | Preço Recomendado — Brasil (`BRL`) | Preço Recomendado — Internacional (`USD`) | Posicionamento Estratégico |
 |---|---|---|---|---|---|
-| **Sweep Pro Mensal** | `sweep_pro_monthly` | `ProductType.SUBS` | **R$ 9,90 / mês** | **US$ 2.99 / month** | Porta de entrada acessível para quem deseja organizar o armazenamento em um mês específico sem compromisso longo. |
-| **Sweep Pro Anual** | `sweep_pro_annual` | `ProductType.SUBS` | **R$ 59,90 / ano** *(equivale a ~R$ 4,99/mês — economia real de 50%)* | **US$ 17.99 / year** *(economia real de 50%)* | Plano âncora de maior retenção (LTV), custando metade das suítes tradicionais com anúncios. |
-| **Sweep Pro Vitalício** | `sweep_pro_lifetime` | `ProductType.INAPP` | **R$ 119,90** *(compra única)* | **US$ 34.99** *(one-time)* | Alternativa para usuários que rejeitam assinaturas recorrentes (público similar ao do [SD Maid 2/SE](https://play.google.com/store/apps/details?id=eu.darken.sdmse)). |
+| **Midiastore Pro Mensal** | `sweep_pro_monthly` | `ProductType.SUBS` | **R$ 9,90 / mês** | **US$ 2.99 / month** | Porta de entrada acessível para quem deseja organizar o armazenamento em um mês específico sem compromisso longo. |
+| **Midiastore Pro Anual** | `sweep_pro_annual` | `ProductType.SUBS` | **R$ 59,90 / ano** *(equivale a ~R$ 4,99/mês — economia real de 50%)* | **US$ 17.99 / year** *(economia real de 50%)* | Plano âncora de maior retenção (LTV), custando metade das suítes tradicionais com anúncios. |
+| **Midiastore Pro Vitalício** | `sweep_pro_lifetime` | `ProductType.INAPP` | **R$ 119,90** *(compra única)* | **US$ 34.99** *(one-time)* | Alternativa para usuários que rejeitam assinaturas recorrentes (público similar ao do [SD Maid 2/SE](https://play.google.com/store/apps/details?id=eu.darken.sdmse)). |
 
 ---
 
