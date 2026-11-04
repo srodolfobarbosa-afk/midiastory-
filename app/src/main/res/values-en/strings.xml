@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
-    <string name="brand_tagline">Storage under your control.</string>
-    <string name="hero_title">See what\'s filling your phone.</string>
-    <string name="hero_subtitle">Find large files and exact copies. Review every suggestion before changing anything.</string>
+    <string name="brand_tagline">A cleaner phone. More space back.</string>
+    <string name="hero_title">Free up space on your phone.</string>
+    <string name="hero_subtitle">Find large files and duplicate copies. Review everything before cleanup. Your media is analyzed on your device.</string>
     <string name="storage_title">PHONE STORAGE</string>
     <string name="storage_note">Storage use is measured on this device. Nothing changes without your confirmation.</string>
     <string name="storage_unavailable">Storage statistics are unavailable on this device.</string>
     <string name="storage_measurement">%1$s used · %2$s free
 Total: %3$s</string>
-    <string name="scan_button">Scan authorized media</string>
+    <string name="scan_button">Scan my phone</string>
     <string name="permission_continue">Manage media permissions</string>
     <string name="cancel_scan">Cancel scan</string>
     <string name="ready_status">Ready. 100% local processing with original reference protection.</string>
@@ -100,9 +100,9 @@ Total: %3$s</string>
     <string name="warn_invalid_rows">Incomplete provider records were safely ignored.</string>
     <string name="issue_summary_line">%1$s: %2$s (%3$d occurrence(s) across %4$d volume(s))</string>
     <string name="page_content_changed">Volume content changed during scan. Start a new session.</string>
-    <string name="oaas_card_title">SMART CLEANUP</string>
-    <string name="oaas_card_headline">What would you like to find?</string>
-    <string name="oaas_card_subtitle">Your media stays on this device. Review results and approve every action.</string>
+    <string name="oaas_card_title">PHONE CLEANUP</string>
+    <string name="oaas_card_headline">What is taking up space?</string>
+    <string name="oaas_card_subtitle">Find what can be safely removed. You review and confirm every cleanup action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
     <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
