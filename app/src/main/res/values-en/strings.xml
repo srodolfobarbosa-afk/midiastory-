@@ -122,4 +122,9 @@ Total: %3$s</string>
 • Prepared for review: %2$s
 • User authorized: %3$s
 • Confirmed freed (verified): %4$s</string>
+    <string name="pro_status_reconciliation">Checking purchases with Google Play…</string>
+    <string name="plan_unavailable">Plan currently unavailable</string>
+    <string name="billing_launch_not_ready">Google Play has not loaded this plan yet. Check your connection, wait a few seconds, and try again.</string>
+    <string name="billing_flow_started">Purchase confirmation opened in Google Play. The charge is not confirmed yet.</string>
+    <string name="oaas_mission_scan_failed">The scan could not be completed. Check permissions and try again.</string>
 </resources>
