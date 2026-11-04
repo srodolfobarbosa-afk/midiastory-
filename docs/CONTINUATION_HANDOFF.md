@@ -43,7 +43,7 @@ Atualizado: 04/11/2026
 
 - A varredura global e as novas alterações ainda precisam de CI verde no commit mais recente.
 - O primeiro teste instrumentado do MediaStore falhou no emulador Android 15 e necessita de diagnóstico; não assumir que é apenas instabilidade do emulador.
-- Limpeza continua desabilitada em Android 10/API 29, apesar de minSdk 29.
+- O fluxo de exclusão permanente API29 foi implementado, mas ainda não foi validado em emulador API29 nem aparelho físico; Lixeira/restauração continuam indisponíveis nessa API.
 - O BillingClient está integrado no código, mas os SKUs e ofertas não foram validados na Play Console.
 - O cliente não valida criptograficamente o purchaseToken através de backend confiável. Não anunciar o entitlement como verificação de produção.
 - Nenhum teste de compra real, assinatura, restauração, reembolso ou expiração foi concluído.
