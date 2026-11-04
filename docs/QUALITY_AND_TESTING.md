@@ -159,3 +159,13 @@ O script valida package e versionCode do source, fingerprint do JKS, assinatura 
 - Billing licenciado: catalog, pending, cancel, retry, restore, ack, refund, expiry e network loss.
 
 **Critério de aprovação:** evidência (logs/screenshots) ligada ao mesmo commit, modelo/API e artefato. Nenhum gate é aprovado pela presença de código ou por um build antigo.
+
+## Atualização de validação — 04/11/2026
+
+- O último HEAD de código funcional, antes desta atualização documental, adicionou StorageUsageCalculator e quatro testes unitários.
+- O workflow 41862544945 para o SHA d11c1b9 estava queued; não houve conclusão para aquele SHA.
+- O novo commit de documentação/posicionamento será novamente submetido ao CI; não transferir resultados anteriores.
+- O medidor usa o armazenamento compartilhado primário, não inclui automaticamente SD/USB.
+- PT-BR/EN/fallback têm 152 chaves; DE/ES/FR/HI/JA/ZH-CN têm 63/152 cada. Faltam 89 por locale, 534 no total.
+- Nenhum teste instrumentado/API29/API35 ou teste físico do HEAD atual foi aprovado.
+- Estado permanece NÃO PRONTO PARA RELEASE.

@@ -73,3 +73,9 @@ Não criar chave temporária nem inserir credenciais privadas no ZIP, APK, repos
 ## Conclusão
 
 O repositório está em recuperação controlada. O próximo marco é CI verde, diagnóstico instrumentado e validação física. Até lá, não solicitar nova rodada de teste do usuário nem enviar atualização à Google Play.
+
+## Atualização de continuidade — 04/11/2026
+
+O posicionamento confirmado é Phone Cleaner com modelo Freemium. O cartão principal de armazenamento foi corrigido para medir o volume compartilhado primário. Quatro testes de domínio foram adicionados, mas ainda dependem de execução no CI. A pesquisa de mercado e tecnologia reforça que o diferenciador deve ser confiança, clareza de cobertura e prova de recuperação real, não a quantidade de ferramentas.
+
+A PR #3 permanece Draft, sem merge. O workflow do HEAD documentado anteriormente estava queued; não declarar build aprovado. Nenhum AAB assinado ou publicação foi produzido.
