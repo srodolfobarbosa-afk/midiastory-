@@ -12,8 +12,8 @@ class MainActivityInstrumentedTest {
     fun activityStartsAndUsesExpectedApplicationLabel() {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
-                assertEquals("Midiastores", activity.getString(R.string.app_name))
-                assertEquals("com.rdf112.sweep.debug", activity.packageName)
+                assertEquals("Sweep", activity.getString(R.string.app_name))
+                assertEquals("com.rdf112.midiastore.debug", activity.packageName)
             }
         }
     }
