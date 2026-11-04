@@ -1,6 +1,6 @@
 # Revenue and Pricing Strategy
 
-Data: 03/11/2026. Não há dados internos de conversão, churn, custos por usuário ou Play Console. Nenhuma receita ou preço é estimado neste documento.
+Data: 04/11/2026. Não há dados internos de conversão, churn ou custos por usuário. O proprietário informou que habilitou o perfil financeiro em 03/11/2026; catálogo de produtos, ativação, preços e vendas in-app ainda não foram verificados.
 
 ## Modelo inicial
 
@@ -12,7 +12,7 @@ Segurança, explicação, revisão e consentimento não são vantagens Pro. Não
 
 ## Identidade e SKUs
 
-O código contém `sweep_pro_monthly`, `sweep_pro_annual` (subscriptions) e `sweep_pro_lifetime` (in-app one-time). Manter IDs até acesso autorizado à Play Console confirmar status/tipos/benefícios. A página pública de `com.rdf112.sweep` retornou 404; portanto preços, disponibilidade, países e direitos existentes são **desconhecidos**. Não criar IDs novos nem inferir preço do nome do produto.
+O código contém `sweep_pro_monthly`, `sweep_pro_annual` (subscriptions) e `sweep_pro_lifetime` (in-app one-time). Manter IDs até acesso autorizado à Play Console confirmar status/tipos/benefícios. O proprietário confirmou a ficha de teste interno como `com.rdf112.midiastore`. O retorno 404 observado para o package legado `com.rdf112.sweep` não representa essa ficha. Status, preços, disponibilidade, países e direitos de compra existentes continuam **não verificados** até inspeção da Play Console. Não criar IDs novos nem inferir preço do nome do produto.
 
 As páginas de concorrentes não expuseram preços transacionais verificáveis nesta coleta. Preços dependem de país, moeda, impostos, promoções, offers e base da Play. A UI deve renderizar apenas `ProductDetails` atualizado e localização oficial.
 
