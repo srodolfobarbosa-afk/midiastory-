@@ -63,4 +63,4 @@ A amostra sinaliza valor em pagamento único para alguns usuários e risco de co
 - [Fossify Gallery](https://github.com/FossifyOrg/Gallery)
 - [Fonte do scraper open source: reviews.js](https://github.com/facundoolano/google-play-scraper/blob/master/lib/reviews.js)
 
-**Limitação:** a consulta pública de `com.rdf112.sweep` retornou HTTP 404. Não foi possível confirmar a listing, o histórico de publicação, a região de lançamento ou a versão da Play Console do Midiastore.
+**Limitação:** o proprietário confirmou uma ficha de teste interno como `com.rdf112.midiastore`. A consulta pública antiga para `com.rdf112.sweep` não representa essa ficha. Este recorte de mercado não confirma o maior versionCode publicado, países de disponibilidade, vendas, preços ou estado atual do listing.
