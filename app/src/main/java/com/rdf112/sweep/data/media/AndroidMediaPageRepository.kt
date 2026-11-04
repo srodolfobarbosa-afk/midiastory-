@@ -478,7 +478,6 @@ class AndroidMediaPageRepository(
             null
         }
     }
-}
 
     companion object {
         private const val GLOBAL_HASH_MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
