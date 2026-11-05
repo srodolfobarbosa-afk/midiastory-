@@ -125,3 +125,44 @@ Não começar do zero, não descartar código já existente e não confundir doc
 A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
 
 A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.
+
+## Operating model for AI-assisted execution — 04/11/2026
+
+The owner wants the assistant to act as the technical manager of the Midiastore recovery, not to make the owner manually coordinate multiple agents or repeatedly run setup commands.
+
+### Execution contract
+
+- Use the connected GitHub repository tools to inspect, edit and verify files directly on `fix/p0-sweep-permissions-missions-billing` whenever the change is safe and within scope.
+- Read the current source, CI logs, test reports and release blockers before proposing or making a change. Do not restart the project or repeat completed setup steps.
+- Use the specialist roles (architecture, QA, security/privacy, performance, growth/revenue and implementation) as review responsibilities. Do not claim six independent agents are running unless an actual agent runtime confirms that.
+- The local Codex extension and `.codex/agents/*.toml` profiles are developer tools; they do not provide unattended background workers by themselves.
+- A GitHub Actions Codex agent can run unattended only after an API provider credential is configured. The official `openai/codex-action@v1` requires an `OPENAI_API_KEY` GitHub Actions secret and uses API billing. Do not add a workflow that requires paid credentials or ask the owner to create/buy them without explicit approval.
+- GitHub Actions Android CI is the persistent automatic build/test monitor for pushes and PR updates. It does not itself autonomously repair Kotlin source.
+- Do not ask the owner to run local commands unless access to their device, Play Console, physical handset, or a local artifact is genuinely necessary.
+- Never promise or imply guaranteed revenue. Optimize for a stable, compliant release and measurable monetization validation.
+
+### Latest verified CI investigation
+
+- Branch HEAD before the CI adjustment: `7dae227c2ff0e60a12e3ecff205847e158725f2a`.
+- Run `41917665474`: Windows script parser passed; Gradle domain/JVM tests, lint, Debug APK and AndroidTest APK build completed before instrumentation.
+- API29 instrumentation did not start: ADB reported the emulator offline / unknown API level.
+- API35 instrumentation process was killed with SIGKILL while the Google APIs image was starting Google Play Services/setup components. The failing report did not contain a Kotlin assertion stack trace. Do not classify the MediaStore adapter as correct or incorrect from this result alone.
+
+### CI adjustment applied
+
+- Commit: `6e193284a8e0914b1f649cb9e415f7b275b46c9b`.
+- File: `.github/workflows/android.yml`.
+- Changed the emulator image from `google_apis` to AOSP `default` and explicitly disabled animations. The MediaStore instrumentation tests remain enabled; no test was removed or weakened.
+- New Android workflow run: `41957550437`, queued when this handoff was updated. Await its exact result before claiming success.
+- A diagnostic note was posted to PR #3. PR remains Draft; main, signing configuration, application identity, version values and Issue #2 were not changed.
+
+### Immediate work queue
+
+1. Verify run `41957550437` against exact SHA `6e193284a8e0914b1f649cb9e415f7b275b46c9b`.
+2. If instrumentation still fails, inspect the new API29/API35 XML and logcat artifacts; repair the actual failure without skipping tests.
+3. Validate global MediaStore scanning, Android 10 RecoverableSecurityException deletion, partial permissions, cancellation and post-delete byte accounting on supported API levels.
+4. Implement and security-test trusted purchase-token verification before enabling Pro purchases; confirm SKUs, offers and prices in Play Console.
+5. Confirm highest published versionCode, upload certificate, privacy/Data Safety and final store listing.
+6. Keep the PR in Draft and do not merge, generate a production release AAB, or publish until release gates pass and the owner authorizes it.
+
+This section is the durable continuity checkpoint for future conversations. Continue from these exact facts and do not make the owner repeat them.
