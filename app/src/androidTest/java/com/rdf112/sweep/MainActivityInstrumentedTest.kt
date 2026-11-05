@@ -152,6 +152,30 @@ class MainActivityInstrumentedTest {
             }
             assertTrue(ownerResolver.update(uri, publish, null, null) >= 1)
 
+            // Prove the fixture is actually owned by the instrumentation package before
+            // using it to test Android 10's cross-package recoverable-consent behavior.
+            val ownerPackage = ownerResolver.query(
+                uri,
+                arrayOf(MediaStore.MediaColumns.OWNER_PACKAGE_NAME),
+                null,
+                null,
+                null,
+            )?.use { cursor ->
+                assertTrue("MediaStore must return the fixture owner", cursor.moveToFirst())
+                val ownerIndex = cursor.getColumnIndex(MediaStore.MediaColumns.OWNER_PACKAGE_NAME)
+                assertTrue("OWNER_PACKAGE_NAME must be available on Android 10", ownerIndex >= 0)
+                cursor.getString(ownerIndex)
+            } ?: throw AssertionError("MediaStore returned a null cursor while checking fixture owner")
+            assertEquals(
+                "Fixture must be owned by the instrumentation package, not the target app",
+                instrumentationContext.packageName,
+                ownerPackage,
+            )
+            assertTrue(
+                "Instrumentation and target app must have distinct package identities",
+                ownerPackage != targetContext.packageName,
+            )
+
             val record = targetResolver.query(
                 uri,
                 arrayOf(
