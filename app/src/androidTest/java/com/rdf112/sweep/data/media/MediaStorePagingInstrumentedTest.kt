@@ -3,6 +3,8 @@ package com.rdf112.sweep.data.media
 import android.Manifest
 import android.content.ContentValues
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.test.core.app.ApplicationProvider
@@ -14,6 +16,9 @@ import com.rdf112.sweep.domain.model.MediaPageOutcome
 import com.rdf112.sweep.domain.model.MediaPageRequest
 import com.rdf112.sweep.domain.model.PageIssueCode
 import kotlinx.coroutines.runBlocking
+import java.io.ByteArrayOutputStream
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.Assume.assumeTrue
@@ -173,6 +178,86 @@ class MediaStorePagingInstrumentedTest {
             }
         } finally {
             resolver.delete(insertedUri, null, null)
+        }
+    }
+
+    @Test
+    fun mediaStoreSha256MatchesIdenticalBytesAndSeparatesDifferentBytes() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val permission = if (Build.VERSION.SDK_INT >= 33) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+        InstrumentationRegistry.getInstrumentation().uiAutomation
+            .grantRuntimePermission(context.packageName, permission)
+
+        fun pngBytes(color: Int): ByteArray {
+            val bitmap = Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888)
+            return try {
+                bitmap.eraseColor(color)
+                ByteArrayOutputStream().use { output ->
+                    check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
+                    output.toByteArray()
+                }
+            } finally {
+                bitmap.recycle()
+            }
+        }
+
+        val identicalBytes = pngBytes(Color.RED)
+        val differentBytes = pngBytes(Color.BLUE)
+        val resolver = context.contentResolver
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val createdUris = mutableListOf<Uri>()
+
+        fun insertFixture(name: String, bytes: ByteArray): Uri {
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/SweepHashInstrumentation/")
+                put(MediaStore.MediaColumns.IS_PENDING, 1)
+            }
+            val uri = requireNotNull(resolver.insert(collection, values))
+            createdUris += uri
+            resolver.openOutputStream(uri, "w").use { output ->
+                requireNotNull(output).write(bytes)
+            }
+            val publish = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
+            assertTrue("Fixture must publish successfully", resolver.update(uri, publish, null, null) >= 1)
+            return uri
+        }
+
+        try {
+            val first = insertFixture("sweep_hash_a_${UUID.randomUUID()}.png", identicalBytes)
+            val second = insertFixture("sweep_hash_b_${UUID.randomUUID()}.png", identicalBytes)
+            val third = insertFixture("sweep_hash_c_${UUID.randomUUID()}.png", differentBytes)
+            val repository = AndroidMediaPageRepository(context, resolver)
+
+            val firstHash = repository.computeSha256(
+                first.toString(),
+                maxBytes = identicalBytes.size.toLong(),
+                expectedBytes = identicalBytes.size.toLong(),
+            )
+            val secondHash = repository.computeSha256(
+                second.toString(),
+                maxBytes = identicalBytes.size.toLong(),
+                expectedBytes = identicalBytes.size.toLong(),
+            )
+            val thirdHash = repository.computeSha256(
+                third.toString(),
+                maxBytes = differentBytes.size.toLong(),
+                expectedBytes = differentBytes.size.toLong(),
+            )
+
+            assertNotNull("A readable, complete file must produce a SHA-256 digest", firstHash)
+            assertNotNull("An identical readable file must produce a digest", secondHash)
+            assertNotNull("A different readable file must produce a digest", thirdHash)
+            assertTrue("SHA-256 must be 64 lowercase hexadecimal characters", firstHash!!.matches(Regex("[0-9a-f]{64}")))
+            assertEquals("Identical file bytes must have identical SHA-256", firstHash, secondHash)
+            assertTrue("Different file bytes must not share a SHA-256 digest", firstHash != thirdHash)
+        } finally {
+            createdUris.forEach { uri -> runCatching { resolver.delete(uri, null, null) } }
         }
     }
 
