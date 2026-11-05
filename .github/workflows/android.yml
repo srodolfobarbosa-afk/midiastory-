@@ -51,13 +51,17 @@ jobs:
           SWEEP_EXPECTED_API_LEVEL: ${{ matrix.api-level }}
         with:
           api-level: ${{ matrix.api-level }}
-          target: google_apis
+          # The instrumented suite exercises Android framework/MediaStore APIs,
+          # not Play Services. Use the lean AOSP image to avoid GMS first-boot
+          # work destabilizing the emulator and killing the instrumentation process.
+          target: default
           arch: x86_64
           profile: pixel_2
           cores: 2
           ram-size: 4096M
           heap-size: 512M
           emulator-boot-timeout: 600
+          disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
           script: bash scripts/ci/run_android_instrumented_tests.sh
       - name: Print instrumented test failure details
