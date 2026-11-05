@@ -58,14 +58,11 @@ jobs:
           arch: x86_64
           profile: pixel_2
           cores: 2
-          # Keep the AVD below the memory pressure seen on GitHub-hosted runners.
-          # The emulator previously booted but became unresponsive to ddmlib before
-          # connectedDebugAndroidTest could enumerate its API level.
-          ram-size: 2048M
-          heap-size: 256M
+          ram-size: 4096M
+          heap-size: 512M
           emulator-boot-timeout: 600
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -no-snapshot-save -no-metrics -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
           script: bash scripts/ci/run_android_instrumented_tests.sh
       - name: Print instrumented test failure details
         if: failure()
