@@ -60,31 +60,57 @@ class MediaStorePagingInstrumentedTest {
             val session = repository.createSession()
             val volume = MediaStore.VOLUME_EXTERNAL_PRIMARY
             assertTrue(volume in session.volumeNames)
-            val page = repository.loadPage(
-                session,
-                MediaPageRequest(
-                    sessionId = session.id,
-                    kind = MediaKind.IMAGE,
-                    volumeName = volume,
-                    offset = 0,
-                    pageSize = 100,
-                ),
-            )
 
-            assertTrue(page.rowsRead <= 100)
-            assertTrue(
-                page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
-                    page.outcome == MediaPageOutcome.END_OF_SOURCE ||
-                    page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED
-            )
-            if (page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
-                page.outcome == MediaPageOutcome.END_OF_SOURCE
-            ) {
-                assertTrue("Inserted test image must be visible in the first sorted page", page.records.any { it.uri == insertedUri.toString() })
-            } else {
-                // A provider which does not prove the structured paging contract must fail closed.
-                assertTrue(page.records.isEmpty())
+            // Do not assume a newly inserted row must be in page zero: OEM providers can
+            // return a different stable ordering. Walk bounded pages and require either
+            // that the row is discovered or that paging is explicitly rejected fail-closed.
+            var offset = 0
+            var discovered = false
+            var providerRejectedPaging = false
+            var lastOutcome: MediaPageOutcome? = null
+            for (pageIndex in 0 until 20) {
+                val page = repository.loadPage(
+                    session,
+                    MediaPageRequest(
+                        sessionId = session.id,
+                        kind = MediaKind.IMAGE,
+                        volumeName = volume,
+                        offset = offset,
+                        pageSize = 100,
+                    ),
+                )
+                lastOutcome = page.outcome
+                assertTrue(
+                    "Unexpected MediaStore outcome at offset=$offset: ${page.outcome}; issues=${page.issues}",
+                    page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
+                        page.outcome == MediaPageOutcome.END_OF_SOURCE ||
+                        page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED,
+                )
+                assertTrue("A bounded page must not exceed 100 provider rows", page.rowsRead <= 100)
+
+                if (page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED) {
+                    assertTrue("Unsupported paging must not expose ambiguous records", page.records.isEmpty())
+                    providerRejectedPaging = true
+                    break
+                }
+                if (page.records.any { it.uri == insertedUri.toString() }) {
+                    discovered = true
+                    break
+                }
+                if (page.outcome == MediaPageOutcome.END_OF_SOURCE) break
+
+                val nextOffset = page.nextOffset
+                assertTrue(
+                    "A successful non-terminal page must advance monotonically",
+                    nextOffset != null && nextOffset > offset,
+                )
+                offset = requireNotNull(nextOffset)
             }
+
+            assertTrue(
+                "Inserted image was not discovered in 20 bounded pages; last outcome=$lastOutcome",
+                discovered || providerRejectedPaging,
+            )
         } finally {
             bitmap.recycle()
             resolver.delete(insertedUri, null, null)

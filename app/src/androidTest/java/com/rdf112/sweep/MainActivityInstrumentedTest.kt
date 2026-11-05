@@ -59,6 +59,7 @@ class MainActivityInstrumentedTest {
             values,
         ) ?: throw AssertionError("MediaStore did not create the API29 test image")
         val bitmap = Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888)
+        var deleteVerified = false
 
         try {
             resolver.openOutputStream(uri, "w").use { output ->
@@ -106,9 +107,14 @@ class MainActivityInstrumentedTest {
                 coordinator.verifyPostDeleteUris(listOf(uri.toString()))
             }
             assertTrue("Deleted URI must be absent from MediaStore", uri.toString() in verified)
+            deleteVerified = true
         } finally {
             bitmap.recycle()
-            resolver.delete(uri, null, null)
+            // A successful permanent delete revokes this app's access to the URI.
+            // Do not issue a second delete from cleanup after the operation was verified.
+            if (!deleteVerified) {
+                runCatching { resolver.delete(uri, null, null) }
+            }
         }
     }
 }
