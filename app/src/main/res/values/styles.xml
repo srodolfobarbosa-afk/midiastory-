@@ -3,9 +3,13 @@
     <style name="Theme.Midiastore" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/sweep_primary</item>
         <item name="colorOnPrimary">@color/sweep_background</item>
+        <item name="colorSecondary">@color/sweep_accent_amber</item>
+        <item name="colorOnSecondary">@color/sweep_background</item>
+        <item name="colorSurface">@color/sweep_surface</item>
+        <item name="colorOnSurface">@color/sweep_text</item>
         <item name="android:colorAccent">@color/sweep_primary</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/sweep_background</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
