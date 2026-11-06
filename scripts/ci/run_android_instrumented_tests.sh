@@ -63,6 +63,24 @@ if [[ "$ready" != true ]]; then
 fi
 
 echo "Emulator ready: serial=$serial api=$api package_service=found activity_service=found"
+export ANDROID_SERIAL="$serial"
+
+# Install the target and the isolated owner app before instrumentation. The helper
+# creates Android 10 MediaStore rows under a genuinely different application UID.
+adb -s "$serial" install -r app/build/outputs/apk/debug/app-debug.apk
+./gradlew --no-daemon :mediaOwnerTest:installDebug
+
+# Establish the Android 14+ selected-photos-only state from ADB, outside the
+# instrumentation process. Revoking runtime permissions from inside a running
+# test process can terminate the process on recent Android releases.
+if (( expected_api >= 34 )); then
+  app_id="com.rdf112.midiastore.debug"
+  adb -s "$serial" shell pm revoke "$app_id" android.permission.READ_MEDIA_IMAGES || true
+  adb -s "$serial" shell pm revoke "$app_id" android.permission.READ_MEDIA_VIDEO || true
+  adb -s "$serial" shell pm revoke "$app_id" android.permission.READ_MEDIA_AUDIO || true
+  adb -s "$serial" shell pm grant "$app_id" android.permission.READ_MEDIA_VISUAL_USER_SELECTED
+fi
+
 ./gradlew --no-daemon :app:connectedDebugAndroidTest 2>&1 | tee "$diagnostics_dir/connectedDebugAndroidTest.log"
 
 python3 - "$diagnostics_dir/instrumented-test-summary.txt" <<'PY'
