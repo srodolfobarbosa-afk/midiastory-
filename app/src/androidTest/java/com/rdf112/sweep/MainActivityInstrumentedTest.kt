@@ -215,6 +215,99 @@ class MainActivityInstrumentedTest {
         } finally {
             bitmap.recycle()
             runCatching { ownerResolver.delete(uri, null, null) }
+        }    @Test
+    fun android10RequiresSystemConsentForMediaOwnedByAnotherPackage() {
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q) return
+
+        val targetContext = ApplicationProvider.getApplicationContext<Context>()
+        val instrumentationContext = InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().uiAutomation
+            .grantRuntimePermission(targetContext.packageName, Manifest.permission.READ_EXTERNAL_STORAGE)
+
+        val ownerResolver = instrumentationContext.contentResolver
+        val targetResolver = targetContext.contentResolver
+        val provider = android.net.Uri.parse(
+            "content://com.rdf112.midiastore.testmediaowner.fixtures",
+        )
+        val displayName = "midiastore-api29-other-owner-${System.nanoTime()}.jpg"
+        val fixture = requireNotNull(
+            ownerResolver.call(
+                provider,
+                "create_image",
+                displayName,
+                null,
+            ),
+        ) { "Independent MediaStore owner app did not create the fixture" }
+        val uri = android.net.Uri.parse(
+            requireNotNull(fixture.getString("fixture_uri")) {
+                "Fixture provider did not return a MediaStore URI"
+            },
+        )
+
+        try {
+            val ownerPackage = targetResolver.query(
+                uri,
+                arrayOf(MediaStore.MediaColumns.OWNER_PACKAGE_NAME),
+                null,
+                null,
+                null,
+            )?.use { cursor ->
+                assertTrue("MediaStore must return the fixture owner", cursor.moveToFirst())
+                val ownerIndex = cursor.getColumnIndex(MediaStore.MediaColumns.OWNER_PACKAGE_NAME)
+                assertTrue("OWNER_PACKAGE_NAME must be available on Android 10", ownerIndex >= 0)
+                cursor.getString(ownerIndex)
+            } ?: throw AssertionError("MediaStore returned a null owner cursor")
+
+            assertEquals(
+                "The fixture must belong to the separately installed owner app",
+                "com.rdf112.midiastore.testmediaowner",
+                ownerPackage,
+            )
+            assertTrue(
+                "The fixture owner must differ from the target app",
+                ownerPackage != targetContext.packageName,
+            )
+
+            val record = targetResolver.query(
+                uri,
+                arrayOf(
+                    BaseColumns._ID,
+                    MediaStore.MediaColumns.SIZE,
+                    MediaStore.MediaColumns.MIME_TYPE,
+                    MediaStore.MediaColumns.DATE_MODIFIED,
+                ),
+                null,
+                null,
+                null,
+            )?.use { cursor ->
+                assertTrue("Target app must be able to read the other package's media", cursor.moveToFirst())
+                val modifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED)
+                MediaRecord(
+                    uri = uri.toString(),
+                    volumeName = MediaStore.VOLUME_EXTERNAL_PRIMARY,
+                    kind = MediaKind.IMAGE,
+                    displayName = displayName,
+                    mimeType = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)),
+                    sizeBytes = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)),
+                    dateModifiedEpochSeconds = if (modifiedIndex >= 0 && !cursor.isNull(modifiedIndex)) {
+                        cursor.getLong(modifiedIndex)
+                    } else null,
+                )
+            } ?: throw AssertionError("Target app could not query the other package's media")
+
+            val coordinator = AndroidTrashOperationCoordinator(targetContext)
+            val attempt = runBlocking { coordinator.deleteApi29Item(record) }
+            assertTrue(
+                "Another app's media must require Android's recoverable consent flow, got $attempt",
+                attempt is Api29DeleteAttempt.ConsentRequired,
+            )
+            val stillPresent = targetResolver.query(uri, arrayOf(BaseColumns._ID), null, null, null)
+                ?.use { it.moveToFirst() } == true
+            assertTrue("A consent request must not delete the file before approval", stillPresent)
+        } finally {
+            runCatching {
+                ownerResolver.call(provider, "delete_fixture", uri.toString(), null)
+            }
         }
     }
 
