@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.startSession()
             switchTab(if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
         } else {
+            pendingKindAfterPermission = null
             pendingOutcomeMission = null
             statusText.text = getString(R.string.permission_denied)
             if (::oaasPipelineStatus.isInitialized) {
@@ -287,6 +288,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progress: ProgressBar
 
     private var updatingVolumeSpinner = false
+    private var pendingKindAfterPermission: MediaKind? = null
     private var renderedVolumes: List<String> = emptyList()
     private var renderedPageKey: String? = null
     private val thumbnailJobs = mutableListOf<Job>()
@@ -557,6 +559,7 @@ class MainActivity : AppCompatActivity() {
                 if (isKindAccessible(viewModel.state.value, kind)) {
                     viewModel.selectKind(kind)
                 } else {
+                    pendingKindAfterPermission = kind
                     requestMediaPermissions()
                 }
             }
@@ -1021,6 +1024,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 (listOf(defaultStatus) + details).joinToString("\n")
             } else state.message ?: defaultStatus
+        }
+
+        val pendingKind = pendingKindAfterPermission
+        if (pendingKind != null && !state.isLoading && state.session != null) {
+            pendingKindAfterPermission = null
+            if (isKindAccessible(state, pendingKind)) viewModel.selectKind(pendingKind)
         }
 
         updateVolumeSpinner(state)
