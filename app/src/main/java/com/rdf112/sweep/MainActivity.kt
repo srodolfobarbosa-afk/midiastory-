@@ -478,11 +478,12 @@ class MainActivity : AppCompatActivity() {
         gaugeCard.addView(spaceMetricsText, top(4))
         addView(wrap(gaugeCard), bottom(22))
 
-        // ORBE GIGANTE DE 1 TOQUE (Inspirado no Dossiê V3 Selo Ouro)
+        // Ação principal em cartão horizontal: foco na tarefa, sem o antigo orbe gigante.
         heroOrbButton = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            background = circleGlowBackground(color(R.color.sweep_primary), color(R.color.sweep_surface_alt))
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(20), dp(18), dp(18), dp(18))
+            background = roundedBackground(color(R.color.sweep_primary), dp(24))
             isClickable = true
             isFocusable = true
             tag = "primary_phone_cleaner_action"
@@ -491,23 +492,21 @@ class MainActivity : AppCompatActivity() {
                 runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
             }
         }
-        heroOrbTitle = label(getString(R.string.analyze_now), 19f, R.color.sweep_background, true).apply {
-            gravity = Gravity.CENTER
+        val heroCopy = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
         }
-        heroOrbSubtitle = label(getString(R.string.tap_to_scan_media), 11f, R.color.sweep_background, false).apply {
-            gravity = Gravity.CENTER
-        }
-        heroOrbButton.addView(heroOrbTitle)
-        heroOrbButton.addView(heroOrbSubtitle, top(4))
+        heroOrbTitle = label(getString(R.string.analyze_now), 17f, R.color.sweep_background, true)
+        heroOrbSubtitle = label(getString(R.string.tap_to_scan_media), 12f, R.color.sweep_background, false)
+        heroCopy.addView(heroOrbTitle)
+        heroCopy.addView(heroOrbSubtitle, top(4))
+        heroOrbButton.addView(heroCopy, LinearLayout.LayoutParams(0, -2, 1f))
+        heroOrbButton.addView(label("→", 28f, R.color.sweep_background, true))
         addView(
             heroOrbButton,
-            LinearLayout.LayoutParams(dp(196), dp(196)).apply {
-                gravity = Gravity.CENTER_HORIZONTAL
-                bottomMargin = dp(22)
-            }
+            LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(18) },
         )
 
-        // Atalhos rápidos de Missões OaaS na Home
+        // Ações de limpeza e categorias acessíveis diretamente da Home.
         val quickMissionsCard = card()
         quickMissionsCard.addView(label(getString(R.string.quick_actions_title), 11f, R.color.sweep_primary_glow, true))
         quickMissionsCard.addView(label(getString(R.string.quick_actions_subtitle), 12f, R.color.sweep_muted, false), top(4))
@@ -519,13 +518,16 @@ class MainActivity : AppCompatActivity() {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
         }
-        quickMissionsCard.addView(quickLargeBtn, top(10))
-
         val quickDupBtn = button(getString(R.string.quick_find_duplicates)) {
             switchTab(AppTab.OAAS)
             runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
         }
-        quickMissionsCard.addView(quickDupBtn, top(8))
+        val missionRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        missionRow.addView(quickLargeBtn, LinearLayout.LayoutParams(0, dp(52), 1f).apply { marginEnd = dp(5) })
+        missionRow.addView(quickDupBtn, LinearLayout.LayoutParams(0, dp(52), 1f).apply { marginStart = dp(5) })
+        quickMissionsCard.addView(missionRow, top(10))
 
         scanButton = button(getString(R.string.scan_button)) {
             startScanOrRequestAccess()
@@ -542,8 +544,30 @@ class MainActivity : AppCompatActivity() {
             visibility = View.GONE
         }
         quickMissionsCard.addView(cancelButton, top(6))
+        addView(wrap(quickMissionsCard), bottom(12))
 
-        addView(wrap(quickMissionsCard), bottom(14))
+        val categoriesCard = card()
+        categoriesCard.addView(label(getString(R.string.media_kind_title), 11f, R.color.sweep_primary_glow, true))
+        val categoryRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        fun categoryShortcut(title: String, kind: MediaKind): MaterialButton =
+            button(title) {
+                switchTab(AppTab.FILES)
+                if (isKindAccessible(viewModel.state.value, kind)) {
+                    viewModel.selectKind(kind)
+                } else {
+                    requestMediaPermissions()
+                }
+            }
+        val photosShortcut = categoryShortcut(getString(R.string.photos_tab), MediaKind.IMAGE)
+        val videosShortcut = categoryShortcut(getString(R.string.videos_tab), MediaKind.VIDEO)
+        val audioShortcut = categoryShortcut(getString(R.string.audio_tab), MediaKind.AUDIO)
+        categoryRow.addView(photosShortcut, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
+        categoryRow.addView(videosShortcut, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
+        categoryRow.addView(audioShortcut, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
+        categoriesCard.addView(categoryRow, top(8))
+        addView(wrap(categoriesCard), bottom(14))
     }
 
     private fun buildFilesExplorerSection(): LinearLayout = LinearLayout(this).apply {
