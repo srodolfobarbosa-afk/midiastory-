@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.os.SystemClock
 import android.provider.MediaStore
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -15,18 +16,22 @@ import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaPageOutcome
 import com.rdf112.sweep.domain.model.MediaPageRequest
 import com.rdf112.sweep.domain.model.PageIssueCode
+import com.rdf112.sweep.domain.model.SessionFreshness
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.Assume.assumeTrue
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import java.util.UUID
 
 /** Executes one real, temporary MediaStore image through the Android paging adapter. */
 @RunWith(AndroidJUnit4::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class MediaStorePagingInstrumentedTest {
     @Test
     fun insertedImageAppearsInBoundedPageOrProviderIsExplicitlyRejected() = runBlocking {
@@ -40,7 +45,8 @@ class MediaStorePagingInstrumentedTest {
             .grantRuntimePermission(context.packageName, readPermission)
 
         val resolver = context.contentResolver
-        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val volume = availableMediaStoreVolume(context)
+        val collection = MediaStore.Images.Media.getContentUri(volume)
         val fileName = "sweep_paging_test_${UUID.randomUUID()}.png"
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
@@ -62,58 +68,75 @@ class MediaStorePagingInstrumentedTest {
             assertTrue(resolver.update(insertedUri, publish, null, null) >= 1)
 
             val repository = AndroidMediaPageRepository(context, resolver)
-            val session = repository.createSession()
-            val volume = MediaStore.VOLUME_EXTERNAL_PRIMARY
-            assertTrue(volume in session.volumeNames)
-
-            // Do not assume a newly inserted row must be in page zero: OEM providers can
-            // return a different stable ordering. Walk bounded pages and require either
-            // that the row is discovered or that paging is explicitly rejected fail-closed.
-            var offset = 0
             var discovered = false
             var providerRejectedPaging = false
+            var restartCount = 0
             var lastOutcome: MediaPageOutcome? = null
-            for (pageIndex in 0 until 20) {
-                val page = repository.loadPage(
-                    session,
-                    MediaPageRequest(
-                        sessionId = session.id,
-                        kind = MediaKind.IMAGE,
-                        volumeName = volume,
-                        offset = offset,
-                        pageSize = 100,
-                    ),
-                )
-                lastOutcome = page.outcome
-                assertTrue(
-                    "Unexpected MediaStore outcome at offset=$offset: ${page.outcome}; issues=${page.issues}",
-                    page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
-                        page.outcome == MediaPageOutcome.END_OF_SOURCE ||
-                        page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED,
-                )
-                assertTrue("A bounded page must not exceed 100 provider rows", page.rowsRead <= 100)
 
-                if (page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED) {
-                    assertTrue("Unsupported paging must not expose ambiguous records", page.records.isEmpty())
-                    providerRejectedPaging = true
-                    break
-                }
-                if (page.records.any { it.uri == insertedUri.toString() }) {
-                    discovered = true
-                    break
-                }
-                if (page.outcome == MediaPageOutcome.END_OF_SOURCE) break
+            for (sessionAttempt in 0 until MAX_SESSION_RESTARTS) {
+                awaitStableMediaStoreRevision(context, volume)
+                val session = repository.createSession()
+                assertTrue("Runtime volume $volume must belong to the captured session", volume in session.volumeNames)
 
-                val nextOffset = page.nextOffset
-                assertTrue(
-                    "A successful non-terminal page must advance monotonically",
-                    nextOffset != null && nextOffset > offset,
-                )
-                offset = requireNotNull(nextOffset)
+                var offset = 0
+                var restartSession = false
+                for (pageIndex in 0 until MAX_TEST_PAGES) {
+                    val page = repository.loadPage(
+                        session,
+                        MediaPageRequest(
+                            sessionId = session.id,
+                            kind = MediaKind.IMAGE,
+                            volumeName = volume,
+                            offset = offset,
+                            pageSize = 100,
+                        ),
+                    )
+                    lastOutcome = page.outcome
+
+                    if (page.outcome == MediaPageOutcome.SESSION_STALE) {
+                        assertEquals(
+                            "A stale paging session must be backed by a proven source revision change",
+                            SessionFreshness.SOURCE_CHANGED,
+                            repository.assessSession(session),
+                        )
+                        restartSession = true
+                        restartCount++
+                        break
+                    }
+
+                    assertTrue(
+                        "Unexpected MediaStore outcome at offset=$offset: ${page.outcome}; issues=${page.issues}",
+                        page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
+                            page.outcome == MediaPageOutcome.END_OF_SOURCE ||
+                            page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED,
+                    )
+                    assertTrue("A bounded page must not exceed 100 provider rows", page.rowsRead <= 100)
+
+                    if (page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED) {
+                        assertTrue("Unsupported paging must not expose ambiguous records", page.records.isEmpty())
+                        providerRejectedPaging = true
+                        break
+                    }
+                    if (page.records.any { it.uri == insertedUri.toString() }) {
+                        discovered = true
+                        break
+                    }
+                    if (page.outcome == MediaPageOutcome.END_OF_SOURCE) break
+
+                    val nextOffset = page.nextOffset
+                    assertTrue(
+                        "A successful non-terminal page must advance monotonically",
+                        nextOffset != null && nextOffset > offset,
+                    )
+                    offset = requireNotNull(nextOffset)
+                }
+
+                if (discovered || providerRejectedPaging || !restartSession) break
             }
 
             assertTrue(
-                "Inserted image was not discovered in 20 bounded pages; last outcome=$lastOutcome",
+                "Inserted image was not discovered in bounded pages or explicitly rejected; " +
+                    "last outcome=$lastOutcome; source-change restarts=$restartCount",
                 discovered || providerRejectedPaging,
             )
         } finally {
@@ -121,6 +144,7 @@ class MediaStorePagingInstrumentedTest {
             resolver.delete(insertedUri, null, null)
         }
     }
+
     @Test
     fun audioOnlyPermissionCanCreateSessionAndReadAudioPage() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
@@ -133,7 +157,8 @@ class MediaStorePagingInstrumentedTest {
             .grantRuntimePermission(context.packageName, readPermission)
 
         val resolver = context.contentResolver
-        val collection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val volume = availableMediaStoreVolume(context)
+        val collection = MediaStore.Audio.Media.getContentUri(volume)
         val fileName = "sweep_audio_paging_test_${UUID.randomUUID()}.wav"
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
@@ -151,23 +176,42 @@ class MediaStorePagingInstrumentedTest {
             assertTrue(resolver.update(insertedUri, publish, null, null) >= 1)
 
             val repository = AndroidMediaPageRepository(context, resolver)
-            val session = repository.createSession()
-            assertTrue(session.accessByKind[MediaKind.AUDIO] == com.rdf112.sweep.domain.model.AccessLevel.FULL)
-            val page = repository.loadPage(
+            awaitStableMediaStoreRevision(context, volume)
+            var session = repository.createSession()
+            assertTrue(volume in session.volumeNames)
+            assertTrue(session.accessByKind[MediaKind.AUDIO] == AccessLevel.FULL)
+
+            var page = repository.loadPage(
                 session,
                 MediaPageRequest(
                     sessionId = session.id,
                     kind = MediaKind.AUDIO,
-                    volumeName = MediaStore.VOLUME_EXTERNAL_PRIMARY,
+                    volumeName = volume,
                     offset = 0,
                     pageSize = 100,
                 ),
             )
+            if (page.outcome == MediaPageOutcome.SESSION_STALE) {
+                assertEquals(SessionFreshness.SOURCE_CHANGED, repository.assessSession(session))
+                awaitStableMediaStoreRevision(context, volume)
+                session = repository.createSession()
+                page = repository.loadPage(
+                    session,
+                    MediaPageRequest(
+                        sessionId = session.id,
+                        kind = MediaKind.AUDIO,
+                        volumeName = volume,
+                        offset = 0,
+                        pageSize = 100,
+                    ),
+                )
+            }
+
             assertTrue(page.rowsRead <= 100)
             assertTrue(
                 page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
                     page.outcome == MediaPageOutcome.END_OF_SOURCE ||
-                    page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED
+                    page.outcome == MediaPageOutcome.PAGING_UNSUPPORTED,
             )
             if (page.outcome == MediaPageOutcome.MORE_AVAILABLE ||
                 page.outcome == MediaPageOutcome.END_OF_SOURCE
@@ -208,7 +252,8 @@ class MediaStorePagingInstrumentedTest {
         val identicalBytes = pngBytes(Color.RED)
         val differentBytes = pngBytes(Color.BLUE)
         val resolver = context.contentResolver
-        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val volume = availableMediaStoreVolume(context)
+        val collection = MediaStore.Images.Media.getContentUri(volume)
         val createdUris = mutableListOf<Uri>()
 
         fun insertFixture(name: String, bytes: ByteArray): Uri {
@@ -261,6 +306,36 @@ class MediaStorePagingInstrumentedTest {
         }
     }
 
+    private fun availableMediaStoreVolume(context: android.content.Context): String {
+        val volumes = MediaStore.getExternalVolumeNames(context)
+        return volumes.firstOrNull { it == MediaStore.VOLUME_EXTERNAL_PRIMARY }
+            ?: volumes.sorted().firstOrNull()
+            ?: throw AssertionError("MediaStore exposed no external volume to the test app")
+    }
+
+    private fun awaitStableMediaStoreRevision(context: android.content.Context, volume: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+        var previous = MediaStore.getGeneration(context, volume)
+        var unchangedReads = 0
+        repeat(24) {
+            SystemClock.sleep(150L)
+            val current = MediaStore.getGeneration(context, volume)
+            if (current == previous) {
+                unchangedReads++
+                if (unchangedReads >= 2) return
+            } else {
+                unchangedReads = 0
+            }
+            previous = current
+        }
+        throw AssertionError("MediaStore generation did not stabilize for $volume after fixture publication")
+    }
+
+    companion object {
+        private const val MAX_SESSION_RESTARTS = 3
+        private const val MAX_TEST_PAGES = 20
+    }
+
     private fun createValidPcmWaveFixture(): ByteArray {
         val sampleRate = 8_000
         val channels = 1
@@ -290,26 +365,18 @@ class MediaStorePagingInstrumentedTest {
     }
 
     @Test
-    fun selectedVisualPermissionIsReportedAsPartialCoverage() = runBlocking {
+    fun aSelectedVisualPermissionIsReportedAsPartialCoverage() = runBlocking {
         assumeTrue("Partial visual access exists from Android 14 onward", Build.VERSION.SDK_INT >= 34)
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
-        runCatching { automation.revokeRuntimePermission(context.packageName, Manifest.permission.READ_MEDIA_IMAGES) }
-        runCatching { automation.revokeRuntimePermission(context.packageName, Manifest.permission.READ_MEDIA_VIDEO) }
-        runCatching { automation.revokeRuntimePermission(context.packageName, Manifest.permission.READ_MEDIA_AUDIO) }
-        automation.grantRuntimePermission(
-            context.packageName,
-            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
-        )
+        val session = AndroidMediaPageRepository(context).createSession()
 
-        val repository = AndroidMediaPageRepository(context)
-        val session = repository.createSession()
         assertTrue(session.accessByKind[MediaKind.IMAGE] == AccessLevel.PARTIAL)
         assertTrue(session.accessByKind[MediaKind.VIDEO] == AccessLevel.PARTIAL)
         assertTrue(session.accessByKind[MediaKind.AUDIO] == AccessLevel.DENIED)
 
-        val volume = MediaStore.VOLUME_EXTERNAL_PRIMARY
-        val page = repository.loadPage(
+        val volume = availableMediaStoreVolume(context)
+        assertTrue(volume in session.volumeNames)
+        val page = AndroidMediaPageRepository(context).loadPage(
             session,
             MediaPageRequest(
                 sessionId = session.id,
@@ -321,5 +388,6 @@ class MediaStorePagingInstrumentedTest {
         )
         assertTrue(page.issues.any { it.code == PageIssueCode.PARTIAL_ACCESS })
     }
+
 
 }
