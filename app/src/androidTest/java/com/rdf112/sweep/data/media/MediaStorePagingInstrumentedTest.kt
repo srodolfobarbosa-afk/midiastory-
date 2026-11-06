@@ -368,7 +368,8 @@ class MediaStorePagingInstrumentedTest {
     fun aSelectedVisualPermissionIsReportedAsPartialCoverage() = runBlocking {
         assumeTrue("Partial visual access exists from Android 14 onward", Build.VERSION.SDK_INT >= 34)
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val session = AndroidMediaPageRepository(context).createSession()
+        val repository = AndroidMediaPageRepository(context)
+        val session = repository.createSession()
 
         assertTrue(session.accessByKind[MediaKind.IMAGE] == AccessLevel.PARTIAL)
         assertTrue(session.accessByKind[MediaKind.VIDEO] == AccessLevel.PARTIAL)
@@ -376,7 +377,7 @@ class MediaStorePagingInstrumentedTest {
 
         val volume = availableMediaStoreVolume(context)
         assertTrue(volume in session.volumeNames)
-        val page = AndroidMediaPageRepository(context).loadPage(
+        val page = repository.loadPage(
             session,
             MediaPageRequest(
                 sessionId = session.id,
