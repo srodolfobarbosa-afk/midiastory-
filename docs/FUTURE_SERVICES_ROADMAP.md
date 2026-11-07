@@ -39,3 +39,14 @@ Storage Forecast deve usar somente amostras locais de `StatFs`, com requisitos e
 ## Relação com a marca
 
 Midiastore permanece o produto de armazenamento/mídia. Serviços independentes podem receber marca própria quando houver equipe, proposta e ciclo de vida independentes. Reutilizar contratos/dados locais por interfaces; não transformar o app em launcher de ferramentas aleatórias nem comprar domínios/branding antes da validação.
+
+## Priorização revisada após o mercado — 04/11/2026
+
+1. Estabilizar e validar Phone Cleaner: CI do HEAD, varredura, SHA-256, revalidação, consentimento e prova pós-limpeza.
+2. Completar um ledger de evidências para explicar cobertura, motivo de cada sugestão, original preservado e bytes realmente recuperados.
+3. Criar Storage History/Forecast local depois que houver amostras suficientes; sem previsão antes de pelo menos três observações ao longo de sete dias.
+4. Prototipar similaridade visual apenas após corpus consentido, benchmark de falso positivo, limite de recursos e revisão humana. SD Maid já oferece recurso perceptual.
+5. Adicionar Downloads/documentos via SAF com seleção explícita; não converter o app em gerenciador universal no primeiro release.
+6. Automatização analítica com WorkManager somente após opt-in e teste de bateria; nunca excluir conteúdo pessoal automaticamente.
+
+Cofre, nuvem/backup, transferência e IA local permanecem em pesquisa futura. Backup exige segurança, recuperação, custo recorrente e operação contínua; não implementar na etapa de recuperação.

@@ -31,3 +31,15 @@ Os links do LiteRT/MediaPipe/AndroidX são pistas para pesquisa adicional, não 
 3. GPL-3.0 não é copiada para o app. MIT tampouco dispensa preservação de aviso, revisão de dependências ou análise de patentes/claims.
 4. Modelos de IA só entram quando oferecem ganho mensurável, funcionam offline e não elevam risco de privacidade, footprint ou suporte OEM.
 5. Reexecutar consulta de licença, atividade, issues e advisories na data de cada release; os snapshots deste documento envelhecem.
+
+## Snapshot técnico adicional — 04/11/2026
+
+| Repositório | Licença indicada no GitHub | Stars/forks | Atividade observada | Decisão |
+|---|---|---:|---|---|
+| d4rken-org/sdmaid-se | GPL-3.0 | 7.980/843 | Commit 02/11/2026; ajustes SAF/root/ADB com testes de transição | Aprender padrões e testes; não copiar código para o app fechado sem análise jurídica |
+| MZarc/Clearo | MIT | 1/0 | Último push 07/08/2026; README atualizado; sem evidência pública forte de manutenção | Inspiração para dHash/UX apenas; não depender como base de produção |
+| FossifyOrg/Gallery | GPL-3.0 | 3.884/296 | Push 03/11/2026; atualização de localização | Referência de galeria e processo de tradução; não copiar código para app fechado |
+
+Nenhuma dependência foi incorporada. WorkManager 2.12.0 foi lançado em 23/09/2026 e não foi adicionado. Pode servir futuramente para relatórios/alertas analíticos opt-in, com constraints, cancelamento e sem exclusão automática.
+
+Referências: [SD Maid](https://github.com/d4rken-org/sdmaid-se), [Clearo](https://github.com/MZarc/Clearo), [Fossify Gallery](https://github.com/FossifyOrg/Gallery), [WorkManager 2.12.0](https://developer.android.com/jetpack/androidx/releases/work).

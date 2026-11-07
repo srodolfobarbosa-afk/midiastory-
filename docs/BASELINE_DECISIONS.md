@@ -22,17 +22,26 @@ Como o AAB auditado indica uma Activity baseada em Views, esta edição conserva
 
 A matriz oficial do Kotlin informa que o KGP 2.3.21 é plenamente compatível com Gradle 8.13 e AGP 8.13.2. O release notes do AGP 8.13.2 confirma R8 8.13.19, compatível com Kotlin 2.3, API máxima 36.1, Gradle 8.13 e JDK 17. A combinação foi selecionada por compatibilidade declarada, mas o build do projeto ainda não foi executado neste ambiente.
 
-## Identidade de atualização
+## Identidade de atualização (04/11/2026)
 
-- `applicationId`: `com.rdf112.sweep`
-- `versionCode`: `9` candidato, baseado no último valor `8` informado pelo proprietário
-- `versionName`: `1.1.1` candidato
+- Nome comercial da ficha: `Midiastore`.
+- `applicationId`: `com.rdf112.midiastore` (confirmado pelo proprietário na ficha de teste interno da Google Play).
+- Namespace de código: `com.rdf112.sweep` (legado técnico; não substituir sem migração planejada).
+- `versionCode`: `17` no build.gradle.kts atual; ainda não confirmado como maior versionCode publicado.
+- `versionName`: `2.2.1` no build.gradle.kts atual.
+- `minSdk=29`, `targetSdk=36`, `compileSdk=36`.
 
-Antes de qualquer envio, conferir novamente pacote, maior versionCode e certificado na Play Console.
+O proprietário confirmou que a ficha do aplicativo de teste interno usa `com.rdf112.midiastore`. Antes de enviar AAB, verificar o maior versionCode efetivamente publicado, o certificado de upload aceito e a identidade do listing. Não gerar chave substituta.
 
-## Funcionalidades deliberadamente fora desta entrega
+## Escopo atual e limites de implementação
 
-Google Play Billing, entitlement, restauração de compra, assinaturas, imagens visualmente semelhantes, compressão, análise de documentos/Downloads, banco de histórico e tarefas agendadas não são simulados nem apresentados como implementados.
+- BillingClient 8.0.0 está integrado no app, mas SKUs/ofertas reais, compra, restauração, assinatura e reembolso ainda não foram validados na Play Console.
+- O cliente verifica presença de assinatura/JSON de compra, mas não valida criptograficamente o purchaseToken via backend confiável. O estado Pro não deve ser tratado como entitlement de produção.
+- A branch `fix/p0-sweep-permissions-missions-billing` implementa varredura global cancelável por tipos, volumes e páginas, com limite de segurança; CI e testes completos ainda estão pendentes.
+- Duplicatas só são confirmadas por SHA-256 não vazio e igual. Cobertura parcial impede pré-seleção automática de duplicatas.
+- Limpeza/Lixeira usa as APIs MediaStore oficiais em Android 11+; o fluxo API 29 continua bloqueado.
+- Similaridade visual, compressão, análise geral de documentos/Downloads via SAF, histórico persistente e tarefas agendadas não estão implementados.
+- Não declarar equivalência binária com o AAB publicado: o código histórico de produção não foi recuperado.
 
 
 ## Desvio transparente da ordenação inicial v1.8

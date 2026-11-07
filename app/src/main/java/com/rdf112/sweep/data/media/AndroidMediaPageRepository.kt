@@ -1,6 +1,7 @@
 package com.rdf112.sweep.data.media
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
@@ -19,6 +20,7 @@ import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaPage
 import com.rdf112.sweep.domain.model.MediaPageOutcome
 import com.rdf112.sweep.domain.model.MediaPageRequest
+import com.rdf112.sweep.domain.model.MediaPagingEvidence
 import com.rdf112.sweep.domain.model.MediaRecord
 import com.rdf112.sweep.domain.model.MediaScanSession
 import com.rdf112.sweep.domain.model.MediaSourceRevision
@@ -32,6 +34,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import java.io.BufferedInputStream
 import java.security.MessageDigest
 import java.util.UUID
@@ -141,6 +145,7 @@ class AndroidMediaPageRepository(
         }
     }
 
+    @SuppressLint("InlinedApi")
     private fun readAccessSnapshot(): Map<MediaKind, AccessLevel> {
         val granted = buildSet {
             listOf(
@@ -197,9 +202,23 @@ class AndroidMediaPageRepository(
 
         cursor.use { c ->
             val extras = runCatching { c.extras }.getOrNull()
+            val honoredArgsReported = extras?.containsKey(ContentResolver.EXTRA_HONORED_ARGS) == true
             val honored = extras?.getStringArray(ContentResolver.EXTRA_HONORED_ARGS)?.toSet().orEmpty()
-            val limitHonoredByProvider = ContentResolver.QUERY_ARG_LIMIT in honored &&
-                ContentResolver.QUERY_ARG_OFFSET in honored
+            val pagingEvidence = MediaPagingEvidence(
+                honoredArgsReported = honoredArgsReported,
+                limitHonored = ContentResolver.QUERY_ARG_LIMIT in honored,
+                offsetHonored = ContentResolver.QUERY_ARG_OFFSET in honored,
+                sortColumnsHonored = ContentResolver.QUERY_ARG_SORT_COLUMNS in honored,
+                sortDirectionHonored = ContentResolver.QUERY_ARG_SORT_DIRECTION in honored,
+            )
+            val issues = inheritedIssues.toMutableList()
+            if (!pagingEvidence.isFullyHonored) {
+                issues += PageIssue(
+                    PageIssueCode.PAGING_ARGS_UNVERIFIED,
+                    kind = request.kind,
+                    volumeName = request.volumeName,
+                )
+            }
 
             val rawTotal = if (extras != null && extras.containsKey(ContentResolver.EXTRA_TOTAL_COUNT)) {
                 runCatching { extras.getLong(ContentResolver.EXTRA_TOTAL_COUNT) }.getOrNull()
@@ -220,12 +239,17 @@ class AndroidMediaPageRepository(
                 -1
             }
             if (idColumn < 0 || sizeColumn < 0 || mimeColumn < 0) {
-                return pagingUnsupported(request, inheritedIssues)
+                return pagingUnsupported(request, issues)
             }
 
-            // Se o provedor (como em alguns Samsung/Xiaomi) não honrar QUERY_ARG_OFFSET no Bundle,
-            // avançamos o cursor até request.offset de forma controlada para garantir a paginação real.
-            if (!limitHonoredByProvider && request.offset > 0) {
+            if (request.offset > 0 && !pagingEvidence.canAdvanceToNextOffset) {
+                // The provider did not confirm OFFSET support and did not expose an unbounded
+                // cursor. Stop rather than risk skipping or duplicating rows.
+                return pagingUnsupported(request, issues)
+            }
+            if (request.offset > 0 && pagingEvidence.canUseCursorOffsetFallback) {
+                // Cursor fallback is safe only when the provider explicitly reports LIMIT and
+                // OFFSET as ignored; otherwise the query may already have applied OFFSET.
                 val targetPos = request.offset - 1
                 if (!c.moveToPosition(targetPos)) {
                     return MediaPage(
@@ -235,7 +259,7 @@ class AndroidMediaPageRepository(
                         providerTotalCount = totalCount ?: c.count.toLong().coerceAtLeast(0L),
                         nextOffset = null,
                         outcome = MediaPageOutcome.END_OF_SOURCE,
-                        issues = inheritedIssues,
+                        issues = issues,
                         observedRowKeys = emptyList(),
                     )
                 }
@@ -243,7 +267,6 @@ class AndroidMediaPageRepository(
 
             val records = ArrayList<MediaRecord>(request.pageSize)
             val observedRowKeys = ArrayList<String>(request.pageSize)
-            val issues = inheritedIssues.toMutableList()
             val ids = HashSet<Long>(request.pageSize)
             var rowsRead = 0
 
@@ -303,14 +326,23 @@ class AndroidMediaPageRepository(
             if (absoluteEnd > Int.MAX_VALUE.toLong()) {
                 return pagingUnsupported(request, issues)
             }
-            val effectiveTotal = totalCount ?: if (!limitHonoredByProvider) c.count.toLong().coerceAtLeast(absoluteEnd) else null
+            val effectiveTotal = totalCount ?: if (pagingEvidence.canUseCursorOffsetFallback) {
+                c.count.toLong().coerceAtLeast(absoluteEnd)
+            } else {
+                null
+            }
             val hasMore = when {
                 rowsRead == 0 -> false
-                effectiveTotal != null -> absoluteEnd < effectiveTotal
+                totalCount != null -> absoluteEnd < totalCount
+                pagingEvidence.canUseCursorOffsetFallback -> absoluteEnd < c.count.toLong()
                 else -> rowsRead == request.pageSize
             }
             val nextOffset = if (hasMore) absoluteEnd.toInt() else null
-            val enrichedRecords = populateStreamingSha256ForSameSizeCandidates(records)
+            val enrichedRecords = if (request.hashSameSizeCandidates) {
+                populateStreamingSha256ForSameSizeCandidates(records)
+            } else {
+                records
+            }
             return MediaPage(
                 request = request,
                 records = enrichedRecords,
@@ -415,36 +447,89 @@ class AndroidMediaPageRepository(
      * exclusivamente para registros que possuem tamanho idêntico (> 0) na página atual, permitindo
      * comprovar duplicatas exatas sem falsos positivos.
      */
-    private fun populateStreamingSha256ForSameSizeCandidates(records: List<MediaRecord>): List<MediaRecord> {
+    private suspend fun populateStreamingSha256ForSameSizeCandidates(records: List<MediaRecord>): List<MediaRecord> {
         val candidateSizes = records
             .filter { it.sizeBytes > 0L }
             .groupBy { it.sizeBytes }
             .filterValues { it.size >= 2 }
             .keys
         if (candidateSizes.isEmpty()) return records
+        var pageBytesHashed = 0L
         return records.map { record ->
-            if (record.sizeBytes in candidateSizes) {
-                val hash = computeStreamingSha256(Uri.parse(record.uri))
-                if (hash != null) record.copy(contentSha256 = hash) else record
-            } else {
+            if (record.sizeBytes !in candidateSizes) {
                 record
+            } else {
+                val remainingPageBudget = PAGE_HASH_BUDGET_BYTES - pageBytesHashed
+                if (
+                    record.sizeBytes <= 0L ||
+                    record.sizeBytes > PAGE_HASH_MAX_FILE_BYTES ||
+                    record.sizeBytes > remainingPageBudget
+                ) {
+                    record
+                } else {
+                    val allowedBytes = minOf(PAGE_HASH_MAX_FILE_BYTES, remainingPageBudget)
+                    pageBytesHashed += record.sizeBytes
+                    val hash = computeStreamingSha256(
+                        Uri.parse(record.uri),
+                        maxBytes = allowedBytes,
+                        expectedBytes = record.sizeBytes,
+                    )
+                    if (hash != null) record.copy(contentSha256 = hash) else record
+                }
             }
         }
     }
 
-    private fun computeStreamingSha256(uri: Uri): String? = runCatching {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val stream = resolver.openInputStream(uri) ?: return null
-        BufferedInputStream(stream, 8192).use { input ->
-            val buffer = ByteArray(8192)
-            var read = input.read(buffer)
-            while (read > 0) {
-                digest.update(buffer, 0, read)
-                read = input.read(buffer)
-            }
+    override suspend fun computeSha256(uri: String): String? =
+        computeSha256(uri, GLOBAL_HASH_MAX_FILE_BYTES)
+
+    override suspend fun computeSha256(uri: String, maxBytes: Long): String? =
+        withContext(Dispatchers.IO) {
+            computeStreamingSha256(Uri.parse(uri), maxBytes)
         }
-        digest.digest().joinToString("") { "%02x".format(it) }
-    }.getOrNull()
+
+    override suspend fun computeSha256(uri: String, maxBytes: Long, expectedBytes: Long): String? =
+        withContext(Dispatchers.IO) {
+            computeStreamingSha256(Uri.parse(uri), maxBytes, expectedBytes)
+        }
+
+    private suspend fun computeStreamingSha256(
+        uri: Uri,
+        maxBytes: Long = GLOBAL_HASH_MAX_FILE_BYTES,
+        expectedBytes: Long? = null,
+    ): String? {
+        require(maxBytes > 0L) { "maxBytes must be positive" }
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            val stream = resolver.openInputStream(uri) ?: return null
+            var bytesRead = 0L
+            BufferedInputStream(stream, 8192).use { input ->
+                val buffer = ByteArray(8192)
+                while (true) {
+                    currentCoroutineContext().ensureActive()
+                    val read = input.read(buffer)
+                    if (read < 0) break
+                    if (read > 0) {
+                        if (read.toLong() > maxBytes - bytesRead) return null
+                        bytesRead += read.toLong()
+                        digest.update(buffer, 0, read)
+                    }
+                }
+            }
+            if (expectedBytes != null && bytesRead != expectedBytes) return null
+            digest.digest().joinToString("") { "%02x".format(it) }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    companion object {
+        private const val GLOBAL_HASH_MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
+        private const val PAGE_HASH_MAX_FILE_BYTES = 512L * 1024L * 1024L
+        private const val PAGE_HASH_BUDGET_BYTES = 1024L * 1024L * 1024L
+    }
 }
 
 class NoMediaAccessException : IllegalStateException("Photo and video access has not been granted.")

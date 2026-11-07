@@ -4,7 +4,7 @@
 
 O projeto contém dois módulos Gradle (`:app` Android e `:domain` Kotlin/JVM), UI Android Views com quatro seções em `MainActivity`, `MediaScanViewModel` com `StateFlow`, regras puras para paginação/seleção/agrupamento/OaaS/Billing e adaptadores Android para MediaStore, operações de mídia, telemetria local e Google Play Billing. A Activity ainda é proprietária da navegação e de grande parte da composição/renderização; não é uma arquitetura de features isoladas.
 
-A baseline Debug executou com Gradle 8.13, AGP 8.13.2, Kotlin 2.3.21, JDK 17 e Android SDK 36. Não há evidência de build Release assinado ou teste em dispositivo. O source ZIP contém um único commit rastreado; os módulos extraídos são arquivos não rastreados.
+A configuração atual usa Gradle 8.13, JDK 17, Android SDK 36 e applicationId com.rdf112.midiastore. A baseline Debug de 03/11 pertence a uma revisão anterior; a branch de recuperação ainda precisa de CI verde, teste instrumentado e validação em aparelho. Não declarar Release assinado ou publicado.
 
 ## Direção
 
@@ -41,7 +41,7 @@ Não criar módulos Gradle vazios agora. Primeiro estabilizar contratos, testes 
 
 ## Decisões de plataforma
 
-- Preservar `applicationId`/namespace `com.rdf112.sweep`; nome visível pode ser Midiastore. Confirmar histórico/certificado na Play Console antes de release.
+- Preservar `applicationId=com.rdf112.midiastore`, confirmado pelo proprietário na ficha de teste interno. O namespace técnico continua `com.rdf112.sweep`; não confundir namespace com package de instalação. Confirmar maior versionCode e certificado na Play Console antes do Release.
 - `minSdk 29`, `targetSdk 36`, `compileSdk 36`, Java 17; consultar Play target policy a cada release e testar API 37 antes da migração.
 - Nada de root, ADB, Shizuku, `MANAGE_EXTERNAL_STORAGE` ou acesso privado de terceiros como requisito do MVP.
 - Não adicionar Room, WorkManager, LiteRT ou MediaPipe sem um caso de uso aprovado e benchmark.
@@ -49,3 +49,11 @@ Não criar módulos Gradle vazios agora. Primeiro estabilizar contratos, testes 
 ## Gatilhos de modularização
 
 Extrair feature do `:app` quando pelo menos dois sinais ocorrerem: equipe independente, ciclo de release separado, API de domínio estável, redução demonstrável do grafo de dependências/tempo de build ou testes de feature isoláveis. Manter no domínio puro aquilo que pode ser testado sem Android.
+
+## Atualização de arquitetura — 04/11/2026
+
+O medidor principal consulta agora o armazenamento compartilhado primário, não a partição privada /data. O cálculo está isolado em StorageUsageCalculator com quatro testes unitários; isso não significa que SD/USB estejam incluídos. Apresentar volumes adicionais separadamente quando forem enumerados e acessíveis.
+
+O projeto permanece com dois módulos Gradle: app e domain. A MainActivity ainda concentra navegação, renderização e operações; não criar módulos vazios. Depois de obter baseline CI verde, refatorar em passos pequenos, extraindo contratos/estado e mantendo o domínio sem Android. Não fazer reescrita arquitetural antes de resolver scanner/MediaStore e instrumentação.
+
+A promessa comercial passa a Phone Cleaner; armazenamento/MediaStore continuam como domínio técnico. Downloads/documentos usam SAF, se adicionados; não adicionar MANAGE_EXTERNAL_STORAGE sem prova de que MediaStore/SAF não atendem ao recurso central.

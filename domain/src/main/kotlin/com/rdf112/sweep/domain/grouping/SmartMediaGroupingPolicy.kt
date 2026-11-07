@@ -1,6 +1,7 @@
 package com.rdf112.sweep.domain.grouping
 
 import com.rdf112.sweep.domain.model.MediaRecord
+import com.rdf112.sweep.domain.model.DuplicateReferenceSnapshot
 
 enum class SmartFilterMode {
     ALL_ITEMS,
@@ -41,26 +42,21 @@ object SmartMediaGroupingPolicy {
     }
 
     /**
-     * Agrupa registros que possuem o mesmo tamanho em bytes (> 0) e, quando houver hash SHA-256,
-     * exige comprovação de conteúdo idêntico.
-     * Rejeita falsos positivos (mesmo tamanho com SHA-256 divergente) e protege 1 referência original por grupo.
+     * Confirma duplicatas somente quando o tamanho é maior que zero e os hashes SHA-256
+     * não vazios são idênticos. Mesmo tamanho sem hash nunca é prova de conteúdo igual.
+     * Protege uma referência original por grupo confirmado.
      */
     fun markProtectedReferencesForSameSizeGroups(records: List<MediaRecord>): List<MediaRecord> {
         val bySize = records.filter { it.sizeBytes > 0L }.groupBy { it.sizeBytes }
         val result = ArrayList<MediaRecord>()
         for ((_, sizeGroup) in bySize) {
             if (sizeGroup.size < 2) continue
-            val anyHasHash = sizeGroup.any { !it.contentSha256.isNullOrBlank() }
-            if (anyHasHash) {
-                val confirmedSubgroups = sizeGroup
-                    .filter { !it.contentSha256.isNullOrBlank() }
-                    .groupBy { it.contentSha256!!.lowercase() }
-                for ((_, hashGroup) in confirmedSubgroups) {
-                    if (hashGroup.size < 2) continue
-                    appendProtectedGroup(hashGroup, result)
-                }
-            } else {
-                appendProtectedGroup(sizeGroup, result)
+            val confirmedSubgroups = sizeGroup
+                .filter { !it.contentSha256.isNullOrBlank() }
+                .groupBy { it.contentSha256!!.lowercase() }
+            for ((_, hashGroup) in confirmedSubgroups) {
+                if (hashGroup.size < 2) continue
+                appendProtectedGroup(hashGroup, result)
             }
         }
         return result.sortedByDescending { it.sizeBytes }
@@ -90,11 +86,20 @@ object SmartMediaGroupingPolicy {
             compareBy<MediaRecord> { it.dateModifiedEpochSeconds ?: Long.MAX_VALUE }
                 .thenBy { it.uri }
         )
+        val original = sorted.first()
+        val originalHash = original.contentSha256?.takeIf(String::isNotBlank)?.lowercase() ?: return
+        val reference = DuplicateReferenceSnapshot(
+            uri = original.uri,
+            sizeBytes = original.sizeBytes,
+            mimeType = original.mimeType,
+            dateModifiedEpochSeconds = original.dateModifiedEpochSeconds,
+            sha256 = originalHash,
+        )
         sorted.forEachIndexed { index, item ->
             if (index == 0) {
-                out += item.copy(isProtected = true, isSelectable = false)
+                out += item.copy(isProtected = true, isSelectable = false, duplicateReferenceSnapshot = null)
             } else {
-                out += item
+                out += item.copy(duplicateReferenceSnapshot = reference)
             }
         }
     }

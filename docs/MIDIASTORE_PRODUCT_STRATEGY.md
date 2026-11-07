@@ -1,10 +1,10 @@
 # Midiastore: estratégia de produto 2027/2028
 
-Data da revisão: 03/11/2026. A marca comercial desejada é **Midiastore**. O identificador Android permanece `com.rdf112.sweep` e o namespace `com.rdf112.sweep` até validação do histórico de publicação e assinatura. A aplicação passou a exibir “Midiastore”; isso não muda a identidade de atualização.
+Data da revisão: 03/11/2026. A marca comercial e a ficha de teste interno confirmada pelo proprietário são **Midiastore**, package `com.rdf112.midiastore`. O namespace técnico e as pastas Kotlin permanecem `com.rdf112.sweep` como legado de implementação. Não alterar `applicationId`, versionCode ou assinatura sem verificar Play Console.
 
 ## Tese
 
-Ser um assistente local de armazenamento que explica o que ocupa espaço, encontra oportunidades verificáveis e deixa cada decisão destrutiva sob controle explícito da pessoa. A promessa não é “limpar tudo”; é mostrar evidência, impacto provável, cobertura e resultado confirmado.
+Ser um **limpador inteligente de celular (phone cleaner) com posicionamento Pro**: explicar o que ocupa espaço, encontrar oportunidades verificáveis e deixar cada decisão destrutiva sob controle explícito da pessoa. A promessa não é “limpar tudo”; é mostrar evidência, impacto provável, cobertura e resultado confirmado.
 
 ## Usuário prioritário
 
@@ -50,10 +50,18 @@ As notas são julgamento de produto, não medição de mercado. A pesquisa de co
 - Sem rede, conta, analytics remoto ou exclusão automatizada.
 - Métrica de sucesso: proporção de previsões que permanecem dentro do intervalo publicado após 14/30 dias; se não houver validação, manter o recurso como experimental.
 
-## Monetização
+## Monetização — decisão confirmada: Freemium
 
-A análise e controles básicos de segurança ficam no plano gratuito. Pro pode oferecer análise em lote/volume, histórico local, exportação, agrupamento visual revisável e relatórios avançados, desde que os recursos existam e tenham custo marginal baixo. Não bloquear a visualização dos arquivos, desfazer a proteção do original ou cobrar por consentimento seguro. SKU/preços e estratégia detalhados em [REVENUE_AND_PRICING_STRATEGY.md](REVENUE_AND_PRICING_STRATEGY.md).
+O plano gratuito mantém análise de fotos, vídeos e áudios acessíveis, localização de arquivos grandes e cópias exatas, revisão manual, proteção do original e limpeza com consentimento oficial do Android. O benefício Pro já presente no código é exportar o resumo da seleção revisada. Histórico avançado, previsão de armazenamento e agrupamento visual permanecem no roadmap, não como funcionalidades disponíveis. Nunca cobrar por segurança, proteção do original, revisão ou consentimento. SKUs e estado do Billing estão detalhados em [REVENUE_AND_PRICING_STRATEGY.md](REVENUE_AND_PRICING_STRATEGY.md).
 
 ## Limite de identidade
 
-A consulta pública da Play para `com.rdf112.sweep` retornou HTTP 404 em 03/11/2026. Isso não prova que nunca foi publicado: pode estar não listado, em teste ou removido. Não alterar `applicationId`, namespace, versionCode para release nem certificado sem AAB histórico e acesso autorizado à Play Console.
+O proprietário mostrou o listing de teste interno `Midiastore — com.rdf112.midiastore`. A consulta pública de `com.rdf112.sweep` não determina o estado desse listing. Maior versionCode publicado e certificado de upload ainda precisam ser conferidos na Play Console. O código histórico do AAB de produção não foi recuperado.
+
+## Direção do primeiro lançamento — Phone Cleaner + Pro Freemium
+
+A identidade para o consumidor é **limpador inteligente de celular (Phone Cleaner)**. “Gerenciamento de armazenamento” é uma capacidade interna. A promessa é encontrar o que ocupa espaço, identificar o que pode ser removido, proteger o original e confirmar o espaço efetivamente recuperado.
+
+O primeiro lançamento não será um gerenciador universal, antivírus, RAM booster, CPU cooler, limpador de cache privado de outros apps nem coleção de ferramentas. Downloads/documentos via SAF, Storage Forecast, similaridade visual e automação são extensões futuras, condicionadas à estabilização e à validação de demanda.
+
+O modelo Freemium mantém o núcleo seguro gratuito. Pro deve monetizar conveniência e relatórios; o benefício pago já presente no cliente é exportação do resumo revisado. Compra permanece bloqueada até validação confiável de purchaseToken e confirmação do catálogo/offerings na Play Console.

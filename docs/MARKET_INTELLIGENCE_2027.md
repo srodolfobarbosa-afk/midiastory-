@@ -63,4 +63,28 @@ A amostra sinaliza valor em pagamento único para alguns usuários e risco de co
 - [Fossify Gallery](https://github.com/FossifyOrg/Gallery)
 - [Fonte do scraper open source: reviews.js](https://github.com/facundoolano/google-play-scraper/blob/master/lib/reviews.js)
 
-**Limitação:** a consulta pública de `com.rdf112.sweep` retornou HTTP 404. Não foi possível confirmar a listing, o histórico de publicação, a região de lançamento ou a versão da Play Console do Midiastore.
+**Limitação:** o proprietário confirmou uma ficha de teste interno como `com.rdf112.midiastore`. A consulta pública antiga para `com.rdf112.sweep` não representa essa ficha. Este recorte de mercado não confirma o maior versionCode publicado, países de disponibilidade, vendas, preços ou estado atual do listing.
+
+## Atualização de mercado — 04/11/2026
+
+### Snapshot público das fichas Google Play
+
+As notas, volumes de avaliações e downloads são os valores exibidos pelas fichas consultadas nesta data; são arredondados e podem variar por região. Não representam usuários ativos nem receita.
+
+| Produto | Downloads | Nota | Avaliações exibidas | Posicionamento |
+|---|---:|---:|---:|---|
+| Files by Google | 5B+ | 4,5 | 9,03M | Gratuito; sugestões de limpeza, duplicatas, navegação e partilha |
+| Avast Cleanup | 50M+ | 4,6 | 1,52M | Freemium com anúncios/compras; mídia, arquivos grandes e apps não usados |
+| AVG Cleaner | 100M+ | 4,6 | 1,97M | Freemium com anúncios/compras; mídia, arquivos, duplicatas e fotos de baixa qualidade |
+| CCleaner | 100M+ | 4,5 | 3,08M | Freemium com anúncios/compras; limpeza, downloads e análise |
+| SD Maid 2/SE | 1M+ | 4,6 | 9,67 mil | Ferramenta técnica; análise gratuita e recursos avançados pagos |
+
+### Sinais recentes e limites da amostra
+
+Uma avaliação exibida na ficha do AVG relatou mais de cinco minutos de limpeza sem mudança de tamanho; outra relatou travamento próximo de 78% e insatisfação com assinatura/reembolso. Uma avaliação do CCleaner relatou ofertas repetidas de upgrade para um assinante. Uma conversa de Reddit em agosto de 2026 pediu uma solução gratuita para duplicatas exatas, imagens semelhantes e fotos desfocadas; os comentários citaram SD Maid e Files by Google. São sinais qualitativos isolados, não taxas de falha nem estimativas de demanda.
+
+Fontes: [Files by Google](https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.files), [Avast](https://play.google.com/store/apps/details?id=com.avast.android.cleaner), [AVG](https://play.google.com/store/apps/details?id=com.avg.cleaner), [CCleaner](https://play.google.com/store/apps/details?id=com.piriform.ccleaner), [SD Maid](https://play.google.com/store/apps/details?id=eu.darken.sdmse), [reviews AVG](https://play.google.com/store/apps/details?hl=pt_BR&id=com.avg.cleaner), [review CCleaner](https://play.google.com/store/apps/details?id=com.piriform.ccleaner), [discussão Reddit](https://www.reddit.com/r/androidapps/comments/1vjo4w1/request_i_need_an_app_to_clean_up_duplicate_and/).
+
+### Consequência para o posicionamento
+
+A primeira versão deve ser Phone Cleaner, não um gerenciador universal. Duplicatas perceptuais e compressão já existem em SD Maid; são recursos competitivos, não diferenciais exclusivos. A oportunidade do Midiastore é cobertura explicável, revisão simples, proteção do original e prova de bytes realmente recuperados.

@@ -10,8 +10,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: midiastore-android-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify-debug:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        api-level: [29, 35]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,14 +32,106 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+      - name: Validate release script and package guards
+        shell: bash
+        run: |
+          bash -n scripts/build_signed_aab.sh
+          grep -Fq 'applicationId = "com.rdf112.midiastore"' app/build.gradle.kts
+          if grep -RInE 'applicationId[[:space:]]*=.*com\\.rdf112\\.sweep|Set-Content.*applicationId' --include='*.ps1' scripts COMPILAR_TUDO_WINDOWS.ps1; then
+            echo "Unsafe legacy package mutation found in Windows scripts." >&2
+            exit 1
+          fi
       - name: Test and build Debug
         run: >-
           ./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug
           :app:assembleDebug :app:assembleDebugAndroidTest
+      - name: Run instrumented tests on Android API${{ matrix.api-level }} emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          SWEEP_EXPECTED_API_LEVEL: ${{ matrix.api-level }}
+        with:
+          api-level: ${{ matrix.api-level }}
+          # The instrumented suite exercises Android framework/MediaStore APIs,
+          # not Play Services. Use the lean AOSP image to avoid GMS first-boot
+          # work destabilizing the emulator and killing the instrumentation process.
+          target: default
+          arch: x86_64
+          profile: pixel_2
+          cores: 2
+          ram-size: 4096M
+          heap-size: 512M
+          emulator-boot-timeout: 600
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
+          script: bash scripts/ci/run_android_instrumented_tests.sh
+      - name: Print instrumented test failure details
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          find app/build/test-results/testDebugUnitTest app/build/outputs/androidTest-results app/build/reports/androidTests app/build/ci-diagnostics -type f -name '*.xml' -print0 2>/dev/null |
+            while IFS= read -r -d '' file; do
+              echo "===== $file ====="
+              sed -n '1,260p' "$file"
+            done
+      - name: Generate Debug APK checksum
+        if: always()
+        shell: bash
+        run: |
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            sha256sum app/build/outputs/apk/debug/app-debug.apk > app/build/outputs/apk/debug/app-debug.apk.sha256
+          fi
+      - name: Upload installable Debug APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: midiastore-debug-apk-api${{ matrix.api-level }}
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/debug/app-debug.apk.sha256
+            app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload Android test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports-api${{ matrix.api-level }}
+          path: |
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/tests/testDebugUnitTest/
+            app/build/outputs/androidTest-results/
+            app/build/reports/androidTests/
+            app/build/ci-diagnostics/
+          if-no-files-found: warn
+          retention-days: 7
+
+  windows-script-validation:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell build and QA scripts
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path . -Recurse -File -Filter '*.ps1' |
+            Where-Object { $_.FullName -notmatch '[\\/](build|\.gradle|\.git)[\\/]' }
+          if (-not $files) { throw "No PowerShell scripts were found." }
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $file.FullName, [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Format-List | Out-String | Write-Host
+              throw "PowerShell syntax error in $($file.FullName)"
+            }
+            Write-Host "OK: $($file.FullName)"
+          }
 
   signed-release:
     if: github.event_name == 'workflow_dispatch'
-    needs: verify-debug
+    needs: [verify-debug, windows-script-validation]
     runs-on: ubuntu-latest
     environment: play-release
     steps:
@@ -46,6 +147,9 @@ jobs:
       - name: Restore the owner upload key to runner temp
         env:
           SWEEP_KEYSTORE_BASE64: ${{ secrets.SWEEP_KEYSTORE_BASE64 }}
+          MIDIASTORE_RELEASE_APPROVED: ${{ secrets.MIDIASTORE_RELEASE_APPROVED }}
+          MIDIASTORE_MAX_PUBLISHED_VERSION_CODE: ${{ secrets.MIDIASTORE_MAX_PUBLISHED_VERSION_CODE }}
+          MIDIASTORE_EXPECTED_CERT_SHA256: ${{ secrets.MIDIASTORE_EXPECTED_CERT_SHA256 }}
         run: |
           set -euo pipefail
           test -n "$SWEEP_KEYSTORE_BASE64"
@@ -58,7 +162,9 @@ jobs:
           SWEEP_STORE_PASSWORD: ${{ secrets.SWEEP_STORE_PASSWORD }}
           SWEEP_KEY_ALIAS: ${{ secrets.SWEEP_KEY_ALIAS }}
           SWEEP_KEY_PASSWORD: ${{ secrets.SWEEP_KEY_PASSWORD }}
-          SWEEP_EXPECTED_CERT_SHA256: ${{ secrets.SWEEP_EXPECTED_CERT_SHA256 }}
+          MIDIASTORE_RELEASE_APPROVED: ${{ secrets.MIDIASTORE_RELEASE_APPROVED }}
+          MIDIASTORE_MAX_PUBLISHED_VERSION_CODE: ${{ secrets.MIDIASTORE_MAX_PUBLISHED_VERSION_CODE }}
+          MIDIASTORE_EXPECTED_CERT_SHA256: ${{ secrets.MIDIASTORE_EXPECTED_CERT_SHA256 }}
         run: bash scripts/build_signed_aab.sh
       - uses: actions/upload-artifact@v4
         with:

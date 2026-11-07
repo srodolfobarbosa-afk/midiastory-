@@ -1,9 +1,9 @@
-# Benchmark de Preços e Posicionamento Comercial — Sweep Pro (Google Play Billing 8.0.0)
+# Benchmark de Preços e Posicionamento Comercial — Midiastore Pro (Google Play Billing 8.0.0)
 
 **Data da consulta:** 02 de novembro de 2026  
 **Mercados analisados:** Brasil (BRL / `R$`) e Internacional / Estados Unidos (USD / `$`)  
-**Pacote de produção:** `com.rdf112.sweep`  
-**IDs oficiais preservados na Google Play Console:**
+**Package confirmado pelo proprietário na ficha interna:** `com.rdf112.midiastore`  
+**IDs atualmente configurados no source — ativação na Play Console ainda não verificada:**
 - Assinatura Mensal (`ProductType.SUBS`): `sweep_pro_monthly`
 - Assinatura Anual (`ProductType.SUBS`): `sweep_pro_annual`
 - Compra Única Vitalícia (`ProductType.INAPP`): `sweep_pro_lifetime`
@@ -22,15 +22,15 @@
 
 ---
 
-## 2. Recomendação de Preços para a Google Play Console (Sweep Pro)
+## 2. Recomendação de Preços para a Google Play Console (Midiastore Pro)
 
-Para posicionar o **Sweep** de forma competitiva frente ao [Avast Cleanup](https://play.google.com/store/apps/details?id=com.avast.android.cleaner) e ao [CCleaner Android](https://play.google.com/store/apps/details?id=com.piriform.ccleaner), entregando **zero anúncios**, **processamento 100% local** e **motor OaaS de 6 etapas com proteção SHA-256 de originais**:
+Para posicionar o **Midiastore** de forma competitiva frente ao [Avast Cleanup](https://play.google.com/store/apps/details?id=com.avast.android.cleaner) e ao [CCleaner Android](https://play.google.com/store/apps/details?id=com.piriform.ccleaner), entregando **sem anúncios intrusivos (meta comercial a validar no release)**, **análise de mídia no dispositivo** e **análise local de mídia e revisão segura de duplicatas exatas por SHA-256 (sujeitas à validação final)**:
 
 | Produto na Play Console | ID do Produto (`productId`) | Tipo no Billing 8.0.0 | Preço Recomendado — Brasil (`BRL`) | Preço Recomendado — Internacional (`USD`) | Posicionamento Estratégico |
 |---|---|---|---|---|---|
-| **Sweep Pro Mensal** | `sweep_pro_monthly` | `ProductType.SUBS` | **R$ 9,90 / mês** | **US$ 2.99 / month** | Porta de entrada acessível para quem deseja organizar o armazenamento em um mês específico sem compromisso longo. |
-| **Sweep Pro Anual** | `sweep_pro_annual` | `ProductType.SUBS` | **R$ 59,90 / ano** *(equivale a ~R$ 4,99/mês — economia real de 50%)* | **US$ 17.99 / year** *(economia real de 50%)* | Plano âncora de maior retenção (LTV), custando metade das suítes tradicionais com anúncios. |
-| **Sweep Pro Vitalício** | `sweep_pro_lifetime` | `ProductType.INAPP` | **R$ 119,90** *(compra única)* | **US$ 34.99** *(one-time)* | Alternativa para usuários que rejeitam assinaturas recorrentes (público similar ao do [SD Maid 2/SE](https://play.google.com/store/apps/details?id=eu.darken.sdmse)). |
+| **Midiastore Pro Mensal** | `sweep_pro_monthly` | `ProductType.SUBS` | **R$ 9,90 / mês** | **US$ 2.99 / month** | Porta de entrada acessível para quem deseja organizar o armazenamento em um mês específico sem compromisso longo. |
+| **Midiastore Pro Anual** | `sweep_pro_annual` | `ProductType.SUBS` | **R$ 59,90 / ano** *(equivale a ~R$ 4,99/mês — economia real de 50%)* | **US$ 17.99 / year** *(economia real de 50%)* | Plano âncora de maior retenção (LTV), custando metade das suítes tradicionais com anúncios. |
+| **Midiastore Pro Vitalício** | `sweep_pro_lifetime` | `ProductType.INAPP` | **R$ 119,90** *(compra única)* | **US$ 34.99** *(one-time)* | Alternativa para usuários que rejeitam assinaturas recorrentes (público similar ao do [SD Maid 2/SE](https://play.google.com/store/apps/details?id=eu.darken.sdmse)). |
 
 ---
 
@@ -39,3 +39,12 @@ Para posicionar o **Sweep** de forma competitiva frente ao [Avast Cleanup](https
 1. **Fonte única da verdade (`ProductDetails`)**: o aplicativo **nunca** exibe preços fixos em reais ou dólares no código-fonte. Todos os valores são lidos dinamicamente de `ProductDetails` (`formattedPrice`, `priceAmountMicros` e `priceCurrencyCode`) retornados pela biblioteca oficial Google Play Billing `8.0.0`.
 2. **Cálculo real de desconto anual (`BillingStatePolicy.calculateRealAnnualDiscountPercent`)**: o percentual de economia do plano anual em relação a `12 × mensal` é calculado matematicamente a partir de `priceAmountMicros`. Caso a Play Store ainda não tenha retornado os dois preços na mesma moeda, o app não exibe nenhum percentual fictício.
 3. **Transparência sobre meios de pagamento**: os métodos disponíveis (cartão, saldo Google Play ou meios locais habilitados pela própria Google Play para cada tipo de produto e país) são gerenciados exclusivamente pelo fluxo nativo da Google Play Store.
+
+
+## Estado real da monetização em 04/11/2026
+
+Este benchmark é uma hipótese de posicionamento, não uma configuração ativa de preços. O proprietário informou que a configuração financeira/recebimento foi habilitada em 03/11/2026; isso não confirma que produtos in-app estejam cadastrados, ativos ou disponíveis no Brasil.
+
+O código usa atualmente os product IDs acima, mas a Play Console, os tipos/ofertas, países, preços e compra de teste ainda precisam ser conferidos. O app deve exibir apenas os preços retornados dinamicamente por ProductDetails. Não usar os valores sugeridos nesta tabela como preços já publicados.
+
+A análise das mídias ocorre localmente, mas Billing se comunica com Google Play e o relatório pode ser compartilhado pelo usuário via ACTION_SEND. Portanto, não descrever todo o aplicativo como “100% offline” ou “nenhum dado sai do aparelho” sem qualificar esses fluxos.

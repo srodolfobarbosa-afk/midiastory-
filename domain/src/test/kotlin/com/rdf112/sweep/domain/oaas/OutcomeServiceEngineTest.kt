@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class OutcomeServiceEngineTest {
-    private fun rec(id: String, size: Long, modSec: Long, sha256: String? = "sha_same") = MediaRecord(
+    private fun rec(id: String, size: Long, modSec: Long, sha256: String? = "e".repeat(64)) = MediaRecord(
         uri = "content://media/external_primary/images/media/$id",
         volumeName = "external_primary",
         kind = MediaKind.IMAGE,
@@ -20,10 +20,10 @@ class OutcomeServiceEngineTest {
 
     @Test
     fun buildsAutomatedOutcomePlanForConfirmedDuplicatesAndSeparatesUnconfirmed() {
-        val dup1 = rec("1", 20L * 1024L * 1024L, 100L, "sha_confirmed")
-        val dup2 = rec("2", 20L * 1024L * 1024L, 200L, "sha_confirmed")
-        val dup3 = rec("3", 20L * 1024L * 1024L, 300L, "sha_confirmed")
-        val falsePositive = rec("4", 20L * 1024L * 1024L, 400L, "sha_different")
+        val dup1 = rec("1", 20L * 1024L * 1024L, 100L, "c".repeat(64))
+        val dup2 = rec("2", 20L * 1024L * 1024L, 200L, "c".repeat(64))
+        val dup3 = rec("3", 20L * 1024L * 1024L, 300L, "c".repeat(64))
+        val falsePositive = rec("4", 20L * 1024L * 1024L, 400L, "d".repeat(64))
 
         val plan = OutcomeServiceEngine.buildAutomatedOutcomePlan(
             mission = DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES,

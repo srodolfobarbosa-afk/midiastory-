@@ -1,68 +1,96 @@
-# Relatório Final — Midiastore 2027/2028
+# Relatório de engenharia — recuperação do Midiastore
 
-Data: 03/11/2026
+Atualizado: 04/11/2026
 
-## Decisão
+## Decisão atual
 
-**APROVADO PELO PROPRIETÁRIO PARA BUILD E ENTREGA; NÃO PRONTO PARA PUBLICAÇÃO NA GOOGLE PLAY.** Debug atual e Release de validação foram compilados. APK/AAB Release foram assinados com uma chave temporária isolada, validados e identificados como `VALIDATION-ONLY`; não são a chave de produção.
+**EM DESENVOLVIMENTO — NÃO É RELEASE CANDIDATE.** O feedback do testador confirmou problemas de fluxo, UX, limpeza e Billing. Foi aberta a PR #3 em rascunho para corrigir uma branch isolada. Nenhum merge ou AAB de produção foi realizado.
 
-## Preservação e identidade
+- PR: https://github.com/srodolfobarbosa-afk/midiastory-/pull/3
+- Issue P0: https://github.com/srodolfobarbosa-afk/midiastory-/issues/2
+- Branch: fix/p0-sweep-permissions-missions-billing
+- Package confirmado pelo proprietário na ficha interna: com.rdf112.midiastore.
+- Namespace interno: com.rdf112.sweep (legado técnico).
+- Build config atual: versionCode 17 / versionName 2.2.1 / minSdk 29 / targetSdk 36 / compileSdk 36. O versionCode máximo já publicado ainda precisa ser consultado na Play Console.
 
-- Raiz: `/workspaces/midiastory-`; branch `main`, alinhada a `origin/main`, HEAD previamente observado `42dae12` (`adicinando o zip`). Esse commit rastreia somente o ZIP; o primeiro levantamento encontrou 81 arquivos extraídos não rastreados. A contagem atual não foi revalidada depois de adicionar a matriz/workflow. Não criei branch: sem baseline de código rastreada, ela não isolaria alterações úteis.
-- Backup original preservado e verificado: `/workspaces/midiastore-pre-2027-audit-2026-11-03.tar.gz`, SHA-256 `3447fb294a9748297c918438dc7c0d328a4f904a27141867afa4c0d5bb11dfdb`; é anterior à matriz/workflow atuais. Backup pré-commit deste estado: `/workspaces/midiastore-precommit-2026-11-03.tar.gz`, SHA-256 `6cf96fcc313fb1cb6f26e1c2a5b4bd793bf3ad85935bc1eed69dc1510561df3a`, 169 entradas e confirma inclusão da matriz, workflow e script.
-- `.gitignore` foi ampliado para caches, SDK/local properties, env, keystores, chaves e artefatos. Filesystem de nomes não encontrou `.env`, keystore, `local.properties` nem `keystore.properties`; varredura textual completa de tokens não foi executada.
-- Branch observada antes de stage: `main`, HEAD `42dae12`, só ZIP rastreado; agora foi criada branch de trabalho e staged/commit local será registrado no histórico Git (sem push). A matriz está em [FEATURE_IMPLEMENTATION_MATRIX.md](FEATURE_IMPLEMENTATION_MATRIX.md).
-- `applicationId`/namespace: `com.rdf112.sweep`; `minSdk 29`, `targetSdk 36`, `compileSdk 36`; versão atual `versionCode 14`, `versionName 2.1.1`. Certificado/JKS de produção, AAB histórico e acesso Play Console não foram encontrados.
-- O nome mostrado foi alterado para Midiastore somente em `app_name`; identity técnica e IDs Billing não foram alterados. Consulta pública à listing retornou HTTP 404, que não prova ausência de publicação.
+## O que foi modificado na branch de recuperação
 
-## Diagnóstico e melhorias
+- Corrigida a configuração de JDK local fixa que impedia o Gradle de usar JAVA_HOME no Codespaces/CI.
+- Marca, strings, tema, paleta e ícone foram alinhados à identidade Midiastore.
+- Ação de revisão de permissões parciais Android 14+ incluída também na aba Arquivos.
+- Missão selecionada na primeira utilização é retomada depois que a primeira leitura de mídia termina.
+- Missões podem ser canceladas na própria tela; botões ficam bloqueados durante execução.
+- Implementada varredura global paginada por tipos de mídia e volumes acessíveis, com limites de segurança, progresso e cancelamento.
+- Hash SHA-256 para candidatos entre páginas é feito em streaming/IO.
+- Duplicatas só são confirmadas por hash não vazio e idêntico; cobertura parcial bloqueia pré-seleção de duplicatas.
+- Mover para a Lixeira não é contabilizado como espaço liberado. Resposta nula do provider não é prova de exclusão.
+- UI de Billing mostra quando o fluxo não inicia e diferencia reconciliação de plano gratuito.
+- Scripts Windows de Release foram desativados porque alternavam package IDs, geravam dois AABs e restauravam package antigo.
+- Novo Release exige package/version confirmados, aprovação explícita e fingerprint correto; workflow não publica diretamente na Play.
+- Documentação de continuidade, matriz de funcionalidades, Data Safety, Billing e QA foi corrigida; adicionado AGENTS.md.
 
-Confirmados: `MainActivity`, `ModernDashboardWidgets`, `AndroidMediaPageRepository`, `OutcomeServiceEngine`, `SmartMediaGroupingPolicy`, `AndroidPlayBillingGateway`, Manifesto, dois módulos Gradle e testes. As quatro áreas visuais e os fluxos de MediaStore, Billing e consentimento estão ligados à Activity.
+## Validação que existe e que falta
 
-A auditoria anterior corrigiu duplicatas sem SHA, hash em streaming, revalidação antes de operação, fallback MediaStore, accounting de Lixeira/bytes e estado Billing. Nesta fase foi provisionado SDK 36, corrigido erro de formato do resumo OaaS, adicionadas regras de backup Android 12+, ícone monocromático e VC14/2.1.1; branding Midiastore preserva pacote/namespace/SKUs.
+Há uma baseline anterior de 03/11/2026 com 58 testes de domínio, 7 testes JVM do app, Lint e build Debug bem-sucedidos. Essa evidência pertence à versão anterior, não à branch de recuperação.
 
-## Pesquisa e decisões de produto
+Na recuperação houve:
+- falha inicial de CI por caminho fixo de JDK, já removido;
+- falha instrumentada MediaStore em emulador Android 15, ainda sem diagnóstico conclusivo;
+- teste JVM com expectativa de marca antiga, corrigido;
+- múltiplos workflows intermediários cancelados à medida que os commits eram atualizados.
 
-- Mercado: cinco concorrentes, snapshots de nota/`ratingCount` e 25 avaliações recentes en-US (cinco por produto), coletadas de 29/10 a 02/11/2026. Amostra pequena, não aleatória e não representativa. Sinais pontuais: compatibilidade de atualização/OEM, espaço recuperado percebido e clareza de assinatura.
-- Open source: SD Maid SE GPL-3.0 ativo; Clearo MIT, mas recente/pequeno e suas capacidades vêm do README, não de validação; Fossify Gallery GPL-3.0 ativo. Nenhum código/dependência foi incorporado. Sem CVE/Dependabot completo, não declarar repositórios livres de vulnerabilidades.
-- Storage Forecast marcou 82/100 como oportunidade, mas ficou em estratégia/backlog; previsão requer histórico local suficiente, transparência e validação. Similaridade visual é candidata de próxima etapa, sempre com revisão humana.
-- Os documentos de estratégia, mercado, GitHub, arquitetura, segurança, roadmap, monetização e testes estão em `docs/`.
-- O script `scripts/build_signed_aab.sh` e `.github/workflows/android.yml` agora definem build assinado manual com secrets e exportação APK/AAB/checksums. Ambos precisam de validação de sintaxe/execução antes de uso; o workflow exige Environment protegido `play-release`.
+A aprovação deve ser verificada somente no workflow do HEAD atual da PR #3. Um run antigo, cancelado ou ainda pendente não é prova de aprovação.
 
-## Testes e builds
+Nenhum teste de compra real, restore/reembolso/expiração, limpeza em aparelho Samsung/Motorola/Xiaomi, matriz API29–36 ou teste físico de desempenho foi concluído nesta recuperação.
 
-Linha de base executada sem `clean`, com Gradle 8.13, AGP 8.13.2, Kotlin 2.3.21, JDK 17.0.17, SDK 36 e Build Tools 35.0.0:
+## Bloqueadores de Release
 
-```bash
-JAVA_HOME=/usr/local/sdkman/candidates/java/17.0.17-ms \
-ANDROID_HOME=/tmp/tmp.Pnk13LDOXN/android-sdk \
-ANDROID_SDK_ROOT=/tmp/tmp.Pnk13LDOXN/android-sdk \
-./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug \
-  :app:assembleDebug :app:assembleDebugAndroidTest
-```
+1. CI verde no HEAD exato da PR #3, incluindo teste instrumentado Android 35.
+2. Diagnóstico e correção do teste MediaStore instrumentado.
+3. Provar varredura global e fail-closed em datasets grandes.
+4. Validar o fluxo recém-implementado de exclusão permanente API29 via RecoverableSecurityException em emulador e aparelho físico; Lixeira/restauração permanecem API30+.
+5. Confirmar SKUs, tipos, ofertas, países e preços no Play Console.
+6. Implementar validação de purchaseToken por backend confiável / Google Play Developer API.
+7. Testar billing completo com license testers.
+8. Confirmar maior versionCode publicado, chave/certificado de upload e assinatura.
+9. Testar em aparelhos físicos e revisar acessibilidade, privacidade e Data Safety.
 
-Resultado Debug final: `BUILD SUCCESSFUL`, 82 tarefas; domínio 58/58, app JVM 7/7; APK Debug e APK de testes instrumentados compilados. Lint passou sem erros, com 76 warnings remanescentes. Release: `compileReleaseKotlin`, `lintRelease`, `assembleRelease` e `bundleRelease` concluíram com sucesso usando JDK 17, SDK 36, Gradle heap 1.4 GB e chave de validação em `/tmp`. Bundletool 1.18.3 validou o AAB e confirmou VC14/2.1.1; apksigner e jarsigner retornaram sucesso. O warning SDK XML v4 persiste.
+## Segurança da cadeia de Release
 
-Não executados: `:app:connectedDebugAndroidTest`, testes de compra real, MediaStore em aparelhos/OEMs, API 37 ou performance. O scanner de credenciais gitleaks/trufflehog não está instalado; regex e busca por nomes não encontraram hits. A assinatura temporária não autoriza distribuição Play.
+O script Windows scripts/preparar_release.ps1 agora só bloqueia Release e não toca no package. A rotina Windows principal executa apenas testes/Debug. A geração assinada está reservada ao environment protegido play-release.
 
-## Artefatos
+Secrets requeridos pelo workflow:
+- SWEEP_KEYSTORE_BASE64
+- SWEEP_STORE_PASSWORD
+- SWEEP_KEY_ALIAS
+- SWEEP_KEY_PASSWORD
+- MIDIASTORE_RELEASE_APPROVED = YES
+- MIDIASTORE_MAX_PUBLISHED_VERSION_CODE (maior versionCode já publicado; o source precisa ser estritamente maior)
+- MIDIASTORE_EXPECTED_CERT_SHA256
 
-- APK Debug: `app/build/outputs/apk/debug/app-debug.apk`.
-- APK AndroidTest: `app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk`.
-- APK Release de validação: `Midiastore-2.1.1-VC14-VALIDATION-ONLY.apk`; SHA-256 `8b6ba0de35871776144a672fa348e9f3540abfcfb1bf2e2c1e13edb07795666e`.
-- AAB Release de validação: `Midiastore-2.1.1-VC14-VALIDATION-ONLY.aab`; SHA-256 `aa09330939b0b4c8a6046920849e663ec4a55d371075228ff019e043256b7116`.
+Não criar chave temporária nem inserir credenciais privadas no ZIP, APK, repositório ou chat.
 
-Não enviar os artefatos `VALIDATION-ONLY` à Play; estão assinados por chave efêmera. O script/workflow de produção usa secrets protegidos, mas ainda não foi executado com a chave legítima.
+## Conclusão
 
-## Pendências P0
+O repositório está em recuperação controlada. O próximo marco é CI verde, diagnóstico instrumentado e validação física. Até lá, não solicitar nova rodada de teste do usuário nem enviar atualização à Google Play.
 
-1. Conferir branch, lista staged e diff, então concluir commit local; não fazer push.
-2. Corrigir/avaliar warnings restantes de Lint e versões de dependências (inclui Billing 8.0.0 vs 9.1.0 sugerida) com changelog/testes, sem upgrade indiscriminado.
-3. Executar `compileReleaseKotlin`/Lint Release; obter/verificar identidade e certificado de upload com proprietário; produzir APK/AAB assinado apenas com chave legítima; validar localmente o novo script/workflow.
-4. Rodar instrumentação em emuladores/dispositivos API 29–36 e matriz Samsung/Motorola/Xiaomi; incluir acesso parcial, alteração/revogação, MediaStore fallback, cancelamento, consentimento e resultado.
-5. Confirmar Play Console: versão publicada, SKUs/tipos/benefícios e disponibilidade. Implementar validação de compras confiável; campos de assinatura presentes no cliente não validam criptograficamente o token.
-6. Auditar manifesto mesclado, targetSdk/política, permissão ampla de mídia, privacidade/Data Safety, billing, licenças de dependências, CVEs/SBOM, R8 e instalação/upgrade.
-7. Confirmar política Play para API 36 e consultar prazo oficial de API 37 antes da próxima atualização. A página oficial observada diz API 36; a data futura de API 37 não foi confirmada nesta pesquisa.
-8. Concluir acessibilidade/layouts pequenos/tablet/dobrável, testes reais de armazenamento, Billing e medições de CPU/memória/bateria.
+## Atualização de continuidade — 04/11/2026
 
-Só depois desses gates mudar o status para pronto para envio. Nenhuma publicação automática foi feita.
+O posicionamento confirmado é Phone Cleaner com modelo Freemium. O cartão principal de armazenamento foi corrigido para medir o volume compartilhado primário. Quatro testes de domínio foram adicionados, mas ainda dependem de execução no CI. A pesquisa de mercado e tecnologia reforça que o diferenciador deve ser confiança, clareza de cobertura e prova de recuperação real, não a quantidade de ferramentas.
+
+A PR #3 permanece Draft, sem merge. O workflow do HEAD documentado anteriormente estava queued; não declarar build aprovado. Nenhum AAB assinado ou publicação foi produzido.
+
+## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+
+- Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
+- PR #3: aberta, Draft, base `main`, não merged.
+- `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
+- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
+- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+
+## Jornada principal Phone Cleaner — atualização de 04/11/2026
+
+A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
+
+A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.

@@ -1,22 +1,32 @@
-# Verifica pré-requisitos do ambiente Windows para o projeto Sweep
+# Verifica pré-requisitos para compilar o Midiastore no Windows.
 $ErrorActionPreference = "Stop"
-Write-Host "=== [1/7] Verificando ambiente Windows para o Sweep ===" -ForegroundColor Cyan
+Write-Host "=== Verificando ambiente Windows do Midiastore ===" -ForegroundColor Cyan
 
 $javaCmd = Get-Command java -ErrorAction SilentlyContinue
 if (-not $javaCmd) {
-    Write-Host "ERRO: Java (JDK 17) não encontrado no PATH." -ForegroundColor Red
-    exit 1
+    throw "Java/JDK 17 não encontrado no PATH."
 }
-Write-Host "Java encontrado: $($javaCmd.Source)" -ForegroundColor Green
+$javaVersionText = (& java -version 2>&1 | Out-String)
+if ($javaVersionText -notmatch 'version\s+"17([\.]|")') {
+    Write-Host $javaVersionText -ForegroundColor Yellow
+    throw "O build requer JDK 17. A versão detectada não é 17."
+}
+Write-Host "JDK 17 encontrado: $($javaCmd.Source)" -ForegroundColor Green
 
-if (Test-Path "local.properties") {
-    Write-Host "local.properties encontrado." -ForegroundColor Green
+$sdk = $env:ANDROID_SDK_ROOT
+if ([string]::IsNullOrWhiteSpace($sdk)) { $sdk = $env:ANDROID_HOME }
+if ([string]::IsNullOrWhiteSpace($sdk) -and (Test-Path ".\local.properties")) {
+    $line = Get-Content ".\local.properties" | Where-Object { $_ -match '^sdk\.dir=' } | Select-Object -First 1
+    if ($line) {
+        $sdk = $line.Substring($line.IndexOf('=') + 1)
+        $sdk = $sdk.Replace('\:', ':').Replace('\\', '\')
+    }
+}
+if ([string]::IsNullOrWhiteSpace($sdk) -or -not (Test-Path (Join-Path $sdk "platform-tools"))) {
+    Write-Host "AVISO: Android SDK não detectado. Configure ANDROID_SDK_ROOT ou local.properties." -ForegroundColor Yellow
 } else {
-    Write-Host "AVISO: local.properties não encontrado na pasta atual." -ForegroundColor Yellow
+    Write-Host "Android SDK: $sdk" -ForegroundColor Green
 }
 
-if ((Test-Path "sweep-upload.jks") -or (Test-Path "app\sweep-upload.jks")) {
-    Write-Host "Chave de assinatura sweep-upload.jks encontrada." -ForegroundColor Green
-} else {
-    Write-Host "AVISO: sweep-upload.jks não encontrada na pasta atual." -ForegroundColor Yellow
-}
+Write-Host "Chave de upload não é necessária para testes Debug." -ForegroundColor Green
+Write-Host "Release/AAB permanece bloqueado nesta rotina local." -ForegroundColor Yellow

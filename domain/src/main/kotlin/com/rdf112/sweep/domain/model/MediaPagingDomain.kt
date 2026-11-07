@@ -9,6 +9,8 @@ data class MediaPageRequest(
     val volumeName: String,
     val offset: Int,
     val pageSize: Int = DEFAULT_PAGE_SIZE,
+    /** Skip per-page duplicate hashing when a global mission will hash cross-page groups. */
+    val hashSameSizeCandidates: Boolean = true,
 ) {
     init {
         require(sessionId.isNotBlank()) { "sessionId must not be blank" }
@@ -22,6 +24,30 @@ data class MediaPageRequest(
         const val DEFAULT_PAGE_SIZE = 100
         const val MAX_PAGE_SIZE = 500
     }
+}
+
+/**
+ * Records what the MediaStore provider explicitly confirms about page and sort arguments.
+ * Missing EXTRA_HONORED_ARGS is unknown evidence, not proof that the provider ignored them.
+ */
+data class MediaPagingEvidence(
+    val honoredArgsReported: Boolean,
+    val limitHonored: Boolean,
+    val offsetHonored: Boolean,
+    val sortColumnsHonored: Boolean,
+    val sortDirectionHonored: Boolean,
+) {
+    val isFullyHonored: Boolean
+        get() = honoredArgsReported && limitHonored && offsetHonored &&
+            sortColumnsHonored && sortDirectionHonored
+
+    /** Safe only when the provider explicitly says both LIMIT and OFFSET are ignored. */
+    val canUseCursorOffsetFallback: Boolean
+        get() = honoredArgsReported && !limitHonored && !offsetHonored
+
+    /** We can advance only when OFFSET is confirmed or a full cursor fallback is confirmed. */
+    val canAdvanceToNextOffset: Boolean
+        get() = offsetHonored || canUseCursorOffsetFallback
 }
 
 enum class MediaPageOutcome {
@@ -38,6 +64,7 @@ enum class PageIssueCode {
     NULL_CURSOR,
     INVALID_ROW,
     PAGING_UNSUPPORTED,
+    PAGING_ARGS_UNVERIFIED,
     SESSION_STALE,
     ACCESS_CHANGED,
     VOLUME_CHANGED,

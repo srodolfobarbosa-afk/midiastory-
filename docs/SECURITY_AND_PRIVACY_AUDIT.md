@@ -47,3 +47,11 @@ A consulta falha deve permanecer `RECONCILIATION_REQUIRED`; produto explicitamen
 5. Scanner tem fallback local sem extras, mas custo aumenta em offsets profundos e estabilidade concorrente de biblioteca não é transacional.
 6. Hash completo de itens candidatos pode aumentar CPU/tempo/bateria; medir em bibliotecas grandes e fornecer cancelamento.
 7. Política de privacidade, Data safety, permissões Play e licenças de todas as dependências precisam ser confrontadas com o binário final.
+
+## Política de permissões e medição — 04/11/2026
+
+O manifesto da branch declara permissões de leitura de mídia e acesso parcial selecionado para Android 14+, mas não declara MANAGE_EXTERNAL_STORAGE. Manter esse limite. O Google Play restringe All files access e exige declaração quando aplicável; para READ_MEDIA_IMAGES/VIDEO, é necessário demonstrar que o acesso amplo serve a uma função central e que Photo Picker não é suficiente. Downloads/documentos específicos devem usar SAF.
+
+O posicionamento Phone Cleaner pode justificar análise da biblioteca inteira se isso for realmente a função principal; não garante aprovação da Play. A declaração precisa explicar a necessidade de cada permissão e a interface deve acomodar usuários que concedem acesso parcial ou negam a permissão.
+
+O medidor agora consulta o armazenamento compartilhado principal; não afirmar que inclui automaticamente cartão SD/USB. Fontes: [política All files access](https://support.google.com/googleplay/android-developer/answer/10467955), [política de fotos e vídeos](https://support.google.com/googleplay/android-developer/answer/16935362), [SAF](https://developer.android.com/guide/topics/providers/document-provider).

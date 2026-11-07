@@ -1,5 +1,6 @@
 package com.rdf112.sweep.presentation.scan
 
+import com.rdf112.sweep.domain.oaas.DesiredOutcomeMission
 import com.rdf112.sweep.domain.model.AccessLevel
 import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaPage
@@ -142,8 +143,220 @@ class MediaScanViewModelTest {
         val first = requireNotNull(viewModel.state.value.currentPage).records.single()
         viewModel.setSelected(first, true)
         val summary = requireNotNull(viewModel.buildReviewSummaryExportText())
-        assertTrue(summary.contains("Midiastores"))
+        assertTrue(summary.contains("Midiastore"))
         assertTrue(summary.contains("same.jpg"))
+    }
+
+    @Test
+    fun globalDuplicateMissionFindsMatchingFilesAcrossDifferentPages() = runTest {
+        val repository = GlobalMissionFakeRepository()
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        assertEquals(ScanUiStatus.READY, viewModel.state.value.status)
+
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        val plan = requireNotNull(progress.plan)
+        assertTrue(progress.coverageComplete)
+        assertEquals(4, progress.pagesProcessed)
+        assertEquals(2L, progress.recordsExamined)
+        assertEquals(1, plan.protectedReferencesKept)
+        assertEquals(1, plan.autoSelectedRecords.size)
+        assertEquals(1, viewModel.state.value.selection.size)
+        assertTrue(plan.autoSelectedRecords.single().uri.endsWith("/second"))
+    }
+
+    @Test
+    fun globalMissionLabelsCoveragePartialWhenAProviderPageFails() = runTest {
+        val repository = GlobalMissionFakeRepository(failVideoSource = true)
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        assertTrue(!progress.coverageComplete)
+        assertTrue(progress.warningCount > 0)
+        assertEquals(ScanUiStatus.PARTIAL, viewModel.state.value.status)
+    }
+
+    @Test
+    fun globalMissionReportsUnverifiedPagingAndKeepsCoveragePartial() = runTest {
+        val repository = GlobalMissionFakeRepository(unverifiedPagingArgs = true)
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        assertTrue(!progress.coverageComplete)
+        assertEquals("paging_args_unverified", progress.message)
+        assertEquals(ScanUiStatus.PARTIAL, viewModel.state.value.status)
+        assertTrue(progress.warningCount > 0)
+    }
+
+    @Test
+    fun globalDuplicateMissionDoesNotPrepareDeletionWhenAnySourceIsUnverified() = runTest {
+        val repository = GlobalMissionFakeRepository(failVideoSource = true)
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        val plan = requireNotNull(progress.plan)
+        assertTrue(!progress.coverageComplete)
+        assertTrue(plan.autoSelectedRecords.isEmpty())
+        assertTrue(viewModel.state.value.selection.isEmpty)
+    }
+
+    @Test
+    fun globalDuplicateMissionStopsAtHashBudgetAndDoesNotSelectAnyFiles() = runTest {
+        val repository = GlobalMissionFakeRepository(
+            imageRecordCount = 6,
+            imageFileSizeBytes = 2L * 1024L * 1024L * 1024L,
+        )
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        val progress = requireNotNull(viewModel.state.value.missionProgress)
+        val plan = requireNotNull(progress.plan)
+        assertTrue(!progress.coverageComplete)
+        assertTrue(plan.autoSelectedRecords.isEmpty())
+        assertTrue(viewModel.state.value.selection.isEmpty)
+        assertTrue(progress.warningCount > 0)
+    }
+
+    @Test
+    fun globalMissionCanRemoveASelectedRecordThatIsNotOnTheCurrentPage() = runTest {
+        val repository = GlobalMissionFakeRepository()
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        val selected = requireNotNull(viewModel.state.value.selection.records.singleOrNull())
+        viewModel.setSelected(selected, false)
+        assertTrue(viewModel.state.value.selection.isEmpty)
+    }
+
+    private class GlobalMissionFakeRepository(
+        private val failVideoSource: Boolean = false,
+        private val unverifiedPagingArgs: Boolean = false,
+        private val imageRecordCount: Int = 2,
+        private val imageFileSizeBytes: Long = 12L * 1024L * 1024L,
+    ) : MediaPageRepository {
+        private val volume = "external_primary"
+        private val access = mapOf(
+            MediaKind.IMAGE to AccessLevel.FULL,
+            MediaKind.VIDEO to AccessLevel.FULL,
+            MediaKind.AUDIO to AccessLevel.FULL,
+        )
+        private val session = MediaScanSession(
+            id = "global-mission-session",
+            startedAtEpochMillis = 1L,
+            accessByKind = access,
+            volumeNames = setOf(volume),
+            revisionsByVolume = mapOf(volume to MediaSourceRevision("test-provider", 1L)),
+        )
+
+        override suspend fun createSession(): MediaScanSession = session
+        override suspend fun assessSession(session: MediaScanSession): SessionFreshness =
+            SessionFreshness.REVISION_UNCHANGED
+
+        override suspend fun computeSha256(uri: String): String? = "f".repeat(64)
+
+        override suspend fun loadPage(
+            session: MediaScanSession,
+            request: MediaPageRequest,
+        ): MediaPage {
+            if (failVideoSource && request.kind == MediaKind.VIDEO) {
+                return MediaPage(
+                    request = request,
+                    records = emptyList(),
+                    rowsRead = 0,
+                    providerTotalCount = null,
+                    nextOffset = null,
+                    outcome = MediaPageOutcome.FAILED,
+                    issues = listOf(
+                        com.rdf112.sweep.domain.model.PageIssue(
+                            com.rdf112.sweep.domain.model.PageIssueCode.PROVIDER_FAILURE,
+                            request.kind,
+                            request.volumeName,
+                        )
+                    ),
+                )
+            }
+            if (request.kind != MediaKind.IMAGE) {
+                return MediaPage(
+                    request = request,
+                    records = emptyList(),
+                    rowsRead = 0,
+                    providerTotalCount = 0L,
+                    nextOffset = null,
+                    outcome = MediaPageOutcome.END_OF_SOURCE,
+                )
+            }
+
+            if (request.offset !in 0 until imageRecordCount) {
+                return MediaPage(
+                    request = request,
+                    records = emptyList(),
+                    rowsRead = 0,
+                    providerTotalCount = imageRecordCount.toLong(),
+                    nextOffset = null,
+                    outcome = MediaPageOutcome.END_OF_SOURCE,
+                )
+            }
+            val id = when (request.offset) {
+                0 -> "first"
+                1 -> "second"
+                else -> "image-${request.offset}"
+            }
+            val record = MediaRecord(
+                uri = "content://media/$volume/images/$id",
+                volumeName = volume,
+                kind = MediaKind.IMAGE,
+                displayName = "$id.jpg",
+                mimeType = "image/jpeg",
+                sizeBytes = imageFileSizeBytes,
+                dateModifiedEpochSeconds = 100L + request.offset,
+            )
+            val more = request.offset < imageRecordCount - 1
+            return MediaPage(
+                request = request,
+                records = listOf(record),
+                rowsRead = 1,
+                providerTotalCount = imageRecordCount.toLong(),
+                nextOffset = if (more) request.offset + 1 else null,
+                outcome = if (more) MediaPageOutcome.MORE_AVAILABLE else MediaPageOutcome.END_OF_SOURCE,
+                issues = if (unverifiedPagingArgs) {
+                    listOf(
+                        com.rdf112.sweep.domain.model.PageIssue(
+                            com.rdf112.sweep.domain.model.PageIssueCode.PAGING_ARGS_UNVERIFIED,
+                            request.kind,
+                            request.volumeName,
+                        )
+                    )
+                } else emptyList(),
+            )
+        }
     }
 
     private class FakePageRepository(
