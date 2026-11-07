@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Almacenamiento bajo tu control.</string>
     <string name="hero_title">Descubre qué ocupa espacio en tu teléfono.</string>
     <string name="hero_subtitle">Encuentra archivos grandes y copias exactas. Revisa cada sugerencia antes de cambiar nada.</string>

@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Midiastores"
-include(":app", ":domain")
+include(":app", ":domain", ":mediaOwnerTest")

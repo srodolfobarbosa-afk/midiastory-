@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">A cleaner phone. More space back.</string>
     <string name="hero_title">Free up space on your phone.</string>
     <string name="hero_subtitle">Find large files and duplicate copies. Review everything before cleanup. Your media is analyzed on your device.</string>
@@ -123,7 +124,7 @@ Total: %3$s</string>
     <string name="oaas_consent_required">Check the option above to save your suggestion.</string>
     <string name="oaas_clear_telemetry_button">Clear local history</string>
     <string name="space_accounting_title">SPACE SUMMARY</string>
-    <string name="space_metrics_summary">• Potentially recoverable on this page: %1$s\n• User authorized: %3$s\n• Space actually freed after deletion: %4$s</string>
+    <string name="space_metrics_summary">• Potentially recoverable on this page: %1$s\n• Prepared for review: %2$s\n• User authorized: %3$s\n• Space actually freed after deletion: %4$s</string>
     <string name="pro_status_reconciliation">Checking purchases with Google Play…</string>
     <string name="plan_unavailable">Plan currently unavailable</string>
     <string name="billing_launch_not_ready">Google Play has not loaded this plan yet. Check your connection, wait a few seconds, and try again.</string>

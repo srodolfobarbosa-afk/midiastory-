@@ -371,7 +371,7 @@ class MainActivity : AppCompatActivity() {
         topBar.addView(brandCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
 
         topProPill = MaterialButton(this).apply {
-            text = "PRO"
+            text = getString(R.string.pro_badge)
             isAllCaps = false
             textSize = 12f
             typeface = Typeface.DEFAULT_BOLD

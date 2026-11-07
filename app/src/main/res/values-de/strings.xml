@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Dein Speicher. Deine Kontrolle.</string>
     <string name="hero_title">Finde heraus, was den Speicher deines Handys belegt.</string>
     <string name="hero_subtitle">Finde große Dateien und exakte Kopien. Prüfe jeden Vorschlag, bevor etwas geändert wird.</string>

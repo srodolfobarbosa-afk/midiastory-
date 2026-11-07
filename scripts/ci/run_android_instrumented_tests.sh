@@ -28,6 +28,7 @@ api=""
 boot=""
 package_service=""
 activity_service=""
+external_volumes=""
 for attempt in $(seq 1 90); do
   if [[ -z "$serial" ]]; then
     serial="$(adb devices | awk '$1 ~ /^emulator-/ && $2 == "device" { print $1; exit }' || true)"
@@ -38,6 +39,7 @@ for attempt in $(seq 1 90); do
     boot="$(adb -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
     package_service="$(adb -s "$serial" shell service check package 2>&1 || true)"
     activity_service="$(adb -s "$serial" shell service check activity 2>&1 || true)"
+    external_volumes="$(adb -s "$serial" shell sm list-volumes all 2>&1 | tr -d '\r' || true)"
   else
     state=""
     api=""
@@ -50,7 +52,8 @@ for attempt in $(seq 1 90); do
         "$api" == "$expected_api" &&
         "$boot" == "1" &&
         "$package_service" == *": found"* &&
-        "$activity_service" == *": found"* ]]; then
+        "$activity_service" == *": found"* &&
+        "$external_volumes" =~ (^|$'\n')emulated\;[0-9]+[[:space:]]+mounted ]]; then
     ready=true
     break
   fi
@@ -62,7 +65,46 @@ if [[ "$ready" != true ]]; then
   exit 1
 fi
 
-echo "Emulator ready: serial=$serial api=$api package_service=found activity_service=found"
+echo "Emulator ready: serial=$serial api=$api package_service=found activity_service=found external_storage=mounted"
+
+if (( expected_api >= 34 )); then
+  debug_package="com.rdf112.midiastore.debug"
+  selected_permission="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+  visual_permissions=(
+    "android.permission.READ_MEDIA_IMAGES"
+    "android.permission.READ_MEDIA_VIDEO"
+    "android.permission.READ_MEDIA_AUDIO"
+  )
+  adb -s "$serial" install -r app/build/outputs/apk/debug/app-debug.apk \
+    > "$diagnostics_dir/permission-precondition-install.txt" 2>&1
+  for permission in "${visual_permissions[@]}"; do
+    adb -s "$serial" shell pm revoke "$debug_package" "$permission" || true
+  done
+  adb -s "$serial" shell pm revoke "$debug_package" "$selected_permission" || true
+  adb -s "$serial" shell pm grant "$debug_package" "$selected_permission"
+
+  permission_state="$(adb -s "$serial" shell dumpsys package "$debug_package")"
+  for permission in "${visual_permissions[@]}"; do
+    if grep -F "$permission: granted=true" <<< "$permission_state" >/dev/null; then
+      capture_diagnostics "Partial-access precondition failed: $permission is still granted"
+      exit 1
+    fi
+  done
+  if ! grep -F "$selected_permission: granted=true" <<< "$permission_state" >/dev/null; then
+    capture_diagnostics "Partial-access precondition failed: $selected_permission is not granted"
+    exit 1
+  fi
+  echo "Prepared isolated API${expected_api} Selected Photos permission state"
+  ./gradlew --no-daemon \
+    "-Pandroid.testInstrumentationRunnerArguments.class=com.rdf112.sweep.data.media.MediaStorePagingInstrumentedTest#aSelectedVisualPermissionIsReportedAsPartialCoverage" \
+    :app:connectedDebugAndroidTest 2>&1 | tee "$diagnostics_dir/selected-visual-permission.log"
+
+  for permission in "${visual_permissions[@]}"; do
+    adb -s "$serial" shell pm revoke "$debug_package" "$permission" || true
+  done
+  adb -s "$serial" shell pm revoke "$debug_package" "$selected_permission" || true
+fi
+
 ./gradlew --no-daemon :app:connectedDebugAndroidTest 2>&1 | tee "$diagnostics_dir/connectedDebugAndroidTest.log"
 
 python3 - "$diagnostics_dir/instrumented-test-summary.txt" <<'PY'

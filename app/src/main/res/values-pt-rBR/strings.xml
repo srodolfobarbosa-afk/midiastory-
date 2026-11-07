@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Seu celular mais leve. Seu espaço de volta.</string>
     <string name="hero_title">Recupere espaço no seu celular.</string>
     <string name="hero_subtitle">Encontre arquivos grandes e cópias repetidas. Revise tudo antes de limpar. Suas mídias são analisadas no próprio aparelho.</string>
@@ -123,7 +124,7 @@ Total: %3$s</string>
     <string name="oaas_consent_required">Marque a opção acima para salvar sua sugestão.</string>
     <string name="oaas_clear_telemetry_button">Apagar histórico local</string>
     <string name="space_accounting_title">RESUMO DE ESPAÇO</string>
-    <string name="space_metrics_summary">• Potencialmente recuperável nesta página: %1$s\n• Autorizado pelo usuário: %3$s\n• Espaço efetivamente liberado após exclusão: %4$s</string>
+    <string name="space_metrics_summary">• Potencialmente recuperável nesta página: %1$s\n• Preparado para revisão: %2$s\n• Autorizado pelo usuário: %3$s\n• Espaço efetivamente liberado após exclusão: %4$s</string>
     <string name="pro_status_reconciliation">Verificando compras na Google Play…</string>
     <string name="plan_unavailable">Plano indisponível no momento</string>
     <string name="billing_launch_not_ready">A Google Play ainda não carregou esse plano. Verifique sua conexão, aguarde alguns segundos e tente novamente.</string>

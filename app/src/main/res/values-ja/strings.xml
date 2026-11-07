@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">ストレージをあなたの手で管理。</string>
     <string name="hero_title">スマートフォンの容量を使っているものを確認しましょう。</string>
     <string name="hero_subtitle">大きなファイルと完全なコピーを見つけ、変更する前に提案内容を確認できます。</string>

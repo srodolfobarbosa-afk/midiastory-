@@ -1,6 +1,7 @@
 package com.rdf112.sweep.data.media
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
@@ -144,6 +145,7 @@ class AndroidMediaPageRepository(
         }
     }
 
+    @SuppressLint("InlinedApi")
     private fun readAccessSnapshot(): Map<MediaKind, AccessLevel> {
         val granted = buildSet {
             listOf(

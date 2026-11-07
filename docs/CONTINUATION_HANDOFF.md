@@ -1,5 +1,53 @@
 # Midiastore — CONTINUIDADE DO PROJETO
 
+## Direção de produto confirmada pelo proprietário — 2026-11-06
+
+- Rodolfo confirmou que o objetivo é um phone cleaner simples e confiável, inspirado na facilidade de uso do Files do Google: ajudar pessoas com o telefone cheio de conteúdo a encontrar o que ocupa espaço e liberar armazenamento sem perda acidental.
+- Rodolfo autorizou explicitamente publicar no GitHub as atualizações do workspace; publicar após revisar e reconciliar os três commits remotos mais recentes, mantendo a PR em Draft e sem fazer merge ou release.
+- Modelo pretendido: um plano gratuito e três opções pagas. O código-fonte existente nomeia as opções Pro mensal, anual e vitalícia; IDs e preços ainda dependem de confirmação no Play Console. Não inventar preços ou prometer recursos não implementados.
+- Referências públicas pesquisadas: [Android Now in Android](https://github.com/android/nowinandroid) para arquitetura e testes; [SpaceSweep](https://github.com/Dhiva-Labs/SpaceSweep) e [Quarry](https://github.com/tanvirr007/quarry-app) para ideias de apresentação de espaço e revisão de limpeza. São referências de leitura, não dependências nem validação das alegações de seus autores. Manter a arquitetura Android Views existente e adotar somente padrões compatíveis com as permissões e limites do Midiastore.
+- Prioridades até a publicação: confiabilidade da varredura e cobertura parcial explícita; seleção e exclusão sempre revisadas pelo usuário; acessibilidade e português/inglês; CI e testes reais; verificação de compra via backend e configuração Play. Não anunciar limpeza de cache de outros apps, fotos semelhantes, acelerador ou outras funções sem implementação e validação.
+
+### Verificação executada nesta retomada
+
+- `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`: **BUILD SUCCESSFUL** em 7m43s; 114 tarefas (1 executada, 113 up-to-date). Gradle e Android caches foram direcionados para diretórios locais ignorados do repositório.
+- `:app:connectedDebugAndroidTest`: **não executado**; falhou em `:mediaOwnerTest:installDebug` com `No connected devices!`. Isso não é falha dos testes do app e também não é evidência de aprovação instrumentada.
+- `git diff --check` e `git diff --cached --check`: sem erros de whitespace.
+- Estado Git continua sem commit ou push nesta retomada; preservar arquivos locais e revisar o diff combinado antes de publicar.
+
+## Checkpoint confirmado — 2026-11-06 (continuação)
+
+- Estado Git: `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`, remoto de recuperação ainda no mesmo SHA conforme leitura anterior. Há mudanças staged, unstaged e untracked; preservadas. Não houve commit, push, reset, limpeza ou merge.
+- GitHub: PR #3 aberta como Draft; Issue #2 aberta. O workflow `42080940375` está associado ao SHA base anterior e não testa estas mudanças locais.
+- Dispositivo: Motorola moto g84 5G / Android 15 API35 / `0085353748`, reidentificado e online. Debug/helper/teste têm UIDs separados (10475/10476/10477; o auxiliar `.codex.test` ficou em 10478). Prova de UID no aparelho não é prova de API29 nem de owner MediaStore para a fixture estrangeira.
+- Builds locais: suite completa Domain, JVM, Lint, Debug, AndroidTest e helper passou; recompilação final dos testes também passou. Ver comandos/checksums/resultados detalhados no final de `docs/QUALITY_AND_TESTING.md` e `docs/DAILY_STATUS.md`.
+- AndroidJUnitRunner direto com APKs finais: MediaStore `OK (5 tests)`, incluindo acesso visual parcial, áudio independente, paginação/session, hash de conteúdo e ausência de fixtures residuais; classe Main `OK (3 tests)` no protocolo, mas 2 casos API29 foram ignorados, restando 1 caso executado. Isso valida apenas API35.
+- Gradle connected/UTP no mesmo AndroidTest APK falhou novamente sem XML/zero casos coletados (`Failed to receive the UTP test results`), enquanto ADB continuou online e o logcat pós-execução não mostra `AndroidRuntime` fatal. Log debug anterior aponta falha ao carregar chave PEM RSA no Netty/BouncyCastle do listener local gRPC do UTP; hipótese proximate de collector/host, não causa raiz comprovada. Resultado UTP permanece FAIL, runner direto PASS.
+- API29 consent estrangeiro permanece NOT RUN. Fixture auxiliar, confirmação MediaStore de owner, cancelamento, novo consentimento, aceite e confirmação pós-exclusão estão implementados e compilados; requer runner API29 Linux/host com virtualização existente. Não deduzir sucesso da compilação/UID/API35.
+- Artefatos desta sessão: `.local-test-results/2026-11-06/`; nenhuma mudança de assinatura, identidade, versão, pacote produção, compra ou dados pessoais.
+- O relatório `docs/RELATORIO_MIDIASTORE_RETOMADA_2026-11-06.md` não está presente localmente e não havia cópia equivalente encontrada; a missão e handoff existentes forneceram continuidade, sem criar documento duplicado. Consulta GitHub read-only final repetiu PR #3 OPEN/Draft em SHA `16545a4277bcc515660a6516c32fb6c770a4e880`, Issue #2 OPEN e run `42080940375` failure no SHA exato.
+
+### Próxima tarefa concreta
+
+Completar revisão integral e segura do diff combinado, preparar commit contendo apenas código/testes/docs intencionais (excluindo caches e capturas locais), e pedir uma autorização única de push para a branch da PR executar a matriz Linux API29/API35. Até essa autorização, continuar validação e correções locais sem push. Manter issue e PR como estão; P0 API29 e UTP continuam abertos.
+
+Nota de validação posterior: teste isolado com `ANDROID_USER_HOME` novo falhou na instalação do helper por keystore Debug diferente, antes da instrumentação. User home original restaurado; APK Debug/helper mantiveram hashes e AndroidTest reempacotado SHA `15344F181D5AAE73BF2945D84BF850220FD30DADE45005AABE91C7223F79DCD1` passou no runner direto (MediaStore 5 testes; Main protocolar 3, dois API29 ignorados). UTP FAIL anterior foi no AndroidTest SHA `D6F1C760...`, igualmente aprovado diretamente; não confundir com a tentativa de instalação incompatível. API29 segue NOT RUN.
+
+## Continuidade atualizada — 2026-11-06, após retomada
+
+- Diretório `C:\Users\rodolfo\midiastory-`; branch `codex/midiastore-release-audit`; HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`. Remote `origin` correto. Árvore continua com alterações staged, unstaged e untracked; nenhuma foi descartada. O AndroidTest atual recebeu uma alteração adicional de harness para detectar serviço de auto-click externo.
+- O teste API35 de exclusão/consentimento falhou intermitentemente porque um serviço externo habilitado (`com.truedevelopersstudio.automatictap.autoclicker`) toca na UI do sistema antes do UiAutomator. O log do MediaProvider registrou concessão automática; não é prova de cancelamento controlado. Os testes de consentimento agora ficam SKIP por assumption nesse ambiente, mantendo todas as assertions. Não alterar configuração global do aparelho.
+- Build completo atual PASS: Domain, app JVM, Lint, Debug, AndroidTest e helper, 114 tarefas/11 executadas. APKs: Debug SHA-256 `EAE637CEF8F581B65B5D8BCDEEF97ADBC4BA8699D38716BBA4A818AD6045091E`; AndroidTest `55EAA999F40E3F0424A2271A5265AADA08167D3C23611A3F52ABDBD13C20E3CD`; helper `B00066BF7FF33116216619D728453D0E38E8525DA0C6F5FD28C590976F5632A1`.
+- Runner direto atual no Motorola API35: classe MediaStore `OK (5 tests)` no protocolo, quatro métodos executados e o caso partial visual skipped por permissões preexistentes; executado novamente isolado após preparar via ADB visual-selected=true e image/video/audio=false, `OK (1 test)`. O estado original de permissões foi restaurado. Main `OK (4 tests)` no protocolo, com 1 caso funcional executado e 3 assumptions/skips. Não contar consentimento nem API29 como aprovados.
+- UTP mais recente, filtrado para MediaStore e usando APKs atuais, FAIL antes de coletar testes: HTML report `0 tests`, sem XML; `utp.0.log` fatal na inicialização. Investigação anterior de `--debug` registra erro de leitura de RSA PEM no listener gRPC local do AGP/UTP; hipótese de falha do coletor/host, causa raiz não confirmada.
+- API29 permanece NOT RUN. Emulador local não tem aceleração disponível; teste auxiliar precisa de API29 Linux para confirmar UID/owner no MediaStore, RecoverableSecurityException, cancelar, aprovar e verificar estado posterior.
+- Logs atualizados: `.local-test-results/2026-11-06/`. PR #3 permanece OPEN/Draft e Issue #2 OPEN; nenhum push/commit/merge nesta retomada.
+- A primeira consulta `gh` dentro do sandbox falhou pelo proxy local `127.0.0.1:9`; consulta read-only autorizada fora do sandbox confirmou novamente PR #3 OPEN/Draft, head `16545a4277bcc515660a6516c32fb6c770a4e880`, Issue #2 OPEN e workflow `42080940375` failure nesse SHA. Windows-script PASS; API29 e API35 FAIL na etapa instrumentada; signed-release SKIPPED.
+
+### Próxima tarefa concreta
+
+Revisar integralmente o diff combinado e separar somente alterações de projeto intencionais dos artefatos locais; depois solicitar autorização específica para push à branch da PR a fim de executar CI Linux/API29. Continuar independentemente a investigação da falha UTP e não fechar os gates de consentimento/API29 antes de resultados executados.
+
 Atualizado: 04/11/2026
 
 ## Identidade correta
@@ -166,3 +214,37 @@ The owner wants the assistant to act as the technical manager of the Midiastore 
 6. Keep the PR in Draft and do not merge, generate a production release AAB, or publish until release gates pass and the owner authorizes it.
 
 This section is the durable continuity checkpoint for future conversations. Continue from these exact facts and do not make the owner repeat them.
+
+## Retomada local — 2026-11-06
+
+- Workspace preservado na branch `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`, igual ao commit remoto confirmado. Existem alterações staged, unstaged e arquivos locais não rastreados da sessão anterior; nenhum foi descartado. PR #3 permanece Draft e Issue #2 não foi alterada.
+- As alterações anteriores de testes, fixture `mediaOwnerTest`, documentação de pesquisa e atualizações de dependências permanecem locais. A alteração unstaged para Core KTX 1.19.1 impedia o build: exige compileSdk 37 e AGP 9.1, incompatíveis com o SDK 36/AGP 8.13.2 deste projeto. Core KTX foi fixado em 1.17.0, mantendo as demais dependências e a configuração de identidade/versão.
+- Build local Windows passou: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`. Lint concluiu com issues existentes; build não significa relatório limpo.
+- No Motorola moto g84 5G (API 35, serial `0085353748`), `:app:connectedDebugAndroidTest` falhou no UTP sem receber resultados e gerou relatório com zero testes. Executando os APKs instalados pelo `AndroidJUnitRunner` via ADB, a suíte concluiu `OK (7 tests)`.
+- A primeira execução direta observou a geração MediaStore mudar durante consultas e o adapter retornar `SESSION_STALE` com `SOURCE_CHANGED` confirmado, sem registros ambíguos. Os testes de paginação/áudio agora reconhecem esse caso apenas quando a revisão realmente prova a mudança da fonte; resultados inesperados continuam falhando.
+- API29 ainda não foi validado: não há AVD API29 neste ambiente. O teste foi preparado para executar o consentimento com mídia criada por um app auxiliar de UID distinto e conferir a atribuição reportada pelo próprio MediaStore, mas requer execução real em API29. Não inferir resultado API29 a partir do moto g84/API35.
+
+## Continuação da validação — 2026-11-06
+
+- Branch `codex/midiastore-release-audit`, HEAD local e base remota `16545a4277bcc515660a6516c32fb6c770a4e880`. Árvore segue com mudanças staged/unstaged e arquivos novos; nada foi descartado ou enviado.
+- Consultas read-only confirmaram PR #3 aberta e Draft, Issue #2 aberta, workflow `42080940375` falho no SHA `16545a4`. Os artefatos locais `.local-ci-42080940375/` mostram que API29 falhou porque MediaStore atribuiu a fixture ao UID do app alvo; API35 falhou ao assumir `external_primary` antes de haver volume disponível e encerrou processo ao revogar permissões durante o teste.
+- Fixture API29 agora vem do provider de `:mediaOwnerTest`, pacote/UID separado, e a assertion consulta o owner real do MediaStore. Ainda falta executar em API29.
+- Testes API35 consultam volumes externos realmente anunciados pelo MediaStore. O teste de acesso parcial roda primeiro e exige permissões visuais/áudio negadas antes de conceder Selected Photos Access; não revoga permissão no processo.
+- Corrigida a assertion anterior: `SESSION_STALE` por si só não passa paginação. Imagem/áudio só terminam com sucesso após sessão estável; até três sessões são tentadas, cada invalidação precisa corresponder a `SOURCE_CHANGED`, e falha se todas permanecerem stale. Um resultado estável ainda precisa ser executado no aparelho.
+- `:app:compileDebugAndroidTestKotlin :app:assembleDebugAndroidTest` concluiu `BUILD SUCCESSFUL` após essa alteração (49 tarefas: 4 executadas, 45 up-to-date). O Kotlin daemon recebeu `AccessDeniedException` ao tentar escrever em `AppData\\Local\\kotlin\\daemon`; compilação usou fallback e terminou com sucesso.
+- Repetição `:app:connectedDebugAndroidTest -x :mediaOwnerTest:installDebug` reproduziu `Failed to receive the UTP test results`, com zero testes coletados. A conexão `adb` do serial `0085353748` desapareceu após a execução. O aparelho precisa ser reconectado para repetir o AndroidJUnitRunner direto e separar runner de coleta.
+- A tentativa local de emulador API29 chegou à falha explícita de aceleração x86_64: o driver de hypervisor não está instalado. Não instalar driver nem alterar proteções globais do Windows; API29 permanece bloqueado por ambiente.
+- Próxima tarefa: quando o Motorola retornar ao ADB, confirmar modelo/API/serial, reinstalar/verificar os APKs recém-compilados, limpar/conceder somente permissões do pacote Debug e executar primeiro o caso Selected Photos isolado, depois a suíte direta completa. Obter XML/logcat/códigos de saída do UTP em nova execução; retomar API29 em CI ou máquina com virtualização já habilitada.
+
+## Auditoria de recuperação — 2026-11-05
+
+- Branch local própria: `codex/midiastore-release-audit`, criada do `origin/fix/p0-sweep-permissions-missions-billing` em `16545a4277bcc515660a6516c32fb6c770a4e880`. A árvore estava limpa antes da auditoria. `main` segue em `3759e176c48f340fa576a06455579277e514d9d9`.
+- PR #3 permanece aberta como Draft, base `main`, não integrada. O trabalho local não foi enviado.
+- O último CI inspecionado, [run 42080940375](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/42080940375), passou JVM, Lint task, builds APK Debug/AndroidTest e parsing PowerShell. Instrumentação API29 e API35 falhou.
+- API29 criava a mídia pelo contexto que tinha o mesmo package/UID do Midiastore. Foi criado `:mediaOwnerTest` com package/UID separado, provider de teste protegido por permissão signature, conferência do owner retornado pelo MediaStore, consentimento Android, retry pós-`RESULT_OK` e verificação de ausência. O código compila, mas precisa rodar em API29.
+- API35 consultava `external_primary` enquanto o sistema ainda informava o volume como desmontável e o processo instrumentado acabou encerrado. Os testes e o runner CI agora aguardam a montagem real do volume, com timeout e diagnóstico. A correção ainda precisa de CI/API35 real.
+- Dependências atualizadas para versões estáveis: Core 1.17, AppCompat 1.8, Activity 1.13, Lifecycle 2.11, Coroutines 1.11, Material 1.14, AndroidX Test 1.7 e Billing 8.3. `billing-ktx` virou `billing`, pois o código usa API callback e não extensões KTX. AGP 8.13.2, Kotlin 2.3.21, Gradle 8.13, identidade e versão do app foram preservados.
+- Validação local Windows concluiu com sucesso: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest`, `:mediaOwnerTest:assembleDebug`. O relatório Lint contém 90 erros `MissingTranslation` e 94 warnings; o build segue porque `abortOnError=false`.
+- Não há imagens/AVDs API29 e API35 instaladas localmente e `adb devices` está vazio. Nenhum teste instrumentado foi executado após a correção.
+- Não há `keystore.properties` nem `sweep-upload.jks` local. O Release não foi executado e nenhuma chave foi gerada. A política de privacidade segue como draft sem URL pública; catálogo Billing, versão publicada máxima e certificado ainda dependem da Play Console.
+- Não fazer push, merge, despacho de workflow externo, build AAB de produção ou publicação sem autorização. PR continua Draft e release bloqueado até CI atualizado e gates de aparelho/Play Console.

@@ -1,6 +1,30 @@
 # Bloqueadores de release — Midiastore
 
+## Reavaliação da retomada — 2026-11-06
+
+- **API29: OPEN / NOT RUN.** Fixture auxiliar com UID independente e assertions do owner real estão compilados, mas sem execução API29. Fechar somente quando o runner API29 provar attribution, pedido recuperável, cancelamento sem remoção, aprovação, ausência da URI e bytes confirmados.
+- **Consentimento API30+: OPEN / SKIP no Motorola.** O teste direto API35 foi afetado por serviço de auto-click de terceiro habilitado no dispositivo, que tocou na janela de consentimento automaticamente. O harness agora pula esse cenário por assumption ambiental, sem relaxar assertions. Fechar com cancelamento e aprovação realmente observados em aparelho/emulador sem automação externa.
+- **UTP: OPEN / FAIL.** Execução filtrada mais recente no Motorola, com APK AndroidTest SHA `55EAA999F40E3F0424A2271A5265AADA08167D3C23611A3F52ABDBD13C20E3CD`, falhou antes de coletar casos; relatório indica 0 testes e não existe XML. Logs debug anteriores mostram falha de leitura RSA PEM no servidor local do listener UTP. Runner direto aprovado não resolve o gate do UTP.
+- **API35 MediaStore sem consentimento: PASS local limitado.** A classe reportou `OK (5 tests)`, mas o log mostrou 4 métodos executados e o caso partial skipped porque o pacote já tinha permissões totais. O caso Selected Photos foi então preparado via ADB e passou isoladamente (`OK (1 test)`); permissões Debug foram restauradas. Não valida API29, consentimento ou UTP.
+- A alteração de guard de auto-click é exclusivamente do harness de teste e foi compilada/testada no Motorola. Não altera configurações do dispositivo nem fluxo de produção.
+
+## Reavaliação após execução local — 2026-11-06
+
+- **P0 API29 segue aberto (NOT RUN).** App auxiliar agora cria fixture em UID separado; teste exige metadata `OWNER_PACKAGE_NAME` do MediaStore, leitura pelo alvo, consentimento recuperável, cancelamento sem remoção, novo pedido/aceite e verificação posterior da ausência da URI. Critério de fechamento: rodar o APK atual em API29 e observar todos esses estados, incluindo resultado por URI/bytes; CI em SHA atual também deve passar.
+- **P0 UTP segue aberto (FAIL do coletor).** No APK AndroidTest final, `connectedDebugAndroidTest` falha sem XML; execução direta no mesmo APK passou. Logs sugerem falha BouncyCastle/PEM no servidor de resultado local UTP, sem causa definitiva. Critério: obter XML/casos pelo UTP no runner suportado ou uma correção de toolchain e evidência separada do runner direto.
+- **API35 instrumentação local:** AndroidJUnitRunner direto passou 5 casos de MediaStore, com partial access efetivamente executado e fixtures sintéticas auditadas como removidas; Main passou Home e ignorou dois testes condicionais API29. Isso não substitui sucesso UTP/CI no commit atual.
+- **CI remoto permanece antigo:** run `42080940375` testa SHA `16545a4`, não as alterações locais. Necessário enviar o conjunto revisado à branch da PR com autorização do proprietário para executar CI API29/API35.
+- Demais gates de release — Lint findings, política/Data Safety, permissão ampla, Billing verificado por backend, Play Console, versionCode publicado e certificado legítimo — permanecem abertos conforme abaixo.
+
 **Estado: BLOQUEADO.** Não gerar nem submeter AAB de produção enquanto os gates P0 abaixo não estiverem fechados.
+
+## Estado de investigação local — 2026-11-06
+
+- Run remoto `42080940375` no SHA `16545a4` falhou em API29/API35. Os XML/logs foram baixados localmente para `.local-ci-42080940375/`; diagnóstico: fixture API29 pertencia ao UID do alvo, volume `external_primary` ainda não existia no momento das inserções API35 e o processo API35 foi encerrado após revogação de permissão durante o teste.
+- Correções locais: fixture API29 em app auxiliar com UID distinto e verificação do owner real; seleção de volume baseada no conjunto runtime do MediaStore; cenário de permissão parcial sem revogação durante processo. Esses testes ainda não foram repetidos na versão atual dos APKs.
+- Compilação AndroidTest atual passou. UTP no Motorola não coletou XML/testes e perdeu conexão ADB; execução direta anterior `OK (7 tests)` é de APK anterior e não fecha o gate atual.
+- API29 continua sem teste executado: emulator não iniciou por ausência de aceleração/hypervisor x86_64 neste host. A fixture corrigida ainda requer execução em API29.
+- Critério de fechamento segue sendo teste instrumentado API29/API35 no SHA candidato, com XML/logs associados e sem skips que ocultem cenário requerido; CI verde no SHA exato da PR continua obrigatório.
 
 ## Identidade e continuidade de atualização
 
@@ -68,3 +92,14 @@ A PR #3 é uma etapa de recuperação, não um release candidate.
 - GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
 - O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
 - Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+
+## Auditoria técnica — atualização 2026-11-05
+
+- PR #3 continua aberta como Draft. O trabalho atual é local e não foi enviado.
+- O run remoto [42080940375](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/42080940375) passou JVM, builds e parser Windows, mas falhou na instrumentação API29/API35. API29 atribuiu a fixture ao próprio Midiastore; API35 consultou MediaStore antes de `external_primary` montar.
+- A branch local adiciona app de fixture com UID independente, checa owner via MediaStore, executa a confirmação Android API29 e verifica o resultado após retry. Testes/runner aguardam o volume emulado montado. Tudo compila, mas ainda não rodou em aparelho/emulador.
+- Build local Windows passou testes JVM, Lint task, APK Debug, APK AndroidTest e APK auxiliar. Lint registra 90 erros `MissingTranslation` e 94 warnings, ocultos como gate pelo `abortOnError=false`.
+- O ambiente local tem JDK 17, SDK 36/Build Tools 35, mas nenhum dispositivo conectado ou system image API29/API35.
+- `targetSdk=36` atende a exigência vigente para novas submissões/atualizações a partir de 31/08/2026. A declaração e elegibilidade de `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO` seguem exigindo avaliação na Play Console. [Requisitos de API](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en) · [Declaração de permissões](https://support.google.com/googleplay/android-developer/answer/9214102?hl=en)
+- Billing 8.3.0 foi configurado; Billing 8 segue dentro do prazo de suporte para updates até 31/08/2027. Isso não comprova SKU, oferta, entitlement ou compra. [Prazos oficiais Billing](https://developer.android.com/google/play/billing/deprecation-faq)
+- Permanecem pendentes: nova execução CI API29/API35, validação em aparelhos físicos, política de privacidade pública e vinculada, Data Safety, catálogo/licenças Play, verificação server-side do purchaseToken, versãoCode publicada máxima e certificado. O Release/AAB não foi executado porque a chave legítima não está disponível.

@@ -42,7 +42,8 @@ class AndroidTrashOperationCoordinator(
     fun supportsSystemTrash(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     /** Android 10 supports permanent deletion through RecoverableSecurityException consent. */
-    fun supportsPermanentDelete(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    // minSdk is 29, where direct deletion and RecoverableSecurityException are available.
+    fun supportsPermanentDelete(): Boolean = true
 
     /**
      * Attempts one API 29 deletion. If the provider requires user consent, the caller must launch

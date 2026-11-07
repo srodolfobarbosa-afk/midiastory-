@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">आपका स्टोरेज, आपके नियंत्रण में।</string>
     <string name="hero_title">जानें कि आपके फ़ोन की जगह कौन ले रहा है।</string>
     <string name="hero_subtitle">बड़ी फ़ाइलें और सटीक कॉपियाँ ढूँढें। कुछ भी बदलने से पहले हर सुझाव देखें。</string>

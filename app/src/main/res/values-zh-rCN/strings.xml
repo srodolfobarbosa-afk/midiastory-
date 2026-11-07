@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="pro_badge">PRO</string>
     <string name="brand_tagline">存储空间，由你掌控。</string>
     <string name="hero_title">查看手机空间被什么占用。</string>
     <string name="hero_subtitle">查找大文件和完全相同的副本。进行任何更改前，先检查每项建议。</string>

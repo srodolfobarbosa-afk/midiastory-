@@ -1,5 +1,24 @@
 # Quality and Testing — Midiastore
 
+## Execução local final — 2026-11-06 — source não enviado, base SHA `16545a4277bcc515660a6516c32fb6c770a4e880`
+
+| Verificação | Estado | Evidência |
+|---|---|---|
+| Domain/JVM/Lint/Debug/AndroidTest/helper | PASS | `./gradlew.bat --no-daemon :domain:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleDebugAndroidTest :mediaOwnerTest:assembleDebug`; BUILD SUCCESSFUL, 114 tarefas (6 executadas). Lint task passa com 184 findings conhecidos e `abortOnError=false`. |
+| Recompile AndroidTest/helper após mudanças finais | PASS | `./gradlew.bat --no-daemon -Pkotlin.compiler.execution.strategy=in-process :app:compileDebugAndroidTestKotlin :app:assembleDebugAndroidTest :mediaOwnerTest:assembleDebug`; BUILD SUCCESSFUL, 81 tarefas (4 executadas). |
+| AndroidJUnitRunner direto, MediaStorePagingInstrumentedTest | PASS | Motorola moto g84 5G, API35, serial `0085353748`; `OK (5 tests)`, incluindo partial visual access executado, áudio independente, página/sessão, SHA-256 de conteúdo e auditoria de cleanup. |
+| AndroidJUnitRunner direto, MainActivityInstrumentedTest | PASS limitado | `OK (3 tests)` protocolo: 1 execução real (Home) e 2 casos API29 ignorados por assumption API; isso não valida API29. |
+| `:app:connectedDebugAndroidTest`/UTP no mesmo APK final | FAIL | Código 1, `Failed to receive the UTP test results`; sem XML e sem casos coletados. Dispositivo ADB continuou online. `utp.0.log` registra fatal do result listener. Logcat pós execução sem `AndroidRuntime` fatal. Diagnóstico debug anterior mostra falha BouncyCastle/PEM RSA enquanto o listener gRPC local inicia; evidência de falha no caminho do coletor, ainda sem causa raiz definitiva. |
+| API29 foreign-owner/consent | NOT RUN | Fixture auxiliar e cenários cancel/aceite compilam, mas exigem runtime API29. UID distinto no Motorola não valida OWNER_PACKAGE_NAME nem consentimento API29. AVD local não iniciou por falta de aceleração. |
+
+APK SHA-256 finais: Debug `0E550D445D231F9B65EBACEA3AA18727764AFD05014294B1D49905B2AD6BA632`; AndroidTest `D6F1C7602F4AB9574413852FABFF9DD234886A92DFE8D339A80DDAC064DDC112`; helper `B00066BF7FF33116216619D728453D0E38E8525DA0C6F5FD28C590976F5632A1`. Evidências detalhadas, stdout do runner, exit codes, logcats, UIDs e checksums: `.local-test-results/2026-11-06/`. A saída direta é protocolo textual; não é XML. O UTP não produziu XML.
+
+### Hash reempacotado e tentativa isolada
+
+- Uma tentativa com `ANDROID_USER_HOME` alternativo criou outra debug keystore e falhou antes de executar testes com `INSTALL_FAILED_UPDATE_INCOMPATIBLE` em `mediaOwnerTest:installDebug`; não é resultado de UTP.
+- Com o user home original, `:app:assembleDebug :app:assembleDebugAndroidTest :mediaOwnerTest:assembleDebug` passou. O APK AndroidTest reempacotado SHA `15344F181D5AAE73BF2945D84BF850220FD30DADE45005AABE91C7223F79DCD1` foi executado pelo runner direto: MediaStore `OK (5)` e Main `OK (3)` (2 casos API29 ignorados). Esse hash ainda não foi testado pelo UTP. A comparação anterior que reproduziu UTP FAIL usou AndroidTest SHA `D6F1C760...`, também aprovado pelo runner direto no Motorola.
+- Checksums atuais estão em `.local-test-results/2026-11-06/final-apk-sha256.txt`. Nenhuma chave de Release foi criada ou usada; manter o Android user home estável para futuras comparações de APK assinado em Debug.
+
 Atualizado em 04/11/2026. Este documento é a situação de QA da branch de recuperação, não uma declaração de release aprovado.
 
 ## Identidade de build
@@ -160,6 +179,17 @@ O script valida package e versionCode do source, fingerprint do JKS, assinatura 
 
 **Critério de aprovação:** evidência (logs/screenshots) ligada ao mesmo commit, modelo/API e artefato. Nenhum gate é aprovado pela presença de código ou por um build antigo.
 
+## Atualização local de validação — 2026-11-06
+
+- Base de código: branch local `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`; mudanças locais ainda não publicadas.
+- `:app:compileDebugAndroidTestKotlin :app:assembleDebugAndroidTest`: `BUILD SUCCESSFUL` após alterar o tratamento de `SESSION_STALE` para exigir sessão estável. Resultado é compilação, não execução dos testes.
+- Kotlin daemon não pôde criar arquivo temporário em `%LOCALAPPDATA%\kotlin\daemon` (`AccessDeniedException`); fallback do compilador concluiu. Reavaliar daemon se voltar a ocorrer.
+- UTP no Motorola moto g84 5G, serial `0085353748`, API35: `:app:connectedDebugAndroidTest -x :mediaOwnerTest:installDebug` falhou ao receber resultados e coletou zero testes. Depois da tentativa, `adb devices -l` ficou vazio. Não classificar como falha de assertion nem sucesso da aplicação; runner direto precisa ser repetido no novo APK.
+- Execução AndroidJUnitRunner direta anterior: `OK (7 tests)` no mesmo aparelho/API35, mas anterior à nova assertion e aos APKs compilados nesta continuação. Dois testes API29 foram ignorados por condição de API; portanto são cinco casos efetivamente executados. O caso de acesso parcial passou com permissões preparadas previamente via ADB.
+- API29: fixture de propriedade agora usa app auxiliar com UID distinto e valida `OWNER_PACKAGE_NAME` real. Sem execução: AVD/imagem API29 não iniciou porque aceleração de virtualização x86_64 não está habilitada/instalada neste host. Nenhum driver foi instalado.
+- Diagnóstico remoto exato run `42080940375`, SHA `16545a4`: XML API29 confirmou owner igual ao app alvo; API35 confirmou `external_primary not found`; logcat registrou morte do UID após revogação de permissão durante a instrumentação. Artefatos locais: `.local-ci-42080940375/`.
+- Próximo gate: reconectar e reidentificar o Motorola; executar teste Selected Photos isolado e suite direta atual, coletar `logcat`, XML e exit code. API29 deve rodar em CI ou host já habilitado para virtualização. Nenhum resultado local substitui CI verde no commit PR mais recente.
+
 ## Atualização de validação — 04/11/2026
 
 - O último HEAD de código funcional, antes desta atualização documental, adicionou StorageUsageCalculator e quatro testes unitários.
@@ -190,3 +220,26 @@ A ação secundária foi renomeada para Abrir arquivos/Browse files, deixando cl
 - GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
 - O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
 - Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+
+## Auditoria local de recuperação — 2026-11-05
+
+- Base da branch local `codex/midiastore-release-audit`: HEAD remoto de recuperação `16545a4277bcc515660a6516c32fb6c770a4e880`; nenhuma alteração enviada ao GitHub.
+- Último workflow remoto examinado: [42080940375](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/42080940375). JVM, Lint task, APKs e parser PowerShell passaram; API29 e API35 instrumentados falharam por fixture com owner incorreto e corrida de montagem do volume, respectivamente.
+- Correção local adiciona app de fixture independente e espera volume montado. `:app:compileDebugAndroidTestKotlin` e `:app:assembleDebugAndroidTest` passaram, mas não houve execução instrumentada após as mudanças.
+- Com JDK 17.0.20.1, Gradle 8.13, SDK Platform 36 e Build Tools 35.0.0, a validação local terminou `BUILD SUCCESSFUL`: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`.
+- O Lint encontrou 184 issues: 90 erros `MissingTranslation` nos recursos de idiomas parciais e 94 warnings. A tarefa passou porque `abortOnError=false`; o relatório não está limpo.
+- `adb devices -l` não listou dispositivo. Não há imagem/AVD local API29 ou API35; instrumentação e teste físico continuam pendentes.
+- Release/AAB não foi validado: a chave legítima não está no workspace e os gates de Play Console estão abertos.
+
+## Execução de continuidade — 2026-11-06 (APK atual)
+
+| Validação | Estado | Evidência / limitação |
+|---|---|---|
+| Domain, JVM, Lint, Debug, AndroidTest e helper | PASS | `./gradlew.bat --no-daemon -Pkotlin.compiler.execution.strategy=in-process :domain:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleDebugAndroidTest :mediaOwnerTest:assembleDebug`; BUILD SUCCESSFUL, 114 tarefas, 11 executadas. Lint ainda reporta 184 findings com `abortOnError=false`. |
+| AndroidJUnitRunner direto — MediaStore, Motorola API35 | PASS com execução isolada parcial | Classe: protocolo `OK (5 tests)`, mas 1 método foi assumption-skipped por permissões preexistentes e 4 executaram. O caso Selected Photos foi preparado via ADB (visual-selected=true, imagens/vídeo/áudio=false), executado isoladamente e passou `OK (1 test)`, exit 0. Permissões Debug restauradas ao estado original. |
+| AndroidJUnitRunner direto — Main, Motorola API35 | PASS limitado | `OK (4 tests)` no protocolo, exit 0; logcat registra 1 teste funcional executado e 3 assumptions por API/ambiente. O cenário de consentimento não foi validado nesta execução. |
+| Consentimento UI API35 no Motorola | SKIP após guard / execução anterior FAIL | Serviço `com.truedevelopersstudio.automatictap.autoclicker` está habilitado. Logcat mostra `MediaProvider: User allowed grant` menos de 1 s após abrir o diálogo, sem interação controlada do teste. O guard de harness pula esse caso; não foi alterada configuração global. Validar em emulador/aparelho sem automação externa. |
+| Gradle `connectedDebugAndroidTest` / UTP | FAIL antes da coleta | Execução filtrada para MediaStore terminou exit 1 com `Failed to receive the UTP test results`; HTML = 0 testes e nenhum XML. `utp.0.log` apenas informa construção do runner e erro fatal. Um `--debug` anterior mostra `BouncyCastlePemReader` incapaz de ler RSA PEM no `UtpTestResultListenerServer`; causa raiz não confirmada. |
+| API29 owner/RecoverableSecurityException | NOT RUN | Nenhum runtime API29 local; AVD não iniciou por falta de aceleração permitida. Requer job Linux API29 após autorização de push. |
+
+Device/build association: Motorola moto g84 5G, Android 15/API35, serial `0085353748`, fingerprint `motorola/bangkk_g/bangkk:15/V1TCS35H.88-16-9/2edd8c-be328e:user/release-keys`; source HEAD `16545a4277bcc515660a6516c32fb6c770a4e880` mais alterações locais não publicadas. APK SHA-256: Debug `EAE637CEF8F581B65B5D8BCDEEF97ADBC4BA8699D38716BBA4A818AD6045091E`, AndroidTest `55EAA999F40E3F0424A2271A5265AADA08167D3C23611A3F52ABDBD13C20E3CD`, helper `B00066BF7FF33116216619D728453D0E38E8525DA0C6F5FD28C590976F5632A1`. Logs/exitcodes: `.local-test-results/2026-11-06/`. Direct instrumentation protocol is not JUnit XML; UTP produced no XML.

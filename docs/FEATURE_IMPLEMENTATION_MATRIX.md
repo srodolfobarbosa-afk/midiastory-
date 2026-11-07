@@ -1,5 +1,17 @@
 # Matriz de Implementação de Funcionalidades — Midiastore
 
+## Evidência local atualizada — 2026-11-06 — API35
+
+| Área | Estado | Evidência e limite |
+|---|---|---|
+| Acesso visual parcial | PASS no Motorola API35 via runner direto | Teste executado com permissões preparadas antes do processo; retorna cobertura `PARTIAL`. Não prova UTP nem outras OEMs. |
+| Áudio independente | PASS no Motorola API35 via runner direto | Teste de permissão de áudio e página MediaStore executado. |
+| Paginação/sessão de imagem | PASS no Motorola API35 via runner direto | Fixture consultada em volume runtime disponível; sessão concluiu/rejeitou conforme contrato. |
+| SHA-256 de duplicatas | PASS no Motorola API35 via runner direto | Conteúdo idêntico e diferente foi diferenciado pelo hash, não por tamanho. |
+| Limpeza das fixtures instrumentadas | PASS no Motorola API35 via runner direto | Auditoria dos diretórios sintéticos confirmou ausência de nomes de fixture após cenários. |
+| API29 foreign-owner consent | NOT RUN | App auxiliar tem UID separado, mas API29 ainda precisa comprovar MediaStore owner e diálogo cancel/aceite em runtime. |
+| Coleta AndroidTest UTP | FAIL | Mesmos APKs: UTP não coletou XML; runner direto executou os casos indicados. |
+
 Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/11/2026. Esta matriz distingue código presente, testes executados e validação real em aparelho. Uma implementação no source não significa que o recurso foi aprovado para produção.
 
 ## Identidade e release
@@ -101,3 +113,19 @@ O primeiro release é um Phone Cleaner, com apresentação Pro e modelo Freemium
 A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
 
 A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.
+
+## Atualização técnica — 2026-11-05
+
+| Área | Estado | Evidência | Pendência |
+|---|---|---|---|
+| Fixture estrangeira API29 | Implementada em teste, runtime pendente | `:mediaOwnerTest` tem package/UID independente; provider protegido por assinatura; AndroidTest confere owner, pede consentimento, repete a exclusão e verifica ausência | Executar em API29 e verificar aceitação/cancelamento da UI do sistema |
+| Montagem do volume | Implementada em testes/CI, runtime pendente | Testes aguardam `external_primary` montado e falham com diagnóstico após timeout; script CI confere volume antes da instrumentação | Novo run API35 verde |
+| Build/JVM | Testado e aprovado localmente | Domain/app JVM, Lint task, Debug, AndroidTest APK e app auxiliar compilaram | Repetir em CI no novo SHA e executar instrumentação |
+| Lint | Executado, findings abertos | 90 `MissingTranslation` errors e 94 warnings; `abortOnError=false` permite retorno zero | Resolver/localizar idiomas e revisar warnings sem mascarar resultados |
+| Release/AAB | Bloqueado | Nenhum arquivo legítimo de keystore disponível | Confirmar chave, certificado e versionCode máximo na Play Console |
+
+## Evidência de continuidade — 2026-11-06
+
+- AndroidJUnitRunner direto no Motorola API35: classe MediaStore protocolar `OK (5 tests)`, mas um caso foi skipped por permissões já concedidas; quatro executaram. O caso Selected Photos foi preparado depois via ADB e passou isoladamente (`OK (1 test)`). Os outros casos passaram áudio independente, sessão/paginação, SHA-256 de conteúdo e auditoria de remoção das fixtures.
+- A classe Main terminou `OK (4 tests)` no protocolo, mas só um cenário de Home foi executado funcionalmente; API29 foi condicionado por API e o teste de consentimento foi pulado por serviço externo de auto-click ativo. Consentimento e API29 seguem sem comprovação runtime.
+- UTP no mesmo ambiente falhou antes de recolher casos (0 testes/sem XML). A passagem direta não fecha UTP nem API29.
