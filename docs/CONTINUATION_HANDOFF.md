@@ -285,3 +285,10 @@ This section is the durable continuity checkpoint for future conversations. Cont
 3. Validar visualmente em aparelho real a home, cards, filtros, navegação, fonte ampliada e TalkBack.
 4. Resolver os findings de localização; a última auditoria local relatou 90 erros MissingTranslation e 94 avisos.
 5. Manter API29, Billing seguro, Play Console, assinatura e testes OEM como gates explícitos de release.
+
+## Avaliação do proprietário no Motorola — 2026-11-07
+
+- O proprietário Rodolfo informou que, no uso real, o app continua visualmente ruim, não executa limpeza útil, os botões não respondem como esperado e os planos pagos não funcionam. Tratar como falha de aceitação e bloqueio total de release; a avaliação do proprietário prevalece sobre aparência de conclusão em compilações ou testes isolados.
+- A verificação local desta data confirmou que o Motorola moto g84 5G (Android 15) responde ao ADB, abriu `MainActivity` e não mostrou `FATAL EXCEPTION` no trecho de logcat consultado. O AndroidJUnitRunner direto terminou `OK (9 tests)`, mas cenários dependentes de API29, consentimento interativo e permissões visuais isoladas foram ignorados por precondições. Isso **não** prova que a experiência real de limpeza, botões, navegação ou Billing esteja funcional.
+- `:app:connectedDebugAndroidTest` continua sem resultado Gradle/UTP (`Failed to receive the UTP test results`); o runner Android direto foi necessário e é evidência limitada ao que os testes cobrem.
+- Não declarar o app pronto para publicar, não promover a produção e não usar aprovação de testes como resposta à avaliação negativa. Próxima etapa de produto: reproduzir no telefone os fluxos relatados, inspecionar a tela e cada ação da navegação, corrigir interação e feedback visual, verificar permissões MediaStore e pós-estado real da limpeza, e validar a tela/estados de Billing com produtos de teste da Play. Manter cada comportamento não executado como não verificado.
