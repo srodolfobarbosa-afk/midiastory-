@@ -13,7 +13,16 @@
 - `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`: **BUILD SUCCESSFUL** em 7m43s; 114 tarefas (1 executada, 113 up-to-date). Gradle e Android caches foram direcionados para diretórios locais ignorados do repositório.
 - `:app:connectedDebugAndroidTest`: **não executado**; falhou em `:mediaOwnerTest:installDebug` com `No connected devices!`. Isso não é falha dos testes do app e também não é evidência de aprovação instrumentada.
 - `git diff --check` e `git diff --cached --check`: sem erros de whitespace.
-- Commit local `a8e0335` contém o diff de app, testes e documentos intencionais. A reconciliação preserva os commits remotos `b646ced`, `ca9ebd0` e `80e2ca8`; os conflitos de paleta e continuidade foram combinados. Ainda não houve push.
+- Commit local `a8e0335` contém o diff de app, testes e documentos intencionais. O merge local está reconciliando a branch remota atual `c546b76`; os commits remotos e o trabalho local estão preservados. Ainda não houve push.
+
+### Atualização após novo avanço da branch — 2026-11-06
+
+- A branch remota avançou mais uma vez até `c546b76` enquanto o trabalho local era preparado, com 14 commits adicionais. Eles incluem um dashboard de limpeza com hierarquia de ações inspirado no Files do Google e melhorias para MediaStore/API29/API35. Nenhum avanço remoto foi sobrescrito.
+- O merge desses commits está em andamento na branch local. Para os conflitos, foram mantidos os testes locais mais completos de proprietário/UID, cancelamento e aceite de consentimento, os testes de cobertura/paginação e o preparo isolado de Selected Photos; a configuração Kotlin/JVM e o manifesto mais recentes do app auxiliar vieram da branch da PR.
+- A suíte completa foi repetida sobre o código combinado: **BUILD SUCCESSFUL** em 8m24s; 117 tarefas (31 executadas, 2 do cache, 84 up-to-date). Incluiu Domain, JVM, Lint, APK Debug, APK AndroidTest e helper.
+- ADB continua sem dispositivo (`adb devices -l` vazio) mesmo após `adb start-server`; o Motorola não está acessível ao host. Não marcar instrumentação física como executada. O CI remoto é necessário para validar API29/API35 enquanto o aparelho não aparece no ADB.
+- Rodolfo autorizou compilar o AAB e enviar ao Play Console quando os critérios estiverem satisfeitos. `:app:bundleRelease` executou compilação, recursos e R8, mas terminou **FAILED** pela proteção do projeto: falta a chave oficial e `keystore.properties`. Foi deixado um AAB local de saída do Gradle, ainda sem verificação de assinatura e proibido para upload; a menção a AAB no Gemini não o disponibiliza neste workspace. Não gerar chave substituta.
+- Play continua bloqueado pelos gates registrados em `docs/RELEASE_BLOCKERS.md`: consentimento/API29 executado, CI atual, validação Billing no Play Console e verificação server-side do purchaseToken, versionCode/certificado e revisão final de privacidade. A autorização do proprietário não substitui essas provas.
 
 ## Checkpoint confirmado — 2026-11-06 (continuação)
 

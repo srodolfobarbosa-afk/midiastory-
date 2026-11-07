@@ -112,6 +112,10 @@ tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.co
     }
 }
 
+tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
+    dependsOn(":mediaOwnerTest:installDebug")
+}
+
 dependencies {
     implementation(project(":domain"))
     implementation("androidx.core:core-ktx:1.17.0")
