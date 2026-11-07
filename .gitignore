@@ -12,6 +12,8 @@ keystore.properties
 .env
 .env.*
 !.env.example
+**/.env.*
+!**/.env.example
 web/.next/
 web/node_modules/
 web/out/

@@ -16,11 +16,11 @@ BACKUP_DIR = ROOT / "backup"
 
 def load_env_file() -> None:
     """Carrega valores de .env.local sem imprimir nenhum deles."""
-    path = ROOT / ".env.local"
+    path = ROOT / "web" / ".env.local"
     if not path.exists():
         return
     for raw in path.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
+        line = raw.strip().lstrip("\ufeff")
         if not line or line.startswith("#") or "=" not in line:
             continue
         name, value = line.split("=", 1)
@@ -32,8 +32,8 @@ def run_adb(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def register_backup(device: str, source: str, destination: Path) -> None:
-    url = os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "").rstrip("/")
-    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    key = os.environ.get("SUPABASE_SECRET_KEY", "")
     if not url or not key:
         print("Cópia concluída; configure o acesso privado do Supabase para registrar os arquivos.")
         return
@@ -41,8 +41,8 @@ def register_backup(device: str, source: str, destination: Path) -> None:
                 "created_at": datetime.now(timezone.utc).isoformat()}]
     request = urllib.request.Request(
         f"{url}/rest/v1/mobile_backups", data=json.dumps(payload).encode(),
-        headers={"apikey": key, "Authorization": f"Bearer {key}",
-                 "Content-Type": "application/json", "Prefer": "return=minimal"}, method="POST")
+        headers={"apikey": key, "Content-Type": "application/json",
+                 "Prefer": "return=minimal"}, method="POST")
     try:
         with urllib.request.urlopen(request, timeout=20):
             pass

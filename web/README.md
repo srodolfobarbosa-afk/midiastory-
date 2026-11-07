@@ -4,13 +4,13 @@ Aplicativo Next.js simples para conversar com documentos armazenados no Supabase
 
 ## Configuração
 
-1. Na raiz do repositório, copie `.env.example` para `.env.local`.
-2. Preencha a chave privada de serviço do Supabase e uma nova chave do Gemini no `.env.local`. Não use a chave do Gemini que foi compartilhada anteriormente; gere outra no Google AI Studio.
+1. Copie `web/.env.example` para `web/.env.local`.
+2. Preencha `SUPABASE_SECRET_KEY` e `GEMINI_API_KEY` no `web/.env.local`. A chave privada do Supabase fica somente no servidor.
 3. No painel do Supabase, execute `supabase/migrations/20261107000100_chat_schema.sql` no SQL Editor.
 4. Instale as dependências dentro de `web/` com `npm install`.
 5. Inicie o chat com `npm run dev` dentro de `web/`.
 
-A senha do banco não é necessária para o chat, que usa a API REST do Supabase. A chave `SUPABASE_SERVICE_ROLE_KEY` fica apenas no servidor e nunca deve começar com `NEXT_PUBLIC_`.
+A senha do banco não é necessária para o chat, que usa a API REST do Supabase. Nunca coloque `SUPABASE_SECRET_KEY` em uma variável com prefixo `NEXT_PUBLIC_`.
 
 ## Limites desta versão
 
