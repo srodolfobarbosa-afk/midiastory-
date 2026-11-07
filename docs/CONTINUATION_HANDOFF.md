@@ -13,7 +13,7 @@
 - `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`: **BUILD SUCCESSFUL** em 7m43s; 114 tarefas (1 executada, 113 up-to-date). Gradle e Android caches foram direcionados para diretórios locais ignorados do repositório.
 - `:app:connectedDebugAndroidTest`: **não executado**; falhou em `:mediaOwnerTest:installDebug` com `No connected devices!`. Isso não é falha dos testes do app e também não é evidência de aprovação instrumentada.
 - `git diff --check` e `git diff --cached --check`: sem erros de whitespace.
-- Estado Git continua sem commit ou push nesta retomada; preservar arquivos locais e revisar o diff combinado antes de publicar.
+- Commit local `a8e0335` contém o diff de app, testes e documentos intencionais. A reconciliação preserva os commits remotos `b646ced`, `ca9ebd0` e `80e2ca8`; os conflitos de paleta e continuidade foram combinados. Ainda não houve push.
 
 ## Checkpoint confirmado — 2026-11-06 (continuação)
 
@@ -248,3 +248,29 @@ This section is the durable continuity checkpoint for future conversations. Cont
 - Não há imagens/AVDs API29 e API35 instaladas localmente e `adb devices` está vazio. Nenhum teste instrumentado foi executado após a correção.
 - Não há `keystore.properties` nem `sweep-upload.jks` local. O Release não foi executado e nenhuma chave foi gerada. A política de privacidade segue como draft sem URL pública; catálogo Billing, versão publicada máxima e certificado ainda dependem da Play Console.
 - Não fazer push, merge, despacho de workflow externo, build AAB de produção ou publicação sem autorização. PR continua Draft e release bloqueado até CI atualizado e gates de aparelho/Play Console.
+## Continuidade remota — 2026-11-06
+
+### Alteração visual aplicada diretamente no GitHub
+
+- A branch de recuperação avançou de `16545a4277bcc515660a6516c32fb6c770a4e880` para `ca9ebd04fa11bfba966830ce7f977ab081954ce1`, por fast-forward, sem force-push.
+- Paleta atualizada para identidade premium escura: fundo midnight, superfícies azul-petróleo, ação primária jade/ciano e acento âmbar.
+- Tema Material 3 alinhado à paleta com cores explícitas de superfície, texto, ação e navegação.
+- Arquivos: `app/src/main/res/values/colors.xml` e `app/src/main/res/values/styles.xml`.
+- PR #3 permanece aberta em Draft; `main` não foi alterada e nenhuma publicação foi feita.
+- O código visual foi gravado e relido pelo GitHub. Ainda não há execução de CI associada ao novo SHA; portanto, não declarar compilação ou teste aprovados por causa dessa alteração.
+
+### Workspace local do Codex — reconciliação obrigatória
+
+- A última leitura local mostrou a branch `codex/midiastore-release-audit` no SHA base `16545a4277bcc515660a6516c32fb6c770a4e880`, com alterações staged, unstaged e arquivos novos.
+- Essas alterações locais incluem correções de testes/fixture API29, descoberta dinâmica de volumes MediaStore API35, documentação e pesquisa. Elas ainda não estão incluídas no SHA remoto acima.
+- Evidência local relatada: AndroidJUnitRunner direto no Motorola API35 executou os testes de mídia; os cenários exclusivos de API29 foram ignorados corretamente nesse aparelho. Isso não valida API29 e não substitui CI.
+- O Gradle UTP no Windows falhou antes de coletar resultados, com erro do listener local/Netty; não classificar como falha de assertion do app nem como aprovação.
+- Antes de continuar alterações que toquem os mesmos arquivos, reconciliar cuidadosamente o workspace local com a branch remota. Não descartar, limpar ou sobrescrever o trabalho local.
+
+### Próximas prioridades remotas
+
+1. Integrar de forma auditável as correções locais de fixture com UID separado, volume MediaStore dinâmico e isolamento do teste de permissões.
+2. Obter CI verde no SHA atual, incluindo API29 e API35; não aceitar testes ignorados como substitutos de cobertura.
+3. Validar visualmente em aparelho real a home, cards, filtros, navegação, fonte ampliada e TalkBack.
+4. Resolver os findings de localização; a última auditoria local relatou 90 erros MissingTranslation e 94 avisos.
+5. Manter API29, Billing seguro, Play Console, assinatura e testes OEM como gates explícitos de release.
