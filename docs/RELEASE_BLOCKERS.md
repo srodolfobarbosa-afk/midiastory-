@@ -1,5 +1,15 @@
 # Bloqueadores de release — Midiastore
 
+## Reavaliação local mais recente — 2026-11-07
+
+- Home: a ação grátis executa a varredura MediaStore de arquivos grandes no próprio app. Manualmente no Moto G84 5G/API35, encontrou 5 candidatos para revisão (84,30 MB) e abriu a lista interna; nenhum arquivo pessoal foi apagado. O teste não aprovou/cancelou a caixa de consentimento de exclusão permanente e não fecha o gate de deleção.
+- A Home não abre mais Files by Google nem pede `MANAGE_EXTERNAL_STORAGE`. O usuário revisa os arquivos selecionados e a exclusão segue o consentimento oficial do Android. Lixeira não é contabilizada como espaço liberado.
+- O botão de compartilhamento abriu o Sharesheet nativo e foi fechado sem publicação.
+- `:app:assembleDebug` passou no Windows para a versão instalada no aparelho. Essa verificação manual não substitui CI, lint e instrumentação.
+- Produtos Google Play mensal/anual/vitalício continuam indisponíveis na consulta Billing. Valores propostos foram documentados, mas não são preços ativos na Play Console. Não há backend confiável de validação de purchaseToken.
+- O app exibe os valores propostos (R$14,90/mês, R$79,90/ano, R$149,90 vitalício), identificados como ainda não ativos até a Play retornar os preços oficiais. Home/limpeza/compartilhamento foram localizados em ES, FR, DE, HI, JA e zh-CN; as demais telas ainda não têm tradução completa nesses idiomas.
+- Publicação pública permanece **NÃO LIBERADA**. Consulte `docs/FINAL_PUBLICATION_CHECKLIST.md` para o resumo atualizado e os gates ainda abertos.
+
 ## Reavaliação da retomada — 2026-11-06
 
 - **API29: OPEN / NOT RUN.** Fixture auxiliar com UID independente e assertions do owner real estão compilados, mas sem execução API29. Fechar somente quando o runner API29 provar attribution, pedido recuperável, cancelamento sem remoção, aprovação, ausência da URI e bytes confirmados.

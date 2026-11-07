@@ -1,5 +1,16 @@
 # Midiastore — CONTINUIDADE DO PROJETO
 
+## Checkpoint mais recente — 2026-11-07
+
+- Rodolfo pediu que o app seja concluído e as atualizações sejam salvas no GitHub. Não mesclar em `main`; manter a PR em Draft.
+- Home está em azul-marinho/rosa, com arte vetorial original, ação principal gratuita, planos Pro e botão de compartilhamento do Android.
+- A ação grátis agora inicia a missão MediaStore de arquivos grandes dentro do Midiastore. No Moto G84 5G/API 35, a varredura encontrou 5 itens para revisão (84,30 MB), e o botão levou à tela interna de revisão. Nenhum arquivo pessoal foi apagado. Esse teste manual não valida o fluxo final de consentimento/exclusão permanente.
+- A ação principal não abre mais o Google Files. A pessoa precisa revisar os candidatos e aprovar a exclusão pelo fluxo Android; o app não promete limpeza silenciosa de cache de outros apps.
+- O Sharesheet do Android abriu com o link da Play Store e foi fechado sem compartilhar/publicar.
+- `:app:assembleDebug` passou no Windows e o APK Debug atual foi instalado no Motorola. Produtos mensais/anual/vitalício aparecem indisponíveis; Play Console e backend de validação de purchaseToken continuam gates externos. Preços recomendados e checklist atual estão em `docs/PRICING_AND_PLAN_MATRIX.md` e `docs/FINAL_PUBLICATION_CHECKLIST.md`.
+- In-app localization remains English + pt-BR. No portrait AI asset was generated; current home character is a native vector illustration.
+- Próximo passo: revisar `git diff`, commit somente arquivos intencionais e enviar para a branch existente da PR. Excluir caches, screenshots, keystores, senhas e arquivos de ponte locais do commit. Continuar bloqueando release pública até fechar `docs/RELEASE_BLOCKERS.md`.
+
 ## Direção de produto confirmada pelo proprietário — 2026-11-06
 
 - Rodolfo confirmou que o objetivo é um phone cleaner simples e confiável, inspirado na facilidade de uso do Files do Google: ajudar pessoas com o telefone cheio de conteúdo a encontrar o que ocupa espaço e liberar armazenamento sem perda acidental.

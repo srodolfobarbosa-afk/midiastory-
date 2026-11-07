@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="sweep_background">#080D18</color>
-    <color name="sweep_surface">#111B2B</color>
-    <color name="sweep_surface_alt">#1B2A40</color>
-    <color name="sweep_primary">#42D7C5</color>
-    <color name="sweep_primary_glow">#8AF3E5</color>
-    <color name="sweep_accent_amber">#F4C66A</color>
+    <color name="sweep_background">#07152E</color>
+    <color name="sweep_surface">#0D2140</color>
+    <color name="sweep_surface_alt">#183456</color>
+    <color name="sweep_primary">#F45D9E</color>
+    <color name="sweep_primary_glow">#FF9BC7</color>
+    <color name="sweep_accent_amber">#6386B4</color>
     <color name="sweep_text">#F4F7FB</color>
-    <color name="sweep_muted">#9AAAC0</color>
+    <color name="sweep_muted">#A6BCD4</color>
     <color name="sweep_success">#43D9A3</color>
     <color name="sweep_warning">#F2C66D</color>
 </resources>

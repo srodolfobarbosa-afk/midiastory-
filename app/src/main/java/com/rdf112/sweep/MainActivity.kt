@@ -2,7 +2,10 @@ package com.rdf112.sweep
 
 import android.Manifest
 import android.app.Activity
+import android.app.AppOpsManager
+import android.app.usage.UsageStatsManager
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -13,7 +16,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.Environment
+import android.os.Process
 import android.os.StatFs
+import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.Size
 import android.view.Gravity
 import android.view.View
@@ -29,8 +37,10 @@ import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -79,17 +89,39 @@ import java.util.Date
  */
 class MainActivity : AppCompatActivity() {
     private enum class AppTab { HOME, FILES, OAAS, PRO }
+    private data class UnusedAppInfo(
+        val packageName: String,
+        val displayName: String,
+        val lastUsedMillis: Long,
+    )
+
+    private val usageAccessLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (hasUsageStatsAccess()) {
+            loadUnusedAppSuggestions()
+        } else {
+            Toast.makeText(this, R.string.pro_unused_apps_permission_denied, Toast.LENGTH_LONG).show()
+        }
+    }
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
+        val homeCleanupPending = pendingOutcomeMission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW
         if (hasAnyMediaPermission()) {
             viewModel.startSession()
-            switchTab(if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
+            switchTab(if (homeCleanupPending) AppTab.HOME else if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
         } else {
             pendingKindAfterPermission = null
             pendingOutcomeMission = null
             statusText.text = getString(R.string.permission_denied)
+            if (homeCleanupPending) {
+                heroOrbButton.isEnabled = true
+                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
+                showHomeCleanupMessage(getString(R.string.home_cleanup_permission_denied))
+            }
             if (::oaasPipelineStatus.isInitialized) {
                 oaasPipelineStatus.text = getString(R.string.oaas_mission_scan_failed)
             }
@@ -234,15 +266,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navFilesBtn: MaterialButton
     private lateinit var navOaasBtn: MaterialButton
     private lateinit var navProBtn: MaterialButton
-    private lateinit var topProPill: MaterialButton
+    private lateinit var bottomNavContainer: LinearLayout
 
     // Widgets da Aba Início (2027 Dashboard)
     private lateinit var storageRingGauge: StorageRingGaugeView
     private lateinit var storageUsedHeadline: TextView
     private lateinit var storageFreeSubline: TextView
-    private lateinit var heroOrbButton: LinearLayout
-    private lateinit var heroOrbTitle: TextView
+    private lateinit var heroOrbButton: MaterialButton
     private lateinit var heroOrbSubtitle: TextView
+    private lateinit var homeCleanupResult: TextView
+    private var homeCleanupCandidateCount = 0
 
     // Widgets compartilhados e das demais abas
     private lateinit var storageText: TextView
@@ -253,6 +286,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var proStatusBadge: TextView
     private lateinit var oaasPipelineStatus: TextView
     private lateinit var oaasCancelMissionButton: MaterialButton
+    private lateinit var missionPermissionButton: MaterialButton
+    private lateinit var missionReviewButton: MaterialButton
+    private lateinit var missionRetryButton: MaterialButton
+    private var debugProPreviewEnabled = false
+    private var debugProPreviewButton: MaterialButton? = null
     private lateinit var oaasFlywheelMetrics: TextView
     private lateinit var recordsContainer: LinearLayout
     private lateinit var selectedContainer: LinearLayout
@@ -280,9 +318,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var restoreTrashButton: MaterialButton
     private lateinit var exportSelectionButton: MaterialButton
     private lateinit var clearSelectionButton: MaterialButton
+    private lateinit var filesReviewCard: MaterialCardView
     private lateinit var planMonthlyButton: MaterialButton
     private lateinit var planAnnualButton: MaterialButton
     private lateinit var planLifetimeButton: MaterialButton
+    private lateinit var homePlanMonthlyButton: MaterialButton
+    private lateinit var homePlanAnnualButton: MaterialButton
+    private lateinit var homePlanLifetimeButton: MaterialButton
     private lateinit var restorePurchasesButton: MaterialButton
     private lateinit var manageSubscriptionButton: MaterialButton
     private lateinit var progress: ProgressBar
@@ -350,39 +392,45 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // 1. TOP APP BAR MODERNA (Logo M + Nome Midiastore + Pílula Seja Pro)
+        // Brand bar with the Midiastore cleanup mark and wordmark.
         val topBar = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(20), dp(14), dp(20), dp(10))
         }
-        val mark = TextView(this).apply {
-            text = "M"
-            textSize = 20f
-            typeface = Typeface.DEFAULT_BOLD
-            gravity = Gravity.CENTER
-            setTextColor(color(R.color.sweep_background))
-            background = gradientPill(color(R.color.sweep_primary), color(R.color.sweep_primary_glow), dp(14))
+        val mark = ImageView(this).apply {
+            setImageResource(R.mipmap.ic_launcher)
             contentDescription = getString(R.string.app_name)
         }
-        topBar.addView(mark, LinearLayout.LayoutParams(dp(42), dp(42)))
+        topBar.addView(mark, LinearLayout.LayoutParams(dp(48), dp(48)))
 
         val brandCopy = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        brandCopy.addView(label(getString(R.string.app_name), 20f, R.color.sweep_text, true))
-        brandCopy.addView(label(getString(R.string.brand_tagline), 11f, R.color.sweep_primary_glow, false))
-        topBar.addView(brandCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
-
-        topProPill = MaterialButton(this).apply {
-            text = getString(R.string.pro_badge)
-            isAllCaps = false
-            textSize = 12f
-            typeface = Typeface.DEFAULT_BOLD
-            cornerRadius = dp(20)
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_accent_amber))
-            setOnClickListener { switchTab(AppTab.PRO) }
+        val wordmark = label(getString(R.string.app_name), 22f, R.color.sweep_text, true).apply {
+            typeface = Typeface.create("sans-serif", Typeface.BOLD)
+            letterSpacing = -0.015f
+            val brandName = getString(R.string.app_name)
+            val accentStart = brandName.indexOf("store", ignoreCase = true)
+            if (accentStart >= 0) {
+                text = SpannableString(brandName).apply {
+                    setSpan(
+                        ForegroundColorSpan(color(R.color.sweep_primary)),
+                        accentStart,
+                        brandName.length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                }
+            }
         }
-        topBar.addView(topProPill, LinearLayout.LayoutParams(-2, dp(38)))
+        brandCopy.addView(wordmark)
+        topBar.addView(brandCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
+        val premiumAreaButton = button(getString(R.string.premium_area_button)) {
+            switchTab(AppTab.PRO)
+        }.apply {
+            minHeight = dp(38)
+            setPadding(dp(12), 0, dp(12), 0)
+            textSize = 12f
+        }
+        topBar.addView(premiumAreaButton, LinearLayout.LayoutParams(-2, dp(38)).apply { marginStart = dp(6) })
         root.addView(topBar, LinearLayout.LayoutParams(-1, -2))
 
         // Barra de progresso fina e status global
@@ -422,22 +470,24 @@ class MainActivity : AppCompatActivity() {
         bodyContainer.addView(proSection)
 
         // 3. BARRA DE NAVEGAÇÃO INFERIOR (4 Abas limpas estilo 2027)
-        val bottomNav = LinearLayout(this).apply {
+        bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             setBackgroundColor(color(R.color.sweep_surface))
             setPadding(dp(10), dp(8), dp(10), dp(10))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
-        navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
-        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
+        navFilesBtn = navTabButton(getString(R.string.nav_files)) { runWithProAccess { switchTab(AppTab.FILES) } }
+        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { runWithProAccess { switchTab(AppTab.OAAS) } }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
+        navFilesBtn.visibility = View.GONE
+        navOaasBtn.visibility = View.GONE
 
-        bottomNav.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
-        bottomNav.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
-        bottomNav.addView(navOaasBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
-        bottomNav.addView(navProBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4) })
-        root.addView(bottomNav, LinearLayout.LayoutParams(-1, -2))
+        bottomNavContainer.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
+        bottomNavContainer.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
+        bottomNavContainer.addView(navOaasBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
+        bottomNavContainer.addView(navProBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4) })
+        root.addView(bottomNavContainer, LinearLayout.LayoutParams(-1, -2))
 
         return root
     }
@@ -446,131 +496,94 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
 
-        // Card de Armazenamento com Medidor Circular 2027
-        val gaugeCard = card()
-        val gaugeRow = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        storageRingGauge = StorageRingGaugeView(this@MainActivity).apply {
-            bottomLabel = getString(R.string.storage_ring_used)
-        }
-        gaugeRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(116), dp(116)).apply { marginEnd = dp(14) })
+        addView(ImageView(this@MainActivity).apply {
+            setImageResource(R.drawable.midiastore_home_illustration)
+            contentDescription = getString(R.string.home_illustration_description)
+            scaleType = ImageView.ScaleType.FIT_CENTER
+        }, LinearLayout.LayoutParams(dp(200), dp(140)).apply { bottomMargin = dp(4) })
 
-        val gaugeInfo = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        gaugeInfo.addView(label(getString(R.string.storage_title), 10f, R.color.sweep_primary_glow, true))
-        storageUsedHeadline = label("...", 20f, R.color.sweep_text, true)
-        gaugeInfo.addView(storageUsedHeadline, top(4))
-        storageFreeSubline = label("...", 13f, R.color.sweep_muted, false)
-        gaugeInfo.addView(storageFreeSubline, top(2))
-        storageText = label(getString(R.string.storage_unavailable), 11f, R.color.sweep_muted, false).apply {
-            visibility = View.GONE
-        }
-        gaugeInfo.addView(storageText)
-        gaugeRow.addView(gaugeInfo, LinearLayout.LayoutParams(0, -2, 1f))
-        gaugeCard.addView(gaugeRow)
-        gaugeCard.addView(label(getString(R.string.storage_note), 10f, R.color.sweep_muted, false), top(8))
-        gaugeCard.addView(label(getString(R.string.space_accounting_title), 10f, R.color.sweep_primary_glow, true), top(14))
-        spaceMetricsText = label(
-            getString(R.string.space_metrics_summary, "0 B", "0 B", "0 B", "0 B"),
-            12f,
-            R.color.sweep_text,
-            false,
-        )
-        gaugeCard.addView(spaceMetricsText, top(4))
-        addView(wrap(gaugeCard), bottom(22))
+        addView(label(getString(R.string.home_welcome_title), 17f, R.color.sweep_text, true),
+            LinearLayout.LayoutParams(-1, -2).apply {
+                gravity = Gravity.CENTER
+                bottomMargin = dp(14)
+            })
 
-        // Ação principal em cartão horizontal: foco na tarefa, sem o antigo orbe gigante.
-        heroOrbButton = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(20), dp(18), dp(18), dp(18))
-            background = roundedBackground(color(R.color.sweep_primary), dp(24))
-            isClickable = true
-            isFocusable = true
+        heroOrbButton = MaterialButton(this@MainActivity).apply {
+            text = getString(R.string.home_cleanup_primary)
+            textSize = 19f
+            isAllCaps = false
+            minHeight = dp(78)
+            cornerRadius = dp(24)
+            insetTop = 0
+            insetBottom = 0
             tag = "primary_phone_cleaner_action"
-            setOnClickListener {
-                switchTab(AppTab.OAAS)
-                runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
-            }
-        }
-        val heroCopy = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-        }
-        heroOrbTitle = label(getString(R.string.analyze_now), 17f, R.color.sweep_background, true)
-        heroOrbSubtitle = label(getString(R.string.tap_to_scan_media), 12f, R.color.sweep_background, false)
-        heroCopy.addView(heroOrbTitle)
-        heroCopy.addView(heroOrbSubtitle, top(4))
-        heroOrbButton.addView(heroCopy, LinearLayout.LayoutParams(0, -2, 1f))
-        heroOrbButton.addView(label("→", 28f, R.color.sweep_background, true))
-        addView(
-            heroOrbButton,
-            LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(18) },
-        )
-
-        // Ações de limpeza e categorias acessíveis diretamente da Home.
-        val quickMissionsCard = card()
-        quickMissionsCard.addView(label(getString(R.string.quick_actions_title), 11f, R.color.sweep_primary_glow, true))
-        quickMissionsCard.addView(label(getString(R.string.quick_actions_subtitle), 12f, R.color.sweep_muted, false), top(4))
-
-        val quickLargeBtn = button(getString(R.string.quick_find_large)) {
-            switchTab(AppTab.OAAS)
-            runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
-        }.apply {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setOnClickListener { onHomeCleanupButtonClicked() }
         }
-        val quickDupBtn = button(getString(R.string.quick_find_duplicates)) {
-            switchTab(AppTab.OAAS)
-            runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
-        }
-        val missionRow = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-        }
-        missionRow.addView(quickLargeBtn, LinearLayout.LayoutParams(0, dp(52), 1f).apply { marginEnd = dp(5) })
-        missionRow.addView(quickDupBtn, LinearLayout.LayoutParams(0, dp(52), 1f).apply { marginStart = dp(5) })
-        quickMissionsCard.addView(missionRow, top(10))
+        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(78)).apply { bottomMargin = dp(8) })
 
-        scanButton = button(getString(R.string.scan_button)) {
-            startScanOrRequestAccess()
-            switchTab(AppTab.FILES)
-        }
-        quickMissionsCard.addView(scanButton, top(8))
+        heroOrbSubtitle = label(getString(R.string.home_cleanup_subtitle), 12f, R.color.sweep_muted, false)
+        addView(heroOrbSubtitle, LinearLayout.LayoutParams(-1, -2).apply {
+            leftMargin = dp(8)
+            rightMargin = dp(8)
+            bottomMargin = dp(16)
+        })
 
-        permissionButton = button(getString(R.string.permission_continue)) {
-            requestMediaPermissions()
-        }
-        quickMissionsCard.addView(permissionButton, top(6))
-
-        cancelButton = button(getString(R.string.cancel_scan)) { viewModel.cancelLoading() }.apply {
+        homeCleanupResult = label("", 14f, R.color.sweep_primary_glow, true).apply {
             visibility = View.GONE
+            setPadding(dp(8), dp(2), dp(8), dp(10))
         }
-        quickMissionsCard.addView(cancelButton, top(6))
-        addView(wrap(quickMissionsCard), bottom(12))
+        addView(homeCleanupResult)
 
-        val categoriesCard = card()
-        categoriesCard.addView(label(getString(R.string.media_kind_title), 11f, R.color.sweep_primary_glow, true))
-        val categoryRow = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
+        val homePlansCard = card()
+        homePlansCard.addView(label(getString(R.string.home_plans_title), 16f, R.color.sweep_text, true))
+        homePlansCard.addView(label(getString(R.string.home_plans_subtitle), 12f, R.color.sweep_muted, false), top(4))
+
+        homePlanMonthlyButton = button(getString(R.string.plan_monthly_default)) {
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
+        }.apply { minHeight = dp(48) }
+        stylePlanPurchaseButton(homePlanMonthlyButton, isProductAvailable = false)
+        homePlansCard.addView(homePlanMonthlyButton, top(10))
+
+        homePlanAnnualButton = button(getString(R.string.plan_annual_default)) {
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
+        }.apply { minHeight = dp(48) }
+        stylePlanPurchaseButton(homePlanAnnualButton, isProductAvailable = false)
+        homePlansCard.addView(homePlanAnnualButton, top(6))
+
+        homePlanLifetimeButton = button(getString(R.string.plan_lifetime_default)) {
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
+        }.apply { minHeight = dp(48) }
+        stylePlanPurchaseButton(homePlanLifetimeButton, isProductAvailable = false)
+        homePlansCard.addView(homePlanLifetimeButton, top(6))
+        homePlansCard.addView(
+            label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false),
+            top(8),
+        )
+        addView(wrap(homePlansCard), bottom(14))
+
+        val shareAppButton = button(getString(R.string.share_app_button)) { shareApp() }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            setTextColor(color(R.color.sweep_text))
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_share)
+            iconTint = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary_glow))
+            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
         }
-        fun categoryShortcut(title: String, kind: MediaKind): MaterialButton =
-            button(title) {
-                switchTab(AppTab.FILES)
-                if (isKindAccessible(viewModel.state.value, kind)) {
-                    viewModel.selectKind(kind)
-                } else {
-                    pendingKindAfterPermission = kind
-                    requestMediaPermissions()
-                }
-            }
-        val photosShortcut = categoryShortcut(getString(R.string.photos_tab), MediaKind.IMAGE)
-        val videosShortcut = categoryShortcut(getString(R.string.videos_tab), MediaKind.VIDEO)
-        val audioShortcut = categoryShortcut(getString(R.string.audio_tab), MediaKind.AUDIO)
-        categoryRow.addView(photosShortcut, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
-        categoryRow.addView(videosShortcut, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
-        categoryRow.addView(audioShortcut, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
-        categoriesCard.addView(categoryRow, top(8))
-        addView(wrap(categoriesCard), bottom(14))
+        addView(shareAppButton, LinearLayout.LayoutParams(-1, dp(52)).apply { bottomMargin = dp(8) })
+    }
+
+    private fun shareApp() {
+        val playStoreLink = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore"
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_message, playStoreLink))
+        }
+        runCatching {
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app_chooser_title)))
+        }.onFailure {
+            Toast.makeText(this, R.string.share_app_unavailable, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun buildFilesExplorerSection(): LinearLayout = LinearLayout(this).apply {
@@ -599,8 +612,12 @@ class MainActivity : AppCompatActivity() {
         controls.addView(filterRow1, bottom(6))
 
         val filterRow2 = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
-        filterDuplicatesButton = button(getString(R.string.filter_same_size)) { viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES) }
-        filterOldButton = button(getString(R.string.filter_older_30d)) { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }
+        filterDuplicatesButton = button(getString(R.string.filter_same_size)) {
+            runWithProAccess { viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES) }
+        }
+        filterOldButton = button(getString(R.string.filter_older_30d)) {
+            runWithProAccess { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }
+        }
         filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginEnd = dp(4) })
         filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginStart = dp(4) })
         controls.addView(filterRow2, bottom(12))
@@ -654,6 +671,14 @@ class MainActivity : AppCompatActivity() {
 
         val reviewCard = card()
         reviewCard.addView(label(getString(R.string.review_title), 11f, R.color.sweep_primary_glow, true))
+        reviewCard.addView(label(getString(R.string.space_accounting_title), 11f, R.color.sweep_primary_glow, true), top(8))
+        spaceMetricsText = label(
+            getString(R.string.space_metrics_summary, "0 B", "0 B", "0 B", "0 B"),
+            11f,
+            R.color.sweep_muted,
+            false,
+        )
+        reviewCard.addView(spaceMetricsText, top(4))
         selectionSummary = label(getString(R.string.nothing_selected), 15f, R.color.sweep_text, true)
         reviewCard.addView(selectionSummary, top(8))
         reviewCard.addView(label(getString(R.string.review_readonly_note), 12f, R.color.sweep_muted, false), top(6))
@@ -677,7 +702,8 @@ class MainActivity : AppCompatActivity() {
 
         clearSelectionButton = button(getString(R.string.clear_review)) { viewModel.clearSelection() }
         reviewCard.addView(clearSelectionButton, top(8))
-        addView(wrap(reviewCard), bottom(14))
+        filesReviewCard = wrap(reviewCard)
+        addView(filesReviewCard, bottom(14))
     }
 
     private fun buildOaasMissionsSection(): LinearLayout = LinearLayout(this).apply {
@@ -687,6 +713,15 @@ class MainActivity : AppCompatActivity() {
         oaasCard.addView(label(getString(R.string.oaas_card_title), 11f, R.color.sweep_primary_glow, true))
         oaasCard.addView(label(getString(R.string.oaas_card_headline), 18f, R.color.sweep_text, true), top(6))
         oaasCard.addView(label(getString(R.string.oaas_card_subtitle), 12f, R.color.sweep_muted, false), top(4))
+        scanButton = button(getString(R.string.scan_button)) {
+            switchTab(AppTab.FILES)
+            startScanOrRequestAccess()
+        }
+        oaasCard.addView(scanButton, top(10))
+        permissionButton = button(getString(R.string.permission_continue)) {
+            requestMediaPermissions()
+        }.apply { visibility = View.GONE }
+        oaasCard.addView(permissionButton, top(6))
         oaasPipelineStatus = label(getString(R.string.oaas_pipeline_idle), 12f, R.color.sweep_primary_glow, true)
         oaasCard.addView(oaasPipelineStatus, top(10))
         oaasCancelMissionButton = button(getString(R.string.cancel_scan)) {
@@ -694,6 +729,7 @@ class MainActivity : AppCompatActivity() {
         }.apply {
             visibility = View.GONE
         }
+        cancelButton = oaasCancelMissionButton
         oaasCard.addView(oaasCancelMissionButton, top(8))
 
         oaasMissionLargeButton = button(getString(R.string.oaas_mission_large)) {
@@ -705,14 +741,43 @@ class MainActivity : AppCompatActivity() {
         oaasCard.addView(oaasMissionLargeButton, top(12))
 
         oaasMissionDuplicatesButton = button(getString(R.string.oaas_mission_duplicates)) {
-            runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+            runWithProAccess { runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES) }
         }
         oaasCard.addView(oaasMissionDuplicatesButton, top(8))
 
         oaasMissionOldButton = button(getString(R.string.oaas_mission_old)) {
-            runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
+            runWithProAccess { runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D) }
         }
         oaasCard.addView(oaasMissionOldButton, top(8))
+
+        missionPermissionButton = button(getString(R.string.permission_continue)) {
+            requestMediaPermissions()
+        }.apply { visibility = View.GONE }
+        oaasCard.addView(missionPermissionButton, top(10))
+
+        missionRetryButton = button(getString(R.string.oaas_retry_scan_button)) {
+            val mission = viewModel.state.value.missionProgress?.mission
+                ?: DesiredOutcomeMission.FREE_MAX_SPACE_NOW
+            pendingOutcomeMission = mission
+            oaasPipelineStatus.text = getString(R.string.oaas_starting_scan_first)
+            if (hasAnyMediaPermission()) viewModel.startSession() else requestMediaPermissions()
+        }.apply { visibility = View.GONE }
+        oaasCard.addView(missionRetryButton, top(8))
+
+        missionReviewButton = button(getString(R.string.oaas_review_results_button)) {
+            switchTab(AppTab.FILES)
+            filesReviewCard.post {
+                filesReviewCard.requestRectangleOnScreen(
+                    android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
+                    true,
+                )
+            }
+        }.apply {
+            visibility = View.GONE
+            setTextColor(color(R.color.sweep_background))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+        }
+        oaasCard.addView(missionReviewButton, top(8))
 
         oaasFlywheelMetrics = label(
             getString(R.string.oaas_flywheel_summary, 0, 0, "0 B"),
@@ -774,28 +839,60 @@ class MainActivity : AppCompatActivity() {
         proCard.addView(label(getString(R.string.pro_free_included), 12f, R.color.sweep_text, false), top(12))
         proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.sweep_accent_amber, false), top(10))
 
+        val unusedAppsButton = button(getString(R.string.pro_unused_apps_button)) {
+            runWithProAccess { requestUnusedAppSuggestions() }
+        }
+        proCard.addView(unusedAppsButton, top(12))
+
+        val advancedCleanupButton = button(getString(R.string.pro_advanced_cleanup_button)) {
+            runWithProAccess { switchTab(AppTab.OAAS) }
+        }
+        proCard.addView(advancedCleanupButton, top(8))
+
+        val browseFilesButton = button(getString(R.string.pro_browse_files_button)) {
+            runWithProAccess { switchTab(AppTab.FILES) }
+        }
+        proCard.addView(browseFilesButton, top(8))
+
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
         }.apply {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
         }
-        planAnnualButton.isEnabled = billingGateway.securePurchaseVerificationAvailable()
+        stylePlanPurchaseButton(planAnnualButton, isProductAvailable = false)
         proCard.addView(planAnnualButton, top(14))
 
         planMonthlyButton = button(getString(R.string.plan_monthly_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
         }
-        planMonthlyButton.isEnabled = billingGateway.securePurchaseVerificationAvailable()
+        stylePlanPurchaseButton(planMonthlyButton, isProductAvailable = false)
         proCard.addView(planMonthlyButton, top(8))
 
         planLifetimeButton = button(getString(R.string.plan_lifetime_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
         }
-        planLifetimeButton.isEnabled = billingGateway.securePurchaseVerificationAvailable()
+        stylePlanPurchaseButton(planLifetimeButton, isProductAvailable = false)
         proCard.addView(planLifetimeButton, top(8))
         if (!billingGateway.securePurchaseVerificationAvailable()) {
             proCard.addView(label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false), top(12))
+        }
+
+        if (isDevelopmentBuild) {
+            val debugPreviewButton = button(getString(R.string.pro_debug_preview_off)) {
+                debugProPreviewEnabled = !debugProPreviewEnabled
+                debugProPreviewButton?.text = getString(
+                    if (debugProPreviewEnabled) R.string.pro_debug_preview_on else R.string.pro_debug_preview_off,
+                )
+                renderBillingState(billingGateway.accessState.value)
+                statusText.text = getString(
+                    if (debugProPreviewEnabled) R.string.pro_debug_preview_enabled else R.string.pro_debug_preview_disabled,
+                )
+                updateReview(viewModel.state.value)
+            }
+            debugProPreviewButton = debugPreviewButton
+            proCard.addView(debugPreviewButton, top(10))
+            proCard.addView(label(getString(R.string.pro_debug_preview_note), 11f, R.color.sweep_muted, false), top(4))
         }
 
         restorePurchasesButton = button(getString(R.string.restore_purchases_button)) {
@@ -818,6 +915,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchTab(tab: AppTab) {
         activeTab = tab
+        statusText.visibility = if (tab == AppTab.FILES) View.VISIBLE else View.GONE
         homeSection.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
         filesSection.visibility = if (tab == AppTab.FILES) View.VISIBLE else View.GONE
         oaasSection.visibility = if (tab == AppTab.OAAS) View.VISIBLE else View.GONE
@@ -841,6 +939,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderBillingState(state: ProAccessSummaryState) {
         if (!::proStatusBadge.isInitialized) return
+        val hasProAccess = state == ProAccessSummaryState.PRO_GRANTED ||
+            (isDevelopmentBuild && debugProPreviewEnabled)
+        if (::bottomNavContainer.isInitialized) {
+            navFilesBtn.visibility = if (hasProAccess) View.VISIBLE else View.GONE
+            navOaasBtn.visibility = if (hasProAccess) View.VISIBLE else View.GONE
+        }
+        if (isDevelopmentBuild && debugProPreviewEnabled) {
+            proStatusBadge.text = getString(R.string.pro_debug_preview_badge)
+            return
+        }
         proStatusBadge.text = when (state) {
             ProAccessSummaryState.PRO_GRANTED -> getString(R.string.pro_status_active)
             ProAccessSummaryState.PENDING_PAYMENT -> getString(R.string.pro_status_pending)
@@ -850,40 +958,73 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderCatalogPrices(catalog: Map<String, PlayCatalogProductUi>) {
-        if (!::planAnnualButton.isInitialized) return
+        if (!::planAnnualButton.isInitialized || !::homePlanAnnualButton.isInitialized) return
         val annual = catalog[BillingStatePolicy.PRODUCT_ANNUAL]
         val monthly = catalog[BillingStatePolicy.PRODUCT_MONTHLY]
         val lifetime = catalog[BillingStatePolicy.PRODUCT_LIFETIME]
-        val canPurchase = billingGateway.securePurchaseVerificationAvailable()
-        planAnnualButton.isEnabled = canPurchase && annual?.isAvailable == true
-        planMonthlyButton.isEnabled = canPurchase && monthly?.isAvailable == true
-        planLifetimeButton.isEnabled = canPurchase && lifetime?.isAvailable == true
+        listOf(
+            planAnnualButton to annual,
+            homePlanAnnualButton to annual,
+            planMonthlyButton to monthly,
+            homePlanMonthlyButton to monthly,
+            planLifetimeButton to lifetime,
+            homePlanLifetimeButton to lifetime,
+        ).forEach { (button, product) ->
+            stylePlanPurchaseButton(button, product?.isAvailable == true)
+        }
 
-        if (annual != null && annual.formattedPrice.isNotBlank()) {
+        val annualLabel = if (annual != null && annual.formattedPrice.isNotBlank()) {
             val realDiscount = BillingStatePolicy.calculateRealAnnualDiscountPercent(
                 monthlyPriceMicros = monthly?.priceAmountMicros,
                 annualPriceMicros = annual.priceAmountMicros,
                 monthlyCurrencyCode = monthly?.priceCurrencyCode,
                 annualCurrencyCode = annual.priceCurrencyCode,
             )
-            planAnnualButton.text = if (realDiscount != null) {
+            if (realDiscount != null) {
                 getString(R.string.plan_annual_with_price_and_discount, annual.formattedPrice, realDiscount)
             } else {
                 getString(R.string.plan_annual_with_price, annual.formattedPrice)
             }
         } else if (annual != null && !annual.isAvailable) {
-            planAnnualButton.text = getString(R.string.plan_unavailable)
+            getString(R.string.plan_annual_unavailable)
+        } else {
+            null
         }
-        if (monthly != null && monthly.formattedPrice.isNotBlank()) {
-            planMonthlyButton.text = getString(R.string.plan_monthly_with_price, monthly.formattedPrice)
+        annualLabel?.let {
+            planAnnualButton.text = it
+            homePlanAnnualButton.text = it
+        }
+        val monthlyLabel = if (monthly != null && monthly.formattedPrice.isNotBlank()) {
+            getString(R.string.plan_monthly_with_price, monthly.formattedPrice)
         } else if (monthly != null && !monthly.isAvailable) {
-            planMonthlyButton.text = getString(R.string.plan_unavailable)
+            getString(R.string.plan_monthly_unavailable)
+        } else {
+            null
         }
-        if (lifetime != null && lifetime.formattedPrice.isNotBlank()) {
-            planLifetimeButton.text = getString(R.string.plan_lifetime_with_price, lifetime.formattedPrice)
+        monthlyLabel?.let {
+            planMonthlyButton.text = it
+            homePlanMonthlyButton.text = it
+        }
+        val lifetimeLabel = if (lifetime != null && lifetime.formattedPrice.isNotBlank()) {
+            getString(R.string.plan_lifetime_with_price, lifetime.formattedPrice)
         } else if (lifetime != null && !lifetime.isAvailable) {
-            planLifetimeButton.text = getString(R.string.plan_unavailable)
+            getString(R.string.plan_lifetime_unavailable)
+        } else {
+            null
         }
+        lifetimeLabel?.let {
+            planLifetimeButton.text = it
+            homePlanLifetimeButton.text = it
+        }
+    }
+
+    private fun stylePlanPurchaseButton(button: MaterialButton, isProductAvailable: Boolean) {
+        val enabled = billingGateway.securePurchaseVerificationAvailable() && isProductAvailable
+        button.isEnabled = enabled
+        button.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            color(if (enabled) R.color.sweep_primary else R.color.sweep_surface_alt),
+        )
+        button.setTextColor(color(if (enabled) R.color.sweep_background else R.color.sweep_muted))
     }
 
     private fun requestPlanPurchase(productId: String) {
@@ -906,6 +1047,140 @@ class MainActivity : AppCompatActivity() {
 
     private fun startScanOrRequestAccess() {
         if (hasAnyMediaPermission()) viewModel.startSession() else requestMediaPermissions()
+    }
+
+    private fun startOneTapCleanup() {
+        homeCleanupCandidateCount = 0
+        heroOrbButton.isEnabled = false
+        heroOrbButton.text = getString(R.string.home_cleanup_scanning_button)
+        heroOrbSubtitle.text = getString(R.string.home_cleanup_scanning)
+        showHomeCleanupMessage(getString(R.string.home_cleanup_scanning))
+        runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+    }
+
+    private fun showHomeCleanupMessage(message: String) {
+        if (::homeCleanupResult.isInitialized) {
+            homeCleanupResult.text = message
+            homeCleanupResult.visibility = View.VISIBLE
+        }
+    }
+
+    private fun onHomeCleanupButtonClicked() {
+        if (!heroOrbButton.isEnabled) return
+        if (homeCleanupCandidateCount > 0) {
+            switchTab(AppTab.FILES)
+            filesReviewCard.post {
+                filesReviewCard.requestRectangleOnScreen(
+                    android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height), true,
+                )
+            }
+        } else {
+            startOneTapCleanup()
+        }
+    }
+
+    private fun runWithProAccess(action: () -> Unit) {
+        val hasVerifiedAccess = billingGateway.accessState.value == ProAccessSummaryState.PRO_GRANTED
+        if (hasVerifiedAccess || (isDevelopmentBuild && debugProPreviewEnabled)) {
+            action()
+        } else {
+            switchTab(AppTab.PRO)
+            Toast.makeText(this, R.string.pro_feature_requires_pro, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun requestUnusedAppSuggestions() {
+        if (!hasUsageStatsAccess()) {
+            Toast.makeText(this, R.string.pro_unused_apps_permission, Toast.LENGTH_LONG).show()
+            runCatching {
+                usageAccessLauncher.launch(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            }.onFailure {
+                Toast.makeText(this, R.string.pro_unused_apps_permission_denied, Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+        loadUnusedAppSuggestions()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun hasUsageStatsAccess(): Boolean = runCatching {
+        getSystemService(AppOpsManager::class.java).checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            packageName,
+        ) == AppOpsManager.MODE_ALLOWED
+    }.getOrDefault(false)
+
+    private fun loadUnusedAppSuggestions() {
+        Toast.makeText(this, R.string.pro_unused_apps_searching, Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            val suggestions = withContext(Dispatchers.IO) { queryUnusedApps() }
+            if (suggestions.isEmpty()) {
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle(R.string.pro_unused_apps_title)
+                    .setMessage(R.string.pro_unused_apps_empty)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+                return@launch
+            }
+            val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM)
+            val labels = suggestions.map { app ->
+                val usage = if (app.lastUsedMillis > 0L) {
+                    getString(R.string.pro_unused_apps_last_used, dateFormat.format(Date(app.lastUsedMillis)))
+                } else {
+                    getString(R.string.pro_unused_apps_never_used)
+                }
+                "${app.displayName} · $usage"
+            }.toTypedArray()
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.pro_unused_apps_title)
+                .setItems(labels) { _, index -> requestUninstallUnusedApp(suggestions[index]) }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun queryUnusedApps(): List<UnusedAppInfo> {
+        val endTime = System.currentTimeMillis()
+        val ninetyDaysMillis = 90L * 24L * 60L * 60L * 1000L
+        val cutoff = (endTime - ninetyDaysMillis).coerceAtLeast(0L)
+        val usage = getSystemService(UsageStatsManager::class.java)
+            .queryAndAggregateUsageStats(cutoff, endTime)
+        val launchableApps = packageManager.queryIntentActivities(
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+            0,
+        )
+        val suggestionsByPackage = linkedMapOf<String, UnusedAppInfo>()
+        for (resolveInfo in launchableApps) {
+            val activityInfo = resolveInfo.activityInfo ?: continue
+            val appInfo = activityInfo.applicationInfo ?: continue
+            val appPackage = activityInfo.packageName
+            if (appPackage == packageName || appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) continue
+            val lastUsed = usage[appPackage]?.lastTimeUsed ?: 0L
+            if (lastUsed > 0L && lastUsed >= cutoff) continue
+            val firstInstalled = runCatching {
+                packageManager.getPackageInfo(appPackage, 0).firstInstallTime
+            }.getOrDefault(endTime)
+            if (firstInstalled >= cutoff) continue
+            val displayName = runCatching {
+                resolveInfo.loadLabel(packageManager).toString()
+            }.getOrDefault(appPackage)
+            suggestionsByPackage.putIfAbsent(
+                appPackage,
+                UnusedAppInfo(appPackage, displayName, lastUsed),
+            )
+        }
+        return suggestionsByPackage.values
+            .sortedWith(compareBy<UnusedAppInfo> { if (it.lastUsedMillis == 0L) 0L else it.lastUsedMillis }
+                .thenBy { it.displayName.lowercase() })
+            .take(50)
+    }
+
+    private fun requestUninstallUnusedApp(app: UnusedAppInfo) {
+        val uninstallIntent = Intent(Intent.ACTION_DELETE, Uri.parse("package:${app.packageName}"))
+        runCatching { startActivity(uninstallIntent) }
+            .onFailure { Toast.makeText(this, R.string.pro_unused_apps_permission_denied, Toast.LENGTH_LONG).show() }
     }
 
     private fun requestMediaPermissions() {
@@ -971,15 +1246,6 @@ class MainActivity : AppCompatActivity() {
         filterOldButton.isEnabled = !state.isLoading
         previousButton.isEnabled = state.canLoadPrevious
         nextButton.isEnabled = state.canLoadNext
-
-        val countInPage = state.currentPage?.records?.size ?: 0
-        heroOrbSubtitle.text = if (state.isLoading) {
-            getString(R.string.loading_page)
-        } else if (countInPage > 0) {
-            getString(R.string.files_count_in_tab, countInPage)
-        } else {
-            getString(R.string.tap_to_scan_media_types)
-        }
 
         val defaultStatus = when (state.status) {
             ScanUiStatus.IDLE -> getString(R.string.ready_status)
@@ -1060,6 +1326,12 @@ class MainActivity : AppCompatActivity() {
         ) {
             pendingOutcomeMission = null
             oaasPipelineStatus.text = getString(R.string.oaas_mission_scan_failed)
+            if (mission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW) {
+                heroOrbButton.isEnabled = true
+                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
+                showHomeCleanupMessage(getString(R.string.home_cleanup_scan_failed))
+            }
         }
     }
 
@@ -1303,7 +1575,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderMissionProgress(progress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress?) {
         progress ?: return
+        val isFreeHomeCleanup = progress.mission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW
+        missionPermissionButton.visibility = if (hasDeniedMediaKind()) View.VISIBLE else View.GONE
         if (progress.isRunning) {
+            if (isFreeHomeCleanup) {
+                heroOrbButton.isEnabled = false
+                heroOrbButton.text = getString(R.string.home_cleanup_scanning_button)
+                heroOrbSubtitle.text = getString(R.string.home_cleanup_scanning)
+                showHomeCleanupMessage(
+                    getString(
+                        R.string.home_cleanup_progress,
+                        progress.pagesProcessed,
+                        progress.recordsExamined,
+                    ),
+                )
+            }
+            missionReviewButton.visibility = View.GONE
+            missionRetryButton.visibility = View.GONE
             oaasPipelineStatus.text = getString(
                 R.string.oaas_global_scan_progress,
                 progress.pagesProcessed,
@@ -1316,6 +1604,15 @@ class MainActivity : AppCompatActivity() {
 
         val plan = progress.plan
         if (plan == null) {
+            if (isFreeHomeCleanup) {
+                homeCleanupCandidateCount = 0
+                heroOrbButton.isEnabled = true
+                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
+                showHomeCleanupMessage(getString(R.string.home_cleanup_scan_failed))
+            }
+            missionReviewButton.visibility = View.GONE
+            missionRetryButton.visibility = if (progress.message in setOf("session_stale", "cancelled")) View.VISIBLE else View.GONE
             oaasPipelineStatus.text = when (progress.message) {
                 "cancelled" -> getString(R.string.oaas_global_scan_cancelled)
                 "safety_limit_reached" -> getString(R.string.oaas_global_scan_limit)
@@ -1324,6 +1621,7 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
+        missionRetryButton.visibility = View.GONE
 
         if (progress !== lastRecordedMissionProgress) {
             outcomeTelemetry.recordMissionRequested(progress.mission, plan.autoSelectedRecords.size)
@@ -1333,6 +1631,15 @@ class MainActivity : AppCompatActivity() {
 
         val formattedBytes = android.text.format.Formatter.formatFileSize(this, plan.estimatedDeliverableBytes)
         val resultMessage = when {
+            plan.autoSelectedRecords.isEmpty() && progress.coverageComplete -> getString(
+                R.string.oaas_no_candidates_complete,
+                progress.recordsExamined,
+            )
+            plan.autoSelectedRecords.isEmpty() -> getString(
+                R.string.oaas_no_candidates_partial,
+                progress.recordsExamined,
+                progress.warningCount,
+            )
             plan.isReadyToDeliver && progress.coverageComplete -> getString(
                 R.string.oaas_global_scan_result_complete,
                 progress.recordsExamined,
@@ -1355,6 +1662,33 @@ class MainActivity : AppCompatActivity() {
                 progress.warningCount,
             )
         }
+        missionReviewButton.text = getString(R.string.oaas_cleanup_continue, formattedBytes)
+        missionReviewButton.visibility = if (plan.autoSelectedRecords.isNotEmpty()) View.VISIBLE else View.GONE
+        if (isFreeHomeCleanup) {
+            homeCleanupCandidateCount = plan.autoSelectedRecords.size
+            heroOrbButton.isEnabled = true
+            heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
+            if (homeCleanupCandidateCount > 0) {
+                heroOrbButton.text = getString(
+                    R.string.home_cleanup_review_button,
+                    homeCleanupCandidateCount,
+                    formattedBytes,
+                )
+                val messageId = if (progress.coverageComplete) {
+                    R.string.home_cleanup_candidates_found
+                } else {
+                    R.string.home_cleanup_candidates_partial
+                }
+                showHomeCleanupMessage(getString(messageId, homeCleanupCandidateCount, formattedBytes))
+            } else {
+                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                showHomeCleanupMessage(
+                    if (progress.coverageComplete) getString(R.string.home_cleanup_no_candidates)
+                    else getString(R.string.home_cleanup_no_candidates_partial),
+                )
+            }
+        }
+        missionPermissionButton.visibility = if (!progress.coverageComplete && hasDeniedMediaKind()) View.VISIBLE else View.GONE
         val coverageNote = when (progress.message) {
             "paging_args_unverified" -> getString(R.string.warn_paging_args_unverified)
             "safety_limit_reached" -> getString(R.string.oaas_global_scan_limit)
@@ -1542,6 +1876,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun exportOrUnlockProSummary() {
         val summaryText = viewModel.buildReviewSummaryExportText() ?: return
+        if (isDevelopmentBuild && debugProPreviewEnabled) {
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_review_subject))
+                putExtra(Intent.EXTRA_TEXT, summaryText)
+            }
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.export_review_summary)))
+            return
+        }
         when (billingGateway.accessState.value) {
             ProAccessSummaryState.PRO_GRANTED -> {
                 val sendIntent = Intent(Intent.ACTION_SEND).apply {
@@ -1571,8 +1914,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val isDevelopmentBuild: Boolean
+        get() = applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0
+
     @Suppress("DEPRECATION")
     private fun refreshStorageStats() {
+        // The simplified Home screen no longer renders the storage gauge/text views.
+        if (!::storageText.isInitialized && !::storageUsedHeadline.isInitialized) return
         runCatching {
             // Measure primary shared storage, where user media is normally stored, rather than app-private /data.
             val primarySharedStorage = Environment.getExternalStorageDirectory()
@@ -1585,20 +1933,26 @@ class MainActivity : AppCompatActivity() {
             val usedFmt = android.text.format.Formatter.formatFileSize(this, usage.usedBytes)
             val freeFmt = android.text.format.Formatter.formatFileSize(this, usage.availableBytes)
             val totalFmt = android.text.format.Formatter.formatFileSize(this, usage.totalBytes)
-            storageText.text = getString(R.string.storage_measurement, usedFmt, freeFmt, totalFmt)
+            if (::storageText.isInitialized) {
+                storageText.text = getString(R.string.storage_measurement, usedFmt, freeFmt, totalFmt)
+            }
             if (::storageUsedHeadline.isInitialized) {
-                storageUsedHeadline.text = getString(R.string.storage_used_of_total, usedFmt, totalFmt)
+                storageUsedHeadline.text = getString(R.string.storage_used_headline, usedFmt)
                 storageFreeSubline.text = getString(R.string.storage_free_subline, freeFmt)
-                storageRingGauge.usedFraction = usage.usedFraction.toFloat()
-                storageRingGauge.centerLabel = "${usage.usedPercent}%"
+                if (::storageRingGauge.isInitialized) {
+                    storageRingGauge.usedFraction = usage.usedFraction.toFloat()
+                    storageRingGauge.centerLabel = "${usage.usedPercent}%"
+                }
             }
         }.onFailure {
-            storageText.text = getString(R.string.storage_unavailable)
+            if (::storageText.isInitialized) storageText.text = getString(R.string.storage_unavailable)
             if (::storageUsedHeadline.isInitialized) {
                 storageUsedHeadline.text = getString(R.string.storage_unavailable)
                 storageFreeSubline.text = ""
-                storageRingGauge.usedFraction = 0f
-                storageRingGauge.centerLabel = "—"
+                if (::storageRingGauge.isInitialized) {
+                    storageRingGauge.usedFraction = 0f
+                    storageRingGauge.centerLabel = "—"
+                }
             }
         }
     }
@@ -1622,14 +1976,18 @@ class MainActivity : AppCompatActivity() {
         textSize = size
         setTextColor(color(colorId))
         if (bold) typeface = Typeface.DEFAULT_BOLD
+        includeFontPadding = false
         setLineSpacing(dp(2).toFloat(), 1f)
     }
 
     private fun button(text: String, onClick: () -> Unit): MaterialButton = MaterialButton(this).apply {
         this.text = text
         isAllCaps = false
-        textSize = 13f
+        textSize = 12f
         cornerRadius = dp(16)
+        setPadding(dp(6), dp(2), dp(6), dp(2))
+        backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+        setTextColor(color(R.color.sweep_text))
         setOnClickListener { onClick() }
     }
 
