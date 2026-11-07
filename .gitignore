@@ -9,3 +9,12 @@ keystore.properties
 *.apk
 .idea/
 .DS_Store
+.env
+.env.*
+!.env.example
+web/.next/
+web/node_modules/
+web/out/
+backup/
+__pycache__/
+*.py[cod]
