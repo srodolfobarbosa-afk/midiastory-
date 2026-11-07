@@ -14,6 +14,15 @@
 
 Auditoria da branch `fix/p0-sweep-permissions-missions-billing`, revisada em 04/11/2026. Esta matriz distingue código presente, testes executados e validação real em aparelho. Uma implementação no source não significa que o recurso foi aprovado para produção.
 
+## Reavaliação local atual — 2026-11-07
+
+- O inventário abaixo tem 62 linhas de área funcional; isso é inventário de escopo, não significa 62 funcionalidades aprovadas.
+- A suíte local `:domain:test :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleDebugAndroidTest` terminou `BUILD SUCCESSFUL`; relatórios JUnit somam 78 testes, 0 falhas, 0 erros e 0 skips. Lint reporta 222 findings e a configuração `abortOnError=false` não os bloqueia.
+- No Motorola API35, o app instalado abriu, mas o toque em “Liberar espaço” terminou com “Não foi possível analisar os arquivos”. O APK local mais novo não pôde substituir o instalado porque a assinatura Debug difere. A tentativa Gradle instrumentada também parou ao instalar `mediaOwnerTest` com assinatura incompatível; nenhum caso instrumentado foi coletado nessa tentativa.
+- As chaves EN/PT-BR/fallback agora são 206/206, sem diferenças. Cada um de ES/FR/DE/HI/JA/zh-CN tem 95/206 chaves; faltam 111 por idioma.
+- A imagem da Home agora sobrepõe o nome “Midiastore” dentro da arte atual. A troca por foto realista e qualquer vinheta de 10 segundos continuam pendentes: a API de imagem não tem créditos e não há ferramenta de vídeo nesta sessão.
+- A compra continua bloqueada até configuração real de produtos e verificação confiável de purchaseToken. Não há AAB pronto para upload nem publicação autorizada pelos gates atuais.
+
 ## Identidade e release
 
 | Área | Estado | Evidência atual | Pendência / limite | Próxima validação |

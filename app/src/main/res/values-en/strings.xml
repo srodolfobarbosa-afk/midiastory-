@@ -132,6 +132,7 @@ Total: %3$s</string>
     <string name="restore_purchases_button">Restore purchases</string>
     <string name="restoring_purchases_status">Reconciling active purchases with Google Play Billing…</string>
     <string name="manage_subscriptions_button">Manage subscriptions on Google Play Store</string>
+    <string name="billing_subscriptions_open_failed">Google Play subscriptions could not be opened. Try again from the Play Store app.</string>
     <string name="privacy_title">PRIVACY</string>
     <string name="privacy_body">Photos, videos, and audio are analyzed on your device. A report leaves Midiastore only when you choose to export or share it. Purchases are processed by Google Play.</string>
     <string name="selection_limit_reached">500-item batch safety limit reached.</string>

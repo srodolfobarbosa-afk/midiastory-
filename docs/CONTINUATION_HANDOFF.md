@@ -11,6 +11,17 @@
 - In-app localization remains English + pt-BR. No portrait AI asset was generated; current home character is a native vector illustration.
 - Próximo passo: revisar `git diff`, commit somente arquivos intencionais e enviar para a branch existente da PR. Excluir caches, screenshots, keystores, senhas e arquivos de ponte locais do commit. Continuar bloqueando release pública até fechar `docs/RELEASE_BLOCKERS.md`.
 
+## Retomada do objetivo de limpeza rápida — 2026-11-07
+
+- O proprietário pediu uma limpeza grátis, fácil e com resultado real em uma ação principal; Pro é opcional e vem depois de valor comprovado. Nenhuma limpeza pode apagar mídia sem revisão e consentimento oficial do Android.
+- Tentativa manual mais recente no Motorola API35: abriu o Midiastore instalado, tocou em “Liberar espaço” e viu “Não foi possível analisar os arquivos”; nenhum arquivo foi apagado. A versão Debug local não atualizou o pacote instalado porque a assinatura Debug é diferente. O erro do build antigo não identifica a causa no source atual.
+- Código local atualizado: exceção global da análise agora registra somente a classe do erro (sem nome/caminho/URI de mídia); planos indisponíveis continuam tocáveis e explicam o bloqueio; restaurar compras confirma a verificação; falha ao abrir gerenciamento da Play Store dá feedback; o nome Midiastore foi sobreposto dentro da arte atual da Home.
+- Validação local do SHA ainda não enviado: Domain/JVM/Lint/Debug/AndroidTest APK completaram `BUILD SUCCESSFUL`; XML JUnit local: 78 testes, 0 falhas, 0 erros, 0 skips. Lint emitiu 222 findings, pois `abortOnError=false`. Não foi execução conectada.
+- A execução `:app:connectedDebugAndroidTest` parou antes dos testes ao instalar `mediaOwnerTest`, por assinatura incompatível com o helper já instalado. Não remover apps nem dados do telefone para contornar. API29 e consentimento de exclusão seguem sem prova runtime.
+- Chaves EN/PT-BR/fallback: 206/206, sincronizadas. ES/FR/DE/HI/JA/zh-CN: 95/206 em cada idioma; 111 chaves faltantes por locale. `docs/CHECKLIST_FINALIZACAO_PT_BR.md` e a seção atual desta matriz registram as pendências.
+- A geração de imagem foi autorizada pelo proprietário, mas a API de imagem respondeu que não há créditos restantes; ferramenta de vídeo de 10 segundos não está disponível nesta sessão. Nenhum asset de foto/vídeo foi adicionado.
+- Não gerar AAB pronto para Play: faltam aprovação instrumentada API29/35, CI verde no SHA atualizado, catálogo/preços e compra real configurados, backend de purchaseToken, traduções e verificação Play Console de versionCode/certificado.
+
 ## Direção de produto confirmada pelo proprietário — 2026-11-06
 
 - Rodolfo confirmou que o objetivo é um phone cleaner simples e confiável, inspirado na facilidade de uso do Files do Google: ajudar pessoas com o telefone cheio de conteúdo a encontrar o que ocupa espaço e liberar armazenamento sem perda acidental.
@@ -303,3 +314,11 @@ This section is the durable continuity checkpoint for future conversations. Cont
 - A verificação local desta data confirmou que o Motorola moto g84 5G (Android 15) responde ao ADB, abriu `MainActivity` e não mostrou `FATAL EXCEPTION` no trecho de logcat consultado. O AndroidJUnitRunner direto terminou `OK (9 tests)`, mas cenários dependentes de API29, consentimento interativo e permissões visuais isoladas foram ignorados por precondições. Isso **não** prova que a experiência real de limpeza, botões, navegação ou Billing esteja funcional.
 - `:app:connectedDebugAndroidTest` continua sem resultado Gradle/UTP (`Failed to receive the UTP test results`); o runner Android direto foi necessário e é evidência limitada ao que os testes cobrem.
 - Não declarar o app pronto para publicar, não promover a produção e não usar aprovação de testes como resposta à avaliação negativa. Próxima etapa de produto: reproduzir no telefone os fluxos relatados, inspecionar a tela e cada ação da navegação, corrigir interação e feedback visual, verificar permissões MediaStore e pós-estado real da limpeza, e validar a tela/estados de Billing com produtos de teste da Play. Manter cada comportamento não executado como não verificado.
+
+## Estado retomado no Motorola � 2026-11-07 (atualiza��o)
+
+- A vers�o em teste � com.rdf112.midiastore.debug (APK Debug usa applicationIdSuffix .debug); n�o confundir com o app Release instalado no telefone.
+- O logo do cabe�alho agora agrupa o s�mbolo e o nome Midiastore; a ilustra��o vetorial anterior da mulher com celular foi preservada, com o nome Midiastore abaixo. Nada foi apagado durante esta valida��o.
+- No moto g84 5G/API35, a a��o Home encontrou 5 itens grandes (84,30 MB), atualizou a CTA para revis�o e abriu a lista. A revis�o mostra consentimento antes de qualquer opera��o. A exclus�o foi deixada intocada.
+- Navegar para Planos Pro funcionou. Mensal/anual/vital�cio continuam indicados como sugeridos e inativos; o app n�o pode concluir compra enquanto Play Console n�o tiver cat�logo ativo e falta backend de purchaseToken.
+- Build :app:assembleDebug p�s-ajustes passou. Testes JVM/Lint est�o em execu��o; o AAB assinado n�o foi gerado. Bloqueios Play Console, versionCode/certificado e valida��o release/API29/CI permanecem.

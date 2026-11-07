@@ -3,6 +3,7 @@ package com.rdf112.sweep.presentation.scan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import android.util.Log
 import com.rdf112.sweep.data.media.NoMediaAccessException
 import com.rdf112.sweep.domain.grouping.SmartFilterMode
 import com.rdf112.sweep.domain.oaas.DesiredOutcomeMission
@@ -40,6 +41,8 @@ const val SWEEP_GLOBAL_DUPLICATE_CANDIDATES_LIMIT = 20_000
 const val SWEEP_GLOBAL_UNIQUE_SIZE_LIMIT = 100_000
 const val SWEEP_GLOBAL_DUPLICATE_HASH_MAX_FILE_BYTES = 2L * 1024L * 1024L * 1024L
 const val SWEEP_GLOBAL_DUPLICATE_HASH_BUDGET_BYTES = 10L * 1024L * 1024L * 1024L
+
+private const val MEDIA_SCAN_LOG_TAG = "MidiastoreMediaScan"
 
 enum class ScanUiStatus {
     IDLE,
@@ -149,6 +152,10 @@ class MediaScanViewModel(
                 throw cancelled
             } catch (error: Exception) {
                 coroutineContext.ensureActive()
+                Log.e(
+                    MEDIA_SCAN_LOG_TAG,
+                    "Media session start failed: error=${error.javaClass.simpleName}",
+                )
                 mutableState.value = MediaScanUiState(
                     status = if (error is NoMediaAccessException) ScanUiStatus.NO_ACCESS else ScanUiStatus.FAILED,
                     message = null,
@@ -617,8 +624,13 @@ class MediaScanViewModel(
                 )
             } catch (cancelled: CancellationException) {
                 throw cancelled
-            } catch (_: Exception) {
+            } catch (failure: Exception) {
                 coroutineContext.ensureActive()
+                // Keep diagnostics useful without logging media names, paths, or URIs.
+                Log.e(
+                    MEDIA_SCAN_LOG_TAG,
+                    "Global mission failed: mission=${mission.name}, error=${failure.javaClass.simpleName}",
+                )
                 val current = mutableState.value
                 mutableState.value = current.copy(
                     status = ScanUiStatus.FAILED,
@@ -852,8 +864,12 @@ class MediaScanViewModel(
             } catch (cancelled: CancellationException) {
                 // Do not let a superseded page mark the replacement page as cancelled.
                 throw cancelled
-            } catch (_: Exception) {
+            } catch (failure: Exception) {
                 coroutineContext.ensureActive()
+                Log.e(
+                    MEDIA_SCAN_LOG_TAG,
+                    "Media page load failed: error=${failure.javaClass.simpleName}",
+                )
                 mutableState.value = mutableState.value.copy(
                     status = ScanUiStatus.FAILED,
                     message = null,

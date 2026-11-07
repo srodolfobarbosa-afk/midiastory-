@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             statusText.text = getString(R.string.permission_denied)
             if (homeCleanupPending) {
                 heroOrbButton.isEnabled = true
-                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbButton.text = getString(R.string.home_cleanup_primary)
                 heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
                 showHomeCleanupMessage(getString(R.string.home_cleanup_permission_denied))
             }
@@ -398,11 +398,17 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(20), dp(14), dp(20), dp(10))
         }
+        val brandLockup = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            background = roundedBackground(color(R.color.sweep_surface), dp(14))
+            setPadding(dp(8), dp(6), dp(14), dp(6))
+        }
         val mark = ImageView(this).apply {
             setImageResource(R.mipmap.ic_launcher)
             contentDescription = getString(R.string.app_name)
         }
-        topBar.addView(mark, LinearLayout.LayoutParams(dp(48), dp(48)))
+        brandLockup.addView(mark, LinearLayout.LayoutParams(dp(40), dp(40)))
 
         val brandCopy = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val wordmark = label(getString(R.string.app_name), 22f, R.color.sweep_text, true).apply {
@@ -422,7 +428,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         brandCopy.addView(wordmark)
-        topBar.addView(brandCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(12) })
+        brandLockup.addView(brandCopy, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(9) })
+        topBar.addView(brandLockup, LinearLayout.LayoutParams(0, -2, 1f))
         val premiumAreaButton = button(getString(R.string.premium_area_button)) {
             switchTab(AppTab.PRO)
         }.apply {
@@ -496,11 +503,17 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
 
-        addView(ImageView(this@MainActivity).apply {
+        val homeHeroImage = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        homeHeroImage.addView(ImageView(this@MainActivity).apply {
             setImageResource(R.drawable.midiastore_home_illustration)
             contentDescription = getString(R.string.home_illustration_description)
             scaleType = ImageView.ScaleType.FIT_CENTER
-        }, LinearLayout.LayoutParams(dp(200), dp(140)).apply { bottomMargin = dp(4) })
+        }, LinearLayout.LayoutParams(dp(200), dp(140)))
+        homeHeroImage.addView(label(getString(R.string.app_name), 14f, R.color.sweep_primary, true))
+        addView(homeHeroImage, LinearLayout.LayoutParams(dp(200), dp(164)).apply { bottomMargin = dp(4) })
 
         addView(label(getString(R.string.home_welcome_title), 17f, R.color.sweep_text, true),
             LinearLayout.LayoutParams(-1, -2).apply {
@@ -898,6 +911,7 @@ class MainActivity : AppCompatActivity() {
         restorePurchasesButton = button(getString(R.string.restore_purchases_button)) {
             billingGateway.startAndReconcile()
             statusText.text = getString(R.string.restoring_purchases_status)
+            Toast.makeText(this@MainActivity, R.string.restoring_purchases_status, Toast.LENGTH_SHORT).show()
         }
         proCard.addView(restorePurchasesButton, top(10))
 
@@ -1019,30 +1033,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stylePlanPurchaseButton(button: MaterialButton, isProductAvailable: Boolean) {
-        val enabled = billingGateway.securePurchaseVerificationAvailable() && isProductAvailable
-        button.isEnabled = enabled
+        val purchasable = billingGateway.securePurchaseVerificationAvailable() && isProductAvailable
+        // Keep unavailable offers tappable so they can explain why checkout is not ready.
+        button.isEnabled = true
         button.backgroundTintList = android.content.res.ColorStateList.valueOf(
-            color(if (enabled) R.color.sweep_primary else R.color.sweep_surface_alt),
+            color(if (purchasable) R.color.sweep_primary else R.color.sweep_surface_alt),
         )
-        button.setTextColor(color(if (enabled) R.color.sweep_background else R.color.sweep_muted))
+        button.setTextColor(color(if (purchasable) R.color.sweep_background else R.color.sweep_muted))
     }
 
     private fun requestPlanPurchase(productId: String) {
         val launched = billingGateway.launchPurchaseFlow(this, productId)
-        statusText.text = getString(
+        val message = getString(
             when {
                 launched -> R.string.billing_flow_started
                 !billingGateway.securePurchaseVerificationAvailable() -> R.string.billing_secure_verification_unavailable
                 else -> R.string.billing_launch_not_ready
-            }
+            },
         )
+        statusText.text = message
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun openPlayStoreSubscriptions() {
-        runCatching {
+        val opened = runCatching {
             val uri = Uri.parse("https://play.google.com/store/account/subscriptions?package=$packageName")
             startActivity(Intent(Intent.ACTION_VIEW, uri))
-        }
+        }.isSuccess
+        if (!opened) Toast.makeText(this, R.string.billing_subscriptions_open_failed, Toast.LENGTH_LONG).show()
     }
 
     private fun startScanOrRequestAccess() {
@@ -1328,7 +1346,7 @@ class MainActivity : AppCompatActivity() {
             oaasPipelineStatus.text = getString(R.string.oaas_mission_scan_failed)
             if (mission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW) {
                 heroOrbButton.isEnabled = true
-                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbButton.text = getString(R.string.home_cleanup_primary)
                 heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
                 showHomeCleanupMessage(getString(R.string.home_cleanup_scan_failed))
             }
@@ -1604,10 +1622,14 @@ class MainActivity : AppCompatActivity() {
 
         val plan = progress.plan
         if (plan == null) {
+            android.util.Log.e(
+                "MidiastoreMediaScan",
+                "Global mission returned no plan: mission=${progress.mission.name}, reason=${progress.message ?: "none"}",
+            )
             if (isFreeHomeCleanup) {
                 homeCleanupCandidateCount = 0
                 heroOrbButton.isEnabled = true
-                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbButton.text = getString(R.string.home_cleanup_primary)
                 heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
                 showHomeCleanupMessage(getString(R.string.home_cleanup_scan_failed))
             }
@@ -1681,7 +1703,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 showHomeCleanupMessage(getString(messageId, homeCleanupCandidateCount, formattedBytes))
             } else {
-                heroOrbButton.text = getString(R.string.home_cleanup_retry_button)
+                heroOrbButton.text = getString(R.string.home_cleanup_primary)
                 showHomeCleanupMessage(
                     if (progress.coverageComplete) getString(R.string.home_cleanup_no_candidates)
                     else getString(R.string.home_cleanup_no_candidates_partial),
