@@ -1,10 +1,19 @@
 #!/usr/bin/env node
 /**
- * Equipe IA: Antigravity (Flash High) + OpenAI Codex CLI + Supabase 24/7
+ * Equipe IA: Antigravity + OpenAI Codex CLI + Supabase 24/7
+ * 
+ * 🏛️ CONSTITUIÇÃO DE AUTONOMIA COGNITIVA, PERCEPÇÃO E EXECUÇÃO CONTÍNUA
+ * (META FUNDAMENTAL: R$ 1.000.000,00 EM VENDAS REAIS NA GOOGLE PLAY)
+ * 1. MENTALIDADE DE INVENÇÃO ONDE NÃO HÁ CAMINHO
+ * 2. BUSCA CONTÍNUA PELA MAIOR IA DISPONÍVEL (Gemini 4 Argon, 3.8 Flash, Codex)
+ * 3. PERCEPÇÃO AUTÔNOMA E EXECUÇÃO DE PONTA A PONTA (Início, Meio e Fim)
+ * 4. LEITURA OBRIGATÓRIA DO PASSADO ANTES DE AGIR (Zero Loop, public.memories)
+ * 5. AUTO-CONSTRUÇÃO DO ECOSSISTEMA (Subagentes, ferramentas, cota <500MB)
+ * 6. COMPROMISSO COM O RESULTADO REAL (20 testadores, aprovação e escala)
  * 
  * Divisão de Responsabilidades:
- * - Antigravity (Flash High): Orquestração, Supabase MCP, GitHub Actions 24h, Google Play API, Web Navigation.
- * - Codex CLI (codex.exe): Edição e geração pesada de código Kotlin/Android, refatorações complexas, Gradle local e testes instrumentados.
+ * - Antigravity (Flash / Argon): Orquestração, Supabase MCP, GitHub Actions, Google Play API, Web Navigation.
+ * - Codex CLI (codex.exe): Edição e geração pesada de código Kotlin/Android, refatorações, Gradle local.
  * 
  * Uso:
  *   node scripts/equipe-ia.mjs list

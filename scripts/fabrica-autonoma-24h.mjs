@@ -2,12 +2,22 @@
 /**
  * MOTOR DE OPERAÇÃO CONTÍNUA 24H (Fábrica Autônoma Midiastore)
  * 
- * Executa ciclos periódicos automatizados para governança e manutenção do ecossistema:
- * 1. Monitoramento e blindagem do Supabase (cota de 500 MB e deduplicação de e-mails)
- * 2. Auditoria e sincronização dos 20 testadores fechados para a Google Play Console
- * 3. Heartbeat do Roteador Multi-LLM (Gemini 3.8 Flash / Argon / GPT-4o-mini / Codex)
- * 4. Processamento da fila de tarefas pendentes em public.orchestrator_tasks
- * 5. Registro contínuo de métricas e status de saúde no Supabase
+ * 🏛️ CONSTITUIÇÃO DE AUTONOMIA COGNITIVA, PERCEPÇÃO E EXECUÇÃO CONTÍNUA
+ * (META FUNDAMENTAL: R$ 1.000.000,00 EM VENDAS REAIS NA GOOGLE PLAY)
+ * 
+ * Princípios Fundamentais:
+ * 1. MENTALIDADE DE INVENÇÃO ONDE NÃO HÁ CAMINHO: Superar bloqueios por engenharia ativa.
+ * 2. BUSCA CONTÍNUA PELA MAIOR IA DISPONÍVEL: Gemini 4 Argon, Gemini 3.8 Flash e Codex local.
+ * 3. PERCEPÇÃO AUTÔNOMA E EXECUÇÃO DE PONTA A PONTA: Diagnosticar e agir do início ao fim.
+ * 4. LEITURA OBRIGATÓRIA DO PASSADO ANTES DE AGIR (ZERO LOOP): public.memories e registrar-memoria.mjs.
+ * 5. AUTO-CONSTRUÇÃO DO ECOSSISTEMA: Subagentes e ferramentas, protegendo a cota de 500 MB.
+ * 6. COMPROMISSO COM O RESULTADO REAL: Destravar os 20 testadores, aprovação e escala de receita.
+ * 
+ * Ciclos de Manutenção:
+ * - Monitoramento e blindagem do Supabase (cota de 500 MB e deduplicação)
+ * - Auditoria dos 20 testadores fechados para o Google Play Console
+ * - Heartbeat do Roteador Multi-LLM (Gemini 3.8 Flash / Argon / Codex)
+ * - Registro contínuo de memórias e marcos no Supabase
  * 
  * Uso:
  *   node scripts/fabrica-autonoma-24h.mjs --once          (Executa 1 ciclo único de auditoria)
