@@ -35,14 +35,14 @@ if (fs.existsSync(secretsPath)) {
 }
 
 const MODEL_CASCADE = [
-  { id: "google/gemini-2.0-flash-exp:free", name: "Gemini 2.0 Flash (Free)" },
-  { id: "google/gemini-flash-1.5", name: "Gemini 1.5 Flash" },
+  { id: "google/gemini-3.8-flash", name: "Gemini 3.8 Flash" },
+  { id: "google/gemini-3.1-flash-lite", name: "Gemini 3.1 Flash-Lite" },
+  { id: "google/gemini-4-argon", name: "Gemini 4 Argon" },
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
-  { id: "meta-llama/llama-3.3-70b-instruct:free", name: "Llama 3.3 70B (Free)" },
-  { id: "openrouter/free", name: "OpenRouter Auto-Free" },
+  { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
 ];
 
-async function callOpenRouter(modelId, prompt, maxTokens = 2500) {
+async function callOpenRouter(modelId, prompt, maxTokens = 1500) {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
