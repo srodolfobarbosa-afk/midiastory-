@@ -25,7 +25,13 @@ const codexPath = "C:\\Users\\rodolfo\\AppData\\Local\\Programs\\OpenAI\\Codex\\
 
 // Carregar chaves
 let openRouterKey = process.env.OPENROUTER_API_KEY || "";
-if (fs.existsSync(secretsPath)) {
+if (process.env.AI_MEDIA_KEYS_JSON) {
+  try {
+    const parsed = JSON.parse(process.env.AI_MEDIA_KEYS_JSON);
+    if (parsed.OPENROUTER_API_KEY) openRouterKey = parsed.OPENROUTER_API_KEY;
+  } catch (e) {}
+}
+if (!openRouterKey && fs.existsSync(secretsPath)) {
   try {
     const raw = JSON.parse(fs.readFileSync(secretsPath, "utf8"));
     if (raw.OPENROUTER_API_KEY) openRouterKey = raw.OPENROUTER_API_KEY;
@@ -42,10 +48,10 @@ const MODEL_CASCADE = [
   { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
 ];
 
-async function callOpenRouter(modelId, prompt, maxTokens = 1500) {
+async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${openRouterKey}`,
@@ -60,6 +66,25 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1500) {
     }),
   });
 
+  // Auto-adaptação para HTTP 402 (crédito insuficiente para reserva alta de tokens)
+  if (res.status === 402 && maxTokens > 750) {
+    console.warn(`[Auto-Adaptação 402] Reduzindo reserva de tokens de ${maxTokens} para 750 para ${modelId}...`);
+    res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openRouterKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://midiastory-df6a0.web.app/",
+        "X-Title": "Midiastore Failover Router",
+      },
+      body: JSON.stringify({
+        model: modelId,
+        max_tokens: 750,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+  }
+
   if (!res.ok) {
     const errText = await res.text();
     const error = new Error(`HTTP ${res.status}: ${errText}`);
@@ -72,13 +97,21 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1500) {
 }
 
 function callCodexLocal(prompt) {
-  if (!fs.existsSync(codexPath)) {
-    throw new Error(`Codex CLI não encontrado em ${codexPath}`);
+  let bin = codexPath;
+  if (!fs.existsSync(bin)) {
+    try {
+      bin = execSync(process.platform === "win32" ? "where codex" : "which codex", { encoding: "utf8" }).trim().split("\n")[0];
+    } catch (e) {
+      bin = "";
+    }
+  }
+  if (!bin || !fs.existsSync(bin)) {
+    throw new Error(`Codex CLI não encontrado no ambiente (${process.platform})`);
   }
   console.log("⚡ Executando via OpenAI Codex CLI Local (Zero dependência de quota externa)...");
   const cleanPrompt = prompt.replace(/"/g, '\\"');
   return execSync(
-    `"${codexPath}" exec --cd "${projectRoot}" --dangerously-bypass-approvals-and-sandbox "${cleanPrompt}"`,
+    `"${bin}" exec --cd "${projectRoot}" --dangerously-bypass-approvals-and-sandbox "${cleanPrompt}"`,
     { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 }
   );
 }
@@ -88,20 +121,18 @@ export async function executeWithFailover(prompt, options = {}) {
 
   console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"})...`);
 
-  // Se for código direto e o usuário preferir local, ou em fallback:
   let lastError = null;
 
   for (let i = 0; i < MODEL_CASCADE.length; i++) {
     const model = MODEL_CASCADE[i];
     console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
     try {
-      const response = await callOpenRouter(model.id, prompt, isCode ? 3500 : 2000);
+      const response = await callOpenRouter(model.id, prompt, isCode ? 2500 : 1200);
       console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
       return { source: model.id, content: response };
     } catch (err) {
       console.warn(`⚠️ Rota ${i + 1} (${model.name}) falhou: ${err.message.slice(0, 140)}`);
       lastError = err;
-      // Tratar 429 (Rate limit), 402 (Insufficient credits), 503 (Overloaded) continuando a cascata
       continue;
     }
   }

@@ -3,8 +3,22 @@ name: Android
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'scripts/**'
+      - '.agents/**'
+      - '.github/workflows/fabrica-autonoma-ubuntu.yml'
+      - 'README.md'
+      - 'AGENTS.md'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'scripts/**'
+      - '.agents/**'
+      - '.github/workflows/fabrica-autonoma-ubuntu.yml'
+      - 'README.md'
+      - 'AGENTS.md'
   workflow_dispatch:
 
 permissions:

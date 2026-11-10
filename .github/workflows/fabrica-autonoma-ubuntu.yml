@@ -69,6 +69,7 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           FIREBASE_ADMIN_KEY_JSON: ${{ secrets.FIREBASE_ADMIN_KEY_JSON }}
+          AI_MEDIA_KEYS_JSON: ${{ secrets.AI_MEDIA_KEYS_JSON }}
         run: |
           node scripts/fabrica-autonoma-24h.mjs --once
 

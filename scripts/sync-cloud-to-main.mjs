@@ -34,7 +34,6 @@ async function pushFileToMain(relPath, commitMsg) {
   if (sha) body.sha = sha;
 
   const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${relPath}`, {
-    method: "POST",
     method: "PUT",
     headers: {
       Authorization: `Bearer ${ghToken}`,
