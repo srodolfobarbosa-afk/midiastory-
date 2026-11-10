@@ -403,3 +403,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #70
 
 ---
+
+### 📍 [10/11/2026, 20:45:57] [Ciclo #7] Guia Prático: Como encontrar e excluir fotos duplicadas automaticamente no Android
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/artigos/como_excluir_fotos_duplicadas.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Este artigo ataca a dor específica de usuários com armazenamento lotado, convertendo leitores em testadores através da oferta de uma solução definitiva dentro da Midiastore. (Provedor: google/gemini-3.1-flash-lite)
+- *Registro Supabase:* Memory #71
+
+---
