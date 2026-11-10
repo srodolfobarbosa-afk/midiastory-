@@ -153,12 +153,12 @@ Pode ser:
 - Um kit de mensagens de conversão para comunidades de tecnologia em docs/campaigns/
 - Uma melhoria arquitetural documentada em docs/
 
-Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em volta do JSON):
+Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em volta do JSON, mantendo o conteúdo conciso e objetivo em até 300 palavras para fechamento perfeito do JSON):
 {
   "action": "Título claro e objetivo da entrega",
   "category": "SEO | MARKETING | OUTREACH | ARCHITECTURE",
   "filename": "docs/caminho/do/arquivo.md",
-  "content": "Conteúdo completo e aprofundado do arquivo",
+  "content": "Conteúdo prático e completo do arquivo",
   "summary": "1 frase explicando o impacto na meta de 20 testadores ou R$ 1 milhão"
 }`;
 
