@@ -34,8 +34,8 @@ import { registrarMemoria } from "./registrar-memoria.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
-const projectRef = "usmqtnlsaavxqguwrtix";
+const token = process.env.SUPABASE_ACCESS_TOKEN || "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const projectRef = process.env.SUPABASE_PROJECT_REF || "usmqtnlsaavxqguwrtix";
 const campaignFile = path.join(projectRoot, "docs", "campaigns", "lista-20-testadores-google-play.txt");
 
 async function runSql(query) {
@@ -54,12 +54,13 @@ async function runSql(query) {
 async function logHeartbeat(cycleNumber, details) {
   try {
     const escapedDetails = JSON.stringify(details).replace(/'/g, "''");
+    const target = process.env.GITHUB_ACTIONS ? "UBUNTU_CLOUD" : "LOCAL_PC";
     await runSql(`
       INSERT INTO public.orchestrator_tasks (state_id, title, target, payload, status, created_at)
       VALUES (
         1, 
         'HEARTBEAT_CICLO_${cycleNumber}', 
-        'LOCAL_PC', 
+        '${target}', 
         '${escapedDetails}', 
         'DONE', 
         NOW()
@@ -204,6 +205,14 @@ Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em
         console.log("📦 Alterações detectadas pelo git. Realizando commit e push autônomo...");
         execSync(`git -C "${projectRoot}" add "${parsed.filename}" docs/LINHA_DO_TEMPO_AUTONOMA.md`, { stdio: "pipe", timeout: 15000 });
         execSync(`git -C "${projectRoot}" commit -m "feat(autonomous-factory): [cycle-${cycleNumber}] ${parsed.action.replace(/"/g, '')}"`, { stdio: "pipe", timeout: 15000 });
+        
+        // Rebase preventivo antes do push para evitar conflitos concorrentes (nuvem vs local)
+        try {
+          execSync(`git -C "${projectRoot}" pull --rebase origin HEAD`, { stdio: "pipe", timeout: 30000 });
+        } catch (pullErr) {
+          console.warn("Aviso no rebase pré-push:", pullErr.message);
+        }
+
         execSync(`git -C "${projectRoot}" push origin HEAD`, { stdio: "pipe", timeout: 30000 });
         console.log("🚀 Commit e push concluídos com sucesso pela Fábrica Autônoma!");
       }
@@ -225,6 +234,8 @@ Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em
   console.log(`----------------------------------------------------------------\n`);
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function main() {
   const args = process.argv.slice(2);
   const isOnce = args.includes("--once");
@@ -237,31 +248,36 @@ async function main() {
   console.log("================================================================");
 
   let cycle = 1;
-  await runAutonomousCycle(cycle);
-
-  if (isOnce) {
-    console.log("Execução única concluída com sucesso.");
-    process.exit(0);
-  }
+  let running = true;
 
   process.on("SIGINT", () => {
     console.log("\n[Fábrica Autônoma] Interrupção recebida (SIGINT). Encerrando graciosamente...");
+    running = false;
     process.exit(0);
   });
 
   process.on("SIGTERM", () => {
     console.log("\n[Fábrica Autônoma] Sinal de término (SIGTERM). Encerrando graciosamente...");
+    running = false;
     process.exit(0);
   });
 
-  setInterval(async () => {
-    cycle++;
+  while (running) {
     try {
       await runAutonomousCycle(cycle);
     } catch (err) {
       console.error(`Erro crítico no ciclo #${cycle}:`, err.message);
     }
-  }, intervalSec * 1000);
+
+    if (isOnce) {
+      console.log("Execução única concluída com sucesso.");
+      break;
+    }
+
+    cycle++;
+    console.log(`Aguardando ${intervalSec}s até o próximo ciclo cognitivo autônomo...`);
+    await sleep(intervalSec * 1000);
+  }
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
