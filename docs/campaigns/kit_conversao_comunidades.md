@@ -1,12 +1,19 @@
-# Estratégia de Conversão: Foco em Early Adopters
+# Kit de Abordagem para Comunidades Tech (Reddit/Discord/Grupos Facebook)
 
-## Mensagem para Grupos de Facebook/Discord (Engajamento Direto)
-"Pessoal, desenvolvi uma solução para o problema crônico de armazenamento no WhatsApp. O app limpa caches ocultos que o sistema não mostra. Preciso de 20 testadores fechados para validar a estabilidade na Google Play antes do lançamento oficial. Quem ajuda a testar e me dar um feedback técnico? Link: [Inserir Link Google Play]"
+## Estratégia de Posicionamento
+Não vender o app, mas oferecer uma ferramenta de utilidade pública para resolver o problema de "Storage full".
 
-## Abordagem para Fóruns (Reddit/TabNews)
-"Como desenvolvedor, criei um utilitário focado em performance (Midiastore) para resolver o acúmulo de arquivos 'fantasma' no diretório do WhatsApp. O projeto está em fase de Closed Testing. Se alguém puder testar a usabilidade e reportar qualquer comportamento atípico, ajudará muito a refinar o produto final."
+## Mensagem Principal (Copy A - Foco em Dor)
+"Pessoal, alguém mais está sofrendo com o sistema do Android consumindo 30GB+? Desenvolvi um utilitário leve para mapear arquivos ocultos e cache de apps que o gerenciador nativo não mostra. Preciso de 5 testadores técnicos para validar a limpeza de cache do WhatsApp. Quem quiser testar (beta fechado), me chama no DM."
 
-## FAQ Rápido para Respostas (Quebra de Objeções)
-- É seguro? Sim, o app utiliza permissões padrão de armazenamento (Scoped Storage).
-- Por que preciso de testadores? Políticas da Google Play exigem 20 perfis ativos por 14 dias para liberação em produção.
-- Onde reportar? Canal de feedback direto no app."
+## Mensagem de Acompanhamento (Copy B - Foco em Benefício)
+"Consegui liberar 4GB só removendo arquivos temporários de mídia enviada que ficam duplicados no WhatsApp. Se alguém quiser o link do APK no console do Google Play para ajudar nos testes, mande uma mensagem. Não precisa de root."
+
+## Checklist de Postagem
+1. Verificar regras da comunidade (evitar spam).
+2. Postar em horários de pico (terça/quarta, 19h-21h).
+3. Responder a todos os comentários com foco na técnica, não no comercial.
+4. Priorizar a coleta de feedbacks sobre UX no console da Google Play.
+
+## Call to Action (CTA)
+"Acesse via convite: [Link do Teste Google Play]"
