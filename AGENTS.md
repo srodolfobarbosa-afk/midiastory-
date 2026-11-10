@@ -13,6 +13,28 @@ You are working on the Android app **Midiastore**. Read this file and `README.md
 - Never create a replacement upload keystore. Use only the legitimate Play App Signing upload key supplied through a secure owner-controlled process.
 - The owner reported that the financial/receiving profile was enabled on 2026-11-03. This does not prove that any in-app product is configured, active, or tested.
 
+## Equipe IA Híbrida: Antigravity + Codex CLI
+
+Para maximizar a produtividade e respeitar limites de cota, as IAs trabalham em conjunto com divisão clara de papéis e sincronização via Supabase:
+
+### 1. Divisão de Responsabilidades
+- **Antigravity (Gemini 3.8 Flash High)**:
+  - Orquestrador principal do projeto e guardião do loop de decisão até atingir `[META_CONCLUIDA]`.
+  - Gerencia Supabase MCP, banco de dados Postgres e Edge Functions 24h.
+  - Gerencia GitHub Actions 24h, APIs da Google Play Store e automação de navegador (Playwright / Chrome DevTools MCP).
+  - Decompõe objetivos complexos em tarefas e delega geração pesada de código ou compilação local para o Codex.
+- **Codex CLI (`codex.exe`)**:
+  - Engenheiro sênior para código Kotlin/Android, refatorações profundas de Views/Architecture e XMLs.
+  - Execução de compilações pesadas no Windows via Gradle (`./gradlew :domain:test`, `:app:assembleDebug`, etc.).
+  - Execução de testes instrumentados locais no emulador Android via ADB.
+  - Acionado pelo Antigravity via `node scripts/equipe-ia.mjs call-codex "..."` ou processando a fila via `node scripts/equipe-ia.mjs codex-next`.
+
+### 2. Protocolo Anti-Sobrescrita e Sincronização em Tempo Real
+1. **Fila Centralizada no Supabase (`public.orchestrator_tasks`)**: Todas as tarefas são registradas e roteadas no Supabase (`target = 'CODEX'`, `'ANTIGRAVITY'` ou `'CLOUD_ACTIONS'`).
+2. **Lock Atômico de Tarefas**: Antes de iniciar o trabalho em uma tarefa, o agente faz uma transição atômica de `status = 'PENDING'` para `status = 'IN_PROGRESS'`. Se a tarefa já tiver sido assumida, ela não é executada novamente.
+3. **Memória Compartilhada (`public.memories`)**: Ambos os agentes registram resumos de suas entregas via `node scripts/sync-agent-memory.mjs write "..."`, garantindo continuidade cross-session.
+4. **Git e Árvore de Arquivos**: Antes de qualquer commit ou edição estrutural, execute `git status` e verifique tarefas em andamento.
+
 ## Git workflow
 
 - Current recovery branch: `fix/p0-sweep-permissions-missions-billing`.
