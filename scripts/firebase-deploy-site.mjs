@@ -59,6 +59,7 @@ async function main() {
     "/hi/index.html": fs.readFileSync("docs/hi/index.html"),
     "/ja/index.html": fs.readFileSync("docs/ja/index.html"),
     "/zh/index.html": fs.readFileSync("docs/zh/index.html"),
+    "/artigos/como-liberar-espaco-whatsapp.html": fs.readFileSync("docs/artigos/como-liberar-espaco-whatsapp.html"),
     "/robots.txt": fs.readFileSync("docs/robots.txt"),
     "/sitemap.xml": fs.readFileSync("docs/sitemap.xml"),
     "/llms.txt": fs.readFileSync("docs/llms.txt"),
