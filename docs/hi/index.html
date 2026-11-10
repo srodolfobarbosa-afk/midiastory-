@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="hi-IN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>Midiastore — अपने एंड्रॉइड स्टोरेज को सुरक्षित रूप से खाली करें</title>
+  <meta name="description" content="भारी फाइलों और छिपे हुए व्हाट्सएप मीडिया को सुरक्षित रूप से साफ करें। वीआईपी क्लोज्ड टेस्टर बनें और 3 महीने का Midiastore Pro मुफ़्त पाएं!">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://midiastory-df6a0.web.app/hi/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Midiastore — अपने एंड्रॉइड स्टोरेज को सुरक्षित रूप से खाली करें">
+  <meta property="og:description" content="भारी फाइलों और छिपे हुए व्हाट्सएप मीडिया को सुरक्षित रूप से साफ करें। वीआईपी क्लोज्ड टेस्टर बनें और 3 महीने का Midiastore Pro मुफ़्त पाएं!">
+  <meta property="og:url" content="https://midiastory-df6a0.web.app/hi/">
+  <meta property="og:site_name" content="Midiastore">
+  <style>
+    :root{color-scheme:dark;--bg:#07111f;--panel:#101d2e;--line:#26364a;--mint:#5de3bf;--white:#f5f8fc;--muted:#b3c0d0}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#123047 0,transparent 55%),var(--bg);color:var(--white);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+    a{color:inherit}.wrap{width:min(100% - 36px,1040px);margin:auto}header{padding:16px 0;border-bottom:1px solid var(--line)}.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brand{font-weight:850;font-size:1.3rem;text-decoration:none;letter-spacing:-.04em}.brand span{color:var(--mint)}
+    .lang-nav{display:flex;gap:6px;font-size:0.85rem;color:var(--muted);align-items:center}.lang-nav a{text-decoration:none;padding:3px 6px;border-radius:6px;transition:0.15s}.lang-nav a:hover,.lang-nav a.active{color:var(--mint);font-weight:700;background:rgba(93,227,191,0.1)}
+    .button{display:inline-flex;justify-content:center;align-items:center;padding:13px 20px;border-radius:12px;background:var(--mint);color:#07111f;text-decoration:none;font-weight:800;min-height:48px;border:none;cursor:pointer;font-size:1rem;transition:transform 0.15s, opacity 0.15s}.button:hover{opacity:0.9;transform:translateY(-1px)}.button.secondary{background:transparent;color:var(--mint);border:1px solid #388b78}
+    .hero{text-align:center;padding:50px 0 30px}.eyebrow{color:var(--mint);font-size:.82rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.hero h1{font-size:clamp(2.3rem,6.5vw,4.5rem);line-height:1.06;letter-spacing:-.055em;margin:14px auto 20px;max-width:850px}.hero h1 em{font-style:normal;color:var(--mint)}.lead{font-size:1.15rem;color:var(--muted);max-width:690px;margin:0 auto 28px}.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}.note{font-size:.87rem;color:var(--muted);margin-top:16px}
+    .vip-testers{margin:36px auto;padding:36px;border:2px solid var(--mint);border-radius:24px;background:linear-gradient(135deg,#0a2736,#101e30 70%);text-align:center;box-shadow:0 15px 40px rgba(93,227,191,0.15)}
+    .vip-testers h2{font-size:clamp(1.8rem,4.5vw,2.5rem);margin:10px 0 14px;letter-spacing:-.03em}
+    .vip-testers p{color:var(--muted);max-width:620px;margin:0 auto 24px;font-size:1.05rem}
+    .tester-form{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:540px;margin:0 auto}
+    .tester-input{flex:1;min-width:260px;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:1rem;outline:none}
+    .tester-input:focus{border-color:var(--mint)}
+    .tester-badge{display:inline-block;background:rgba(93,227,191,0.15);color:var(--mint);padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px}
+    .feedback-msg{margin-top:16px;font-weight:700;font-size:0.95rem;display:none}
+    .feedback-msg.success{display:block;color:var(--mint)}
+    .feedback-msg.error{display:block;color:#f87171}
+    section{padding:30px 0}.section-title{text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);letter-spacing:-.03em}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:25px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:23px}.card h3{margin:0 0 8px;font-size:1.12rem}.card p{color:var(--muted);margin:0}.tag{font-size:.78rem;font-weight:800;color:var(--mint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+    .pro{margin:40px auto;padding:34px;border:1px solid #338d79;border-radius:22px;background:linear-gradient(130deg,#102b34,#101d2e 65%);text-align:center}.pro h2{font-size:clamp(1.7rem,4vw,2.4rem);margin:8px 0}.pro p{color:var(--muted);max-width:650px;margin:0 auto 20px}.control{margin:28px auto 50px;max-width:790px;padding:25px;background:#0b1725;border:1px solid var(--line);border-radius:18px}.control h2{margin:0 0 8px}.control p{margin:0;color:var(--muted)}footer{border-top:1px solid var(--line);padding:25px 0 34px;color:var(--muted);font-size:.9rem;text-align:center}
+    @media(max-width:600px){.nav{flex-direction:column}.lang-nav{margin-top:8px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="https://midiastory-df6a0.web.app/hi/">Midia<span>store</span></a>
+      <div class="lang-nav"><a href="/" class="">PT</a><a href="/en/" class="">EN</a><a href="/es/" class="">ES</a><a href="/de/" class="">DE</a><a href="/fr/" class="">FR</a><a href="/hi/" class="active">HI</a><a href="/ja/" class="">JA</a><a href="/zh/" class="">ZH</a></div>
+      <a class="button" href="#vip-testers">VIP Pro</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">स्टोरेज फुल हो गया है? समझदारी से शुरुआत करें</div>
+      <h1>देखें कि क्या जगह ले रहा है।<br><em>क्या रखना है, निर्णय आपका है।</em></h1>
+      <p class="lead">Midiastore आपके एंड्रॉइड फोन में बड़ी फाइलों, डुप्लिकेट फोटो और छिपे हुए व्हाट्सएप मीडिया को सुरक्षित रूप से ढूंढता है।</p>
+      <div class="actions"><a class="button" href="#vip-testers">क्लोज्ड टेस्ट में शामिल हों (मुफ़्त वीआईपी)</a></div>
+      <p class="note">विश्लेषण और समीक्षा 100% मुफ़्त है। फ़ाइल हटाने के लिए हमेशा एंड्रॉइड की पुष्टि आवश्यक है।</p>
+    </section>
+
+    <!-- VIP TESTER FUNNEL -->
+    <section class="vip-testers" id="vip-testers">
+      <div class="tester-badge">⭐ Google Play आधिकारिक वीआईपी परीक्षक कार्यक्रम</div>
+      <h2>बीटा टेस्टर्स के लिए सीटें खुली हैं</h2>
+      <p>Google Play को लॉन्च से पहले 20 परीक्षकों की आवश्यकता है। नीचे अपना ईमेल दर्ज करें और <strong>3 महीने का Midiastore Pro मुफ़्त</strong> पाएं!</p>
+      
+      <form class="tester-form" id="testerForm">
+        <input type="email" id="testerEmail" class="tester-input" placeholder="आपका Google Play ईमेल (उदा: name@gmail.com)" required>
+        <button type="submit" id="testerSubmitBtn" class="button">मेरा वीआईपी स्थान सुरक्षित करें</button>
+      </form>
+      <div id="feedbackMsg" class="feedback-msg"></div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Midiastore</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="tag">पहचानें</div>
+          <h3>भारी मीडिया फाइलें</h3>
+          <p>भूले हुए वीडियो और डाउनलोड की तुरंत पहचान करें जो स्टोरेज भर रहे हैं।</p>
+        </article>
+        <article class="card">
+          <div class="tag">WhatsApp क्लीनर</div>
+          <h3>छिपे हुए ऑडियो और वीडियो</h3>
+          <p>पुराने वॉइस नोट्स और .nomedia फाइलों को साफ करें जो गैलरी में नहीं दिखतीं।</p>
+        </article>
+        <article class="card">
+          <div class="tag">100% सुरक्षित</div>
+          <h3>SHA-256 डुप्लिकेट</h3>
+          <p>सटीक बाइनरी जांच ताकि आपकी अनमोल यादें कभी गलती से न हटें।</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="pro">
+      <div class="eyebrow">Midiastore Pro</div>
+      <h2>अपने फोन को सुपरफास्ट बनाएं</h2>
+      <p>सिंगल टैप बैच डिलीशन, ऑटोमैटिक रिमाइंडर और हमेशा के लिए विज्ञापन-मुक्त अनुभव।</p>
+      <a class="button" href="#vip-testers">मेरा वीआईपी स्थान सुरक्षित करें</a>
+    </section>
+
+    <aside class="control">
+      <h2>आपकी फाइलें, आपका पूर्ण नियंत्रण</h2>
+      <p>Midiastore एंड्रॉइड स्कोप्ड स्टोरेज नीतियों का पूरी तरह सम्मान करता है।</p>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>© 2026 Midiastore · <a href="/privacidade.html">गोपनीयता नीति</a></p>
+      <p>Google Play and Android are registered trademarks of Google LLC.</p>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('testerForm');
+    const emailInput = document.getElementById('testerEmail');
+    const submitBtn = document.getElementById('testerSubmitBtn');
+    const feedback = document.getElementById('feedbackMsg');
+    const SUPABASE_URL = "https://usmqtnlsaavxqguwrtix.supabase.co";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU";
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email || !email.includes('@')) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Enviando...";
+      feedback.className = "feedback-msg";
+      feedback.style.display = "none";
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/beta_testers`, {
+          method: "POST",
+          headers: {
+            "apikey": ANON_KEY,
+            "Authorization": `Bearer ${ANON_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ email: email, source: "landing_page_hi" })
+        });
+
+        if (res.ok || res.status === 201 || res.status === 204) {
+          feedback.className = "feedback-msg success";
+          feedback.innerText = "🎉 वीआईपी स्थान सुरक्षित! आपका ईमेल आधिकारिक Google Play सूची में जोड़ दिया गया है!";
+          emailInput.value = "";
+        } else if (res.status === 409) {
+          feedback.className = "feedback-msg success";
+          feedback.innerText = "✅ यह ईमेल पहले से ही हमारी VIP सूची में पंजीकृत है!";
+        } else {
+          feedback.className = "feedback-msg error";
+          feedback.innerText = "Error. Please try again.";
+        }
+      } catch (err) {
+        feedback.className = "feedback-msg error";
+        feedback.innerText = "Connection error. Please try again.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "मेरा वीआईपी स्थान सुरक्षित करें";
+        feedback.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

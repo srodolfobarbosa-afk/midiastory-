@@ -1,0 +1,173 @@
+{
+  "googleSearchKeywords": {
+    "pt-BR": [
+      "limpar espaço Android",
+      "aplicativo para liberar memória",
+      "aumentar espaço armazenamento celular",
+      "minimizar arquivos duplicados",
+      "gestão de armazenamento Android",
+      "melhor app limpeza de espaço",
+      "otimizar memória celular",
+      "remover arquivos indesejados",
+      "como liberar espaço no Android",
+      "aplicativo com cópias exatas SHA-256"
+    ],
+    "en-US": [
+      "clean Android space",
+      "best app to free up memory",
+      "increase phone storage space",
+      "minimize duplicate files",
+      "Android storage management",
+      "top space cleaning app",
+      "optimize phone memory",
+      "remove unwanted files",
+      "how to free up space on Android",
+      "app with exact SHA-256 copies"
+    ]
+  },
+  "reelsAndShortsHooks": [
+    {
+      "visualHook": "Mostrando a tela do celular cheia",
+      "caption": "Liberte espaço em seu celular em segundos! 🚀",
+      "hashtags": "#LimpadorDeEspaco #Android #MemoriaCheia #Midiastore"
+    },
+    {
+      "visualHook": "Imagens de arquivos duplicados aparecendo",
+      "caption": "Encontre e remova cópias indesejadas com um toque! 💎",
+      "hashtags": "#ArquivosDuplicados #Otimização #Midiastore"
+    },
+    {
+      "visualHook": "Antes e depois da limpeza",
+      "caption": "Veja a mágica acontecer! ✨ Libere GBs em instantes!",
+      "hashtags": "#AntesEDepois #LimpezaDeEspaco #Midiastore"
+    },
+    {
+      "visualHook": "Notificações de espaço livre",
+      "caption": "Liberar espaço ficou fácil! Baixe e veja! 📲",
+      "hashtags": "#Facilidade #Limpador #AppTop #Midiastore"
+    },
+    {
+      "visualHook": "Gráfico de armazenamento",
+      "caption": "Mantenha seu celular sempre leve e rápido! 🏃‍♂️💨",
+      "hashtags": "#CelularLeve #Tecnologia #Midiastore"
+    }
+  ],
+  "tiktokCommentReplies": [
+    "Sabia que você pode liberar mais espaço com nosso app? Experimente já!",
+    "Soluções rápidas para memória cheia? O Midiastore faz isso em um clique!",
+    "Descubra arquivos duplicados e limpe seu celular usando o Midiastore!",
+    "Tenha um Android mais leve! A solução está aqui: Midiastore.",
+    "Liberte seu storage com o app que identifica cópias exatas! Baixe já!"
+  ],
+  "pinterestPins": [
+    {
+      "title": "Liberte Espaço do Seu Android com Midiastore!",
+      "description": "Descubra o melhor aplicativo para limpar a memória do seu celular e gerenciar seus arquivos. Baixe agora na Play Store!",
+      "link": "https://play.google.com/store/apps/details?id=com.rdf112.midiastore"
+    },
+    {
+      "title": "Otimização de Armazenamento: App Essencial!",
+      "description": "Libere armazenamento, remova arquivos indesejados e melhore a performance do seu Android com o Midiastore. Clique e baixe!",
+      "link": "https://play.google.com/store/apps/details?id=com.rdf112.midiastore"
+    },
+    {
+      "title": "Diga Adeus aos Arquivos Duplicados!",
+      "description": "Identifique e remova cópias exatas em seu celular com a ajuda do Midiastore. Faça o download agora!",
+      "link": "https://play.google.com/store/apps/details?id=com.rdf112.midiastore"
+    }
+  ],
+  "telegramBroadcast": {
+    "message": "🆕 Liberte mais espaço no seu celular! Conheça o Midiastore: o limpador de espaço que transforma sua experiência no Android. Instale agora e vá bem mais longe com seu dispositivo!"
+  },
+  "microInfluencerOutreach": [
+    {
+      "message": "Olá [Nome]! Sou do Midiastore e gostaria de oferecer acesso vitalício ao nosso app premium em troca de uma menção nas suas redes. Vamos conversar?",
+      "platform": "DM/E-mail"
+    },
+    {
+      "message": "Oi [Nome]! Adoramos seu conteúdo e achamos que o Midiastore pode ser uma ótima dica para seus seguidores. Que tal um acesso Pro em troca de uma resenha?",
+      "platform": "DM/E-mail"
+    },
+    {
+      "message": "[Nome], estamos em busca de micro-influencers para ajudar a divulgar o Midiastore. Oferecemos acesso vitalício ao nosso plano Pro! Vamos nos conectar?",
+      "platform": "DM/E-mail"
+    }
+  ],
+  "dealPortalsPromobitPelando": [
+    {
+      "text": "🚀 Achamos uma super dica! O Midiastore é o aplicativo que você precisa pra liberar espaço no seu Android. Compensa muito! Confira mais aqui: [link]",
+      "portal": "Promobit"
+    },
+    {
+      "text": "Dica must-have para quem tem celular cheio! Com o Midiastore, você organiza e limpa seu armazenamento de forma fácil. Conheça: [link]",
+      "portal": "Pelando"
+    }
+  ],
+  "inboundBlogOutreach": [
+    {
+      "proposal": "Proposta de guest post: 'Como Liberar Espaço no Seu Android em 5 Minutos'. O Midiastore é a solução ideal e podemos apresentar algumas dicas práticas.",
+      "blog": "Blog parceiro"
+    },
+    {
+      "proposal": "Artigo sobre 'A Importância de Limpar Arquivos Duplicados'. O Midiastore pode ajudar e adoraria compartilhar isso com seus leitores!",
+      "blog": "Blog parceiro"
+    }
+  ],
+  "smartPushNotifications": [
+    {
+      "notification": "🚨 Novo arquivo grande detectado! Libere espaço agora com o Midiastore!",
+      "trigger": "novos arquivos grandes >10MB detectados"
+    },
+    {
+      "notification": "🔔 Lembrete: é hora de sua limpeza mensal. O Midiastore facilita para você!",
+      "trigger": "limpeza mensal"
+    },
+    {
+      "notification": "✨ Descubra o plano Pro e obtenha benefícios exclusivos no Midiastore!",
+      "trigger": "oportunidade no plano Pro"
+    },
+    {
+      "notification": "📦 Temos novidades! Identificamos arquivos duplicados para você. Venha conferir!",
+      "trigger": "novos arquivos duplicados detectados"
+    }
+  ],
+  "viralReferralInvite": [
+    {
+      "message": "🤑 Gostou do Midiastore? Indique para seus amigos e ganhe benefícios incríveis! #IndiqueECompartilhe",
+      "platform": "WhatsApp"
+    },
+    {
+      "message": "🌟 Liberou espaço no seu celular? Compartilhe o app Midiastore e ajude seus amigos a também ficarem livres! #IndiqueECompartilhe",
+      "platform": "WhatsApp"
+    }
+  ],
+  "abandonedProRecoveryEmails": [
+    {
+      "email": "Olá! Notamos que você começou a assinar o nosso Plano Pro, mas ainda não finalizou a compra. O Midiastore pode transformar seu Android. Conclusão fácil e rápida!",
+      "subject": "Finalize sua assinatura do Midiastore Pro!"
+    },
+    {
+      "email": "Oi! Percebemos que você estava tão perto de ter o nosso plano Pro! Não perca os benefícios de liberar espaço no seu celular. Clique e finalize agora!",
+      "subject": "Sua chance de acessar o Midiastore Pro!"
+    }
+  ],
+  "productHuntLaunch": {
+    "tagline": "Liberte seu Android do espaço cheio com Midiastore!",
+    "creatorDescription": "Criado pela equipe apaixonada pela eficiência no seu celular.",
+    "firstComment": "Midiastore oferece uma solução única e inovadora para quem luta contra o armazenamento limitado no Android."
+  },
+  "gamificationDailyChallenges": [
+    {
+      "challenge": "Acesse o app por 5 dias seguidos e ganhe 1 mês grátis do Plano Pro!",
+      "description": "Mantenha seus hábitos saudáveis e ganhe benefícios!"
+    },
+    {
+      "challenge": "Limpe 10 arquivos hoje e receba acesso a dicas exclusivas!",
+      "description": "Participe para receber dicas incríveis."
+    },
+    {
+      "challenge": "Complete uma limpeza semanal por 4 semanas e desbloqueie uma ferramenta premium!",
+      "description": "Ajude seu dispositivo a ser mais leve, aproveite o desafio!"
+    }
+  ]
+}

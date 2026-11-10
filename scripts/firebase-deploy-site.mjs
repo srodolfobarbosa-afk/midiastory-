@@ -52,6 +52,13 @@ async function main() {
 
   const filesToDeploy = {
     "/index.html": fs.readFileSync("docs/index.html"),
+    "/en/index.html": fs.readFileSync("docs/en/index.html"),
+    "/es/index.html": fs.readFileSync("docs/es/index.html"),
+    "/de/index.html": fs.readFileSync("docs/de/index.html"),
+    "/fr/index.html": fs.readFileSync("docs/fr/index.html"),
+    "/hi/index.html": fs.readFileSync("docs/hi/index.html"),
+    "/ja/index.html": fs.readFileSync("docs/ja/index.html"),
+    "/zh/index.html": fs.readFileSync("docs/zh/index.html"),
     "/robots.txt": fs.readFileSync("docs/robots.txt"),
     "/sitemap.xml": fs.readFileSync("docs/sitemap.xml"),
     "/llms.txt": fs.readFileSync("docs/llms.txt"),
