@@ -133,6 +133,41 @@ async function processNextCodex() {
   await runCodexTask(pending[0]);
 }
 
+async function callOpenRouterLlm(prompt, model = "openrouter/free") {
+  const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
+  console.log(`\n🧠 [EQUIPE IA] Consultando Modelo Remoto (${model}) via OpenRouter...`);
+  
+  const modelsToTry = [model, "openai/gpt-4o-mini"];
+  for (const m of modelsToTry) {
+    try {
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${aiKeys.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://midiastory-df6a0.web.app/",
+          "X-Title": "Midiastore Equipe IA",
+        },
+        body: JSON.stringify({
+          model: m,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+      if (!res.ok) {
+        console.warn(`Modelo ${m} retornou ${res.status}. Tentando próximo...`);
+        continue;
+      }
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || "";
+      console.log(`\n--- RESPOSTA (${m}) ---\n${reply}\n`);
+      return reply;
+    } catch (e) {
+      console.warn(`Erro no modelo ${m}:`, e.message);
+    }
+  }
+  throw new Error("Nenhum modelo do OpenRouter respondeu com sucesso.");
+}
+
 async function callCodexDirect(prompt) {
   console.log(`\n🚀 Invocando Codex CLI diretamente...`);
   console.log(`Prompt: "${prompt}"`);
@@ -178,8 +213,22 @@ async function main() {
       process.exit(1);
     }
     await callCodexDirect(prompt);
+  } else if (action === "call-llm") {
+    const modelIdx = process.argv.indexOf("--model");
+    let model = "openrouter/free";
+    let promptArgs = process.argv.slice(3);
+    if (modelIdx !== -1) {
+      model = process.argv[modelIdx + 1] || model;
+      promptArgs = process.argv.slice(3, modelIdx);
+    }
+    const prompt = promptArgs.join(" ");
+    if (!prompt) {
+      console.error("Uso: node scripts/equipe-ia.mjs call-llm 'seu prompt' [--model deepseek/deepseek-r1:free]");
+      process.exit(1);
+    }
+    await callOpenRouterLlm(prompt, model);
   } else {
-    console.log("Comandos disponíveis: list, add, codex-next, call-codex");
+    console.log("Comandos disponíveis: list, add, codex-next, call-codex, call-llm");
   }
 }
 
