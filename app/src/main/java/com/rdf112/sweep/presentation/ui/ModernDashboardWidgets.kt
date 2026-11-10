@@ -27,14 +27,14 @@ class StorageRingGaugeView(context: Context) : View(context) {
         style = Paint.Style.STROKE
         strokeWidth = strokePx
         strokeCap = Paint.Cap.ROUND
-        color = Color.parseColor("#1E3229")
+        color = Color.parseColor("#1C2942")
     }
 
     private val progressPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = strokePx
         strokeCap = Paint.Cap.ROUND
-        color = Color.parseColor("#10B981")
+        color = Color.parseColor("#00E5B0")
     }
 
     private val percentTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -45,7 +45,7 @@ class StorageRingGaugeView(context: Context) : View(context) {
     }
 
     private val subTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#34D399")
+        color = Color.parseColor("#5DF5D3")
         textSize = sp(10f)
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         textAlign = Paint.Align.CENTER
@@ -82,9 +82,9 @@ class StorageRingGaugeView(context: Context) : View(context) {
             arcRect.right,
             arcRect.bottom,
             intArrayOf(
-                Color.parseColor("#10B981"),
-                Color.parseColor("#22D3EE"),
-                Color.parseColor("#F59E0B"),
+                Color.parseColor("#00E5B0"),
+                Color.parseColor("#38BDF8"),
+                Color.parseColor("#FBBF24"),
             ),
             floatArrayOf(0f, 0.7f, 1f),
             Shader.TileMode.CLAMP,

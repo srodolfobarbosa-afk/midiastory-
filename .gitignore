@@ -9,3 +9,8 @@ keystore.properties
 *.apk
 .idea/
 .DS_Store
+.mcp.json
+**/mcp_config.json
+*service-account*.json
+play-console-key.json
+.secrets/

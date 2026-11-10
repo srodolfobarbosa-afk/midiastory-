@@ -50,8 +50,8 @@ android {
         applicationId = "com.rdf112.midiastore"
         minSdk = 29
         targetSdk = 36
-        versionCode = 17
-        versionName = "2.2.1"
+        versionCode = 20
+        versionName = "2.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -83,7 +83,7 @@ android {
         }
         release {
             // Ativa R8 para eliminar o aviso de tabela de símbolos de desobfuscação na Google Play Console
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             isShrinkResources = false
             if (uploadSigningReady) {
                 signingConfig = signingConfigs.getByName("upload")

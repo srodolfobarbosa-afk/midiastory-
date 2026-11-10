@@ -13,23 +13,30 @@ You are working on the Android app **Midiastore**. Read this file and `README.md
 - Never create a replacement upload keystore. Use only the legitimate Play App Signing upload key supplied through a secure owner-controlled process.
 - The owner reported that the financial/receiving profile was enabled on 2026-11-03. This does not prove that any in-app product is configured, active, or tested.
 
-## Equipe IA Híbrida: Antigravity + Codex CLI
+## Equipe IA Híbrida: Auto-Evolução, Antigravity + Codex CLI
 
-Para maximizar a produtividade e respeitar limites de cota, as IAs trabalham em conjunto com divisão clara de papéis e sincronização via Supabase:
+> [!IMPORTANT]
+> **Princípio Fundamental de Auto-Evolução Contínua:** Nada nesta arquitetura ou fluxo de trabalho é estático ou fixo.
+> Como agentes de IA, temos autonomia total e dever de iniciativa para atualizar, otimizar, refatorar e melhorar este fluxo.
+> Em cada etapa, nos perguntamos: **"Como podemos melhorar?"** — seja adotando novos modelos de linguagem (LLMs), integrando bibliotecas mais modernas, adicionando novos servidores MCP ou otimizando custos e consumo de tokens.
 
-### 1. Divisão de Responsabilidades
-- **Antigravity (Gemini 3.8 Flash High)**:
-  - Orquestrador principal do projeto e guardião do loop de decisão até atingir `[META_CONCLUIDA]`.
-  - Gerencia Supabase MCP, banco de dados Postgres e Edge Functions 24h.
-  - Gerencia GitHub Actions 24h, APIs da Google Play Store e automação de navegador (Playwright / Chrome DevTools MCP).
-  - Decompõe objetivos complexos em tarefas e delega geração pesada de código ou compilação local para o Codex.
-- **Codex CLI (`codex.exe`)**:
-  - Engenheiro sênior para código Kotlin/Android, refatorações profundas de Views/Architecture e XMLs.
-  - Execução de compilações pesadas no Windows via Gradle (`./gradlew :domain:test`, `:app:assembleDebug`, etc.).
-  - Execução de testes instrumentados locais no emulador Android via ADB.
-  - Acionado pelo Antigravity via `node scripts/equipe-ia.mjs call-codex "..."` ou processando a fila via `node scripts/equipe-ia.mjs codex-next`.
+### 1. Matriz de Agentes, Modelos e Failover de Inteligência
 
-### 2. Protocolo Anti-Sobrescrita e Sincronização em Tempo Real
+| Agente | Modelo / Runtime | Responsabilidade Principal | Gestão de Cotas & Failover |
+| :--- | :--- | :--- | :--- |
+| **Antigravity** | **Gemini 3.8 Flash (High)** / *Argon quando disponível* | **Orquestrador Central**: Loop de decisão 24/7, Supabase MCP, GitHub Actions 24h, Google Play Console API, navegação web autônoma (Playwright/Chrome DevTools) e decomposição de metas. | Quando a cota semanal do Argon atinge o teto, o **Flash (High)** assume com máxima velocidade e raciocínio profundo. Reseta semanalmente. |
+| **Codex CLI** | **`codex.exe` local** (OpenAI / GPT-4o / o-series) | **Engenheiro de Código & Execução**: Refatoração profunda de Kotlin/Android, UI/Views, compilações pesadas no Windows (`./gradlew`) e testes instrumentados no emulador Android via ADB. | Opera pela assinatura/chaves locais OpenAI do usuário. Invocado sob demanda para não gastar tokens em tarefas triviais. |
+| **IA Nativa Cloud** | **Supabase Edge Function** (`native-orchestrator`) + Gemini Flash / OpenRouter | **Guardiã do Loop 24/7 (Custo Zero)**: Monitoramento autônomo na nuvem mesmo com o PC desligado, acionando GitHub Actions e salvando memórias no Postgres. | Usa rota gratuita (OpenRouter / Gemini 2.0 Flash / Free Tier) com 500k invocações mensais no Supabase. Custo: R$ 0,00. |
+| **Cloud Hands** | **GitHub Actions Runners** (Linux Ubuntu) | **Braço Executor na Nuvem**: Execução de scripts autônomos de crescimento orgânico, checagem de reviews da Play Store, builds e deploy do site. | Minutos gratuitos ilimitados por ser repositório público no GitHub. |
+
+### 2. Estratégia de Expansão de Tokens e Poder Computacional
+Para garantir que a equipe nunca fique sem poder de IA:
+1. **Failover Multinível**: Se o modelo principal esgotar sua cota temporária, o orquestrador migra instantaneamente para o próximo nível sem parar o projeto:
+   `Argon (High) ➔ Gemini 3.8 Flash (High) ➔ Codex CLI (o-series/GPT-4o) ➔ DeepSeek-R1 / Qwen 2.5 Coder (OpenRouter)`.
+2. **OpenRouter Multi-Model Pool**: Já configurado com fallback para modelos gratuitos e de alta capacidade (como `deepseek/deepseek-r1:free` e `qwen/qwen-2.5-coder-32b-instruct:free`).
+3. **Iniciativa Ativa de Pesquisa**: A IA pesquisa e propõe ativamente novos MCPs e ferramentas abertas no GitHub (como Playwright MCP, Chrome DevTools MCP e Agentic Skills) para expandir as capacidades do ambiente.
+
+### 3. Protocolo Anti-Sobrescrita e Sincronização em Tempo Real
 1. **Fila Centralizada no Supabase (`public.orchestrator_tasks`)**: Todas as tarefas são registradas e roteadas no Supabase (`target = 'CODEX'`, `'ANTIGRAVITY'` ou `'CLOUD_ACTIONS'`).
 2. **Lock Atômico de Tarefas**: Antes de iniciar o trabalho em uma tarefa, o agente faz uma transição atômica de `status = 'PENDING'` para `status = 'IN_PROGRESS'`. Se a tarefa já tiver sido assumida, ela não é executada novamente.
 3. **Memória Compartilhada (`public.memories`)**: Ambos os agentes registram resumos de suas entregas via `node scripts/sync-agent-memory.mjs write "..."`, garantindo continuidade cross-session.

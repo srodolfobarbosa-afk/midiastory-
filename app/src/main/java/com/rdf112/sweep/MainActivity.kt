@@ -275,6 +275,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var heroOrbButton: MaterialButton
     private lateinit var heroOrbSubtitle: TextView
     private lateinit var homeCleanupResult: TextView
+    private lateinit var homeDirectCleanRow: LinearLayout
     private var homeCleanupCandidateCount = 0
 
     // Widgets compartilhados e das demais abas
@@ -484,11 +485,9 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(10), dp(8), dp(10), dp(10))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
-        navFilesBtn = navTabButton(getString(R.string.nav_files)) { runWithProAccess { switchTab(AppTab.FILES) } }
-        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { runWithProAccess { switchTab(AppTab.OAAS) } }
+        navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
+        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
-        navFilesBtn.visibility = View.GONE
-        navOaasBtn.visibility = View.GONE
 
         bottomNavContainer.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
         bottomNavContainer.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
@@ -503,30 +502,41 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
 
-        val homeHeroImage = LinearLayout(this@MainActivity).apply {
+        val heroHeader = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(dp(4), dp(2), dp(4), dp(12))
         }
-        homeHeroImage.addView(ImageView(this@MainActivity).apply {
-            setImageResource(R.drawable.midiastore_home_illustration)
-            contentDescription = getString(R.string.home_illustration_description)
-            scaleType = ImageView.ScaleType.FIT_CENTER
-        }, LinearLayout.LayoutParams(dp(200), dp(140)))
-        homeHeroImage.addView(label(getString(R.string.app_name), 14f, R.color.sweep_primary, true))
-        addView(homeHeroImage, LinearLayout.LayoutParams(dp(200), dp(164)).apply { bottomMargin = dp(4) })
+        heroHeader.addView(label(getString(R.string.brand_tagline), 12f, R.color.sweep_primary_glow, true))
+        heroHeader.addView(label(getString(R.string.home_welcome_title), 20f, R.color.sweep_text, true), top(4))
+        addView(heroHeader, LinearLayout.LayoutParams(-1, -2))
 
-        addView(label(getString(R.string.home_welcome_title), 17f, R.color.sweep_text, true),
-            LinearLayout.LayoutParams(-1, -2).apply {
-                gravity = Gravity.CENTER
-                bottomMargin = dp(14)
-            })
+        // Card de Medidor de Armazenamento Real (Anel + GB usados/livres)
+        val storageCard = card()
+        val storageRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        storageRingGauge = StorageRingGaugeView(this@MainActivity).apply {
+            bottomLabel = getString(R.string.storage_ring_used)
+        }
+        storageRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(112), dp(112)).apply { marginEnd = dp(16) })
+        val storageCopy = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+        storageCopy.addView(label(getString(R.string.storage_title), 11f, R.color.sweep_primary_glow, true))
+        storageUsedHeadline = label(getString(R.string.storage_unavailable), 19f, R.color.sweep_text, true)
+        storageCopy.addView(storageUsedHeadline, top(4))
+        storageFreeSubline = label("", 13f, R.color.sweep_muted, false)
+        storageCopy.addView(storageFreeSubline, top(3))
+        storageCopy.addView(label(getString(R.string.storage_note), 11f, R.color.sweep_muted, false), top(6))
+        storageRow.addView(storageCopy, LinearLayout.LayoutParams(0, -2, 1f))
+        storageCard.addView(storageRow)
+        addView(wrap(storageCard), bottom(14))
 
         heroOrbButton = MaterialButton(this@MainActivity).apply {
             text = getString(R.string.home_cleanup_primary)
-            textSize = 19f
+            textSize = 18f
             isAllCaps = false
-            minHeight = dp(78)
-            cornerRadius = dp(24)
+            minHeight = dp(68)
+            cornerRadius = dp(22)
             insetTop = 0
             insetBottom = 0
             tag = "primary_phone_cleaner_action"
@@ -534,24 +544,122 @@ class MainActivity : AppCompatActivity() {
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
             setOnClickListener { onHomeCleanupButtonClicked() }
         }
-        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(78)).apply { bottomMargin = dp(8) })
+        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(68)).apply { bottomMargin = dp(6) })
 
         heroOrbSubtitle = label(getString(R.string.home_cleanup_subtitle), 12f, R.color.sweep_muted, false)
         addView(heroOrbSubtitle, LinearLayout.LayoutParams(-1, -2).apply {
-            leftMargin = dp(8)
-            rightMargin = dp(8)
-            bottomMargin = dp(16)
+            leftMargin = dp(6)
+            rightMargin = dp(6)
+            bottomMargin = dp(12)
         })
 
-        homeCleanupResult = label("", 14f, R.color.sweep_primary_glow, true).apply {
+        homeCleanupResult = label("", 13f, R.color.sweep_primary_glow, true).apply {
             visibility = View.GONE
-            setPadding(dp(8), dp(2), dp(8), dp(10))
+            setPadding(dp(8), dp(2), dp(8), dp(8))
         }
         addView(homeCleanupResult)
 
+        homeDirectCleanRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            visibility = View.GONE
+        }
+        val homeTrashBtn = button(getString(R.string.move_to_trash_button)) {
+            requestMoveSelectedToTrash()
+        }.apply {
+            setTextColor(color(R.color.sweep_background))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+        }
+        val homeDeleteBtn = button(getString(R.string.permanent_delete_button)) {
+            requestPermanentDeleteSelected()
+        }.apply {
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
+        }
+        homeDirectCleanRow.addView(homeTrashBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
+        homeDirectCleanRow.addView(homeDeleteBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
+        addView(homeDirectCleanRow, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(14) })
+
+        // Card de Ações Rápidas (Grade 2x2 estilo Files by Google + SD Maid SE)
+        val quickCard = card()
+        quickCard.addView(label(getString(R.string.quick_actions_title), 11f, R.color.sweep_primary_glow, true))
+        quickCard.addView(label(getString(R.string.quick_actions_subtitle), 12f, R.color.sweep_muted, false), top(4))
+
+        val quickRow1 = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val quickLargeBtn = button(getString(R.string.quick_find_large)) {
+            startOneTapCleanup()
+        }.apply { minHeight = dp(54) }
+        val quickDupBtn = button(getString(R.string.quick_find_duplicates)) {
+            runWithProAccess {
+                switchTab(AppTab.OAAS)
+                runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+            }
+        }.apply { minHeight = dp(54) }
+        quickRow1.addView(quickLargeBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        quickRow1.addView(quickDupBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
+        quickCard.addView(quickRow1, top(10))
+
+        val quickRow2 = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val quickOldBtn = button(getString(R.string.filter_older_30d)) {
+            runWithProAccess {
+                switchTab(AppTab.OAAS)
+                runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
+            }
+        }.apply { minHeight = dp(54) }
+        val quickUnusedAppsBtn = button(getString(R.string.pro_unused_apps_title)) {
+            runWithProAccess { requestUnusedAppSuggestions() }
+        }.apply { minHeight = dp(54) }
+        quickRow2.addView(quickOldBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        quickRow2.addView(quickUnusedAppsBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
+        quickCard.addView(quickRow2, top(8))
+        addView(wrap(quickCard), bottom(14))
+
+        // Card de Atalhos Diretos por Categoria (Fotos, Vídeos, Áudios)
+        val mediaKindsCard = card()
+        mediaKindsCard.addView(label(getString(R.string.media_kind_title), 11f, R.color.sweep_primary_glow, true))
+        mediaKindsCard.addView(label(getString(R.string.tap_to_scan_media_types), 12f, R.color.sweep_muted, false), top(4))
+        val kindsRow = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
+        val homePhotosBtn = button(getString(R.string.photos_tab)) {
+            switchTab(AppTab.FILES)
+            viewModel.selectKind(MediaKind.IMAGE)
+            startScanOrRequestAccess()
+        }
+        val homeVideosBtn = button(getString(R.string.videos_tab)) {
+            switchTab(AppTab.FILES)
+            viewModel.selectKind(MediaKind.VIDEO)
+            startScanOrRequestAccess()
+        }
+        val homeAudioBtn = button(getString(R.string.audio_tab)) {
+            switchTab(AppTab.FILES)
+            viewModel.selectKind(MediaKind.AUDIO)
+            startScanOrRequestAccess()
+        }
+        kindsRow.addView(homePhotosBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
+        kindsRow.addView(homeVideosBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
+        kindsRow.addView(homeAudioBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
+        mediaKindsCard.addView(kindsRow, top(10))
+        addView(wrap(mediaKindsCard), bottom(14))
+
         val homePlansCard = card()
-        homePlansCard.addView(label(getString(R.string.home_plans_title), 16f, R.color.sweep_text, true))
-        homePlansCard.addView(label(getString(R.string.home_plans_subtitle), 12f, R.color.sweep_muted, false), top(4))
+        val homePlansHeader = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val homePlansLogo = ImageView(this@MainActivity).apply {
+            setImageResource(R.mipmap.ic_launcher)
+            contentDescription = getString(R.string.app_name)
+        }
+        homePlansHeader.addView(homePlansLogo, LinearLayout.LayoutParams(dp(36), dp(36)).apply { marginEnd = dp(10) })
+        val homePlansTitles = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+        homePlansTitles.addView(label(getString(R.string.home_plans_title), 16f, R.color.sweep_text, true))
+        homePlansTitles.addView(label(getString(R.string.home_plans_subtitle), 12f, R.color.sweep_muted, false), top(2))
+        homePlansHeader.addView(homePlansTitles, LinearLayout.LayoutParams(0, -2, 1f))
+        homePlansCard.addView(homePlansHeader)
 
         homePlanMonthlyButton = button(getString(R.string.plan_monthly_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
@@ -570,10 +678,12 @@ class MainActivity : AppCompatActivity() {
         }.apply { minHeight = dp(48) }
         stylePlanPurchaseButton(homePlanLifetimeButton, isProductAvailable = false)
         homePlansCard.addView(homePlanLifetimeButton, top(6))
-        homePlansCard.addView(
-            label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false),
-            top(8),
-        )
+        if (!billingGateway.securePurchaseVerificationAvailable()) {
+            homePlansCard.addView(
+                label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false),
+                top(8),
+            )
+        }
         addView(wrap(homePlansCard), bottom(14))
 
         val shareAppButton = button(getString(R.string.share_app_button)) { shareApp() }.apply {
@@ -617,22 +727,28 @@ class MainActivity : AppCompatActivity() {
         controls.addView(typeRow, bottom(12))
 
         controls.addView(label(getString(R.string.smart_filter_title), 11f, R.color.sweep_primary_glow, true), bottom(6))
-        val filterRow1 = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
-        filterAllButton = button(getString(R.string.filter_all)) { viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS) }
-        filterLargeButton = button(getString(R.string.filter_large_10mb)) { viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB) }
-        filterRow1.addView(filterAllButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginEnd = dp(4) })
-        filterRow1.addView(filterLargeButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginStart = dp(4) })
+        val filterRow1 = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        filterAllButton = button(getString(R.string.filter_all)) { viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS) }.apply { minHeight = dp(52) }
+        filterLargeButton = button(getString(R.string.filter_large_10mb)) { viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB) }.apply { minHeight = dp(52) }
+        filterRow1.addView(filterAllButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        filterRow1.addView(filterLargeButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
         controls.addView(filterRow1, bottom(6))
 
-        val filterRow2 = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
+        val filterRow2 = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
         filterDuplicatesButton = button(getString(R.string.filter_same_size)) {
             runWithProAccess { viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES) }
-        }
+        }.apply { minHeight = dp(52) }
         filterOldButton = button(getString(R.string.filter_older_30d)) {
             runWithProAccess { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }
-        }
-        filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginEnd = dp(4) })
-        filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, dp(54), 1f).apply { marginStart = dp(4) })
+        }.apply { minHeight = dp(52) }
+        filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
         controls.addView(filterRow2, bottom(12))
 
         controls.addView(label(getString(R.string.volume_title), 11f, R.color.sweep_muted, true), bottom(4))
@@ -655,32 +771,6 @@ class MainActivity : AppCompatActivity() {
         }
         controls.addView(filesPermissionButton, top(8))
         addView(wrap(controls), bottom(14))
-
-        val resultsCard = card()
-        resultsCard.addView(label(getString(R.string.results_title), 11f, R.color.sweep_primary_glow, true))
-        pageLabel = label(getString(R.string.not_scanned), 16f, R.color.sweep_text, true)
-        resultsCard.addView(pageLabel, top(8))
-        resultSummary = label(getString(R.string.page_results_hint), 12f, R.color.sweep_muted, false)
-        resultsCard.addView(resultSummary, top(6))
-        recordsContainer = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(0, dp(8), 0, 0)
-        }
-        resultsCard.addView(recordsContainer)
-
-        val navigation = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        previousButton = button(getString(R.string.previous_page)) { viewModel.loadPreviousPage() }
-        nextButton = button(getString(R.string.next_page)) { viewModel.loadNextPage() }.apply {
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
-        }
-        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginEnd = dp(6) })
-        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(6) })
-        resultsCard.addView(navigation, top(12))
-        addView(wrap(resultsCard), bottom(14))
 
         val reviewCard = card()
         reviewCard.addView(label(getString(R.string.review_title), 11f, R.color.sweep_primary_glow, true))
@@ -717,6 +807,32 @@ class MainActivity : AppCompatActivity() {
         reviewCard.addView(clearSelectionButton, top(8))
         filesReviewCard = wrap(reviewCard)
         addView(filesReviewCard, bottom(14))
+
+        val resultsCard = card()
+        resultsCard.addView(label(getString(R.string.results_title), 11f, R.color.sweep_primary_glow, true))
+        pageLabel = label(getString(R.string.not_scanned), 16f, R.color.sweep_text, true)
+        resultsCard.addView(pageLabel, top(8))
+        resultSummary = label(getString(R.string.page_results_hint), 12f, R.color.sweep_muted, false)
+        resultsCard.addView(resultSummary, top(6))
+        recordsContainer = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(8), 0, 0)
+        }
+        resultsCard.addView(recordsContainer)
+
+        val navigation = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        previousButton = button(getString(R.string.previous_page)) { viewModel.loadPreviousPage() }
+        nextButton = button(getString(R.string.next_page)) { viewModel.loadNextPage() }.apply {
+            setTextColor(color(R.color.sweep_background))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+        }
+        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginEnd = dp(6) })
+        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(6) })
+        resultsCard.addView(navigation, top(12))
+        addView(wrap(resultsCard), bottom(14))
     }
 
     private fun buildOaasMissionsSection(): LinearLayout = LinearLayout(this).apply {
@@ -845,9 +961,21 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
 
         val proCard = card()
-        proCard.addView(label(getString(R.string.pro_card_title), 11f, R.color.sweep_accent_amber, true))
+        val proHeaderRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val proHeaderLogo = ImageView(this@MainActivity).apply {
+            setImageResource(R.mipmap.ic_launcher)
+            contentDescription = getString(R.string.app_name)
+        }
+        proHeaderRow.addView(proHeaderLogo, LinearLayout.LayoutParams(dp(42), dp(42)).apply { marginEnd = dp(12) })
+        val proHeaderTextCol = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+        proHeaderTextCol.addView(label(getString(R.string.pro_card_title), 11f, R.color.sweep_accent_amber, true))
         proStatusBadge = label(getString(R.string.pro_status_free), 17f, R.color.sweep_text, true)
-        proCard.addView(proStatusBadge, top(6))
+        proHeaderTextCol.addView(proStatusBadge, top(2))
+        proHeaderRow.addView(proHeaderTextCol, LinearLayout.LayoutParams(0, -2, 1f))
+        proCard.addView(proHeaderRow)
         proCard.addView(label(getString(R.string.pro_card_subtitle), 13f, R.color.sweep_muted, false), top(6))
         proCard.addView(label(getString(R.string.pro_free_included), 12f, R.color.sweep_text, false), top(12))
         proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.sweep_accent_amber, false), top(10))
@@ -953,11 +1081,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderBillingState(state: ProAccessSummaryState) {
         if (!::proStatusBadge.isInitialized) return
-        val hasProAccess = state == ProAccessSummaryState.PRO_GRANTED ||
-            (isDevelopmentBuild && debugProPreviewEnabled)
         if (::bottomNavContainer.isInitialized) {
-            navFilesBtn.visibility = if (hasProAccess) View.VISIBLE else View.GONE
-            navOaasBtn.visibility = if (hasProAccess) View.VISIBLE else View.GONE
+            navFilesBtn.visibility = View.VISIBLE
+            navOaasBtn.visibility = View.VISIBLE
         }
         if (isDevelopmentBuild && debugProPreviewEnabled) {
             proStatusBadge.text = getString(R.string.pro_debug_preview_badge)
@@ -1560,6 +1686,9 @@ class MainActivity : AppCompatActivity() {
             )
         }
         val hasSelection = selected.isNotEmpty() && !state.isLoading
+        if (::homeDirectCleanRow.isInitialized) {
+            homeDirectCleanRow.visibility = if (hasSelection) View.VISIBLE else View.GONE
+        }
         moveToTrashButton.isEnabled = hasSelection && trashCoordinator.supportsSystemTrash()
         permanentDeleteButton.isEnabled = hasSelection && trashCoordinator.supportsPermanentDelete()
         exportSelectionButton.isEnabled = hasSelection
@@ -1986,7 +2115,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun wrap(content: LinearLayout): MaterialCardView = MaterialCardView(this).apply {
         radius = dp(22).toFloat()
-        cardElevation = dp(2).toFloat()
+        cardElevation = 0f
         setCardBackgroundColor(color(R.color.sweep_surface))
         strokeWidth = dp(1)
         strokeColor = color(R.color.sweep_surface_alt)
@@ -2007,7 +2136,7 @@ class MainActivity : AppCompatActivity() {
         isAllCaps = false
         textSize = 12f
         cornerRadius = dp(16)
-        setPadding(dp(6), dp(2), dp(6), dp(2))
+        setPadding(dp(10), dp(8), dp(10), dp(8))
         backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         setTextColor(color(R.color.sweep_text))
         setOnClickListener { onClick() }
