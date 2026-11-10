@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111f">
   <title>Midiastore — Veja o que ocupa espaço no seu Android</title>
-  <meta name="description" content="Encontre arquivos grandes nas mídias acessíveis do seu Android. Revise antes de agir. Análise e limpeza segura grátis; conheça a exportação de resumo do Midiastore Pro.">
-  <meta name="keywords" content="Midiastore, liberar espaço no celular, armazenamento cheio Android, arquivos grandes Android, storage cleaner Android">
+  <meta name="description" content="Encontre arquivos grandes nas mídias acessíveis do seu Android. Participe do programa VIP de testadores fechados e ganhe 3 meses de Midiastore Pro grátis!">
+  <meta name="keywords" content="Midiastore, liberar espaço no celular, armazenamento cheio Android, arquivos grandes Android, storage cleaner Android, beta tester">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://midiastory-df6a0.web.app/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Midiastore — Seu espaço, sob seu controle">
-  <meta property="og:description" content="Encontre arquivos grandes, revise com calma e escolha o que fazer. Comece grátis.">
+  <meta property="og:description" content="Encontre arquivos grandes, revise com calma e escolha o que fazer. Programa VIP de testadores aberto!">
   <meta property="og:url" content="https://midiastory-df6a0.web.app/">
   <meta property="og:site_name" content="Midiastore">
   <script type="application/ld+json">
@@ -21,23 +21,50 @@
     :root{color-scheme:dark;--bg:#07111f;--panel:#101d2e;--line:#26364a;--mint:#5de3bf;--white:#f5f8fc;--muted:#b3c0d0}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#123047 0,transparent 55%),var(--bg);color:var(--white);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
     a{color:inherit}.wrap{width:min(100% - 36px,1040px);margin:auto}header{padding:18px 0;border-bottom:1px solid var(--line)}.nav{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-weight:850;font-size:1.3rem;text-decoration:none;letter-spacing:-.04em}.brand span{color:var(--mint)}
-    .button{display:inline-flex;justify-content:center;align-items:center;padding:13px 20px;border-radius:12px;background:var(--mint);color:#07111f;text-decoration:none;font-weight:800;min-height:48px}.button.secondary{background:transparent;color:var(--mint);border:1px solid #388b78}
-    .hero{text-align:center;padding:76px 0 44px}.eyebrow{color:var(--mint);font-size:.82rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.hero h1{font-size:clamp(2.4rem,7vw,4.7rem);line-height:1.04;letter-spacing:-.055em;margin:14px auto 20px;max-width:850px}.hero h1 em{font-style:normal;color:var(--mint)}.lead{font-size:1.15rem;color:var(--muted);max-width:690px;margin:0 auto 28px}.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}.note{font-size:.87rem;color:var(--muted);margin-top:16px}
+    .button{display:inline-flex;justify-content:center;align-items:center;padding:13px 20px;border-radius:12px;background:var(--mint);color:#07111f;text-decoration:none;font-weight:800;min-height:48px;border:none;cursor:pointer;font-size:1rem;transition:transform 0.15s, opacity 0.15s}.button:hover{opacity:0.9;transform:translateY(-1px)}.button.secondary{background:transparent;color:var(--mint);border:1px solid #388b78}
+    .hero{text-align:center;padding:60px 0 36px}.eyebrow{color:var(--mint);font-size:.82rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.hero h1{font-size:clamp(2.3rem,6.5vw,4.5rem);line-height:1.06;letter-spacing:-.055em;margin:14px auto 20px;max-width:850px}.hero h1 em{font-style:normal;color:var(--mint)}.lead{font-size:1.15rem;color:var(--muted);max-width:690px;margin:0 auto 28px}.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}.note{font-size:.87rem;color:var(--muted);margin-top:16px}
+    
+    /* Seção VIP de Recrutamento de Testadores */
+    .vip-testers{margin:40px auto;padding:36px;border:2px solid var(--mint);border-radius:24px;background:linear-gradient(135deg,#0a2736,#101e30 70%);text-align:center;box-shadow:0 15px 40px rgba(93,227,191,0.15)}
+    .vip-testers h2{font-size:clamp(1.8rem,4.5vw,2.5rem);margin:10px 0 14px;letter-spacing:-.03em}
+    .vip-testers p{color:var(--muted);max-width:620px;margin:0 auto 24px;font-size:1.05rem}
+    .tester-form{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:540px;margin:0 auto}
+    .tester-input{flex:1;min-width:260px;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:1rem;outline:none}
+    .tester-input:focus{border-color:var(--mint)}
+    .tester-badge{display:inline-block;background:rgba(93,227,191,0.15);color:var(--mint);padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px}
+    .feedback-msg{margin-top:16px;font-weight:700;font-size:0.95rem;display:none}
+    .feedback-msg.success{display:block;color:var(--mint)}
+    .feedback-msg.error{display:block;color:#f87171}
+
     section{padding:30px 0}.section-title{text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);letter-spacing:-.03em}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:25px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:23px}.card h3{margin:0 0 8px;font-size:1.12rem}.card p{color:var(--muted);margin:0}.tag{font-size:.78rem;font-weight:800;color:var(--mint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
     .pro{margin:42px auto;padding:34px;border:1px solid #338d79;border-radius:22px;background:linear-gradient(130deg,#102b34,#101d2e 65%);text-align:center}.pro h2{font-size:clamp(1.7rem,4vw,2.4rem);margin:8px 0}.pro p{color:var(--muted);max-width:650px;margin:0 auto 20px}.control{margin:28px auto 50px;max-width:790px;padding:25px;background:#0b1725;border:1px solid var(--line);border-radius:18px}.control h2{margin:0 0 8px}.control p{margin:0;color:var(--muted)}footer{border-top:1px solid var(--line);padding:25px 0 34px;color:var(--muted);font-size:.9rem;text-align:center}
-    @media(max-width:520px){.nav .button{padding:10px 12px;font-size:.9rem}.hero{padding-top:56px}.pro{padding:25px 19px}}
+    @media(max-width:520px){.nav .button{padding:10px 12px;font-size:.9rem}.hero{padding-top:40px}.vip-testers{padding:24px 16px}}
   </style>
 </head>
 <body>
-  <header><div class="wrap nav"><a class="brand" href="#inicio" aria-label="Midiastore início">Midia<span>store</span></a><a class="button" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore">Baixar grátis</a></div></header>
+  <header><div class="wrap nav"><a class="brand" href="#inicio" aria-label="Midiastore início">Midia<span>store</span></a><a class="button" href="#vip-testers">Seja Testador VIP</a></div></header>
   <main class="wrap" id="inicio">
     <section class="hero">
       <div class="eyebrow">Armazenamento cheio? Comece por uma revisão</div>
       <h1>Descubra o que ocupa espaço.<br><em>Você decide o que fazer.</em></h1>
       <p class="lead">O Midiastore ajuda a encontrar arquivos grandes nas mídias acessíveis do seu Android. Revise os itens com calma antes de qualquer ação.</p>
-      <div class="actions"><a class="button" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore">Instale grátis e revise seus arquivos</a></div>
+      <div class="actions"><a class="button" href="#vip-testers">Participar do Teste Fechado VIP (Grátis)</a></div>
       <p class="note">A análise, a revisão e a limpeza segura são gratuitas. A remoção exige sua confirmação pelo Android.</p>
     </section>
+
+    <!-- FUNIL VIP DE RECRUTAMENTO DE TESTADORES -->
+    <section class="vip-testers" id="vip-testers">
+      <div class="tester-badge">⭐ Programa VIP Exclusivo Google Play</div>
+      <h2>Vagas Abertas para Testadores Fechados</h2>
+      <p>O Google Play exige 20 testadores voluntários antes da publicação mundial. Cadastre seu e-mail da Google Play Store abaixo e ganhe <strong>3 meses de Midiastore Pro grátis</strong> como agradecimento!</p>
+      
+      <form class="tester-form" id="testerForm">
+        <input type="email" id="testerEmail" class="tester-input" placeholder="Seu e-mail da Google Play (ex: nome@gmail.com)" required>
+        <button type="submit" id="testerSubmitBtn" class="button">Quero Minha Vaga VIP</button>
+      </form>
+      <div id="feedbackMsg" class="feedback-msg"></div>
+    </section>
+
     <section aria-labelledby="como-funciona">
       <h2 class="section-title" id="como-funciona">Mais clareza antes de liberar espaço</h2>
       <div class="cards">
@@ -46,15 +73,71 @@
         <article class="card"><div class="tag">Confirme</div><h3>Decisão com você</h3><p>Quando disponível, a ação de remoção segue o pedido de confirmação do sistema Android.</p></article>
       </div>
     </section>
+
     <section class="pro" aria-labelledby="pro-title">
       <div class="eyebrow">Midiastore Pro</div>
       <h2 id="pro-title">Leve o resumo da sua revisão com você.</h2>
-      <p>O Pro adiciona a exportação do resumo da seleção revisada. Instale o app grátis e consulte nele a disponibilidade, os planos e as condições exibidos pela Google Play.</p>
-      <a class="button" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore">Conheça o Midiastore Pro no app</a>
-      <p class="note">A oferta e o preço podem variar conforme disponibilidade na Google Play. Nenhuma assinatura é iniciada por esta página.</p>
+      <p>O Pro adiciona a exportação do resumo da seleção revisada, além de detecção de cópias exatas e limpador de mídia pesada do WhatsApp. Cadastre-se como testador VIP para ter acesso antecipado.</p>
+      <a class="button" href="#vip-testers">Garantir Acesso Pro Grátis</a>
     </section>
+
     <aside class="control"><h2>Seus arquivos, sua decisão</h2><p>O Midiastore analisa mídias acessíveis no dispositivo. A cobertura depende das permissões concedidas e dos arquivos disponibilizados pelo Android. Sempre revise antes de remover.</p></aside>
   </main>
-  <footer><div class="wrap"><p>© 2026 Midiastore · <a href="privacidade.html">Privacidade</a></p><p>Google Play e Android são marcas de seus respectivos proprietários.</p></div></footer>
+
+  <footer><div class="wrap"><p>© 2026 Midiastore · <a href="privacidade.html">Privacidade</a></p><p>Google Play e Android são marcas registradas de seus respectivos proprietários.</p></div></footer>
+
+  <script>
+    const form = document.getElementById('testerForm');
+    const emailInput = document.getElementById('testerEmail');
+    const submitBtn = document.getElementById('testerSubmitBtn');
+    const feedback = document.getElementById('feedbackMsg');
+
+    const SUPABASE_URL = "https://usmqtnlsaavxqguwrtix.supabase.co";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU";
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email || !email.includes('@')) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Cadastrando...";
+      feedback.className = "feedback-msg";
+      feedback.style.display = "none";
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/beta_testers`, {
+          method: "POST",
+          headers: {
+            "apikey": ANON_KEY,
+            "Authorization": `Bearer ${ANON_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ email: email, source: "landing_page_vip" })
+        });
+
+        if (res.ok || res.status === 201 || res.status === 204) {
+          feedback.className = "feedback-msg success";
+          feedback.innerText = "🎉 Vaga garantida! Seu e-mail foi adicionado à lista de testadores VIP. Em instantes você receberá o link da Google Play Store!";
+          emailInput.value = "";
+        } else if (res.status === 409) {
+          feedback.className = "feedback-msg success";
+          feedback.innerText = "✅ Este e-mail já está cadastrado na nossa lista VIP de testadores da Google Play!";
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          feedback.className = "feedback-msg error";
+          feedback.innerText = "Erro ao cadastrar. Verifique o e-mail ou tente novamente.";
+        }
+      } catch (err) {
+        feedback.className = "feedback-msg error";
+        feedback.innerText = "Falha de conexão. Tente novamente em instantes.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Quero Minha Vaga VIP";
+        feedback.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
