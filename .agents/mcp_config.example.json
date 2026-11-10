@@ -10,6 +10,10 @@
     "chrome-devtools": {
       "command": "npx.cmd",
       "args": ["-y", "chrome-devtools-mcp@latest"]
+    },
+    "rea": {
+      "command": "npx.cmd",
+      "args": ["-y", "rea-agents@latest"]
     }
   }
 }
