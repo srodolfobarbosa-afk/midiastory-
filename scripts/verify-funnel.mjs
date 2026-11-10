@@ -20,7 +20,7 @@ async function verify() {
   const html = await res.text();
   const hasVipSection = html.includes('id="vip-testers"');
   const hasSupabase = html.includes('supabase.co');
-  const hasForm = html.includes('id="vip-form"');
+  const hasForm = html.includes('id="testerForm"');
 
   console.log(` - Seção VIP presente (#vip-testers): ${hasVipSection ? "SIM" : "NÃO"}`);
   console.log(` - Conexão Supabase configurada: ${hasSupabase ? "SIM" : "NÃO"}`);
@@ -28,10 +28,10 @@ async function verify() {
 
   // 2. Testar endpoint da tabela beta_testers no Supabase
   console.log("\nTestando integridade do banco Supabase...");
-  let token = "";
-  if (fs.existsSync(mcpConfigPath)) {
+  let token = process.env.SUPABASE_ACCESS_TOKEN || "";
+  if (!token && fs.existsSync(mcpConfigPath)) {
     const raw = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
-    token = raw?.mcpServers?.supabase?.headers?.Authorization?.replace(/^Bearer\s+/i, "") || "";
+    token = raw?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN || raw?.mcpServers?.supabase?.headers?.Authorization?.replace(/^Bearer\s+/i, "") || "";
   }
 
   if (token) {
