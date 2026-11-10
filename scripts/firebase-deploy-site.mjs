@@ -6,9 +6,23 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const keyPath = "C:\\Users\\rodolfo\\Downloads\\midiastory-df6a0-firebase-adminsdk-fbsvc-d0543767cb.json";
+function loadFirebaseKey() {
+  if (process.env.FIREBASE_ADMIN_KEY_JSON) {
+    try { return JSON.parse(process.env.FIREBASE_ADMIN_KEY_JSON); } catch (e) {}
+  }
+  const localSecret = path.join(projectRoot, ".secrets", "firebase-admin.json");
+  if (fs.existsSync(localSecret)) {
+    return JSON.parse(fs.readFileSync(localSecret, "utf8"));
+  }
+  const downloadsPath = "C:\\Users\\rodolfo\\Downloads\\midiastory-df6a0-firebase-adminsdk-fbsvc-d0543767cb.json";
+  if (fs.existsSync(downloadsPath)) {
+    return JSON.parse(fs.readFileSync(downloadsPath, "utf8"));
+  }
+  throw new Error("Credencial do Firebase Admin não encontrada.");
+}
+
+const key = loadFirebaseKey();
 const siteId = "midiastory-df6a0";
-const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
 
 async function getAccessToken() {
   const now = Math.floor(Date.now() / 1000);

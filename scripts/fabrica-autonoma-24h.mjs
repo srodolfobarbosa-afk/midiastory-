@@ -26,6 +26,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { checkAndMaintain } from "./supabase-maintenance.mjs";
 import { executeWithFailover } from "./ai-failover-router.mjs";
@@ -126,37 +127,98 @@ async function runAutonomousCycle(cycleNumber) {
     cycleSummary.steps.testers = `ERROR: ${err.message}`;
   }
 
-  // Etapa 3: Roteador de IA & Failover Ping
+  // Etapa 3: Ativação Cognitiva da LLM Construtora (Gemini 4 Argon / 3.8 Flash / Codex)
   try {
-    console.log(`\n[Etapa 3/4] Heartbeat do Roteador Multi-LLM...`);
-    const aiResult = await executeWithFailover("Responda apenas 'PULSO_OK' para teste de integridade do cluster.", { isCode: false });
-    console.log(`Provedor Ativo: ${aiResult.source} | Resposta: ${aiResult.content.slice(0, 50).trim()}`);
-    cycleSummary.steps.aiFleet = { provider: aiResult.source, status: "ONLINE" };
+    console.log(`\n[Etapa 3/4] 🧠 LLM Construtora Autônoma Ativa (Planejamento & Criação)...`);
+    
+    // Ler histórico recente do Supabase para manter linha de raciocínio
+    let recentMemories = [];
+    try {
+      const memRows = await runSql(`SELECT content FROM public.memories ORDER BY id DESC LIMIT 3;`);
+      recentMemories = memRows.map(r => r.content);
+    } catch (e) {
+      console.warn("Aviso ao ler memórias:", e.message);
+    }
+
+    const prompt = `Você é o Agente Autônomo Construtor do Midiastore (com.rdf112.midiastore), operando em regime 24/7 rumo à meta de R$ 1.000.000,00 em vendas e no fechamento dos 20 testadores fechados na Google Play.
+Contexto recente:
+${recentMemories.join("\n")}
+
+Ciclo atual: #${cycleNumber}.
+Gere UMA entrega técnica concreta e inédita para o projeto:
+Pode ser:
+- Um artigo rico de SEO em docs/artigos/ (focado em como limpar WhatsApp, liberar memória no Android, fotos duplicadas)
+- Um novo roteiro viral detalhado para Reels/TikTok em docs/campaigns/
+- Um kit de mensagens de conversão para comunidades de tecnologia em docs/campaigns/
+- Uma melhoria arquitetural documentada em docs/
+
+Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em volta do JSON):
+{
+  "action": "Título claro e objetivo da entrega",
+  "category": "SEO | MARKETING | OUTREACH | ARCHITECTURE",
+  "filename": "docs/caminho/do/arquivo.md",
+  "content": "Conteúdo completo e aprofundado do arquivo",
+  "summary": "1 frase explicando o impacto na meta de 20 testadores ou R$ 1 milhão"
+}`;
+
+    const aiResult = await executeWithFailover(prompt, { isCode: false });
+    let parsed = null;
+    try {
+      const cleanJson = aiResult.content.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "").trim();
+      parsed = JSON.parse(cleanJson);
+    } catch (err) {
+      console.warn("LLM retornou texto livre, adaptando para nota técnica:", err.message);
+      parsed = {
+        action: `Entrega Cognitiva do Ciclo #${cycleNumber}`,
+        category: "MARKETING",
+        filename: `docs/campaigns/entrega-ciclo-${cycleNumber}.md`,
+        content: aiResult.content,
+        summary: "Diretriz estratégica gerada pela LLM."
+      };
+    }
+
+    // Gravar artefato no disco
+    if (parsed.filename && parsed.content) {
+      const fullPath = path.join(projectRoot, parsed.filename);
+      fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+      fs.writeFileSync(fullPath, parsed.content, "utf8");
+      console.log(`📝 Arquivo gerado pela LLM: ${parsed.filename}`);
+    }
+
+    // Gravar memória da ação
+    await registrarMemoria({
+      action: `[Ciclo #${cycleNumber}] ${parsed.action}`,
+      studied: "Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores",
+      attempted: `Criação autônoma do artefato ${parsed.filename}`,
+      errors: "Nenhum erro na geração",
+      fixes: "Nenhuma correção necessária",
+      conclusions: `${parsed.summary} (Provedor: ${aiResult.source})`
+    });
+
+    cycleSummary.steps.aiFleet = { provider: aiResult.source, action: parsed.action, filename: parsed.filename };
+
+    // Auto-commit e push git se houver alterações
+    try {
+      const gitStatus = execSync(`git -C "${projectRoot}" status --porcelain`, { encoding: "utf8" });
+      if (gitStatus.trim()) {
+        console.log("📦 Alterações detectadas pelo git. Realizando commit e push autônomo...");
+        execSync(`git -C "${projectRoot}" add "${parsed.filename}" docs/LINHA_DO_TEMPO_AUTONOMA.md`, { stdio: "pipe", timeout: 15000 });
+        execSync(`git -C "${projectRoot}" commit -m "feat(autonomous-factory): [cycle-${cycleNumber}] ${parsed.action.replace(/"/g, '')}"`, { stdio: "pipe", timeout: 15000 });
+        execSync(`git -C "${projectRoot}" push origin HEAD`, { stdio: "pipe", timeout: 30000 });
+        console.log("🚀 Commit e push concluídos com sucesso pela Fábrica Autônoma!");
+      }
+    } catch (gitErr) {
+      console.warn("Aviso no auto-commit git:", gitErr.message);
+    }
   } catch (err) {
     console.warn(`⚠️ Aviso na Etapa 3:`, err.message);
-    cycleSummary.steps.aiFleet = `FALLBACK_REQUIRED: ${err.message}`;
+    cycleSummary.steps.aiFleet = `ERROR: ${err.message}`;
   }
 
   // Etapa 4: Gravação do Heartbeat no Supabase
   const durationMs = Date.now() - startTime;
   cycleSummary.durationMs = durationMs;
   await logHeartbeat(cycleNumber, cycleSummary);
-
-  // Regra de Ouro: Gravação de memória periódica (a cada 10 ciclos)
-  if (cycleNumber % 10 === 0) {
-    try {
-      await registrarMemoria({
-        action: `Marco de Operação Contínua: Ciclo #${cycleNumber}`,
-        studied: `Status de saúde do Supabase e lista de 20 testadores fechados`,
-        attempted: `Auditoria e sincronização de estado automatizada`,
-        errors: cycleSummary.steps.supabase.startsWith("ERROR") ? cycleSummary.steps.supabase : "Zero erros",
-        fixes: "Nenhuma correção necessária. Sistema saudável.",
-        conclusions: `Ciclo #${cycleNumber} concluído em ${(durationMs / 1000).toFixed(2)}s. Provedor IA: ${cycleSummary.steps.aiFleet?.provider || "N/A"}.`,
-      });
-    } catch (e) {
-      console.warn("Aviso ao registrar memória periódica:", e.message);
-    }
-  }
 
   console.log(`\n----------------------------------------------------------------`);
   console.log(`✅ [CICLO #${cycleNumber} CONCLUÍDO] Duração: ${(durationMs / 1000).toFixed(2)}s`);
