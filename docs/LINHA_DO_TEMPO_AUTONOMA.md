@@ -213,3 +213,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #51
 
 ---
+
+### 📍 [10/11/2026, 19:39:31] [Ciclo #7] Criação de Guia Prático: Como Identificar e Remover Arquivos 'Lixo' do WhatsApp
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/artigos/guia_limpeza_whatsapp_storage.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Este artigo ataca diretamente a causa raiz da falta de espaço em 90% dos Androids, convertendo usuários frustrados em testadores que precisam da solução técnica do app. (Provedor: google/gemini-3.1-flash-lite)
+- *Registro Supabase:* Memory #52
+
+---
