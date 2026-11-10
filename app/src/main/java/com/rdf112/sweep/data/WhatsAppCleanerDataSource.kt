@@ -54,8 +54,9 @@ class WhatsAppCleanerDataSource(
                 "%Android/media/com.whatsapp/WhatsApp/Media/%",
                 "%Android/media/com.whatsapp.w4b/WhatsApp Business/Media/%",
             )
+            val sortOrder = "${MediaStore.Files.FileColumns.SIZE} DESC"
             val items = mutableListOf<WhatsAppMediaItem>()
-            val cursor = resolver.query(collection, projection, selection, args, null)
+            val cursor = resolver.query(collection, projection, selection, args, sortOrder)
                 ?: throw IllegalStateException("MediaStore did not return a cursor")
 
             cursor.use {

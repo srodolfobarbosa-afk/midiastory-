@@ -17,6 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 const mcpConfigPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
 const projectRef = "usmqtnlsaavxqguwrtix";
+const GOAL = 20;
 
 function getToken() {
   if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
@@ -31,7 +32,6 @@ function getToken() {
       // fallback
     }
   }
-  // Token conhecido do projeto
   return "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
 }
 
@@ -53,82 +53,33 @@ async function runSql(query) {
 
 async function checkBetaTesters() {
   try {
-    // 1. Verificar se a tabela beta_testers existe
-    const tableCheck = await runSql(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' AND table_name = 'beta_testers';
-    `);
-
-    if (!tableCheck || tableCheck.length === 0) {
-      console.log("[INFO] Tabela public.beta_testers ainda não existe no Supabase.");
-      console.log("[SETUP] Criando estrutura recomendada da tabela public.beta_testers...");
-      await runSql(`
-        CREATE TABLE IF NOT EXISTS public.beta_testers (
-          id BIGSERIAL PRIMARY KEY,
-          email TEXT UNIQUE NOT NULL,
-          name TEXT,
-          device_model TEXT,
-          android_version TEXT,
-          source_channel TEXT DEFAULT 'web_vip_funnel',
-          reciprocal_app_name TEXT,
-          reciprocal_play_link TEXT,
-          status TEXT DEFAULT 'pending_opt_in', -- pending_opt_in, opted_in, active_14_days, completed
-          registered_at TIMESTAMPTZ DEFAULT NOW(),
-          last_active_at TIMESTAMPTZ,
-          notes TEXT
-        );
-        CREATE INDEX IF NOT EXISTS idx_beta_testers_email ON public.beta_testers (email);
-        CREATE INDEX IF NOT EXISTS idx_beta_testers_status ON public.beta_testers (status);
-      `);
-      console.log("[SETUP] Tabela public.beta_testers criada com sucesso!");
-    }
-
-    // 2. Consultar testadores cadastrados
     const testers = await runSql(`
-      SELECT id, email, name, device_model, source_channel, reciprocal_app_name, status, registered_at
+      SELECT id, email, source, status, created_at, synced_to_play_at
       FROM public.beta_testers
-      ORDER BY registered_at DESC
-      LIMIT 50;
+      ORDER BY id ASC;
     `);
 
-    const countRes = await runSql(`
-      SELECT 
-        COUNT(*) as total,
-        COUNT(CASE WHEN status = 'opted_in' OR status = 'active_14_days' THEN 1 END) as active_count,
-        COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count
-      FROM public.beta_testers;
-    `);
+    const count = testers.length;
+    const remaining = Math.max(GOAL - count, 0);
 
-    const stats = countRes[0] || { total: 0, active_count: 0, completed_count: 0 };
+    const now = new Date().toLocaleTimeString("pt-BR");
+    console.log(`[${now}] === STATUS DE RECRUTAMENTO MIDIASTORE ===`);
+    console.log(`Testadores Registrados: ${count}/${GOAL} (${((count / GOAL) * 100).toFixed(0)}%)`);
+    console.log(`Faltam para liberação de Produção: ${remaining} testador(es)`);
 
-    console.log("\n=======================================================");
-    console.log("   MIDIASTORE - PAINEL DE MONITORAMENTO DE TESTADORES   ");
-    console.log("=======================================================");
-    console.log(`Meta Google Play: 20 testadores por 14 dias`);
-    console.log(`Total Cadastrado: ${stats.total} | Ativos: ${stats.active_count} | Concluídos: ${stats.completed_count}`);
-    console.log("-------------------------------------------------------");
-
-    if (testers.length === 0) {
-      console.log("Nenhum testador registrado ainda no banco.");
-      console.log("Divulgue o link do funil VIP oficial:");
-      console.log("👉 https://midiastory-df6a0.web.app/#vip-testers");
-    } else {
-      testers.forEach((t, i) => {
-        console.log(`[#${i + 1}] ID:${t.id} | ${t.email} (${t.name || "Sem Nome"})`);
-        console.log(`    Status: ${t.status} | Canal: ${t.source_channel || "Direto"}`);
-        if (t.reciprocal_app_name) {
-          console.log(`    App Mútuo: ${t.reciprocal_app_name}`);
-        }
-        console.log(`    Cadastro: ${t.registered_at}`);
+    if (testers.length > 0) {
+      console.log("Últimos inscritos:");
+      testers.slice(-5).forEach(t => {
+        console.log(` - [#${t.id}] ${t.email} (${t.source || "site"}) [${t.status || "PENDING"}]`);
       });
     }
-    console.log("=======================================================\n");
 
-    return { stats, testers };
+    // Exportar lista atualizada para arquivo
+    const exportPath = path.join(projectRoot, "docs", "campaigns", "lista-20-testadores-google-play.txt");
+    const emailsText = testers.map(t => t.email).join("\n");
+    fs.writeFileSync(exportPath, emailsText, "utf8");
   } catch (err) {
     console.error("[ERRO ao monitorar beta_testers]:", err.message);
-    throw err;
   }
 }
 
@@ -139,14 +90,10 @@ async function main() {
   await checkBetaTesters();
 
   if (isWatch) {
-    console.log("[POLLING] Monitoramento em loop ativo (a cada 30 segundos)...");
+    console.log("[POLLING] Monitoramento contínuo em segundo plano ativo (intervalo: 60s)...");
     setInterval(async () => {
-      try {
-        await checkBetaTesters();
-      } catch (e) {
-        console.error("Erro na verificação periódica:", e.message);
-      }
-    }, 30000);
+      await checkBetaTesters();
+    }, 60000);
   }
 }
 

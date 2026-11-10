@@ -135,7 +135,15 @@ async function processNextCodex() {
 
 async function callOpenRouterLlm(prompt, model = "google/gemini-4-argon") {
   const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
-  if (model === "argon") model = "google/gemini-4-argon";
+  const modelAliases = {
+    argon: "google/gemini-4-argon",
+    o3: "openai/o3",
+    "o3-pro": "openai/o3-pro",
+    r1: "deepseek/deepseek-r1-0528",
+    gpt4o: "openai/gpt-4o-2024-11-20",
+    "gpt4o-mini": "openai/gpt-4o-mini",
+  };
+  if (modelAliases[model]) model = modelAliases[model];
   console.log(`\n🧠 [EQUIPE IA] Consultando Modelo Remoto (${model}) via OpenRouter...`);
   
   const modelsToTry = [model, "google/gemini-4-argon", "openai/gpt-4o-mini", "openrouter/free"];
