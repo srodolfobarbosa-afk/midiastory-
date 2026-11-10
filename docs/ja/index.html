@@ -31,6 +31,19 @@
     .feedback-msg.success{display:block;color:var(--mint)}
     .feedback-msg.error{display:block;color:#f87171}
     section{padding:30px 0}.section-title{text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);letter-spacing:-.03em}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:25px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:23px}.card h3{margin:0 0 8px;font-size:1.12rem}.card p{color:var(--muted);margin:0}.tag{font-size:.78rem;font-weight:800;color:var(--mint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+    .calculator-card{margin:36px auto;padding:32px 24px;border:1px solid #338d79;border-radius:24px;background:linear-gradient(135deg,#0c2331,#101e30 75%);text-align:center;max-width:680px;box-shadow:0 12px 36px rgba(0,0,0,0.4)}
+    .calculator-card h2{font-size:clamp(1.5rem,3.8vw,2.1rem);margin:8px 0 12px;letter-spacing:-.03em}
+    .calculator-card p{color:var(--muted);max-width:560px;margin:0 auto 20px}
+    .calc-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:20px}
+    .calc-control-group{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:240px;flex:1}
+    .calc-control-group label{font-size:0.86rem;color:var(--mint);font-weight:700}
+    .calc-select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:0.95rem;outline:none}
+    .calc-select:focus{border-color:var(--mint)}
+    .calc-result-box{background:rgba(93,227,191,0.06);padding:22px;border-radius:18px;border:1px dashed rgba(93,227,191,0.35);margin-top:10px}
+    .calc-result-label{font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--mint);font-weight:800}
+    .calc-result-value{font-size:clamp(2.4rem,6vw,3.2rem);font-weight:900;color:var(--white);margin:4px 0}
+    .calc-result-value span{color:var(--mint)}
+    .calc-subtext{font-size:0.88rem;color:var(--muted);margin:0 auto 16px;max-width:480px}
     .pro{margin:40px auto;padding:34px;border:1px solid #338d79;border-radius:22px;background:linear-gradient(130deg,#102b34,#101d2e 65%);text-align:center}.pro h2{font-size:clamp(1.7rem,4vw,2.4rem);margin:8px 0}.pro p{color:var(--muted);max-width:650px;margin:0 auto 20px}.control{margin:28px auto 50px;max-width:790px;padding:25px;background:#0b1725;border:1px solid var(--line);border-radius:18px}.control h2{margin:0 0 8px}.control p{margin:0;color:var(--muted)}footer{border-top:1px solid var(--line);padding:25px 0 34px;color:var(--muted);font-size:.9rem;text-align:center}
     @media(max-width:600px){.nav{flex-direction:column}.lang-nav{margin-top:8px}}
   </style>
@@ -51,6 +64,40 @@
       <p class="lead">MidiastoreはAndroid端末内の大きなメディア、完全一致の重複写真、忘れられたWhatsAppの音声メモを安全に検出します。</p>
       <div class="actions"><a class="button" href="#vip-testers">クローズドテストに参加（VIP Pro無料）</a></div>
       <p class="note">スキャンと確認は完全無料です。ファイルの削除には必ずAndroidシステムの確認画面が表示されます。</p>
+    </section>
+
+    <!-- INTERACTIVE CLUTTER ESTIMATOR -->
+    <section class="calculator-card" id="calculator">
+      <div class="tester-badge">⚡ Simulador de Espaço Oculto</div>
+      <h2>Quanto espaço você pode recuperar hoje?</h2>
+      <p>O WhatsApp acumula cópias, áudios e vídeos que nunca aparecem na galeria. Faça uma estimativa:</p>
+
+      <div class="calc-controls">
+        <div class="calc-control-group">
+          <label for="timeSelect">Tempo de uso do aparelho:</label>
+          <select id="timeSelect" class="calc-select">
+            <option value="4.2">6 meses</option>
+            <option value="8.8" selected>1 ano</option>
+            <option value="16.5">2 anos</option>
+            <option value="26.0">3 anos ou mais</option>
+          </select>
+        </div>
+        <div class="calc-control-group">
+          <label for="groupSelect">Grupos e conversas diárias:</label>
+          <select id="groupSelect" class="calc-select">
+            <option value="1">Poucos (1 a 3 grupos)</option>
+            <option value="1.4" selected>Moderado (4 a 10 grupos)</option>
+            <option value="2.1">Intenso (Mais de 10 grupos)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="calc-result-box">
+        <div class="calc-result-label">Espaço Oculto Estimado:</div>
+        <div class="calc-result-value"><span id="calcGb">12.3</span> GB</div>
+        <p class="calc-subtext">Mídias duplicadas e notas de voz esquecidas consumindo seu armazenamento.</p>
+        <a class="button" href="#vip-testers" onclick="document.getElementById('testerEmail').focus()">Quero Liberar Esse Espaço Grátis</a>
+      </div>
     </section>
 
     <!-- VIP TESTER FUNNEL -->
@@ -108,6 +155,22 @@
   </footer>
 
   <script>
+    const timeSelect = document.getElementById('timeSelect');
+    const groupSelect = document.getElementById('groupSelect');
+    const calcGb = document.getElementById('calcGb');
+    function updateCalc() {
+      if (!timeSelect || !groupSelect || !calcGb) return;
+      const base = parseFloat(timeSelect.value);
+      const mult = parseFloat(groupSelect.value);
+      const total = (base * mult).toFixed(1);
+      calcGb.innerText = total;
+    }
+    if (timeSelect && groupSelect) {
+      timeSelect.addEventListener('change', updateCalc);
+      groupSelect.addEventListener('change', updateCalc);
+      updateCalc();
+    }
+
     const form = document.getElementById('testerForm');
     const emailInput = document.getElementById('testerEmail');
     const submitBtn = document.getElementById('testerSubmitBtn');
