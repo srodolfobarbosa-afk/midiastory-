@@ -1,7 +1,11 @@
 import fs from "node:fs";
+import path from "node:path";
 import zlib from "node:zlib";
 import crypto from "node:crypto";
+import { fileURLToPath } from "node:url";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, "..");
 const keyPath = "C:\\Users\\rodolfo\\Downloads\\midiastory-df6a0-firebase-adminsdk-fbsvc-d0543767cb.json";
 const siteId = "midiastory-df6a0";
 const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
@@ -50,21 +54,29 @@ async function main() {
     console.log(`Enable (${key.project_id}) ${svc}:`, enRes.status);
   }
 
-  const filesToDeploy = {
-    "/index.html": fs.readFileSync("docs/index.html"),
-    "/en/index.html": fs.readFileSync("docs/en/index.html"),
-    "/es/index.html": fs.readFileSync("docs/es/index.html"),
-    "/de/index.html": fs.readFileSync("docs/de/index.html"),
-    "/fr/index.html": fs.readFileSync("docs/fr/index.html"),
-    "/hi/index.html": fs.readFileSync("docs/hi/index.html"),
-    "/ja/index.html": fs.readFileSync("docs/ja/index.html"),
-    "/zh/index.html": fs.readFileSync("docs/zh/index.html"),
-    "/artigos/como-liberar-espaco-whatsapp.html": fs.readFileSync("docs/artigos/como-liberar-espaco-whatsapp.html"),
-    "/robots.txt": fs.readFileSync("docs/robots.txt"),
-    "/sitemap.xml": fs.readFileSync("docs/sitemap.xml"),
-    "/llms.txt": fs.readFileSync("docs/llms.txt"),
-    "/icon-512.png": fs.readFileSync("docs/icon-512.png"),
-  };
+  const fileMappings = [
+    ["/index.html", "index.html"],
+    ["/en/index.html", "en/index.html"],
+    ["/es/index.html", "es/index.html"],
+    ["/de/index.html", "de/index.html"],
+    ["/fr/index.html", "fr/index.html"],
+    ["/hi/index.html", "hi/index.html"],
+    ["/ja/index.html", "ja/index.html"],
+    ["/zh/index.html", "zh/index.html"],
+    ["/artigos/como-liberar-espaco-whatsapp.html", "artigos/como-liberar-espaco-whatsapp.html"],
+    ["/robots.txt", "robots.txt"],
+    ["/sitemap.xml", "sitemap.xml"],
+    ["/llms.txt", "llms.txt"],
+    ["/icon-512.png", "icon-512.png"],
+  ];
+
+  const filesToDeploy = {};
+  for (const [urlPath, relPath] of fileMappings) {
+    const fullPath = path.join(projectRoot, "docs", relPath);
+    if (fs.existsSync(fullPath)) {
+      filesToDeploy[urlPath] = fs.readFileSync(fullPath);
+    }
+  }
 
   const gzippedByPath = {};
   const hashesByPath = {};
