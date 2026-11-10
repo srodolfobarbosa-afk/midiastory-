@@ -133,11 +133,12 @@ async function processNextCodex() {
   await runCodexTask(pending[0]);
 }
 
-async function callOpenRouterLlm(prompt, model = "openrouter/free") {
+async function callOpenRouterLlm(prompt, model = "google/gemini-4-argon") {
   const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
+  if (model === "argon") model = "google/gemini-4-argon";
   console.log(`\n🧠 [EQUIPE IA] Consultando Modelo Remoto (${model}) via OpenRouter...`);
   
-  const modelsToTry = [model, "openai/gpt-4o-mini"];
+  const modelsToTry = [model, "google/gemini-4-argon", "openai/gpt-4o-mini", "openrouter/free"];
   for (const m of modelsToTry) {
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -150,11 +151,13 @@ async function callOpenRouterLlm(prompt, model = "openrouter/free") {
         },
         body: JSON.stringify({
           model: m,
+          max_tokens: 3000,
           messages: [{ role: "user", content: prompt }],
         }),
       });
       if (!res.ok) {
-        console.warn(`Modelo ${m} retornou ${res.status}. Tentando próximo...`);
+        const errText = await res.text();
+        console.warn(`Modelo ${m} retornou ${res.status}: ${errText.slice(0, 150)}. Tentando próximo...`);
         continue;
       }
       const data = await res.json();
