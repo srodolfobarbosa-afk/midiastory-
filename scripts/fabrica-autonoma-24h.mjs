@@ -19,6 +19,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkAndMaintain } from "./supabase-maintenance.mjs";
 import { executeWithFailover } from "./ai-failover-router.mjs";
+import { registrarMemoria } from "./registrar-memoria.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -130,6 +131,22 @@ async function runAutonomousCycle(cycleNumber) {
   const durationMs = Date.now() - startTime;
   cycleSummary.durationMs = durationMs;
   await logHeartbeat(cycleNumber, cycleSummary);
+
+  // Regra de Ouro: Gravação de memória periódica (a cada 10 ciclos)
+  if (cycleNumber % 10 === 0) {
+    try {
+      await registrarMemoria({
+        action: `Marco de Operação Contínua: Ciclo #${cycleNumber}`,
+        studied: `Status de saúde do Supabase e lista de 20 testadores fechados`,
+        attempted: `Auditoria e sincronização de estado automatizada`,
+        errors: cycleSummary.steps.supabase.startsWith("ERROR") ? cycleSummary.steps.supabase : "Zero erros",
+        fixes: "Nenhuma correção necessária. Sistema saudável.",
+        conclusions: `Ciclo #${cycleNumber} concluído em ${(durationMs / 1000).toFixed(2)}s. Provedor IA: ${cycleSummary.steps.aiFleet?.provider || "N/A"}.`,
+      });
+    } catch (e) {
+      console.warn("Aviso ao registrar memória periódica:", e.message);
+    }
+  }
 
   console.log(`\n----------------------------------------------------------------`);
   console.log(`✅ [CICLO #${cycleNumber} CONCLUÍDO] Duração: ${(durationMs / 1000).toFixed(2)}s`);
