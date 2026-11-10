@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "serverUrl": "https://mcp.supabase.com/mcp"
+    },
+    "playwright": {
+      "command": "npx.cmd",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "chrome-devtools": {
+      "command": "npx.cmd",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  }
+}
