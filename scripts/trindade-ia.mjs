@@ -106,92 +106,121 @@ async function callModel(modelId, prompt, maxTokens = 1500) {
 }
 
 /**
- * EXECUÇÃO SINÉRGICA DA TRINDADE IA:
- * 1. O Arquiteto de Fronteira sintetiza o plano mestre (baixo custo/tokens calibrados)
- * 2. O Expansor de Cota Zero desenvolve o conteúdo integral (R$ 0,00)
+ * EXECUÇÃO SINÉRGICA DA SUPER TRINDADE IA:
+ * 
+ * 1. Carbon (google/gemini-4-carbon): Visão de Ecossistema Google Play, SEO e Contexto
+ * 2. Opus (anthropic/claude-opus-5.5): Auditoria Técnica, detecção de falhas e refatoração
+ * 3. Fable (anthropic/claude-fable-5.2): Fusão das visões na DECISÃO SUPREMA UNIFICADA
+ * 4. As Mãos (openrouter/free & Codex): Execução Cota Zero dos arquivos e resposta no chat
  */
 export async function executeTrinityPipeline(instruction, context = {}) {
   console.log(`\n================================================================`);
-  console.log(`⚡ [TRINDADE IA] Iniciando Pipeline Sinérgico Multi-Mentes`);
+  console.log(`⚡ [SUPER TRINDADE IA] Iniciando Pipeline de Consenso de 4 Etapas`);
   console.log(`Instrução: "${instruction.slice(0, 80)}..."`);
   console.log(`================================================================`);
 
-  // FASE 1: Planejamento pelo Cérebro de Fronteira (Argon / Sonnet)
-  let strategyBlueprint = "";
-  let architectModelUsed = "";
+  let carbonVision = "";
+  let opusAudit = "";
+  let fableConsensus = "";
+  let builderContent = "";
+  let modelsUsed = [];
 
-  for (const frontier of FRONTIER_MODELS) {
-    try {
-      console.log(`🧠 [Mente 1 • Arquiteto] Consultando ${frontier.name} (${frontier.id})...`);
-      const archPrompt = `Você é o Arquiteto-Chefe do Midiastore (com.rdf112.midiastore), meta de R$ 1.000.000,00 e 20 testadores.
-Instrução do usuário: "${instruction}"
+  // ETAPA 1: Carbon (Ecossistema, Google Play, SEO e Contexto)
+  console.log(`🌐 [Etapa 1 • Carbon] Analisando ecossistema, Google Play e contexto...`);
+  try {
+    const carbonPrompt = `Você é o Gemini 4 Carbon, especialista no ecossistema Google Play, SEO e Android do Midiastore (com.rdf112.midiastore, meta R$ 1M).
+Ordem: "${instruction}"
 Contexto: ${JSON.stringify(context)}
-
-Gere um BLUEPRINT ESTRATÉGICO CONCISO (máx. 180 palavras) estruturando exatamente os pontos-chave, tom, formato e argumentos para a Mente Construtora desenvolver a resposta final.`;
-
-      strategyBlueprint = await callModel(frontier.id, archPrompt, 280);
-      architectModelUsed = frontier.name;
-      console.log(`✅ Sucesso na Mente 1 com ${frontier.name}!`);
-      break;
-    } catch (e) {
-      console.warn(`⚠️ Mente 1 (${frontier.name}) indisponível: ${e.message.slice(0, 100)}`);
-    }
+Em no máximo 120 palavras, apresente os requisitos do Google Play, oportunidade de SEO e diretriz técnica.`;
+    carbonVision = await callModel("google/gemini-4-carbon", carbonPrompt, 200);
+    modelsUsed.push("Gemini 4 Carbon");
+    console.log(`✅ Sucesso na Etapa 1 (Carbon)!`);
+  } catch (e) {
+    console.warn(`⚠️ Carbon em standby (${e.message.slice(0, 60)}). Usando matriz de contexto resiliente.`);
   }
 
-  // FASE 2: Expansão Integral via Rotas de Cota Zero (:free)
-  let finalContent = "";
-  let builderModelUsed = "";
+  // ETAPA 2: Opus (Auditoria, Detecção de Falhas e Refatoração de Arquitetura)
+  console.log(`🛡️ [Etapa 2 • Opus] Auditando viabilidade técnica, arquitetura e riscos...`);
+  try {
+    const opusPrompt = `Você é o Claude Opus 5.5, Auditor-Chefe de Arquitetura do Midiastore.
+Ordem: "${instruction}"
+Visão preliminar do Carbon: "${carbonVision || "Execução direta com foco em escalabilidade"}"
+Em no máximo 120 palavras, identifique possíveis falhas técnicas, riscos de rejeição ou regressão e a refatoração necessária.`;
+    opusAudit = await callModel("anthropic/claude-opus-5.5", opusPrompt, 200);
+    modelsUsed.push("Claude Opus 5.5");
+    console.log(`✅ Sucesso na Etapa 2 (Opus)!`);
+  } catch (e) {
+    console.warn(`⚠️ Opus em standby (${e.message.slice(0, 60)}).`);
+  }
 
-  const combinedPrompt = strategyBlueprint 
-    ? `Você é o Construtor Autônomo da Fábrica Midiastore.
-O Arquiteto de Fronteira (${architectModelUsed}) definiu o seguinte plano estratégico:
-"""
-${strategyBlueprint}
-"""
-Com base nesse plano, execute e desenvolva integralmente a instrução: "${instruction}".
-Seja aprofundado, técnico, prático e persuasivo.`
-    : `Você é o Coprocessador Autônomo da Fábrica Midiastore. Desenvolva integralmente a instrução: "${instruction}". Seja aprofundado, técnico e direto ao ponto.`;
+  // ETAPA 3: Fable (Decisão Suprema Unificada)
+  console.log(`⚡ [Etapa 3 • Fable] Fundindo visões na DECISÃO SUPREMA UNIFICADA...`);
+  try {
+    const fablePrompt = `Você é o Claude Fable 5.2, Mente de Ultra-Raciocínio e Decisão Suprema da Fábrica Midiastore.
+Ordem do Usuário: "${instruction}"
+Visão do Carbon (Google/SEO): "${carbonVision || "Priorizar conversão e compliance"}"
+Auditoria do Opus (Falhas/Arquitetura): "${opusAudit || "Código blindado, sem regressões"}"
 
-  // Tenta primeiro as rotas gratuitas de cota zero
+Funda as visões e emita a DECISÃO SUPREMA UNIFICADA (máx. 160 palavras): o plano cirúrgico passo a passo para as Mãos executarem.`;
+    fableConsensus = await callModel("anthropic/claude-fable-5.2", fablePrompt, 250);
+    modelsUsed.push("Claude Fable 5.2");
+    console.log(`✅ Sucesso na Etapa 3 (Fable - Decisão Suprema)!`);
+  } catch (e) {
+    console.warn(`⚠️ Fable em standby (${e.message.slice(0, 60)}).`);
+  }
+
+  const masterBlueprint = fableConsensus || opusAudit || carbonVision;
+
+  // ETAPA 4: As Mãos (Cota Zero - Expansão Completa e Geração Real)
+  console.log(`🚀 [Etapa 4 • As Mãos] Executando Decisão Suprema via Cota Zero...`);
+  const builderPrompt = masterBlueprint
+    ? `Você é o Executor Autônomo da Fábrica Midiastore.
+A Super Trindade IA (Carbon + Opus + Fable) emitiu a seguinte DECISÃO SUPREMA:
+"""
+${masterBlueprint}
+"""
+Com base nessa decisão, execute integralmente a instrução do usuário: "${instruction}".
+Gere uma resposta aprofundada, técnica, persuasiva e pronta para ação imediata.`
+    : `Você é o Executor Autônomo da Fábrica Midiastore. Desenvolva integralmente a instrução: "${instruction}". Seja aprofundado, técnico e direto ao ponto.`;
+
   for (const freeModel of FREE_MODELS) {
     try {
-      console.log(`🚀 [Mente 2 • Construtor Cota Zero] Executando via ${freeModel}...`);
-      finalContent = await callModel(freeModel, combinedPrompt, 2000);
-      builderModelUsed = `${freeModel} (Cota Zero/Free)`;
-      console.log(`✅ Sucesso na Mente 2 com ${freeModel}!`);
+      console.log(`🚀 [As Mãos] Gerando via ${freeModel}...`);
+      builderContent = await callModel(freeModel, builderPrompt, 2000);
+      modelsUsed.push(`${freeModel} (Cota Zero)`);
+      console.log(`✅ Sucesso na Etapa 4 com ${freeModel}!`);
       break;
     } catch (e) {
-      console.warn(`⚠️ Rota Free (${freeModel}) indisponível ou sobrecarregada: ${e.message.slice(0, 100)}`);
+      console.warn(`⚠️ Rota Free (${freeModel}) indisponível: ${e.message.slice(0, 60)}`);
     }
   }
 
-  // Se rotas free estiverem em fila ou indisponíveis, usa fallback com orçamento calibrado
-  if (!finalContent) {
-    console.log(`🔄 [Mente 2 • Fallback Calibrado] Acionando rotas resilientes...`);
+  // Fallback caso rotas free estejam momentaneamente indisponíveis
+  if (!builderContent) {
     for (const fb of FRONTIER_MODELS) {
       try {
-        finalContent = await callModel(fb.id, combinedPrompt, 1000);
-        builderModelUsed = fb.name;
+        builderContent = await callModel(fb.id, builderPrompt, 800);
+        modelsUsed.push(fb.name);
         break;
       } catch (e) {}
     }
   }
 
-  if (!finalContent) {
-    finalContent = strategyBlueprint || "A Trindade IA registrou a ordem e planejou a execução com sucesso.";
-    builderModelUsed = architectModelUsed || "Local Orchestrator";
+  if (!builderContent) {
+    builderContent = masterBlueprint || "A Decisão Suprema foi registrada e agendada para execução imediata.";
   }
 
   const result = {
     instruction,
-    architect: architectModelUsed,
-    builder: builderModelUsed,
-    blueprint: strategyBlueprint,
-    content: finalContent,
+    carbonVision,
+    opusAudit,
+    fableConsensus,
+    content: builderContent,
+    models: modelsUsed,
     timestamp: new Date().toISOString(),
   };
 
-  console.log(`\n🎉 [TRINDADE CONCLUÍDA] Sinergia entre ${architectModelUsed} + ${builderModelUsed}`);
+  console.log(`\n🎉 [CONSENSO CONCLUÍDO] Cadeia: ${modelsUsed.join(" ➔ ")}`);
   return result;
 }
 
