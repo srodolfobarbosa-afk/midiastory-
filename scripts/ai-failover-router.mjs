@@ -41,11 +41,14 @@ if (!openRouterKey && fs.existsSync(secretsPath)) {
 }
 
 const MODEL_CASCADE = [
+  { id: "google/gemini-4-carbon", name: "Gemini 4 Carbon" },
+  { id: "anthropic/claude-fable-5.2", name: "Claude Fable 5.2" },
+  { id: "anthropic/claude-opus-5.5", name: "Claude Opus 5.5" },
   { id: "google/gemini-4-argon", name: "Gemini 4 Argon" },
   { id: "google/gemini-3.8-flash", name: "Gemini 3.8 Flash" },
-  { id: "google/gemini-3.1-flash-lite", name: "Gemini 3.1 Flash-Lite" },
+  { id: "openrouter/free", name: "OpenRouter Free Router" },
+  { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 (Free)" },
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
-  { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
 ];
 
 async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
