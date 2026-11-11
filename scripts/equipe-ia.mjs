@@ -1,10 +1,19 @@
 #!/usr/bin/env node
 /**
- * Equipe IA: Antigravity (Flash High) + OpenAI Codex CLI + Supabase 24/7
+ * Equipe IA: Antigravity + OpenAI Codex CLI + Supabase 24/7
+ * 
+ * 🏛️ CONSTITUIÇÃO DE AUTONOMIA COGNITIVA, PERCEPÇÃO E EXECUÇÃO CONTÍNUA
+ * (META FUNDAMENTAL: R$ 1.000.000,00 EM VENDAS REAIS NA GOOGLE PLAY)
+ * 1. MENTALIDADE DE INVENÇÃO ONDE NÃO HÁ CAMINHO
+ * 2. BUSCA CONTÍNUA PELA MAIOR IA DISPONÍVEL (Gemini 4 Argon, 3.8 Flash, Codex)
+ * 3. PERCEPÇÃO AUTÔNOMA E EXECUÇÃO DE PONTA A PONTA (Início, Meio e Fim)
+ * 4. LEITURA OBRIGATÓRIA DO PASSADO ANTES DE AGIR (Zero Loop, public.memories)
+ * 5. AUTO-CONSTRUÇÃO DO ECOSSISTEMA (Subagentes, ferramentas, cota <500MB)
+ * 6. COMPROMISSO COM O RESULTADO REAL (20 testadores, aprovação e escala)
  * 
  * Divisão de Responsabilidades:
- * - Antigravity (Flash High): Orquestração, Supabase MCP, GitHub Actions 24h, Google Play API, Web Navigation.
- * - Codex CLI (codex.exe): Edição e geração pesada de código Kotlin/Android, refatorações complexas, Gradle local e testes instrumentados.
+ * - Antigravity (Flash / Argon): Orquestração, Supabase MCP, GitHub Actions, Google Play API, Web Navigation.
+ * - Codex CLI (codex.exe): Edição e geração pesada de código Kotlin/Android, refatorações, Gradle local.
  * 
  * Uso:
  *   node scripts/equipe-ia.mjs list
@@ -133,14 +142,36 @@ async function processNextCodex() {
   await runCodexTask(pending[0]);
 }
 
-async function callOpenRouterLlm(prompt, model = "openrouter/free") {
+async function callOpenRouterLlm(prompt, model = "anthropic/claude-fable-5.2") {
   const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
+  const modelAliases = {
+    fable: "anthropic/claude-fable-5.2",
+    carbon: "google/gemini-4-carbon",
+    opus: "anthropic/claude-opus-5.5",
+    argon: "google/gemini-4-argon",
+    o3: "openai/o3",
+    "o3-pro": "openai/o3-pro",
+    r1: "deepseek/deepseek-r1-0528",
+    gpt4o: "openai/gpt-4o-2024-11-20",
+    "gpt4o-mini": "openai/gpt-4o-mini",
+    free: "openrouter/free",
+  };
+  if (modelAliases[model]) model = modelAliases[model];
   console.log(`\n🧠 [EQUIPE IA] Consultando Modelo Remoto (${model}) via OpenRouter...`);
   
-  const modelsToTry = [model, "openai/gpt-4o-mini"];
+  const modelsToTry = [
+    model,
+    "google/gemini-4-carbon",
+    "anthropic/claude-fable-5.2",
+    "anthropic/claude-opus-5.5",
+    "google/gemini-4-argon",
+    "openai/gpt-4o-mini",
+    "openrouter/free",
+  ];
   for (const m of modelsToTry) {
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      let maxTokens = 1500;
+      let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${aiKeys.OPENROUTER_API_KEY}`,
@@ -150,11 +181,36 @@ async function callOpenRouterLlm(prompt, model = "openrouter/free") {
         },
         body: JSON.stringify({
           model: m,
+          max_tokens: maxTokens,
           messages: [{ role: "user", content: prompt }],
         }),
       });
+
+      // Auto-calibragem de tokens caso o OpenRouter exija menos max_tokens
+      if (res.status === 402) {
+        const errText = await res.text();
+        const match = errText.match(/can only afford (\d+)/i);
+        const affordable = match ? Math.max(50, parseInt(match[1], 10) - 10) : 350;
+        console.warn(`[Equipe IA • Calibragem 402] Ajustando tokens para ${affordable} em ${m}...`);
+        res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${aiKeys.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://midiastory-df6a0.web.app/",
+            "X-Title": "Midiastore Equipe IA",
+          },
+          body: JSON.stringify({
+            model: m,
+            max_tokens: affordable,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        });
+      }
+
       if (!res.ok) {
-        console.warn(`Modelo ${m} retornou ${res.status}. Tentando próximo...`);
+        const errText = await res.text();
+        console.warn(`Modelo ${m} retornou ${res.status}: ${errText.slice(0, 150)}. Tentando próximo...`);
         continue;
       }
       const data = await res.json();
