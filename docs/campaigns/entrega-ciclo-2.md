@@ -1,0 +1,5 @@
+{
+  "action": "Guia Completo para Limpar WhatsApp e Liberar Espaço no Android",
+  "category": "SEO",
+  "filename": "docs/artigos/limpar-whatsapp-liberar-memoria-android.md",
+  "content": "O WhatsApp é uma das aplicações que mais consome memória em dispositivos Android, devido ao armazenamento de mensagens, fotos e vídeos. Para liberar espaço, comece acessando 'Configurações' > 'Armazenamento e Dados'. Aqui, você pode visualizar o espaço ocupado por mídias e documentos. Para limpar o histórico de chats, selecione 'Gerenciar Armazenamento'. O aplicativo permite excluir arquivos muito grandes, ou você pode optar por apagar conversas inteiras. Outra alternativa é usar o recurso de 'Exportar Chat', permitindo que você salve informações importantes antes da exclusão. Para limpar fotos duplicadas, utilize um aplicativo específico de gerenciamento de arquivos ou uma ferramenta de limpeza que permita identificar e remover as duplicações. Ao finalizar esse processo, recomenda-se reiniciar o dispositivo para garantir que o
