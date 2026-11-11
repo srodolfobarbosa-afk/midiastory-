@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T02:25:10.823Z",
+  "generatedAt": "2026-11-11T02:43:41.776Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,34 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 208,
+      "title": "HEARTBEAT_CICLO_25",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 25,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #25",
+            "filename": "docs/campaigns/entrega-ciclo-25.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T02:22:58.285Z",
+        "durationMs": 764254
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 02:35:44.102447+00"
+    },
     {
       "id": 207,
       "title": "HEARTBEAT_CICLO_24",
@@ -413,59 +441,43 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 00:13:54.144267+00"
-    },
-    {
-      "id": 193,
-      "title": "HEARTBEAT_CICLO_11",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 11,
-        "steps": {
-          "aiFleet": {
-            "action": "Guia Prático: Como Liberar Espaço no Android Limpando o WhatsApp e Fotos Duplicadas",
-            "filename": "docs/artigos/guia_liberar_espaco_android_limpar_whatsapp_fotos_duplicadas.md",
-            "provider": "openai/gpt-4o-mini"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK"
-        },
-        "timestamp": "2026-11-11T00:07:05.305Z",
-        "durationMs": 182382
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 00:10:03.905472+00"
     }
   ],
   "commits": [
     {
+      "hash": "f019b63",
+      "msg": "feat(telemetry): live terminal operations web dashboard and auto-deploy to firebase",
+      "time": "2 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "5b50cb5",
+      "msg": "feat(autonomous-factory): [cycle-25] Entrega Cognitiva do Ciclo #25",
+      "time": "9 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "ac22403",
       "msg": "feat(autonomous-factory): [cycle-22] Entrega Cognitiva do Ciclo #22",
-      "time": "34 minutes ago",
+      "time": "53 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e4f9866",
       "msg": "feat(autonomous-factory): [cycle-21] Entrega Cognitiva do Ciclo #21",
-      "time": "46 minutes ago",
+      "time": "64 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "3e38f0c",
       "msg": "feat(autonomous-factory): [cycle-20] Entrega Cognitiva do Ciclo #20",
-      "time": "66 minutes ago",
+      "time": "84 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "78fdc2c",
       "msg": "feat(autonomous-factory): [cycle-19] Entrega Cognitiva do Ciclo #19",
-      "time": "76 minutes ago",
+      "time": "2 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
@@ -495,24 +507,12 @@
     {
       "hash": "6cb82e3",
       "msg": "feat(autonomous-factory): [cycle-11] Guia Prático: Como Liberar Espaço no Android Limpando o WhatsApp e Fotos Duplicadas",
-      "time": "2 hours ago",
+      "time": "3 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "b3a25d6",
       "msg": "feat(autonomous-factory): [cycle-10] Guia Completo: Como Limpar WhatsApp para Liberar Espaço e Melhorar o Desempenho do Android",
-      "time": "2 hours ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "8f7a6ea",
-      "msg": "feat(autonomous-factory): [cycle-7] Guia Prático: Como encontrar e excluir fotos duplicadas automaticamente no Android",
-      "time": "3 hours ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "ab48a89",
-      "msg": "feat(autonomous-factory): [cycle-6] Guia de SEO: Como liberar 5GB no Android sem apagar nada importante",
       "time": "3 hours ago",
       "author": "srodolfobarbosa-afk"
     }
@@ -656,8 +656,8 @@
       {
         "name": "entrega-ciclo-1.md",
         "url": "/campaigns/entrega-ciclo-1.md",
-        "sizeKb": "0.3",
-        "modifiedAt": "2026-11-10T23:21:28.052Z"
+        "sizeKb": "0.4",
+        "modifiedAt": "2026-11-11T02:43:39.527Z"
       },
       {
         "name": "entrega-ciclo-14.md",
@@ -700,6 +700,18 @@
         "url": "/campaigns/entrega-ciclo-24.md",
         "sizeKb": "0.2",
         "modifiedAt": "2026-11-11T02:18:41.557Z"
+      },
+      {
+        "name": "entrega-ciclo-25.md",
+        "url": "/campaigns/entrega-ciclo-25.md",
+        "sizeKb": "0.4",
+        "modifiedAt": "2026-11-11T02:34:46.973Z"
+      },
+      {
+        "name": "entrega-ciclo-26.md",
+        "url": "/campaigns/entrega-ciclo-26.md",
+        "sizeKb": "1.1",
+        "modifiedAt": "2026-11-11T02:43:10.616Z"
       },
       {
         "name": "estrategia-aquisicao-pro.md",
@@ -753,7 +765,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T02:23:16.154Z"
+        "modifiedAt": "2026-11-11T02:43:35.693Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
