@@ -1,5 +1,5 @@
 {
-  "action": "Como Limpar WhatsApp e Liberar Memória no Android",
-  "category": "SEO",
-  "filename": "docs/artigos/como-limpar-whatsapp-liberar-memorias.md",
-  "content": "O WhatsApp é um dos aplicativos mais utilizados, mas pode consumir muita memória ao longo do tempo. Neste artigo, vamos explorar métodos eficazes para limpar o WhatsApp, liberando espaço no seu dispositivo Android. 1. **Remoção de Mídias Duplicadas**: Acesse 'Configurações' no WhatsApp, vá em 'Armazenamento e dados' e toque em 'Gerenciar armazenamento'. Aqui, você poderá
+  "action": "Roteiro Viral de Limpeza de WhatsApp em 30 Segundos",
+  "category": "MARKETING",
+  "filename": "docs/campaigns/roteiro-reels-limpeza-whatsapp-30s.md",
+  "content": "Roteiro de Reels/TikTok para liberar espaco no Android e limpar WhatsApp sem abrir muitas telas. Cena 1: plano medio no
