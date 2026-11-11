@@ -1,0 +1,1 @@
+Entendido. Vou trabalhar no Midiastore com foco em avanços concretos e verificáveis, respeitando os bloqueios de release e as ações que dependem do proprietário, como acesso ao Play Console, credenciais e testes em dispositivos.
