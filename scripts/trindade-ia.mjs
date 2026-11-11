@@ -5,13 +5,15 @@
  * 🏛️ CONSTITUIÇÃO DE AUTONOMIA COGNITIVA & EXECUÇÃO CONTÍNUA
  * (META FUNDAMENTAL: R$ 1.000.000,00 EM VENDAS REAIS NA GOOGLE PLAY)
  * 
- * Sinergia de 3 Mentes:
- * 1. MENTE ARQUITETA (Ultra-Fronteira): Gemini 4 Argon / Claude Opus
- *    - Define a estratégia, diretrizes e estrutura em ultra-alta densidade (max_tokens: 250).
- * 2. MENTE EXPANSORA (Zero Custo / Rotas :free): Gemini 2.0 Flash / DeepSeek R1 Free / Llama 3.3
- *    - Expande o plano do Arquiteto gerando conteúdo completo, código e roteiros sem gastar créditos.
- * 3. MENTE AUDITORA & INTEGRADORA:
- *    - Revisa e consolida a entrega final para garantir conformidade com a meta de R$ 1.000.000,00.
+ * Sinergia da Super Trindade IA:
+ * 1. MENTE 1 • CONTEXTO & ECOSSISTEMA: Gemini 4 Carbon (google/gemini-4-carbon)
+ *    - Analisa o ecossistema Google Play, SEO, Android e contexto massivo com cache 95% off.
+ * 2. MENTE 2 • ESTRATEGISTA & RACIOCÍNIO: Claude Fable 5.2 (anthropic/claude-fable-5.2)
+ *    - Modela a engenharia de conversão, monetização do Billing v7 e arquitetura de vendas.
+ * 3. MENTE 3 • AUDITOR & REFATORADOR: Claude Opus 5.5 (anthropic/claude-opus-5.5)
+ *    - Audita o código em profundidade, encontra falhas, refatora e blinda contra regressões.
+ * 4. MENTE 4 • CONSTRUTOR COTA ZERO: OpenRouter Free / Gemma 4 (openrouter/free)
+ *    - Expande o plano gerando artigos completos, HTML e scripts 24/7 a custo zero (R$ 0,00).
  */
 
 import fs from "node:fs";
