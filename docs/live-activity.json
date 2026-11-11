@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T02:48:05.986Z",
+  "generatedAt": "2026-11-11T02:51:37.134Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 210,
+      "title": "HEARTBEAT_CICLO_2",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 2,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #2",
+            "filename": "docs/campaigns/entrega-ciclo-2.md",
+            "provider": "openai/gpt-4o-mini"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T02:47:59.583Z",
+        "durationMs": 24427
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 02:48:23.441058+00"
+    },
     {
       "id": 209,
       "title": "HEARTBEAT_CICLO_1",
@@ -414,71 +443,49 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 00:22:32.052615+00"
-    },
-    {
-      "id": 195,
-      "title": "HEARTBEAT_CICLO_13",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 13,
-        "steps": {
-          "aiFleet": {
-            "action": "Guia Prático para Limpeza de Espaço no Android: WhatsApp e Fotos Duplicadas",
-            "filename": "docs/artigos/guia_limpeza_espaco_android_whatsapp_fotos_duplicadas.md",
-            "provider": "openai/gpt-4o-mini"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK"
-        },
-        "timestamp": "2026-11-11T00:16:54.763Z",
-        "durationMs": 41333
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 00:17:35.744405+00"
     }
   ],
   "commits": [
     {
+      "hash": "9e6c2b0",
+      "msg": "feat(autonomous-factory): [cycle-2] Entrega Cognitiva do Ciclo #2",
+      "time": "3 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "27c8c74",
       "msg": "feat(autonomous-factory): [cycle-1] Entrega Cognitiva do Ciclo #1",
-      "time": "4 minutes ago",
+      "time": "7 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "f019b63",
       "msg": "feat(telemetry): live terminal operations web dashboard and auto-deploy to firebase",
-      "time": "6 minutes ago",
+      "time": "10 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5b50cb5",
       "msg": "feat(autonomous-factory): [cycle-25] Entrega Cognitiva do Ciclo #25",
-      "time": "13 minutes ago",
+      "time": "17 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "ac22403",
       "msg": "feat(autonomous-factory): [cycle-22] Entrega Cognitiva do Ciclo #22",
-      "time": "57 minutes ago",
+      "time": "61 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e4f9866",
       "msg": "feat(autonomous-factory): [cycle-21] Entrega Cognitiva do Ciclo #21",
-      "time": "69 minutes ago",
+      "time": "72 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "3e38f0c",
       "msg": "feat(autonomous-factory): [cycle-20] Entrega Cognitiva do Ciclo #20",
-      "time": "89 minutes ago",
+      "time": "2 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
@@ -508,12 +515,6 @@
     {
       "hash": "ef917d8",
       "msg": "feat(autonomous-factory): [cycle-13] Guia Prático para Limpeza de Espaço no Android: WhatsApp e Fotos Duplicadas",
-      "time": "3 hours ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "6cb82e3",
-      "msg": "feat(autonomous-factory): [cycle-11] Guia Prático: Como Liberar Espaço no Android Limpando o WhatsApp e Fotos Duplicadas",
       "time": "3 hours ago",
       "author": "srodolfobarbosa-afk"
     }
@@ -721,6 +722,12 @@
         "modifiedAt": "2026-11-11T02:43:10.616Z"
       },
       {
+        "name": "entrega-ciclo-3.md",
+        "url": "/campaigns/entrega-ciclo-3.md",
+        "sizeKb": "0.5",
+        "modifiedAt": "2026-11-11T02:51:29.473Z"
+      },
+      {
         "name": "estrategia-aquisicao-pro.md",
         "url": "/campaigns/estrategia-aquisicao-pro.md",
         "sizeKb": "7.4",
@@ -772,7 +779,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T02:48:00.689Z"
+        "modifiedAt": "2026-11-11T02:51:25.369Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
