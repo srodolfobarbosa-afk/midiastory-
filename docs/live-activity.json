@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:17:39.647Z",
+  "generatedAt": "2026-11-11T03:22:44.648Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 214,
+      "title": "HEARTBEAT_CICLO_6",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 6,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #6",
+            "filename": "docs/campaigns/entrega-ciclo-6.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T03:14:37.353Z",
+        "durationMs": 201713
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 03:17:58.478732+00"
+    },
     {
       "id": 213,
       "title": "HEARTBEAT_CICLO_5",
@@ -418,83 +447,61 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 00:43:14.869051+00"
-    },
-    {
-      "id": 199,
-      "title": "HEARTBEAT_CICLO_17",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 17,
-        "steps": {
-          "aiFleet": {
-            "action": "Otimização de Desempenho do Android: Guia Completo para Limpar Aplicativos e Liberar Memória",
-            "filename": "docs/artigos/otimizacao_desempenho_android_completo.md",
-            "provider": "meta-llama/llama-3.3-70b-instruct"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK"
-        },
-        "timestamp": "2026-11-11T00:36:32.400Z",
-        "durationMs": 116391
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 00:38:25.304783+00"
     }
   ],
   "commits": [
     {
+      "hash": "025dae8",
+      "msg": "feat(autonomous-factory): [cycle-6] Entrega Cognitiva do Ciclo #6",
+      "time": "5 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "3c40cb6",
       "msg": "feat(autonomous-factory): [cycle-5] Entrega Cognitiva do Ciclo #5",
-      "time": "6 minutes ago",
+      "time": "11 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0b42d44",
       "msg": "feat(autonomous-factory): [cycle-4] Entrega Cognitiva do Ciclo #4",
-      "time": "14 minutes ago",
+      "time": "19 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e51e2ae",
       "msg": "feat(autonomous-factory): [cycle-3] Entrega Cognitiva do Ciclo #3",
-      "time": "26 minutes ago",
+      "time": "31 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "9e6c2b0",
       "msg": "feat(autonomous-factory): [cycle-2] Entrega Cognitiva do Ciclo #2",
-      "time": "29 minutes ago",
+      "time": "34 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "27c8c74",
       "msg": "feat(autonomous-factory): [cycle-1] Entrega Cognitiva do Ciclo #1",
-      "time": "33 minutes ago",
+      "time": "39 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "f019b63",
       "msg": "feat(telemetry): live terminal operations web dashboard and auto-deploy to firebase",
-      "time": "36 minutes ago",
+      "time": "41 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5b50cb5",
       "msg": "feat(autonomous-factory): [cycle-25] Entrega Cognitiva do Ciclo #25",
-      "time": "43 minutes ago",
+      "time": "48 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "ac22403",
       "msg": "feat(autonomous-factory): [cycle-22] Entrega Cognitiva do Ciclo #22",
-      "time": "87 minutes ago",
+      "time": "2 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
@@ -513,12 +520,6 @@
       "hash": "78fdc2c",
       "msg": "feat(autonomous-factory): [cycle-19] Entrega Cognitiva do Ciclo #19",
       "time": "2 hours ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "16b24bc",
-      "msg": "feat(autonomous-factory): [cycle-16] Otimização de Desempenho do Android: Guia para Remoção de Fotos Duplicadas e Liberação de Memória",
-      "time": "3 hours ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
@@ -749,6 +750,12 @@
         "modifiedAt": "2026-11-11T03:17:38.083Z"
       },
       {
+        "name": "entrega-ciclo-7.md",
+        "url": "/campaigns/entrega-ciclo-7.md",
+        "sizeKb": "1.1",
+        "modifiedAt": "2026-11-11T03:22:42.233Z"
+      },
+      {
         "name": "estrategia-aquisicao-pro.md",
         "url": "/campaigns/estrategia-aquisicao-pro.md",
         "sizeKb": "7.4",
@@ -800,7 +807,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T03:14:38.454Z"
+        "modifiedAt": "2026-11-11T03:21:00.545Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",

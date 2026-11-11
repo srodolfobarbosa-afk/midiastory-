@@ -1,0 +1,5 @@
+Assumi a atuação de construtor e fiz uma auditoria inicial. Encontrei e removi um token Supabase fixo de [registrar-memoria.mjs](/C:/Users/rodolfo/midiastory-/scripts/registrar-memoria.mjs); agora o script busca a credencial na variável `SUPABASE_ACCESS_TOKEN` ou na configuração MCP local. Registrei a ação no Supabase como memória **#95** e na [linha do tempo](/C:/Users/rodolfo/midiastory-/docs/LINHA_DO_TEMPO_AUTONOMA.md).
+
+O token exposto precisa ser **revogado e rotacionado pelo proprietário no Supabase**; removê-lo do arquivo não invalida a credencial nem apaga possíveis cópias no histórico Git. A verificação de sintaxe do script passou.
+
+Os bloqueios prioritários continuam sendo a validação de limpeza em API 29, a coleta instrumentada/CI no SHA atual e a configuração e validação segura de Billing. Não encontrei evidência atual do progresso dos 20 testadores. O checkout está na branch `codex/midiastore-release-audit`, 71 commits à frente da referência remota, com vários arquivos locais não rastreados; preservei esse estado e não fiz push.

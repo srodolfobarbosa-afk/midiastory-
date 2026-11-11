@@ -653,3 +653,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #94
 
 ---
+
+### 📍 [11/11/2026, 00:22:26] Auditoria autônoma: remoção de credencial Supabase hardcoded
+- **📖 Estudou / Leu:** AGENTS.md, README.md, CONTINUATION_HANDOFF.md, FEATURE_IMPLEMENTATION_MATRIX.md, RELEASE_BLOCKERS.md, LINHA_DO_TEMPO_AUTONOMA.md e public.memories até #94
+- **⚙️ Tentou / Executou:** Inspeção read-only do status Git e migração do registrador para SUPABASE_ACCESS_TOKEN ou configuração MCP local
+- **⚠️ Erros Encontrados:** registrar-memoria.mjs continha token Supabase literal no código-fonte
+- **🔧 Como Corrigiu:** Token literal removido; acesso agora depende de variável de ambiente ou arquivo MCP local fora do código
+- **🎯 Conclusão:** Não publicar nem enviar alterações; token exposto precisa ser revogado/rotacionado no Supabase pelo owner
+- *Registro Supabase:* Memory #95
+
+---
+
+### 📍 [11/11/2026, 00:22:42] [Ciclo #7] Entrega Cognitiva do Ciclo #7
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/campaigns/entrega-ciclo-7.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Diretriz estratégica gerada pela LLM. (Provedor: local_codex)
+- *Registro Supabase:* Memory #96
+
+---
