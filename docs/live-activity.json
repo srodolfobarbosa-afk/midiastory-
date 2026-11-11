@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T03:11:14.914Z",
+  "generatedAt": "2026-11-11T03:17:39.647Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 213,
+      "title": "HEARTBEAT_CICLO_5",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 5,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #5",
+            "filename": "docs/campaigns/entrega-ciclo-5.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T03:07:21.471Z",
+        "durationMs": 255740
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 03:11:36.498633+00"
+    },
     {
       "id": 212,
       "title": "HEARTBEAT_CICLO_4",
@@ -417,77 +446,55 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 00:38:25.304783+00"
-    },
-    {
-      "id": 198,
-      "title": "HEARTBEAT_CICLO_16",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 16,
-        "steps": {
-          "aiFleet": {
-            "action": "Otimização de Desempenho do Android: Guia para Remoção de Fotos Duplicadas e Liberação de Memória",
-            "filename": "docs/artigos/guia_otimizacao_desempenho_android.md",
-            "provider": "meta-llama/llama-3.3-70b-instruct"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK"
-        },
-        "timestamp": "2026-11-11T00:30:56.789Z",
-        "durationMs": 147667
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 00:33:21.14573+00"
     }
   ],
   "commits": [
     {
+      "hash": "3c40cb6",
+      "msg": "feat(autonomous-factory): [cycle-5] Entrega Cognitiva do Ciclo #5",
+      "time": "6 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "0b42d44",
       "msg": "feat(autonomous-factory): [cycle-4] Entrega Cognitiva do Ciclo #4",
-      "time": "7 minutes ago",
+      "time": "14 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e51e2ae",
       "msg": "feat(autonomous-factory): [cycle-3] Entrega Cognitiva do Ciclo #3",
-      "time": "19 minutes ago",
+      "time": "26 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "9e6c2b0",
       "msg": "feat(autonomous-factory): [cycle-2] Entrega Cognitiva do Ciclo #2",
-      "time": "23 minutes ago",
+      "time": "29 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "27c8c74",
       "msg": "feat(autonomous-factory): [cycle-1] Entrega Cognitiva do Ciclo #1",
-      "time": "27 minutes ago",
+      "time": "33 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "f019b63",
       "msg": "feat(telemetry): live terminal operations web dashboard and auto-deploy to firebase",
-      "time": "29 minutes ago",
+      "time": "36 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5b50cb5",
       "msg": "feat(autonomous-factory): [cycle-25] Entrega Cognitiva do Ciclo #25",
-      "time": "36 minutes ago",
+      "time": "43 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "ac22403",
       "msg": "feat(autonomous-factory): [cycle-22] Entrega Cognitiva do Ciclo #22",
-      "time": "81 minutes ago",
+      "time": "87 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
@@ -511,12 +518,6 @@
     {
       "hash": "16b24bc",
       "msg": "feat(autonomous-factory): [cycle-16] Otimização de Desempenho do Android: Guia para Remoção de Fotos Duplicadas e Liberação de Memória",
-      "time": "3 hours ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "efb8d41",
-      "msg": "feat(autonomous-factory): [cycle-15] Guia Definitivo para Limpeza do WhatsApp e Liberação de Memória no Android",
       "time": "3 hours ago",
       "author": "srodolfobarbosa-afk"
     }
@@ -742,6 +743,12 @@
         "modifiedAt": "2026-11-11T03:11:13.184Z"
       },
       {
+        "name": "entrega-ciclo-6.md",
+        "url": "/campaigns/entrega-ciclo-6.md",
+        "sizeKb": "0.9",
+        "modifiedAt": "2026-11-11T03:17:38.083Z"
+      },
+      {
         "name": "estrategia-aquisicao-pro.md",
         "url": "/campaigns/estrategia-aquisicao-pro.md",
         "sizeKb": "7.4",
@@ -793,7 +800,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T03:07:22.783Z"
+        "modifiedAt": "2026-11-11T03:14:38.454Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
