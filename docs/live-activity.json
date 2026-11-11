@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T05:42:20.506Z",
+  "generatedAt": "2026-11-11T05:46:03.694Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 243,
+      "title": "HEARTBEAT_CICLO_16",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 16,
+        "steps": {
+          "aiFleet": {
+            "action": "Roteiro Viral para Reels/TikTok: \"Libere 2 GB no Android em 30 Segundos\"",
+            "filename": "docs/campaigns/roteiro-viral-liberar-espaco-android.md",
+            "provider": "openrouter/free"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T05:42:00.149Z",
+        "durationMs": 37572
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 05:42:36.868364+00"
+    },
     {
       "id": 242,
       "title": "HEARTBEAT_CICLO_15",
@@ -431,107 +460,78 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 04:48:09.940817+00"
-    },
-    {
-      "id": 228,
-      "title": "HEARTBEAT_CICLO_1",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 1,
-        "steps": {
-          "aiFleet": {
-            "action": "Guia Rápido: 3 Truques para Liberar Memória e Otimizar Performance no Android em 15 Segundos",
-            "filename": "docs/campaigns/reels-optimiza-android.md",
-            "provider": "openrouter/free"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T04:44:05.196Z",
-        "durationMs": 27420
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 04:44:31.797932+00"
     }
   ],
   "commits": [
     {
+      "hash": "937dcc9",
+      "msg": "feat(autonomous-factory): [cycle-16] Roteiro Viral para Reels/TikTok: Libere 2 GB no Android em 30 Segundos",
+      "time": "4 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "fff358a",
       "msg": "feat(autonomous-factory): [cycle-15] Entrega Cognitiva do Ciclo #15",
-      "time": "4 minutes ago",
+      "time": "7 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "26cf5b4",
       "msg": "feat(autonomous-factory): [cycle-14] Entrega Cognitiva do Ciclo #14",
-      "time": "7 minutes ago",
+      "time": "11 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "869c12b",
       "msg": "feat(autonomous-factory): [cycle-13] Entrega Cognitiva do Ciclo #13",
-      "time": "11 minutes ago",
+      "time": "15 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "b744be9",
       "msg": "feat(autonomous-factory): [cycle-12] Entrega Cognitiva do Ciclo #12",
-      "time": "15 minutes ago",
+      "time": "18 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e80a5f0",
       "msg": "feat(autonomous-factory): [cycle-11] Entrega Cognitiva do Ciclo #11",
-      "time": "18 minutes ago",
+      "time": "22 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5a1f7f9",
       "msg": "feat(autonomous-factory): [cycle-10] Entrega Cognitiva do Ciclo #10",
-      "time": "22 minutes ago",
+      "time": "25 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "2e2d854",
       "msg": "feat(autonomous-factory): [cycle-9] Entrega Cognitiva do Ciclo #9",
-      "time": "25 minutes ago",
+      "time": "29 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5091ac5",
       "msg": "feat(autonomous-factory): [cycle-8] Roteiro viral Reels/TikTok: 'Detectei 500 fotos duplicadas e recuperei 1.5GB em 1 minuto'",
-      "time": "29 minutes ago",
+      "time": "33 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "7fe7304",
       "msg": "feat(autonomous-factory): [cycle-7] Entrega Cognitiva do Ciclo #7",
-      "time": "33 minutes ago",
+      "time": "37 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5194913",
       "msg": "feat(autonomous-factory): [cycle-6] Entrega Cognitiva do Ciclo #6",
-      "time": "37 minutes ago",
+      "time": "41 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "1f07cc3",
       "msg": "feat(autonomous-factory): [cycle-5] Roteiro viral Reels/TikTok: 3 Truques para Limpar WhatsApp e Liberar 2 GB em 30 s",
-      "time": "43 minutes ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "43daf65",
-      "msg": "feat(autonomous-factory): [cycle-4] Entrega Técnica: Artigo SEO para Limpar WhatsApp, Liberar Memória e Remover Fotos Duplicadas no Android",
       "time": "47 minutes ago",
       "author": "srodolfobarbosa-afk"
     }
@@ -543,6 +543,12 @@
         "url": "/artigos/como-liberar-espaco-whatsapp.html",
         "sizeKb": "7.7",
         "modifiedAt": "2026-11-10T14:59:57.084Z"
+      },
+      {
+        "name": "como-limpar-whatsapp-liberar-espaco-android.md",
+        "url": "/artigos/como-limpar-whatsapp-liberar-espaco-android.md",
+        "sizeKb": "1.4",
+        "modifiedAt": "2026-11-11T05:45:58.887Z"
       },
       {
         "name": "como_excluir_fotos_duplicadas.md",
@@ -892,7 +898,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T05:42:01.987Z"
+        "modifiedAt": "2026-11-11T05:45:43.727Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
