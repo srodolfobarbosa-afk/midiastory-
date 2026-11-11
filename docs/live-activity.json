@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T05:57:39.892Z",
+  "generatedAt": "2026-11-11T06:01:45.693Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 247,
+      "title": "HEARTBEAT_CICLO_20",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 20,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #20",
+            "filename": "docs/campaigns/entrega-ciclo-20.md",
+            "provider": "openrouter/free"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T05:57:15.410Z",
+        "durationMs": 72932
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 05:58:27.503595+00"
+    },
     {
       "id": 246,
       "title": "HEARTBEAT_CICLO_19",
@@ -431,108 +460,79 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 05:05:20.254716+00"
-    },
-    {
-      "id": 232,
-      "title": "HEARTBEAT_CICLO_5",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 5,
-        "steps": {
-          "aiFleet": {
-            "action": "Roteiro viral Reels/TikTok: \"3 Truques para Limpar WhatsApp e Liberar 2 GB em 30 s\"",
-            "filename": "docs/campaigns/reels-limpar-whatsapp-3-truques-30s.md",
-            "provider": "openrouter/free"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T04:58:30.295Z",
-        "durationMs": 70998
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 04:59:40.604718+00"
     }
   ],
   "commits": [
     {
+      "hash": "a08987f",
+      "msg": "feat(autonomous-factory): [cycle-20] Entrega Cognitiva do Ciclo #20",
+      "time": "4 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "32b10cc",
       "msg": "feat(autonomous-factory): [cycle-19] Kit de Mensagens de Conversão para Comunidades de Tecnologia",
-      "time": "4 minutes ago",
+      "time": "8 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "33428ee",
       "msg": "feat(autonomous-factory): [cycle-18] Entrega Cognitiva do Ciclo #18",
-      "time": "8 minutes ago",
+      "time": "12 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "a37e134",
       "msg": "feat(autonomous-factory): [cycle-17] Artigo SEO completo: Como limpar o WhatsApp e liberar espaço no Android",
-      "time": "11 minutes ago",
+      "time": "15 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "937dcc9",
       "msg": "feat(autonomous-factory): [cycle-16] Roteiro Viral para Reels/TikTok: Libere 2 GB no Android em 30 Segundos",
-      "time": "15 minutes ago",
+      "time": "19 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "fff358a",
       "msg": "feat(autonomous-factory): [cycle-15] Entrega Cognitiva do Ciclo #15",
-      "time": "19 minutes ago",
+      "time": "23 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "26cf5b4",
       "msg": "feat(autonomous-factory): [cycle-14] Entrega Cognitiva do Ciclo #14",
-      "time": "22 minutes ago",
+      "time": "27 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "869c12b",
       "msg": "feat(autonomous-factory): [cycle-13] Entrega Cognitiva do Ciclo #13",
-      "time": "26 minutes ago",
+      "time": "30 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "b744be9",
       "msg": "feat(autonomous-factory): [cycle-12] Entrega Cognitiva do Ciclo #12",
-      "time": "30 minutes ago",
+      "time": "34 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e80a5f0",
       "msg": "feat(autonomous-factory): [cycle-11] Entrega Cognitiva do Ciclo #11",
-      "time": "34 minutes ago",
+      "time": "38 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5a1f7f9",
       "msg": "feat(autonomous-factory): [cycle-10] Entrega Cognitiva do Ciclo #10",
-      "time": "37 minutes ago",
+      "time": "41 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "2e2d854",
       "msg": "feat(autonomous-factory): [cycle-9] Entrega Cognitiva do Ciclo #9",
-      "time": "41 minutes ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "5091ac5",
-      "msg": "feat(autonomous-factory): [cycle-8] Roteiro viral Reels/TikTok: 'Detectei 500 fotos duplicadas e recuperei 1.5GB em 1 minuto'",
-      "time": "44 minutes ago",
+      "time": "45 minutes ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
@@ -771,8 +771,8 @@
       {
         "name": "entrega-ciclo-21.md",
         "url": "/campaigns/entrega-ciclo-21.md",
-        "sizeKb": "0.3",
-        "modifiedAt": "2026-11-11T01:37:53.226Z"
+        "sizeKb": "0.0",
+        "modifiedAt": "2026-11-11T06:01:41.648Z"
       },
       {
         "name": "entrega-ciclo-22.md",
@@ -904,7 +904,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T05:57:17.400Z"
+        "modifiedAt": "2026-11-11T06:01:31.612Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
