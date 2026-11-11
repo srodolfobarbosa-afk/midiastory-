@@ -1,0 +1,1 @@
+Entendido. Vou trabalhar no Midiastore com foco em entregas concretas para os 20 testadores e a preparação responsável para a Google Play, seguindo as instruções do repositório e sem inventar resultados ou contornar os bloqueios de acesso e validação.
