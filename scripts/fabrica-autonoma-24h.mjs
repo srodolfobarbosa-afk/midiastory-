@@ -245,6 +245,81 @@ Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em
   console.log(`----------------------------------------------------------------\n`);
 }
 
+async function checkAndProcessChatCommands() {
+  try {
+    const tasks = await runSql(`
+      SELECT id, title, target, payload, status, created_at
+      FROM public.orchestrator_tasks
+      WHERE target IN ('CODEX', 'LOCAL_PC') AND status = 'PENDING'
+      ORDER BY id ASC
+      LIMIT 1;
+    `);
+
+    if (!tasks || tasks.length === 0) return false;
+
+    const task = tasks[0];
+    console.log(`\n💬 [CHAT DE COMANDO RECEBIDO] #${task.id}: ${task.title}`);
+
+    // Reivindica a tarefa atomicamente; outro worker pode tê-la reservado após o SELECT.
+    const claimedTasks = await runSql(`
+      UPDATE public.orchestrator_tasks
+      SET status = 'IN_PROGRESS', updated_at = NOW()
+      WHERE id = ${task.id} AND status = 'PENDING'
+      RETURNING id;
+    `);
+    if (!claimedTasks || claimedTasks.length === 0) {
+      console.log(`ℹ️ [COMANDO IGNORADO] #${task.id} foi reivindicado por outro worker.`);
+      return false;
+    }
+
+    const userCommand = task.payload?.text || task.payload?.prompt || task.title;
+
+    const prompt = `Você é o Coprocessador Autônomo da Fábrica Midiastore (com.rdf112.midiastore), operando em regime 24/7 rumo à meta de R$ 1.000.000,00 e aos 20 testadores fechados.
+O usuário enviou uma ordem direta pelo Chat de Comando do Terminal Web:
+"${userCommand}"
+
+Responda ou execute com máxima precisão técnica, objetividade e clareza em até 200 palavras.`;
+
+    let responseText = "";
+    let provider = "desconhecido";
+    try {
+      const aiRes = await executeWithFailover(prompt, { isCode: false });
+      responseText = aiRes.content;
+      provider = aiRes.source;
+      console.log(`✅ [CHAT DE COMANDO RESPONDIDO] Provedor: ${provider}`);
+    } catch (err) {
+      responseText = `⚠️ Erro ao processar comando com IA: ${err.message}`;
+    }
+
+    // Atualiza a tarefa como DONE com o resultado
+    const escapedResult = JSON.stringify({ response: responseText, replied_at: new Date().toISOString(), provider }).replace(/'/g, "''");
+    await runSql(`
+      UPDATE public.orchestrator_tasks
+      SET status = 'DONE', result = '${escapedResult}'::jsonb, updated_at = NOW()
+      WHERE id = ${task.id};
+    `);
+
+    // Grava memória
+    await registrarMemoria({
+      action: `[Chat de Comando] #${task.id}: ${task.title.slice(0, 80)}`,
+      studied: "Instrução recebida via Terminal Web pelo usuário",
+      attempted: `Execução via Coprocessador com ${provider}`,
+      errors: "Nenhum erro",
+      fixes: "Nenhuma correção necessária",
+      conclusions: responseText.slice(0, 150)
+    });
+
+    // Atualiza feed e deploy
+    await generateTerminalFeed();
+    try { await deploySite(); } catch (e) {}
+
+    return true;
+  } catch (err) {
+    console.warn("Aviso ao processar comando do chat:", err.message);
+    return false;
+  }
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function main() {
@@ -274,6 +349,9 @@ async function main() {
   });
 
   while (running) {
+    // 1. Processar qualquer comando pendente do Chat Web antes do ciclo de rotina
+    await checkAndProcessChatCommands();
+
     try {
       await runAutonomousCycle(cycle);
     } catch (err) {
@@ -286,8 +364,13 @@ async function main() {
     }
 
     cycle++;
-    console.log(`Aguardando ${intervalSec}s até o próximo ciclo cognitivo autônomo...`);
-    await sleep(intervalSec * 1000);
+    console.log(`Aguardando ${intervalSec}s. Monitorando comandos do Chat Web a cada 5s...`);
+    const sleepStart = Date.now();
+    while (running && Date.now() - sleepStart < intervalSec * 1000) {
+      const hadCommand = await checkAndProcessChatCommands();
+      if (hadCommand) break; // Reinicia ciclo imediatamente se houver ordem do usuário!
+      await sleep(5000);
+    }
   }
 }
 
