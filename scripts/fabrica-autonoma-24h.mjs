@@ -30,6 +30,7 @@ import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { checkAndMaintain } from "./supabase-maintenance.mjs";
 import { executeWithFailover } from "./ai-failover-router.mjs";
+import { executeTrinityPipeline } from "./trindade-ia.mjs";
 import { registrarMemoria } from "./registrar-memoria.mjs";
 import { deploySite } from "./firebase-deploy-site.mjs";
 import { generateTerminalFeed } from "./generate-terminal-data.mjs";
@@ -283,12 +284,20 @@ Responda ou execute com máxima precisão técnica, objetividade e clareza em at
     let responseText = "";
     let provider = "desconhecido";
     try {
-      const aiRes = await executeWithFailover(prompt, { isCode: false });
-      responseText = aiRes.content;
-      provider = aiRes.source;
-      console.log(`✅ [CHAT DE COMANDO RESPONDIDO] Provedor: ${provider}`);
+      console.log(`⚡ [PROCESSANDO VIA SUPER TRINDADE IA] Acionando Carbon + Opus + Fable + Cota Zero...`);
+      const trinityRes = await executeTrinityPipeline(userCommand, { taskId: task.id, origin: "WebTerminalChat" });
+      responseText = trinityRes.content;
+      provider = `Super Trindade (${trinityRes.models ? trinityRes.models.join(" ➔ ") : "Trindade"})`;
+      console.log(`✅ [CHAT DE COMANDO RESPONDIDO VIA TRINDADE] ${provider}`);
     } catch (err) {
-      responseText = `⚠️ Erro ao processar comando com IA: ${err.message}`;
+      console.warn(`⚠️ Trindade falhou (${err.message}). Acionando fallback padrão...`);
+      try {
+        const aiRes = await executeWithFailover(prompt, { isCode: false });
+        responseText = aiRes.content;
+        provider = aiRes.source;
+      } catch (e2) {
+        responseText = `⚠️ Erro ao processar comando com IA: ${e2.message}`;
+      }
     }
 
     // Atualiza a tarefa como DONE com o resultado
