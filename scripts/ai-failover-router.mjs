@@ -67,8 +67,11 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
   });
 
   // Auto-adaptação para HTTP 402 (crédito insuficiente para reserva alta de tokens)
-  if (res.status === 402 && maxTokens > 750) {
-    console.warn(`[Auto-Adaptação 402] Reduzindo reserva de tokens de ${maxTokens} para 750 para ${modelId}...`);
+  if (res.status === 402) {
+    const errText = await res.text();
+    const match = errText.match(/can only afford (\d+)/i);
+    const affordableTokens = match ? Math.max(60, parseInt(match[1], 10) - 15) : Math.floor(maxTokens * 0.4);
+    console.warn(`[Auto-Adaptação 402] Ajustando tokens dinamicamente para ${affordableTokens} para ${modelId}...`);
     res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -79,7 +82,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
       },
       body: JSON.stringify({
         model: modelId,
-        max_tokens: 750,
+        max_tokens: affordableTokens,
         messages: [{ role: "user", content: prompt }],
       }),
     });

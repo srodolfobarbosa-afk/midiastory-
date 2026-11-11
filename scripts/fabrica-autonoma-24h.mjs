@@ -31,6 +31,8 @@ import { fileURLToPath } from "node:url";
 import { checkAndMaintain } from "./supabase-maintenance.mjs";
 import { executeWithFailover } from "./ai-failover-router.mjs";
 import { registrarMemoria } from "./registrar-memoria.mjs";
+import { deploySite } from "./firebase-deploy-site.mjs";
+import { generateTerminalFeed } from "./generate-terminal-data.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -198,23 +200,32 @@ Retorne APENAS um JSON válido no seguinte formato exato (sem blocos markdown em
 
     cycleSummary.steps.aiFleet = { provider: aiResult.source, action: parsed.action, filename: parsed.filename };
 
+    // Atualização da Central do Terminal & Deploy no Firebase Hosting
+    try {
+      console.log(`\n[Live Dashboard] Atualizando telemetria em tempo real para docs/terminal.html...`);
+      await generateTerminalFeed();
+      console.log(`[Firebase Deploy] Publicando nova versão no Firebase Hosting...`);
+      await deploySite();
+      cycleSummary.steps.firebaseDeploy = "DEPLOY_SUCCESS";
+    } catch (deployErr) {
+      console.warn("Aviso na atualização do dashboard/deploy:", deployErr.message);
+      cycleSummary.steps.firebaseDeploy = `WARNING: ${deployErr.message}`;
+    }
+
     // Auto-commit e push git se houver alterações
     try {
       const gitStatus = execSync(`git -C "${projectRoot}" status --porcelain`, { encoding: "utf8" });
       if (gitStatus.trim()) {
         console.log("📦 Alterações detectadas pelo git. Realizando commit e push autônomo...");
-        execSync(`git -C "${projectRoot}" add "${parsed.filename}" docs/LINHA_DO_TEMPO_AUTONOMA.md`, { stdio: "pipe", timeout: 15000 });
-        execSync(`git -C "${projectRoot}" commit -m "feat(autonomous-factory): [cycle-${cycleNumber}] ${parsed.action.replace(/"/g, '')}"`, { stdio: "pipe", timeout: 15000 });
+        execSync(`git -C "${projectRoot}" add docs/`, { stdio: "pipe", timeout: 20000 });
+        execSync(`git -C "${projectRoot}" commit -m "feat(autonomous-factory): [cycle-${cycleNumber}] ${parsed.action.replace(/"/g, '')}"`, { stdio: "pipe", timeout: 20000 });
         
-        // Rebase preventivo antes do push para evitar conflitos concorrentes (nuvem vs local)
         try {
-          execSync(`git -C "${projectRoot}" pull --rebase origin HEAD`, { stdio: "pipe", timeout: 30000 });
-        } catch (pullErr) {
-          console.warn("Aviso no rebase pré-push:", pullErr.message);
+          execSync(`git -C "${projectRoot}" push origin HEAD`, { stdio: "pipe", timeout: 45000 });
+          console.log("🚀 Commit e push concluídos com sucesso pela Fábrica Autônoma!");
+        } catch (pushErr) {
+          console.warn("Aviso no push git:", pushErr.message);
         }
-
-        execSync(`git -C "${projectRoot}" push origin HEAD`, { stdio: "pipe", timeout: 30000 });
-        console.log("🚀 Commit e push concluídos com sucesso pela Fábrica Autônoma!");
       }
     } catch (gitErr) {
       console.warn("Aviso no auto-commit git:", gitErr.message);

@@ -57,6 +57,11 @@ async function main() {
   await pushFileToMain("scripts/fabrica-autonoma-24h.mjs", "feat(engine): sync active builder engine to main");
   await pushFileToMain("scripts/ai-failover-router.mjs", "feat(ai): sync failover router with Gemini 3.8/Argon to main");
   await pushFileToMain("scripts/registrar-memoria.mjs", "feat(memory): sync memory registrar to main");
+  await pushFileToMain("scripts/firebase-deploy-site.mjs", "feat(deploy): sync dynamic firebase deploy to main");
+  await pushFileToMain("scripts/generate-terminal-data.mjs", "feat(telemetry): sync terminal data compiler to main");
+  await pushFileToMain("docs/terminal.html", "feat(ui): add live terminal 24h dashboard to main");
+  await pushFileToMain("docs/painel.html", "feat(ui): add painel redirect to main");
+  await pushFileToMain("docs/live-activity.json", "feat(telemetry): sync live activity feed to main");
 }
 
 main().catch(console.error);

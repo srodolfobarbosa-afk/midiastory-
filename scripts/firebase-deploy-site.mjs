@@ -52,7 +52,7 @@ async function getAccessToken() {
   return data.access_token;
 }
 
-async function main() {
+export async function deploySite() {
   const token = await getAccessToken();
   console.log("Firebase OAuth2 Token obtido para:", key.client_email);
 
@@ -68,21 +68,26 @@ async function main() {
     console.log(`Enable (${key.project_id}) ${svc}:`, enRes.status);
   }
 
-  const fileMappings = [
-    ["/index.html", "index.html"],
-    ["/en/index.html", "en/index.html"],
-    ["/es/index.html", "es/index.html"],
-    ["/de/index.html", "de/index.html"],
-    ["/fr/index.html", "fr/index.html"],
-    ["/hi/index.html", "hi/index.html"],
-    ["/ja/index.html", "ja/index.html"],
-    ["/zh/index.html", "zh/index.html"],
-    ["/artigos/como-liberar-espaco-whatsapp.html", "artigos/como-liberar-espaco-whatsapp.html"],
-    ["/robots.txt", "robots.txt"],
-    ["/sitemap.xml", "sitemap.xml"],
-    ["/llms.txt", "llms.txt"],
-    ["/icon-512.png", "icon-512.png"],
-  ];
+  function getDocsFiles(dir, baseDir = "") {
+    let results = [];
+    if (!fs.existsSync(dir)) return results;
+    const list = fs.readdirSync(dir);
+    for (const file of list) {
+      if (file.startsWith(".") || file.endsWith(".bak")) continue;
+      const fullPath = path.join(dir, file);
+      const stat = fs.statSync(fullPath);
+      const relPath = path.join(baseDir, file).replace(/\\/g, "/");
+      if (stat.isDirectory()) {
+        results = results.concat(getDocsFiles(fullPath, relPath));
+      } else {
+        results.push([`/${relPath}`, relPath]);
+      }
+    }
+    return results;
+  }
+
+  const docsDir = path.join(projectRoot, "docs");
+  const fileMappings = getDocsFiles(docsDir);
 
   const filesToDeploy = {};
   for (const [urlPath, relPath] of fileMappings) {
@@ -162,7 +167,9 @@ async function main() {
   console.log("Release site:", relRes.status, await relRes.text());
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  deploySite().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
