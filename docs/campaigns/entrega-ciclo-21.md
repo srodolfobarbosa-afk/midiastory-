@@ -1,0 +1,1 @@
+Entendido. Vou trabalhar no Midiastore com foco em avanço concreto rumo aos 20 testadores e às vendas, seguindo as instruções do repositório e respeitando os bloqueios que dependem do proprietário, como acesso ao Play Console, credenciais e testes em dispositivos.
