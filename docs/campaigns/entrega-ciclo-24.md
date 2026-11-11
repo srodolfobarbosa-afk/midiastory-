@@ -1,0 +1,1 @@
+Entendido. Vou trabalhar no Midiastore com foco em progresso concreto e verificável, seguindo as regras do projeto e preservando os limites de acesso à Play Console, credenciais e testes em dispositivos. Qual tarefa você quer priorizar agora?
