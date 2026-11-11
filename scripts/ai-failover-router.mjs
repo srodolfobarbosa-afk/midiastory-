@@ -15,7 +15,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -115,11 +115,26 @@ function callCodexLocal(prompt) {
     throw new Error(`Codex CLI não encontrado no ambiente (${process.platform})`);
   }
   console.log("⚡ Executando via OpenAI Codex CLI Local (Zero dependência de quota externa)...");
-  const cleanPrompt = prompt.replace(/"/g, '\\"');
-  return execSync(
-    `"${bin}" exec --cd "${projectRoot}" --dangerously-bypass-approvals-and-sandbox "${cleanPrompt}"`,
-    { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 }
-  );
+  const cleanPrompt = `Instrução: Responda diretamente e com profundidade em português para o projeto Midiastore (com.rdf112.midiastore), mantendo os preços oficiais (R$ 14,99/mês, R$ 79,99/ano, R$ 149,99 Vitalício).\n\n${prompt}`;
+  const out = execFileSync(bin, [
+    "exec",
+    "--cd", projectRoot,
+    "--dangerously-bypass-approvals-and-sandbox",
+    cleanPrompt
+  ], {
+    encoding: "utf8",
+    timeout: 60000,
+    input: "",
+  });
+  const lines = out.split("\n");
+  const codexIndex = lines.findIndex(l => l.trim() === "codex");
+  if (codexIndex !== -1) {
+    const afterCodex = lines.slice(codexIndex + 1);
+    const tokensIndex = afterCodex.findIndex(l => l.trim().startsWith("tokens used"));
+    const responseLines = tokensIndex !== -1 ? afterCodex.slice(0, tokensIndex) : afterCodex;
+    return responseLines.join("\n").trim();
+  }
+  return out.trim();
 }
 
 export async function executeWithFailover(prompt, options = {}) {
