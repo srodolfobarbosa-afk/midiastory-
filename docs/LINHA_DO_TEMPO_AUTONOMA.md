@@ -783,3 +783,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #106
 
 ---
+
+### 📍 [11/11/2026, 01:34:04] Retomada autônoma e reserva atômica de comandos locais
+- **📖 Estudou / Leu:** AGENTS.md, README.md, docs/CONTINUATION_HANDOFF.md, docs/FEATURE_IMPLEMENTATION_MATRIX.md, docs/RELEASE_BLOCKERS.md, docs/LINHA_DO_TEMPO_AUTONOMA.md, memórias Supabase até #106 e scripts/fabrica-autonoma-24h.mjs
+- **⚙️ Tentou / Executou:** Consulta read-only da fila public.orchestrator_tasks; inspeção do diff existente; restringida a consulta às tarefas CODEX/LOCAL_PC e troca da reserva por UPDATE condicional com RETURNING
+- **⚠️ Erros Encontrados:** Primeira tentativa de consulta read-only falhou por quoting no comando inline do Node; repetida com PowerShell e concluída. Fila sem tarefas PENDING/IN_PROGRESS. Nenhum CI/device/Play Console verificado nesta etapa.
+- **🔧 Como Corrigiu:** Corrigido o worker para não selecionar tarefas de outros destinos e continuar apenas quando a reivindicação atômica de status PENDING para IN_PROGRESS retornar a linha
+- **🎯 Conclusão:** Correção local aplicada ao arquivo previamente modificado, preservando as demais mudanças; daemon, testes, deploy, commit e push não executados. Bloqueios de API29, CI, Billing/backend e Play Console seguem sem evidência nova.
+- *Registro Supabase:* Memory #107
+
+---
+
+### 📍 [11/11/2026, 01:34:18] [Ciclo #16] Entrega Cognitiva do Ciclo #16
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/campaigns/entrega-ciclo-16.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Diretriz estratégica gerada pela LLM. (Provedor: local_codex)
+- *Registro Supabase:* Memory #108
+
+---
