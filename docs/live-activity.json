@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T04:00:05.729Z",
+  "generatedAt": "2026-11-11T04:16:52.869Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 221,
+      "title": "HEARTBEAT_CICLO_12",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 12,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #12",
+            "filename": "docs/campaigns/entrega-ciclo-12.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T03:55:12.421Z",
+        "durationMs": 360614
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 04:01:12.468833+00"
+    },
     {
       "id": 220,
       "title": "HEARTBEAT_CICLO_11",
@@ -424,107 +453,79 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 02:07:02.190258+00"
-    },
-    {
-      "id": 205,
-      "title": "HEARTBEAT_CICLO_23",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 23,
-        "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #23",
-            "filename": "docs/campaigns/entrega-ciclo-23.md",
-            "provider": "local_codex"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK"
-        },
-        "timestamp": "2026-11-11T01:54:44.853Z",
-        "durationMs": 406712
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 02:01:36.190258+00"
     }
   ],
   "commits": [
     {
+      "hash": "38525e5",
+      "msg": "feat(autonomous-factory): [cycle-12] Entrega Cognitiva do Ciclo #12",
+      "time": "16 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "531e5d2",
       "msg": "feat(autonomous-factory): [cycle-11] Entrega Cognitiva do Ciclo #11",
-      "time": "8 minutes ago",
+      "time": "25 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0455e3e",
       "msg": "feat(autonomous-factory): [cycle-10] Entrega Cognitiva do Ciclo #10",
-      "time": "13 minutes ago",
+      "time": "30 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "06e2cc8",
       "msg": "feat(ai): elevate Gemini 4 Argon to primary tier with adaptive 402 budgeting",
-      "time": "17 minutes ago",
+      "time": "34 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "fb1f8b4",
       "msg": "feat(autonomous-factory): [cycle-9] Entrega Cognitiva do Ciclo #9",
-      "time": "19 minutes ago",
+      "time": "36 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "7c88f65",
       "msg": "feat(autonomous-factory): [cycle-8] Entrega Cognitiva do Ciclo #8",
-      "time": "30 minutes ago",
+      "time": "47 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "8daa361",
       "msg": "feat(autonomous-factory): [cycle-7] Entrega Cognitiva do Ciclo #7",
-      "time": "37 minutes ago",
+      "time": "54 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "025dae8",
       "msg": "feat(autonomous-factory): [cycle-6] Entrega Cognitiva do Ciclo #6",
-      "time": "42 minutes ago",
+      "time": "59 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "3c40cb6",
       "msg": "feat(autonomous-factory): [cycle-5] Entrega Cognitiva do Ciclo #5",
-      "time": "48 minutes ago",
+      "time": "65 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0b42d44",
       "msg": "feat(autonomous-factory): [cycle-4] Entrega Cognitiva do Ciclo #4",
-      "time": "56 minutes ago",
+      "time": "73 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e51e2ae",
       "msg": "feat(autonomous-factory): [cycle-3] Entrega Cognitiva do Ciclo #3",
-      "time": "68 minutes ago",
+      "time": "85 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "9e6c2b0",
       "msg": "feat(autonomous-factory): [cycle-2] Entrega Cognitiva do Ciclo #2",
-      "time": "72 minutes ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "27c8c74",
-      "msg": "feat(autonomous-factory): [cycle-1] Entrega Cognitiva do Ciclo #1",
-      "time": "76 minutes ago",
+      "time": "88 minutes ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
@@ -689,6 +690,12 @@
         "modifiedAt": "2026-11-11T03:59:46.433Z"
       },
       {
+        "name": "entrega-ciclo-13.md",
+        "url": "/campaigns/entrega-ciclo-13.md",
+        "sizeKb": "1.1",
+        "modifiedAt": "2026-11-11T04:15:32.960Z"
+      },
+      {
         "name": "entrega-ciclo-14.md",
         "url": "/campaigns/entrega-ciclo-14.md",
         "sizeKb": "1.3",
@@ -842,7 +849,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T03:55:13.475Z"
+        "modifiedAt": "2026-11-11T04:04:43.600Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",

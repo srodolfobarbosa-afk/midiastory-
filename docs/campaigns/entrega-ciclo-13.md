@@ -1,0 +1,5 @@
+Fiz o levantamento inicial. O estado local não corresponde à branch descrita nas instruções: estou em `codex/midiastore-release-audit`, 78 commits à frente de `origin/fix/p0-sweep-permissions-missions-billing`. Há uma alteração em `scripts/fabrica-autonoma-24h.mjs` e vários arquivos locais não rastreados. Preservei tudo e não executei a fábrica, builds, comandos da fila ou ações externas.
+
+Os documentos indicam que a publicação continua bloqueada por evidências de CI e testes nos dispositivos necessários, validação de compras por backend e verificações que dependem do Play Console. O registro mais recente na linha do tempo aponta 1 de 20 testadores, sem comprovação dos 14 dias; não confirmei esse número em uma fonte atual.
+
+Não consegui consultar `public.memories` nesta sessão: não há ferramenta Supabase disponível, e não executei o registrador sem confirmar como ele obtém acesso. Para escolher um próximo trabalho seguro, preciso primeiro reconciliar o estado desta branch local divergente com a branch de recuperação indicada nas instruções, preservando as alterações existentes.
