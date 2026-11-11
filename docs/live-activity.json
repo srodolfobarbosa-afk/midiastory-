@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T07:02:52.381Z",
+  "generatedAt": "2026-11-11T07:07:05.515Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 259,
+      "title": "HEARTBEAT_CICLO_32",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 32,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #32",
+            "filename": "docs/campaigns/entrega-ciclo-32.md",
+            "provider": "openrouter/free"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T07:02:16.587Z",
+        "durationMs": 79146
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 07:03:34.852373+00"
+    },
     {
       "id": 258,
       "title": "HEARTBEAT_CICLO_31",
@@ -431,107 +460,78 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 05:50:05.929068+00"
-    },
-    {
-      "id": 244,
-      "title": "HEARTBEAT_CICLO_17",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 17,
-        "steps": {
-          "aiFleet": {
-            "action": "Artigo SEO completo: Como limpar o WhatsApp e liberar espaço no Android",
-            "filename": "docs/artigos/como-limpar-whatsapp-liberar-espaco-android.md",
-            "provider": "openrouter/free"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T05:45:42.848Z",
-        "durationMs": 40127
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 05:46:22.117696+00"
     }
   ],
   "commits": [
     {
+      "hash": "4aee0db",
+      "msg": "feat(autonomous-factory): [cycle-32] Entrega Cognitiva do Ciclo #32",
+      "time": "4 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "3dd3d68",
       "msg": "feat(autonomous-factory): [cycle-31] Entrega Cognitiva do Ciclo #31",
-      "time": "4 minutes ago",
+      "time": "8 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0a8670f",
       "msg": "feat(autonomous-factory): [cycle-30] Entrega Cognitiva do Ciclo #30",
-      "time": "9 minutes ago",
+      "time": "13 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "ac8a4f8",
       "msg": "feat(autonomous-factory): [cycle-29] Entrega Cognitiva do Ciclo #29",
-      "time": "15 minutes ago",
+      "time": "19 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "257d7ec",
       "msg": "feat(autonomous-factory): [cycle-28] Entrega Cognitiva do Ciclo #28",
-      "time": "20 minutes ago",
+      "time": "24 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0dd6704",
       "msg": "feat(autonomous-factory): [cycle-27] Artigo SEO: Guia Definitivo para Limpar WhatsApp e Liberar GBs no Android sem Perder Dados",
-      "time": "26 minutes ago",
+      "time": "31 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "fa92a6c",
       "msg": "feat(autonomous-factory): [cycle-26] Kit de Conversão: Limpeza de Android em 3 Passos para Atingir a Meta de 20 Testadores e R$ 1M",
-      "time": "32 minutes ago",
+      "time": "36 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "835b881",
       "msg": "feat(autonomous-factory): [cycle-25] Entrega Cognitiva do Ciclo #25",
-      "time": "37 minutes ago",
+      "time": "41 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "46df2d9",
       "msg": "feat(autonomous-factory): [cycle-24] Entrega Cognitiva do Ciclo #24",
-      "time": "45 minutes ago",
+      "time": "49 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "940109b",
       "msg": "feat(autonomous-factory): [cycle-22] Entrega Cognitiva do Ciclo #22",
-      "time": "56 minutes ago",
+      "time": "60 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "00079ba",
       "msg": "feat(autonomous-factory): [cycle-21] Entrega Cognitiva do Ciclo #21",
-      "time": "61 minutes ago",
+      "time": "65 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "a08987f",
       "msg": "feat(autonomous-factory): [cycle-20] Entrega Cognitiva do Ciclo #20",
-      "time": "65 minutes ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "32b10cc",
-      "msg": "feat(autonomous-factory): [cycle-19] Kit de Mensagens de Conversão para Comunidades de Tecnologia",
       "time": "69 minutes ago",
       "author": "srodolfobarbosa-afk"
     }
@@ -916,7 +916,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T07:02:17.544Z"
+        "modifiedAt": "2026-11-11T07:06:39.006Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
