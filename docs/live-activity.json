@@ -1,0 +1,832 @@
+{
+  "generatedAt": "2026-11-11T02:25:10.823Z",
+  "system": {
+    "status": "ONLINE",
+    "goalValue": "R$ 1.000.000,00",
+    "appPackage": "com.rdf112.midiastore",
+    "version": "v2.3.1 (vc20)",
+    "targetTesters": 20,
+    "currentTesters": 1,
+    "testersProgressPercent": 5,
+    "supabaseSizeMb": 11.92,
+    "supabaseLimitMb": 500,
+    "runners": {
+      "hostWindows": "ATIVO (Daemon local)",
+      "ubuntuCloud": "ATIVO (GitHub Actions cron */30)"
+    }
+  },
+  "testers": [
+    {
+      "id": 1,
+      "email": "teste.beta.vip@gmail.com",
+      "source": "landing_page_test",
+      "status": "READY_FOR_CONSOLE_INVITE",
+      "created_at": "2026-11-10 06:05:04.465442+00"
+    }
+  ],
+  "memories": [],
+  "tasks": [
+    {
+      "id": 207,
+      "title": "HEARTBEAT_CICLO_24",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 24,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #24",
+            "filename": "docs/campaigns/entrega-ciclo-24.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "ERROR: fetch failed"
+        },
+        "timestamp": "2026-11-11T02:04:50.952Z",
+        "durationMs": 914726
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 02:19:56.418266+00"
+    },
+    {
+      "id": 206,
+      "title": "HEARTBEAT_CICLO_1",
+      "target": "UBUNTU_CLOUD",
+      "payload": {
+        "cycle": 1,
+        "steps": {
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 274. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 434. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"},{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 417. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"},{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 305. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"},{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 96. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"},{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 180. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"},{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 750 tokens, but can only afford 678. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T02:07:00.839Z",
+        "durationMs": 1278
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 02:07:02.190258+00"
+    },
+    {
+      "id": 205,
+      "title": "HEARTBEAT_CICLO_23",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 23,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #23",
+            "filename": "docs/campaigns/entrega-ciclo-23.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T01:54:44.853Z",
+        "durationMs": 406712
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 02:01:36.190258+00"
+    },
+    {
+      "id": 204,
+      "title": "HEARTBEAT_CICLO_22",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 22,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #22",
+            "filename": "docs/campaigns/entrega-ciclo-22.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T01:42:47.916Z",
+        "durationMs": 537862
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 01:51:40.633725+00"
+    },
+    {
+      "id": 203,
+      "title": "HEARTBEAT_CICLO_21",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 21,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #21",
+            "filename": "docs/campaigns/entrega-ciclo-21.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T01:23:05.572Z",
+        "durationMs": 983809
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 01:39:25.183024+00"
+    },
+    {
+      "id": 202,
+      "title": "HEARTBEAT_CICLO_20",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 20,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #20",
+            "filename": "docs/campaigns/entrega-ciclo-20.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T01:12:34.196Z",
+        "durationMs": 416280
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 01:19:52.772773+00"
+    },
+    {
+      "id": 201,
+      "title": "HEARTBEAT_CICLO_19",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 19,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #19",
+            "filename": "docs/campaigns/entrega-ciclo-19.md",
+            "provider": "local_codex"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:46:27.666Z",
+        "durationMs": 1386894
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 01:09:31.90859+00"
+    },
+    {
+      "id": 200,
+      "title": "HEARTBEAT_CICLO_18",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 18,
+        "steps": {
+          "aiFleet": {
+            "action": "Guia de Otimização de Armazenamento do Android",
+            "filename": "docs/artigos/guia_otimizacao_armazenamento_android.md",
+            "provider": "meta-llama/llama-3.3-70b-instruct"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:41:26.620Z",
+        "durationMs": 108201
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:43:14.869051+00"
+    },
+    {
+      "id": 199,
+      "title": "HEARTBEAT_CICLO_17",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 17,
+        "steps": {
+          "aiFleet": {
+            "action": "Otimização de Desempenho do Android: Guia Completo para Limpar Aplicativos e Liberar Memória",
+            "filename": "docs/artigos/otimizacao_desempenho_android_completo.md",
+            "provider": "meta-llama/llama-3.3-70b-instruct"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:36:32.400Z",
+        "durationMs": 116391
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:38:25.304783+00"
+    },
+    {
+      "id": 198,
+      "title": "HEARTBEAT_CICLO_16",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 16,
+        "steps": {
+          "aiFleet": {
+            "action": "Otimização de Desempenho do Android: Guia para Remoção de Fotos Duplicadas e Liberação de Memória",
+            "filename": "docs/artigos/guia_otimizacao_desempenho_android.md",
+            "provider": "meta-llama/llama-3.3-70b-instruct"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:30:56.789Z",
+        "durationMs": 147667
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:33:21.14573+00"
+    },
+    {
+      "id": 197,
+      "title": "HEARTBEAT_CICLO_15",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 15,
+        "steps": {
+          "aiFleet": {
+            "action": "Guia Definitivo para Limpeza do WhatsApp e Liberação de Memória no Android",
+            "filename": "docs/artigos/guia_limpeza_whatsapp_memoria_android.md",
+            "provider": "openai/gpt-4o-mini"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:25:32.957Z",
+        "durationMs": 127757
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:27:42.291332+00"
+    },
+    {
+      "id": 196,
+      "title": "HEARTBEAT_CICLO_14",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 14,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #14",
+            "filename": "docs/campaigns/entrega-ciclo-14.md",
+            "provider": "openai/gpt-4o-mini"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:20:37.348Z",
+        "durationMs": 114581
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:22:32.052615+00"
+    },
+    {
+      "id": 195,
+      "title": "HEARTBEAT_CICLO_13",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 13,
+        "steps": {
+          "aiFleet": {
+            "action": "Guia Prático para Limpeza de Espaço no Android: WhatsApp e Fotos Duplicadas",
+            "filename": "docs/artigos/guia_limpeza_espaco_android_whatsapp_fotos_duplicadas.md",
+            "provider": "openai/gpt-4o-mini"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:16:54.763Z",
+        "durationMs": 41333
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:17:35.744405+00"
+    },
+    {
+      "id": 194,
+      "title": "HEARTBEAT_CICLO_12",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 12,
+        "steps": {
+          "aiFleet": {
+            "action": "Guia Completo para Limpeza de Espaço no Android: WhatsApp e Fotos Duplicadas",
+            "filename": "docs/artigos/guia_limpeza_android_whatsapp_fotos.md",
+            "provider": "openai/gpt-4o-mini"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:13:04.638Z",
+        "durationMs": 49700
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:13:54.144267+00"
+    },
+    {
+      "id": 193,
+      "title": "HEARTBEAT_CICLO_11",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 11,
+        "steps": {
+          "aiFleet": {
+            "action": "Guia Prático: Como Liberar Espaço no Android Limpando o WhatsApp e Fotos Duplicadas",
+            "filename": "docs/artigos/guia_liberar_espaco_android_limpar_whatsapp_fotos_duplicadas.md",
+            "provider": "openai/gpt-4o-mini"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T00:07:05.305Z",
+        "durationMs": 182382
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 00:10:03.905472+00"
+    }
+  ],
+  "commits": [
+    {
+      "hash": "ac22403",
+      "msg": "feat(autonomous-factory): [cycle-22] Entrega Cognitiva do Ciclo #22",
+      "time": "34 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "e4f9866",
+      "msg": "feat(autonomous-factory): [cycle-21] Entrega Cognitiva do Ciclo #21",
+      "time": "46 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "3e38f0c",
+      "msg": "feat(autonomous-factory): [cycle-20] Entrega Cognitiva do Ciclo #20",
+      "time": "66 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "78fdc2c",
+      "msg": "feat(autonomous-factory): [cycle-19] Entrega Cognitiva do Ciclo #19",
+      "time": "76 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "16b24bc",
+      "msg": "feat(autonomous-factory): [cycle-16] Otimização de Desempenho do Android: Guia para Remoção de Fotos Duplicadas e Liberação de Memória",
+      "time": "2 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "efb8d41",
+      "msg": "feat(autonomous-factory): [cycle-15] Guia Definitivo para Limpeza do WhatsApp e Liberação de Memória no Android",
+      "time": "2 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "efdcba5",
+      "msg": "feat(autonomous-factory): [cycle-14] Entrega Cognitiva do Ciclo #14",
+      "time": "2 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "ef917d8",
+      "msg": "feat(autonomous-factory): [cycle-13] Guia Prático para Limpeza de Espaço no Android: WhatsApp e Fotos Duplicadas",
+      "time": "2 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "6cb82e3",
+      "msg": "feat(autonomous-factory): [cycle-11] Guia Prático: Como Liberar Espaço no Android Limpando o WhatsApp e Fotos Duplicadas",
+      "time": "2 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "b3a25d6",
+      "msg": "feat(autonomous-factory): [cycle-10] Guia Completo: Como Limpar WhatsApp para Liberar Espaço e Melhorar o Desempenho do Android",
+      "time": "2 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "8f7a6ea",
+      "msg": "feat(autonomous-factory): [cycle-7] Guia Prático: Como encontrar e excluir fotos duplicadas automaticamente no Android",
+      "time": "3 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
+      "hash": "ab48a89",
+      "msg": "feat(autonomous-factory): [cycle-6] Guia de SEO: Como liberar 5GB no Android sem apagar nada importante",
+      "time": "3 hours ago",
+      "author": "srodolfobarbosa-afk"
+    }
+  ],
+  "artifacts": {
+    "artigos": [
+      {
+        "name": "como-liberar-espaco-whatsapp.html",
+        "url": "/artigos/como-liberar-espaco-whatsapp.html",
+        "sizeKb": "7.7",
+        "modifiedAt": "2026-11-10T14:59:57.084Z"
+      },
+      {
+        "name": "como_excluir_fotos_duplicadas.md",
+        "url": "/artigos/como_excluir_fotos_duplicadas.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T23:45:57.531Z"
+      },
+      {
+        "name": "como_liberar_5gb_android.md",
+        "url": "/artigos/como_liberar_5gb_android.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-10T23:42:11.244Z"
+      },
+      {
+        "name": "como_liberar_espaco_whatsapp_android.md",
+        "url": "/artigos/como_liberar_espaco_whatsapp_android.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T22:24:32.504Z"
+      },
+      {
+        "name": "como_limpar_cache_whatsapp_android.md",
+        "url": "/artigos/como_limpar_cache_whatsapp_android.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-10T23:50:38.271Z"
+      },
+      {
+        "name": "como_limpar_whatsapp_liberar_espaco_android.md",
+        "url": "/artigos/como_limpar_whatsapp_liberar_espaco_android.md",
+        "sizeKb": "1.7",
+        "modifiedAt": "2026-11-10T23:58:49.350Z"
+      },
+      {
+        "name": "faq_performance_android_midiastore.md",
+        "url": "/artigos/faq_performance_android_midiastore.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T22:27:31.236Z"
+      },
+      {
+        "name": "guia_liberacao_armazenamento_android.md",
+        "url": "/artigos/guia_liberacao_armazenamento_android.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T22:36:32.433Z"
+      },
+      {
+        "name": "guia_liberar_espaco_android.md",
+        "url": "/artigos/guia_liberar_espaco_android.md",
+        "sizeKb": "1.7",
+        "modifiedAt": "2026-11-10T23:25:59.460Z"
+      },
+      {
+        "name": "guia_liberar_espaco_android_2026.md",
+        "url": "/artigos/guia_liberar_espaco_android_2026.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T23:03:32.129Z"
+      },
+      {
+        "name": "guia_liberar_espaco_android_limpar_whatsapp_fotos_duplicadas.md",
+        "url": "/artigos/guia_liberar_espaco_android_limpar_whatsapp_fotos_duplicadas.md",
+        "sizeKb": "2.2",
+        "modifiedAt": "2026-11-11T00:08:18.196Z"
+      },
+      {
+        "name": "guia_limpar_whatsapp_android.md",
+        "url": "/artigos/guia_limpar_whatsapp_android.md",
+        "sizeKb": "2.3",
+        "modifiedAt": "2026-11-11T00:02:54.273Z"
+      },
+      {
+        "name": "guia_limpeza_android_whatsapp_fotos.md",
+        "url": "/artigos/guia_limpeza_android_whatsapp_fotos.md",
+        "sizeKb": "2.1",
+        "modifiedAt": "2026-11-11T00:13:25.999Z"
+      },
+      {
+        "name": "guia_limpeza_espaco_android_whatsapp_fotos_duplicadas.md",
+        "url": "/artigos/guia_limpeza_espaco_android_whatsapp_fotos_duplicadas.md",
+        "sizeKb": "1.9",
+        "modifiedAt": "2026-11-11T00:17:08.070Z"
+      },
+      {
+        "name": "guia_limpeza_whatsapp_memoria_android.md",
+        "url": "/artigos/guia_limpeza_whatsapp_memoria_android.md",
+        "sizeKb": "2.4",
+        "modifiedAt": "2026-11-11T00:25:50.129Z"
+      },
+      {
+        "name": "guia_limpeza_whatsapp_storage.md",
+        "url": "/artigos/guia_limpeza_whatsapp_storage.md",
+        "sizeKb": "1.1",
+        "modifiedAt": "2026-11-10T22:39:31.417Z"
+      },
+      {
+        "name": "guia_otimizacao_armazenamento_android.md",
+        "url": "/artigos/guia_otimizacao_armazenamento_android.md",
+        "sizeKb": "2.3",
+        "modifiedAt": "2026-11-11T00:42:07.758Z"
+      },
+      {
+        "name": "guia_otimizacao_desempenho_android.md",
+        "url": "/artigos/guia_otimizacao_desempenho_android.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-11T00:31:46.565Z"
+      },
+      {
+        "name": "limpeza_whatsapp_android_2026.md",
+        "url": "/artigos/limpeza_whatsapp_android_2026.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-10T23:06:32.694Z"
+      },
+      {
+        "name": "limpeza_whatsapp_android_performance.md",
+        "url": "/artigos/limpeza_whatsapp_android_performance.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-10T22:51:31.691Z"
+      },
+      {
+        "name": "otimizacao_desempenho_android_completo.md",
+        "url": "/artigos/otimizacao_desempenho_android_completo.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-11T00:37:36.810Z"
+      }
+    ],
+    "campaigns": [
+      {
+        "name": "criativos-video",
+        "url": "/campaigns/criativos-video",
+        "sizeKb": "0.0",
+        "modifiedAt": "2026-11-10T05:37:32.372Z"
+      },
+      {
+        "name": "entrega-ciclo-1.md",
+        "url": "/campaigns/entrega-ciclo-1.md",
+        "sizeKb": "0.3",
+        "modifiedAt": "2026-11-10T23:21:28.052Z"
+      },
+      {
+        "name": "entrega-ciclo-14.md",
+        "url": "/campaigns/entrega-ciclo-14.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-11T00:20:54.707Z"
+      },
+      {
+        "name": "entrega-ciclo-19.md",
+        "url": "/campaigns/entrega-ciclo-19.md",
+        "sizeKb": "1.1",
+        "modifiedAt": "2026-11-11T01:08:34.538Z"
+      },
+      {
+        "name": "entrega-ciclo-20.md",
+        "url": "/campaigns/entrega-ciclo-20.md",
+        "sizeKb": "0.2",
+        "modifiedAt": "2026-11-11T01:18:42.000Z"
+      },
+      {
+        "name": "entrega-ciclo-21.md",
+        "url": "/campaigns/entrega-ciclo-21.md",
+        "sizeKb": "0.3",
+        "modifiedAt": "2026-11-11T01:37:53.226Z"
+      },
+      {
+        "name": "entrega-ciclo-22.md",
+        "url": "/campaigns/entrega-ciclo-22.md",
+        "sizeKb": "0.3",
+        "modifiedAt": "2026-11-11T01:49:58.328Z"
+      },
+      {
+        "name": "entrega-ciclo-23.md",
+        "url": "/campaigns/entrega-ciclo-23.md",
+        "sizeKb": "0.2",
+        "modifiedAt": "2026-11-11T02:00:02.673Z"
+      },
+      {
+        "name": "entrega-ciclo-24.md",
+        "url": "/campaigns/entrega-ciclo-24.md",
+        "sizeKb": "0.2",
+        "modifiedAt": "2026-11-11T02:18:41.557Z"
+      },
+      {
+        "name": "estrategia-aquisicao-pro.md",
+        "url": "/campaigns/estrategia-aquisicao-pro.md",
+        "sizeKb": "7.4",
+        "modifiedAt": "2026-11-10T04:12:59.314Z"
+      },
+      {
+        "name": "instagram-28k-estrategia.md",
+        "url": "/campaigns/instagram-28k-estrategia.md",
+        "sizeKb": "6.1",
+        "modifiedAt": "2026-11-10T14:59:22.899Z"
+      },
+      {
+        "name": "kit-anuncios-8-idiomas.md",
+        "url": "/campaigns/kit-anuncios-8-idiomas.md",
+        "sizeKb": "14.1",
+        "modifiedAt": "2026-11-10T06:10:24.361Z"
+      },
+      {
+        "name": "kit_abordagem_comunidades_testadores.md",
+        "url": "/campaigns/kit_abordagem_comunidades_testadores.md",
+        "sizeKb": "1.8",
+        "modifiedAt": "2026-11-10T22:33:31.873Z"
+      },
+      {
+        "name": "kit_conversao_comunidades.md",
+        "url": "/campaigns/kit_conversao_comunidades.md",
+        "sizeKb": "1.1",
+        "modifiedAt": "2026-11-10T23:32:45.211Z"
+      },
+      {
+        "name": "kit_outreach_comunidades_v1.md",
+        "url": "/campaigns/kit_outreach_comunidades_v1.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-10T22:57:32.147Z"
+      },
+      {
+        "name": "kit_recrutamento_20_testadores_playstore.md",
+        "url": "/campaigns/kit_recrutamento_20_testadores_playstore.md",
+        "sizeKb": "4.5",
+        "modifiedAt": "2026-11-10T21:26:29.234Z"
+      },
+      {
+        "name": "latest-campaign.json",
+        "url": "/campaigns/latest-campaign.json",
+        "sizeKb": "7.4",
+        "modifiedAt": "2026-11-10T03:16:05.132Z"
+      },
+      {
+        "name": "lista-20-testadores-google-play.txt",
+        "url": "/campaigns/lista-20-testadores-google-play.txt",
+        "sizeKb": "0.0",
+        "modifiedAt": "2026-11-11T02:23:16.154Z"
+      },
+      {
+        "name": "postagens-comunidades-t4t.md",
+        "url": "/campaigns/postagens-comunidades-t4t.md",
+        "sizeKb": "3.8",
+        "modifiedAt": "2026-11-10T19:22:43.442Z"
+      },
+      {
+        "name": "prospeccao-ativa-testadores.md",
+        "url": "/campaigns/prospeccao-ativa-testadores.md",
+        "sizeKb": "11.8",
+        "modifiedAt": "2026-11-10T06:30:10.318Z"
+      },
+      {
+        "name": "recrutamento-20-testadores.md",
+        "url": "/campaigns/recrutamento-20-testadores.md",
+        "sizeKb": "4.0",
+        "modifiedAt": "2026-11-10T06:06:52.542Z"
+      },
+      {
+        "name": "respostas-formulario-producao-google-play.md",
+        "url": "/campaigns/respostas-formulario-producao-google-play.md",
+        "sizeKb": "2.8",
+        "modifiedAt": "2026-11-10T16:31:28.500Z"
+      },
+      {
+        "name": "roteiro_reels_5gb_em_1_minuto.md",
+        "url": "/campaigns/roteiro_reels_5gb_em_1_minuto.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T22:54:32.816Z"
+      },
+      {
+        "name": "roteiro_reels_galeria_lenta.md",
+        "url": "/campaigns/roteiro_reels_galeria_lenta.md",
+        "sizeKb": "1.4",
+        "modifiedAt": "2026-11-10T22:48:32.045Z"
+      },
+      {
+        "name": "roteiro_tiktok_solucao_automatica_espaco.md",
+        "url": "/campaigns/roteiro_tiktok_solucao_automatica_espaco.md",
+        "sizeKb": "1.0",
+        "modifiedAt": "2026-11-10T23:00:32.619Z"
+      },
+      {
+        "name": "roteiro_viral_armazenamento_oculto.md",
+        "url": "/campaigns/roteiro_viral_armazenamento_oculto.md",
+        "sizeKb": "1.4",
+        "modifiedAt": "2026-11-10T23:12:33.722Z"
+      },
+      {
+        "name": "roteiro_viral_liberacao_espaco.md",
+        "url": "/campaigns/roteiro_viral_liberacao_espaco.md",
+        "sizeKb": "1.5",
+        "modifiedAt": "2026-11-10T22:30:32.295Z"
+      },
+      {
+        "name": "roteiro_viral_pastas_ocultas.md",
+        "url": "/campaigns/roteiro_viral_pastas_ocultas.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-10T22:42:32.542Z"
+      },
+      {
+        "name": "roteiro_viral_reels_limpeza.md",
+        "url": "/campaigns/roteiro_viral_reels_limpeza.md",
+        "sizeKb": "0.9",
+        "modifiedAt": "2026-11-10T23:29:24.406Z"
+      },
+      {
+        "name": "roteiro_viral_whatsapp.md",
+        "url": "/campaigns/roteiro_viral_whatsapp.md",
+        "sizeKb": "1.6",
+        "modifiedAt": "2026-11-10T23:37:34.446Z"
+      }
+    ]
+  }
+}
