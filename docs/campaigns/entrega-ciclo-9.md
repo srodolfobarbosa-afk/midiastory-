@@ -1,0 +1,1 @@
+Entendido. Vou seguir as instruções do repositório e avançar com trabalho concreto quando você indicar a próxima tarefa. Não vou presumir acesso à Play Console, credenciais ou dispositivos, nem alterar identificadores, assinatura ou versões sem autorização explícita.
