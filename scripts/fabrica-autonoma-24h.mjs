@@ -31,6 +31,7 @@ import { fileURLToPath } from "node:url";
 import { checkAndMaintain } from "./supabase-maintenance.mjs";
 import { executeWithFailover } from "./ai-failover-router.mjs";
 import { executeTrinityPipeline } from "./trindade-ia.mjs";
+import { executarConselhoTrindade } from "./conselho-trindade.mjs";
 import { registrarMemoria } from "./registrar-memoria.mjs";
 import { deploySite } from "./firebase-deploy-site.mjs";
 import { generateTerminalFeed } from "./generate-terminal-data.mjs";
@@ -251,7 +252,7 @@ async function checkAndProcessChatCommands() {
     const tasks = await runSql(`
       SELECT id, title, target, payload, status, created_at
       FROM public.orchestrator_tasks
-      WHERE target IN ('CODEX', 'LOCAL_PC') AND status = 'PENDING'
+      WHERE target IN ('CODEX', 'LOCAL_PC', 'CHAT_COMMAND', 'CONSELHO_TRINDADE') AND status = 'PENDING'
       ORDER BY id ASC
       LIMIT 1;
     `);
@@ -259,7 +260,7 @@ async function checkAndProcessChatCommands() {
     if (!tasks || tasks.length === 0) return false;
 
     const task = tasks[0];
-    console.log(`\n💬 [CHAT DE COMANDO RECEBIDO] #${task.id}: ${task.title}`);
+    console.log(`\n💬 [CHAT DE COMANDO RECEBIDO] #${task.id} (${task.target}): ${task.title}`);
 
     // Reivindica a tarefa atomicamente; outro worker pode tê-la reservado após o SELECT.
     const claimedTasks = await runSql(`
@@ -275,33 +276,45 @@ async function checkAndProcessChatCommands() {
 
     const userCommand = task.payload?.text || task.payload?.prompt || task.title;
 
-    const prompt = `Você é o Coprocessador Autônomo da Fábrica Midiastore (com.rdf112.midiastore), operando em regime 24/7 rumo à meta de R$ 1.000.000,00 e aos 20 testadores fechados.
+    let responseText = "";
+    let provider = "desconhecido";
+    let resultPayload = null;
+
+    try {
+      console.log(`⚡ [PROCESSANDO VIA CONSELHO TRINDADE] Acionando Carbon + Opus + Fable + Cota Zero...`);
+      const trindadeRes = await executarConselhoTrindade(userCommand, { taskId: task.id, origin: "WebTerminalChat", target: task.target });
+      responseText = trindadeRes.resposta;
+      provider = `Conselho Trindade (${trindadeRes.modelos ? trindadeRes.modelos.join(" ➔ ") : "Trindade"})`;
+      resultPayload = {
+        response: responseText,
+        carbon: trindadeRes.carbon,
+        opus: trindadeRes.opus,
+        fable: trindadeRes.fable,
+        modelos: trindadeRes.modelos,
+        provider,
+        replied_at: new Date().toISOString()
+      };
+      console.log(`✅ [CHAT DE COMANDO RESPONDIDO VIA TRINDADE] ${provider}`);
+    } catch (err) {
+      console.warn(`⚠️ Conselho Trindade falhou (${err.message}). Acionando fallback padrão...`);
+      try {
+        const prompt = `Você é o Coprocessador Autônomo da Fábrica Midiastore (com.rdf112.midiastore), operando em regime 24/7 rumo à meta de R$ 1.000.000,00 e aos 20 testadores fechados.
 O usuário enviou uma ordem direta pelo Chat de Comando do Terminal Web:
 "${userCommand}"
 
 Responda ou execute com máxima precisão técnica, objetividade e clareza em até 200 palavras.`;
-
-    let responseText = "";
-    let provider = "desconhecido";
-    try {
-      console.log(`⚡ [PROCESSANDO VIA SUPER TRINDADE IA] Acionando Carbon + Opus + Fable + Cota Zero...`);
-      const trinityRes = await executeTrinityPipeline(userCommand, { taskId: task.id, origin: "WebTerminalChat" });
-      responseText = trinityRes.content;
-      provider = `Super Trindade (${trinityRes.models ? trinityRes.models.join(" ➔ ") : "Trindade"})`;
-      console.log(`✅ [CHAT DE COMANDO RESPONDIDO VIA TRINDADE] ${provider}`);
-    } catch (err) {
-      console.warn(`⚠️ Trindade falhou (${err.message}). Acionando fallback padrão...`);
-      try {
         const aiRes = await executeWithFailover(prompt, { isCode: false });
         responseText = aiRes.content;
         provider = aiRes.source;
+        resultPayload = { response: responseText, provider, replied_at: new Date().toISOString() };
       } catch (e2) {
         responseText = `⚠️ Erro ao processar comando com IA: ${e2.message}`;
+        resultPayload = { response: responseText, error: e2.message, replied_at: new Date().toISOString() };
       }
     }
 
-    // Atualiza a tarefa como DONE com o resultado
-    const escapedResult = JSON.stringify({ response: responseText, replied_at: new Date().toISOString(), provider }).replace(/'/g, "''");
+    // Atualiza a tarefa como DONE com o resultado estruturado
+    const escapedResult = JSON.stringify(resultPayload).replace(/'/g, "''");
     await runSql(`
       UPDATE public.orchestrator_tasks
       SET status = 'DONE', result = '${escapedResult}'::jsonb, updated_at = NOW()
