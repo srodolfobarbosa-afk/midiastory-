@@ -286,11 +286,83 @@
     .cmd-bar {
       background: #090e1a;
       border-top: 1px solid var(--term-border);
-      padding: 0.9rem 1.25rem;
+      padding: 1rem 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.75rem;
     }
+    .model-selector-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .model-selector-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.3rem;
+    }
+    .model-chip {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .model-chip:hover {
+      border-color: var(--accent-cyan);
+      color: #fff;
+    }
+    .model-chip.active {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 182, 212, 0.25));
+      border-color: var(--accent-green);
+      color: #5eead4;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
+    .chat-bubble-user {
+      background: #1e293b;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px 12px 2px 12px;
+      padding: 0.85rem 1.1rem;
+      margin: 0.6rem 0;
+      color: #f1f5f9;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      font-family: 'Inter', sans-serif;
+    }
+    .chat-bubble-ai {
+      background: #0d1424;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px 12px 12px 2px;
+      padding: 1rem 1.25rem;
+      margin: 0.6rem 0;
+      color: #e2e8f0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+    }
+    .trinity-card {
+      background: rgba(15, 23, 42, 0.7);
+      border-left: 3px solid var(--accent-green);
+      padding: 0.6rem 0.85rem;
+      margin-top: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+    }
+    .trinity-card.carbon { border-left-color: #38bdf8; }
+    .trinity-card.opus { border-left-color: #f59e0b; }
+    .trinity-card.fable { border-left-color: #a855f7; }
     .cmd-prompt-line {
       display: flex;
       align-items: center;
@@ -489,9 +561,19 @@ Carregando telemetria em tempo real...
 
       <!-- Chat de Comando do Coprocessador (Interativo 24h) -->
       <div class="cmd-bar">
+        <!-- Seletor de Modelo de Inteligência -->
+        <div class="model-selector-bar">
+          <span class="model-selector-title">Destinatário da Ordem:</span>
+          <button class="model-chip active" id="chip-trindade" onclick="selectModel('FUSAO_TRINDADE')">✨ Fusão Trindade (Carbon + Opus + Fable)</button>
+          <button class="model-chip" id="chip-carbon" onclick="selectModel('CARBON')">🌐 Gemini 4 Carbon (Play/SEO)</button>
+          <button class="model-chip" id="chip-opus" onclick="selectModel('OPUS')">🛡️ Claude Opus 5.5 (Auditoria)</button>
+          <button class="model-chip" id="chip-fable" onclick="selectModel('FABLE')">⚡ Claude Fable 5.2 (Estratégia)</button>
+          <button class="model-chip" id="chip-free" onclick="selectModel('FREE')">🚀 Cota Zero (openrouter/free)</button>
+        </div>
+
         <div class="cmd-prompt-line">
           <span class="cmd-prompt-prefix">antigravity@midiastore:~$</span>
-          <input type="text" class="cmd-input" id="cmd-input" placeholder="Digite uma ordem para a IA ou Codex (ex: 'Crie um artigo sobre fotos duplicadas', 'Recrute testadores no Reddit')..." onkeydown="if(event.key==='Enter') sendChatCommand()" />
+          <input type="text" class="cmd-input" id="cmd-input" placeholder="Digite uma ordem para a Trindade IA ou Codex (ex: 'Crie um artigo sobre fotos duplicadas', 'Recrute testadores no Reddit')..." onkeydown="if(event.key==='Enter') sendChatCommand()" />
           <button class="btn btn-primary" id="btn-send-cmd" onclick="sendChatCommand()">⚡ Executar Ordem</button>
         </div>
         <div class="cmd-quick-chips">
@@ -500,6 +582,7 @@ Carregando telemetria em tempo real...
           <button class="chip-btn" onclick="quickCommand('Crie um roteiro viral dinâmico para TikTok/Reels sobre remoção de fotos duplicadas')">📱 +1 Roteiro Viral</button>
           <button class="chip-btn" onclick="quickCommand('Gere um kit de abordagem para comunidades T4T no Reddit r/AndroidClosedTesting')">👥 Kit Testadores T4T</button>
           <button class="chip-btn" onclick="quickCommand('Realize uma auditoria completa de retenção e blindagem do Supabase')">🛡️ Auditar Supabase</button>
+          <button class="chip-btn" onclick="quickCommand('Otimize o modelo de conversão do Pro Lifetime (R$ 29,90) rumo a R$ 1.000.000,00')">💰 Estratégia R$ 1 Milhão</button>
         </div>
       </div>
     </div>
@@ -649,6 +732,18 @@ Carregando telemetria em tempo real...
     const SUPABASE_URL = "https://usmqtnlsaavxqguwrtix.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU";
 
+    let currentSelectedModel = 'FUSAO_TRINDADE';
+
+    function selectModel(m) {
+      currentSelectedModel = m;
+      document.querySelectorAll('.model-chip').forEach(c => c.classList.remove('active'));
+      if (m === 'FUSAO_TRINDADE') document.getElementById('chip-trindade')?.classList.add('active');
+      if (m === 'CARBON') document.getElementById('chip-carbon')?.classList.add('active');
+      if (m === 'OPUS') document.getElementById('chip-opus')?.classList.add('active');
+      if (m === 'FABLE') document.getElementById('chip-fable')?.classList.add('active');
+      if (m === 'FREE') document.getElementById('chip-free')?.classList.add('active');
+    }
+
     async function sendChatCommand() {
       const input = document.getElementById('cmd-input');
       const cmd = input.value.trim();
@@ -656,11 +751,16 @@ Carregando telemetria em tempo real...
       input.value = '';
 
       const time = new Date().toLocaleTimeString('pt-BR');
-      addLogLine(time, "VOCÊ", "tag-ai", `> ${cmd}`, "ALL");
-      addLogLine(time, "COPROCESSOR", "tag-git", `⏳ Enviando ordem para a fila do Supabase...`, "ALL");
+      const targetLabel = currentSelectedModel === 'FUSAO_TRINDADE' ? 'FUSÃO TRINDADE (Carbon+Opus+Fable)' : currentSelectedModel;
+      addLogLine(time, "VOCÊ", "tag-ai", `[Destino: ${targetLabel}] > ${cmd}`, "ALL");
+      addLogLine(time, "CONSELHO", "tag-git", `⏳ Enviando ordem para a fila do Supabase e disparando Native Orchestrator...`, "ALL");
       renderLogs();
 
       try {
+        const targetType = (currentSelectedModel === 'FUSAO_TRINDADE' || currentSelectedModel === 'CARBON' || currentSelectedModel === 'OPUS' || currentSelectedModel === 'FABLE')
+          ? 'CONSELHO_TRINDADE'
+          : 'CHAT_COMMAND';
+
         const res = await fetch(`${SUPABASE_URL}/rest/v1/orchestrator_tasks`, {
           method: 'POST',
           headers: {
@@ -671,9 +771,9 @@ Carregando telemetria em tempo real...
           },
           body: JSON.stringify({
             state_id: 1,
-            title: `ORDEM_USUARIO: ${cmd.slice(0, 80)}`,
-            target: 'CHAT_COMMAND',
-            payload: { text: cmd, author: 'WEB_TERMINAL' },
+            title: `ORDEM_${currentSelectedModel}: ${cmd.slice(0, 80)}`,
+            target: targetType,
+            payload: { text: cmd, model_target: currentSelectedModel, author: 'WEB_TERMINAL' },
             status: 'PENDING'
           })
         });
@@ -681,10 +781,21 @@ Carregando telemetria em tempo real...
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
         const taskId = data[0].id;
-        addLogLine(time, "COPROCESSOR", "tag-success", `✅ Ordem registrada (Tarefa #${taskId}). Coprocessador processando agora...`, "ALL");
+        addLogLine(time, "CONSELHO", "tag-success", `✅ Ordem #${taskId} enfileirada com sucesso! O Conselho Trindade está deliberando...`, "ALL");
         renderLogs();
 
-        // Polling para aguardar a resposta da IA
+        // Dispara Edge Function native-orchestrator em paralelo
+        fetch(`${SUPABASE_URL}/functions/v1/native-orchestrator`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_ANON,
+            Authorization: `Bearer ${SUPABASE_ANON}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ action: 'TRIGGER_CYCLE', prompt: cmd, model: currentSelectedModel, taskId })
+        }).catch(() => {});
+
+        // Polling para aguardar a resposta da IA e o debate completo
         let attempts = 0;
         const interval = setInterval(async () => {
           attempts++;
@@ -696,18 +807,37 @@ Carregando telemetria em tempo real...
             if (rows && rows[0] && rows[0].status === 'DONE') {
               clearInterval(interval);
               const replyTime = new Date().toLocaleTimeString('pt-BR');
-              const resp = rows[0].result?.response || "Ordem executada com sucesso.";
-              const provider = rows[0].result?.provider || "Gemini 4 Argon / Codex";
-              addLogLine(replyTime, `IA (${provider})`, "tag-success", resp, "AI");
+              const resObj = rows[0].result || {};
+              const resp = resObj.response || "Ordem executada com sucesso pelo Conselho Trindade.";
+              const provider = resObj.provider || "Conselho Trindade (Gemini 4 Carbon + Claude Opus 5.5 + Claude Fable 5.2)";
+
+              // Se o debate estruturado estiver presente, renderiza as etapas
+              if (resObj.carbon) {
+                addLogLine(replyTime, "CARBON (Play/SEO)", "tag-git", `🌐 Proposta: ${resObj.carbon}`, "AI");
+              }
+              if (resObj.opus) {
+                addLogLine(replyTime, "OPUS (Auditoria)", "tag-firebase", `🛡️ Auditoria: ${resObj.opus}`, "AI");
+              }
+              if (resObj.fable) {
+                addLogLine(replyTime, "FABLE (Decisão)", "tag-ai", `⚡ Decisão Suprema: ${resObj.fable}`, "AI");
+              }
+
+              addLogLine(replyTime, `RESPOSTA FINAL (${provider})`, "tag-success", `🚀 ${resp}`, "AI");
               renderLogs();
               fetchLiveFeed();
             }
           } catch(e) {}
 
-          if (attempts > 40) {
+          if (attempts > 45) {
             clearInterval(interval);
           }
-        }, 2500);
+        }, 2000);
+
+      } catch(e) {
+        addLogLine(time, "ERRO", "tag-warn", `Falha ao enviar comando: ${e.message}`, "ALL");
+        renderLogs();
+      }
+    }
 
       } catch(e) {
         addLogLine(time, "ERRO", "tag-warn", `Falha ao enviar comando: ${e.message}`, "ALL");

@@ -913,3 +913,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #119
 
 ---
+
+### 📍 [11/11/2026, 02:13:15] [Ciclo #8] Roteiro viral Reels/TikTok: 'Detectei 500 fotos duplicadas e recuperei 1.5GB em 1 minuto'
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/campaigns/reels-fotos-duplicadas-500-1gb.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Este roteiro foca na dor específica de fotos duplicadas, atraindo usuários com cellular cheio e direcionando-os diretamente para o programa de 20 testadores, acelerando o alcance da meta de R$ 1 milhão. (Provedor: openrouter/free)
+- *Registro Supabase:* Memory #120
+
+---
