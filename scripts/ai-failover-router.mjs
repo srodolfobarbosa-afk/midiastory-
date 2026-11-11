@@ -41,9 +41,9 @@ if (!openRouterKey && fs.existsSync(secretsPath)) {
 }
 
 const MODEL_CASCADE = [
+  { id: "google/gemini-4-argon", name: "Gemini 4 Argon" },
   { id: "google/gemini-3.8-flash", name: "Gemini 3.8 Flash" },
   { id: "google/gemini-3.1-flash-lite", name: "Gemini 3.1 Flash-Lite" },
-  { id: "google/gemini-4-argon", name: "Gemini 4 Argon" },
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
   { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
 ];
