@@ -283,6 +283,69 @@
     .tag-supabase { color: #34d399; }
     .tag-success { color: #4ade80; }
     .tag-warn { color: #f87171; }
+    .cmd-bar {
+      background: #090e1a;
+      border-top: 1px solid var(--term-border);
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .cmd-prompt-line {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #050811;
+      border: 1px solid var(--card-border);
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+    }
+    .cmd-prompt-line:focus-within {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+    .cmd-prompt-prefix {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-green);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .cmd-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #f3f4f6;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+    .cmd-quick-chips {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .chip-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .chip-btn {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip-btn:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--accent-cyan);
+      color: #fff;
+    }
     .content-sections-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
@@ -422,6 +485,22 @@
       </div>
       <div class="term-body" id="term-logs">
 Carregando telemetria em tempo real...
+      </div>
+
+      <!-- Chat de Comando do Coprocessador (Interativo 24h) -->
+      <div class="cmd-bar">
+        <div class="cmd-prompt-line">
+          <span class="cmd-prompt-prefix">antigravity@midiastore:~$</span>
+          <input type="text" class="cmd-input" id="cmd-input" placeholder="Digite uma ordem para a IA ou Codex (ex: 'Crie um artigo sobre fotos duplicadas', 'Recrute testadores no Reddit')..." onkeydown="if(event.key==='Enter') sendChatCommand()" />
+          <button class="btn btn-primary" id="btn-send-cmd" onclick="sendChatCommand()">⚡ Executar Ordem</button>
+        </div>
+        <div class="cmd-quick-chips">
+          <span class="chip-label">Comandos Rápidos:</span>
+          <button class="chip-btn" onclick="quickCommand('Gere um artigo aprofundado de SEO sobre como liberar espaço no WhatsApp no Android')">📝 +1 Artigo SEO WhatsApp</button>
+          <button class="chip-btn" onclick="quickCommand('Crie um roteiro viral dinâmico para TikTok/Reels sobre remoção de fotos duplicadas')">📱 +1 Roteiro Viral</button>
+          <button class="chip-btn" onclick="quickCommand('Gere um kit de abordagem para comunidades T4T no Reddit r/AndroidClosedTesting')">👥 Kit Testadores T4T</button>
+          <button class="chip-btn" onclick="quickCommand('Realize uma auditoria completa de retenção e blindagem do Supabase')">🛡️ Auditar Supabase</button>
+        </div>
       </div>
     </div>
 
@@ -565,6 +644,80 @@ Carregando telemetria em tempo real...
       } catch (e) {
         console.warn("Aviso ao carregar feed:", e.message);
       }
+    }
+
+    const SUPABASE_URL = "https://usmqtnlsaavxqguwrtix.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU";
+
+    async function sendChatCommand() {
+      const input = document.getElementById('cmd-input');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      input.value = '';
+
+      const time = new Date().toLocaleTimeString('pt-BR');
+      addLogLine(time, "VOCÊ", "tag-ai", `> ${cmd}`, "ALL");
+      addLogLine(time, "COPROCESSOR", "tag-git", `⏳ Enviando ordem para a fila do Supabase...`, "ALL");
+      renderLogs();
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/orchestrator_tasks`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_ANON,
+            Authorization: `Bearer ${SUPABASE_ANON}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          },
+          body: JSON.stringify({
+            state_id: 1,
+            title: `ORDEM_USUARIO: ${cmd.slice(0, 80)}`,
+            target: 'CHAT_COMMAND',
+            payload: { text: cmd, author: 'WEB_TERMINAL' },
+            status: 'PENDING'
+          })
+        });
+
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const taskId = data[0].id;
+        addLogLine(time, "COPROCESSOR", "tag-success", `✅ Ordem registrada (Tarefa #${taskId}). Coprocessador processando agora...`, "ALL");
+        renderLogs();
+
+        // Polling para aguardar a resposta da IA
+        let attempts = 0;
+        const interval = setInterval(async () => {
+          attempts++;
+          try {
+            const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/orchestrator_tasks?id=eq.${taskId}&select=*`, {
+              headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
+            });
+            const rows = await checkRes.json();
+            if (rows && rows[0] && rows[0].status === 'DONE') {
+              clearInterval(interval);
+              const replyTime = new Date().toLocaleTimeString('pt-BR');
+              const resp = rows[0].result?.response || "Ordem executada com sucesso.";
+              const provider = rows[0].result?.provider || "Gemini 4 Argon / Codex";
+              addLogLine(replyTime, `IA (${provider})`, "tag-success", resp, "AI");
+              renderLogs();
+              fetchLiveFeed();
+            }
+          } catch(e) {}
+
+          if (attempts > 40) {
+            clearInterval(interval);
+          }
+        }, 2500);
+
+      } catch(e) {
+        addLogLine(time, "ERRO", "tag-warn", `Falha ao enviar comando: ${e.message}`, "ALL");
+        renderLogs();
+      }
+    }
+
+    function quickCommand(text) {
+      document.getElementById('cmd-input').value = text;
+      sendChatCommand();
     }
 
     function copyLogs() {
