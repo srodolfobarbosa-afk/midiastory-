@@ -413,3 +413,33 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #71
 
 ---
+
+### 📍 [10/11/2026, 20:50:38] [Ciclo #8] Guia Prático: Como Limpar o Cache do WhatsApp e Ganhar 2GB em Segundos
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/artigos/como_limpar_cache_whatsapp_android.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Ataca diretamente a dor do armazenamento causado pelo WhatsApp, convertendo usuários frustrados em testadores da Midiastore ao oferecer uma solução automatizada superior à limpeza manual. (Provedor: google/gemini-3.1-flash-lite)
+- *Registro Supabase:* Memory #72
+
+---
+
+### 📍 [10/11/2026, 20:58:49] [Ciclo #9] Guia Definitivo: Como Limpar Whatsapp e Liberar Espaço no Android em 5 Passos
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/artigos/como_limpar_whatsapp_liberar_espaco_android.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Este guia prático ajuda usuários a economizar espaço no smartphone, convertendo-os em testes do Midiastore ao resolver uma dor comum. (Provedor: openai/gpt-4o-mini)
+- *Registro Supabase:* Memory #73
+
+---
+
+### 📍 [10/11/2026, 21:02:54] [Ciclo #10] Guia Completo: Como Limpar WhatsApp para Liberar Espaço e Melhorar o Desempenho do Android
+- **📖 Estudou / Leu:** Histórico de memórias recentes e gaps da meta de R$ 1M / 20 testadores
+- **⚙️ Tentou / Executou:** Criação autônoma do artefato docs/artigos/guia_limpar_whatsapp_android.md
+- **⚠️ Erros Encontrados:** Nenhum erro na geração
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Este guia prático abordará uma dor comum dos usuários, ajudando a converter leitores em testadores da Midiastore e contribuindo para a meta de R$ 1 milhão em vendas. (Provedor: openai/gpt-4o-mini)
+- *Registro Supabase:* Memory #74
+
+---
