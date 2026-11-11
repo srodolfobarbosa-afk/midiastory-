@@ -29,15 +29,28 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const mcpConfigPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
 const projectRef = "usmqtnlsaavxqguwrtix";
 const timelinePath = path.join(projectRoot, "docs", "LINHA_DO_TEMPO_AUTONOMA.md");
+
+function getToken() {
+  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
+  if (fs.existsSync(mcpConfigPath)) {
+    const config = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
+    const envToken = config?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN;
+    if (envToken) return envToken.trim();
+    const authorization = config?.mcpServers?.supabase?.headers?.Authorization || "";
+    const configuredToken = authorization.replace(/^Bearer\s+/i, "").trim();
+    if (configuredToken) return configuredToken;
+  }
+  throw new Error("Token Supabase nao encontrado. Configure SUPABASE_ACCESS_TOKEN ou .agents/plugins/supabase/mcp_config.json.");
+}
 
 async function runSql(query) {
   const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${getToken()}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query }),
