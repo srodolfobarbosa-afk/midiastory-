@@ -51,7 +51,7 @@ const MODEL_CASCADE = [
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
 ];
 
-async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
+async function callOpenRouter(modelId, prompt, maxTokens = 1500) {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
   let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
