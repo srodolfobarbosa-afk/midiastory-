@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-11T05:27:23.704Z",
+  "generatedAt": "2026-11-11T05:31:05.746Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -26,6 +26,35 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 239,
+      "title": "HEARTBEAT_CICLO_12",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 12,
+        "steps": {
+          "aiFleet": {
+            "action": "Entrega Cognitiva do Ciclo #12",
+            "filename": "docs/campaigns/entrega-ciclo-12.md",
+            "provider": "openrouter/free"
+          },
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-11T05:27:07.919Z",
+        "durationMs": 43659
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 05:27:50.77286+00"
+    },
     {
       "id": 238,
       "title": "HEARTBEAT_CICLO_11",
@@ -431,108 +460,79 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 04:34:33.393388+00"
-    },
-    {
-      "id": 224,
-      "title": "HEARTBEAT_CICLO_15",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 15,
-        "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #15",
-            "filename": "docs/campaigns/entrega-ciclo-15.md",
-            "provider": "local_codex"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T04:28:02.376Z",
-        "durationMs": 67486
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 04:29:09.148311+00"
     }
   ],
   "commits": [
     {
+      "hash": "b744be9",
+      "msg": "feat(autonomous-factory): [cycle-12] Entrega Cognitiva do Ciclo #12",
+      "time": "3 minutes ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "e80a5f0",
       "msg": "feat(autonomous-factory): [cycle-11] Entrega Cognitiva do Ciclo #11",
-      "time": "3 minutes ago",
+      "time": "7 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5a1f7f9",
       "msg": "feat(autonomous-factory): [cycle-10] Entrega Cognitiva do Ciclo #10",
-      "time": "7 minutes ago",
+      "time": "10 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "2e2d854",
       "msg": "feat(autonomous-factory): [cycle-9] Entrega Cognitiva do Ciclo #9",
-      "time": "10 minutes ago",
+      "time": "14 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5091ac5",
       "msg": "feat(autonomous-factory): [cycle-8] Roteiro viral Reels/TikTok: 'Detectei 500 fotos duplicadas e recuperei 1.5GB em 1 minuto'",
-      "time": "14 minutes ago",
+      "time": "18 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "7fe7304",
       "msg": "feat(autonomous-factory): [cycle-7] Entrega Cognitiva do Ciclo #7",
-      "time": "18 minutes ago",
+      "time": "22 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "5194913",
       "msg": "feat(autonomous-factory): [cycle-6] Entrega Cognitiva do Ciclo #6",
-      "time": "22 minutes ago",
+      "time": "26 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "1f07cc3",
       "msg": "feat(autonomous-factory): [cycle-5] Roteiro viral Reels/TikTok: 3 Truques para Limpar WhatsApp e Liberar 2 GB em 30 s",
-      "time": "28 minutes ago",
+      "time": "32 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "43daf65",
       "msg": "feat(autonomous-factory): [cycle-4] Entrega Técnica: Artigo SEO para Limpar WhatsApp, Liberar Memória e Remover Fotos Duplicadas no Android",
-      "time": "32 minutes ago",
+      "time": "36 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "328589e",
       "msg": "feat(autonomous-factory): [cycle-3] Entrega Cognitiva do Ciclo #3",
-      "time": "36 minutes ago",
+      "time": "39 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "626325a",
       "msg": "feat(autonomous-factory): [cycle-2] Artigo SEO Libere Espaço no Android: WhatsApp, Fotos Duplicadas e Cache em 3 Passos",
-      "time": "39 minutes ago",
+      "time": "43 minutes ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "9c2fc39",
       "msg": "feat(autonomous-factory): [cycle-1] Guia Rápido: 3 Truques para Liberar Memória e Otimizar Performance no Android em 15 Segundos",
-      "time": "43 minutes ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "d2e16cd",
-      "msg": "feat(autonomous-factory): [cycle-18] Entrega Cognitiva do Ciclo #18",
-      "time": "44 minutes ago",
+      "time": "47 minutes ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
@@ -892,7 +892,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T05:27:08.862Z"
+        "modifiedAt": "2026-11-11T05:30:53.592Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
