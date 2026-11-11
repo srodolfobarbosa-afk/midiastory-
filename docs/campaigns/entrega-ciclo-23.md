@@ -1,1 +1,5 @@
-Entendido. Vou trabalhar no Midiastore com foco em progresso concreto, respeitando os bloqueios e limites definidos no `AGENTS.md`. Diga qual tarefa você quer que eu execute agora.
+{
+  "action": "Guia SEO: Como limpar o WhatsApp e liberar memória no Android em 2026 – Passo a passo para usuários e testadores",
+  "category": "SEO",
+  "filename": "docs/artigos/como-limpar-whatsapp-android-2026.md",
+  "content": "# Como limpar o WhatsApp e liberar memória no Android em 2026\n\n**Meta description:** Aprenda a limpar o histórico, cachê e mídia do WhatsApp no Android para liberar até 2 GB de espaço e melhorar a performance do seu aparelho. Guia passo a passo, sem root.\n\n## Por que liberar memória?\n- O WhatsApp armazena mensagens, fotos, vídeos e arquivos temporários que consomem RAM e armazenamento interno.\n- Dispositivos com menos de 4 GB de RAM ficam lentos, especialmente ao usar múltiplas apps.\n\n## Passo a passo para limpar o WhatsApp\n1. **Backup das conversas** – Abra WhatsApp > Configurações > Conversas > Backup > Salvar no Google Drive.\n2. **Desinstale e reinstale** (método mais eficaz) –\n   a. Abra Configurações > Apps > WhatsApp > Desinstalar.\n   b. Reinicie o telefone.\n   c. Instale a versão mais recente da Play Store.\n   d. Restaure o backup.\n3. **Limpe o cache via ajustes** –\n   a. Configurações > Apps > WhatsApp > Armazen
