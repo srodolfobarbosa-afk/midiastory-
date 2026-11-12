@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-11-11T10:26:39.505Z",
+  "generatedAt": "2026-11-12T00:15:34.866Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
     "appPackage": "com.rdf112.midiastore",
     "version": "v2.3.1 (vc20)",
     "targetTesters": 20,
-    "currentTesters": 1,
-    "testersProgressPercent": 5,
+    "currentTesters": 2,
+    "testersProgressPercent": 10,
     "supabaseSizeMb": 11.92,
     "supabaseLimitMb": 500,
     "runners": {
@@ -22,22 +22,25 @@
       "source": "landing_page_test",
       "status": "READY_FOR_CONSOLE_INVITE",
       "created_at": "2026-11-10 06:05:04.465442+00"
+    },
+    {
+      "id": 3,
+      "email": "rjvsb22@gmail.com",
+      "source": "landing_page_pt",
+      "status": "PENDING_PLAY_INVITE",
+      "created_at": "2026-11-11 23:17:33.552846+00"
     }
   ],
   "memories": [],
   "tasks": [
     {
-      "id": 307,
-      "title": "HEARTBEAT_CICLO_79",
+      "id": 419,
+      "title": "HEARTBEAT_CICLO_15",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 79,
+        "cycle": 15,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #79",
-            "filename": "docs/campaigns/entrega-ciclo-79.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -46,27 +49,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T10:21:21.939Z",
-        "durationMs": 73824
+        "timestamp": "2026-11-11T18:04:01.444Z",
+        "durationMs": 17844
       },
       "status": "DONE",
-      "created_at": "2026-11-11 10:22:34.43116+00"
+      "created_at": "2026-11-11 18:04:19.285284+00"
     },
     {
-      "id": 306,
-      "title": "HEARTBEAT_CICLO_78",
+      "id": 418,
+      "title": "HEARTBEAT_CICLO_14",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 78,
+        "cycle": 14,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #78",
-            "filename": "docs/campaigns/entrega-ciclo-78.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -75,27 +73,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T10:17:12.835Z",
-        "durationMs": 64441
+        "timestamp": "2026-11-11T18:00:48.871Z",
+        "durationMs": 11001
       },
       "status": "DONE",
-      "created_at": "2026-11-11 10:18:15.95608+00"
+      "created_at": "2026-11-11 18:00:59.862815+00"
     },
     {
-      "id": 305,
-      "title": "HEARTBEAT_CICLO_77",
+      "id": 417,
+      "title": "HEARTBEAT_CICLO_13",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 77,
+        "cycle": 13,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #77",
-            "filename": "docs/campaigns/entrega-ciclo-77.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -104,27 +97,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T10:12:50.169Z",
-        "durationMs": 78023
+        "timestamp": "2026-11-11T17:57:26.609Z",
+        "durationMs": 16597
       },
       "status": "DONE",
-      "created_at": "2026-11-11 10:14:06.968623+00"
+      "created_at": "2026-11-11 17:57:43.246484+00"
     },
     {
-      "id": 304,
-      "title": "HEARTBEAT_CICLO_76",
+      "id": 416,
+      "title": "HEARTBEAT_CICLO_12",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 76,
+        "cycle": 12,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #76",
-            "filename": "docs/campaigns/entrega-ciclo-76.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -133,27 +121,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T10:08:25.288Z",
-        "durationMs": 84054
+        "timestamp": "2026-11-11T17:54:11.965Z",
+        "durationMs": 13984
       },
       "status": "DONE",
-      "created_at": "2026-11-11 10:09:48.051296+00"
+      "created_at": "2026-11-11 17:54:25.990051+00"
     },
     {
-      "id": 303,
-      "title": "HEARTBEAT_CICLO_75",
+      "id": 415,
+      "title": "HEARTBEAT_CICLO_11",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 75,
+        "cycle": 11,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #75",
-            "filename": "docs/campaigns/entrega-ciclo-75.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -162,27 +145,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T10:04:26.971Z",
-        "durationMs": 53321
+        "timestamp": "2026-11-11T17:50:59.764Z",
+        "durationMs": 11155
       },
       "status": "DONE",
-      "created_at": "2026-11-11 10:05:19.000948+00"
+      "created_at": "2026-11-11 17:51:10.947646+00"
     },
     {
-      "id": 302,
-      "title": "HEARTBEAT_CICLO_74",
+      "id": 414,
+      "title": "HEARTBEAT_CICLO_10",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 74,
+        "cycle": 10,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #74",
-            "filename": "docs/campaigns/entrega-ciclo-74.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -191,104 +169,16 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T10:00:15.819Z",
-        "durationMs": 65713
+        "timestamp": "2026-11-11T17:47:45.549Z",
+        "durationMs": 13029
       },
       "status": "DONE",
-      "created_at": "2026-11-11 10:01:20.233801+00"
+      "created_at": "2026-11-11 17:47:58.594653+00"
     },
     {
-      "id": 301,
-      "title": "HEARTBEAT_CICLO_73",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 73,
-        "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #73",
-            "filename": "docs/campaigns/entrega-ciclo-73.md",
-            "provider": "local_codex"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T09:56:10.494Z",
-        "durationMs": 60618
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 09:57:09.835326+00"
-    },
-    {
-      "id": 300,
-      "title": "HEARTBEAT_CICLO_72",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 72,
-        "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #72",
-            "filename": "docs/campaigns/entrega-ciclo-72.md",
-            "provider": "local_codex"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T09:52:02.566Z",
-        "durationMs": 63180
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 09:53:04.476282+00"
-    },
-    {
-      "id": 299,
-      "title": "HEARTBEAT_CICLO_71",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 71,
-        "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #71",
-            "filename": "docs/campaigns/entrega-ciclo-71.md",
-            "provider": "local_codex"
-          },
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
-        },
-        "timestamp": "2026-11-11T09:47:49.301Z",
-        "durationMs": 71586
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 09:48:59.607659+00"
-    },
-    {
-      "id": 298,
+      "id": 413,
       "title": "HEARTBEAT_CICLO_1",
       "target": "UBUNTU_CLOUD",
       "payload": {
@@ -305,24 +195,20 @@
           },
           "supabase": "OK"
         },
-        "timestamp": "2026-11-11T09:44:55.231Z",
-        "durationMs": 1176
+        "timestamp": "2026-11-11T17:45:51.347Z",
+        "durationMs": 1613
       },
       "status": "DONE",
-      "created_at": "2026-11-11 09:44:56.473023+00"
+      "created_at": "2026-11-11 17:45:53.477307+00"
     },
     {
-      "id": 297,
-      "title": "HEARTBEAT_CICLO_70",
+      "id": 412,
+      "title": "HEARTBEAT_CICLO_9",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 70,
+        "cycle": 9,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #70",
-            "filename": "docs/campaigns/entrega-ciclo-70.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -331,27 +217,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T09:43:32.435Z",
-        "durationMs": 72271
+        "timestamp": "2026-11-11T17:43:41.759Z",
+        "durationMs": 58145
       },
       "status": "DONE",
-      "created_at": "2026-11-11 09:44:43.468252+00"
+      "created_at": "2026-11-11 17:44:39.937052+00"
     },
     {
-      "id": 296,
-      "title": "HEARTBEAT_CICLO_69",
+      "id": 411,
+      "title": "HEARTBEAT_CICLO_8",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 69,
+        "cycle": 8,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #69",
-            "filename": "docs/campaigns/entrega-ciclo-69.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -360,27 +241,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T09:39:07.676Z",
-        "durationMs": 70906
+        "timestamp": "2026-11-11T17:39:36.916Z",
+        "durationMs": 62958
       },
       "status": "DONE",
-      "created_at": "2026-11-11 09:40:17.329004+00"
+      "created_at": "2026-11-11 17:40:39.926985+00"
     },
     {
-      "id": 295,
-      "title": "HEARTBEAT_CICLO_68",
+      "id": 410,
+      "title": "HEARTBEAT_CICLO_7",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 68,
+        "cycle": 7,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #68",
-            "filename": "docs/campaigns/entrega-ciclo-68.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -389,27 +265,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T09:34:53.108Z",
-        "durationMs": 69138
+        "timestamp": "2026-11-11T17:35:27.918Z",
+        "durationMs": 62749
       },
       "status": "DONE",
-      "created_at": "2026-11-11 09:36:00.991231+00"
+      "created_at": "2026-11-11 17:36:30.712237+00"
     },
     {
-      "id": 294,
-      "title": "HEARTBEAT_CICLO_67",
+      "id": 409,
+      "title": "HEARTBEAT_CICLO_6",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 67,
+        "cycle": 6,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #67",
-            "filename": "docs/campaigns/entrega-ciclo-67.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -418,27 +289,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T09:30:36.135Z",
-        "durationMs": 71780
+        "timestamp": "2026-11-11T17:31:23.678Z",
+        "durationMs": 62983
       },
       "status": "DONE",
-      "created_at": "2026-11-11 09:31:46.708167+00"
+      "created_at": "2026-11-11 17:32:26.714644+00"
     },
     {
-      "id": 293,
-      "title": "HEARTBEAT_CICLO_66",
+      "id": 408,
+      "title": "HEARTBEAT_CICLO_5",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 66,
+        "cycle": 5,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #66",
-            "filename": "docs/campaigns/entrega-ciclo-66.md",
-            "provider": "local_codex"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -447,801 +313,175 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T09:26:17.028Z",
-        "durationMs": 73756
+        "timestamp": "2026-11-11T17:27:18.563Z",
+        "durationMs": 63167
       },
       "status": "DONE",
-      "created_at": "2026-11-11 09:27:29.539871+00"
+      "created_at": "2026-11-11 17:28:21.794497+00"
+    },
+    {
+      "id": 407,
+      "title": "HEARTBEAT_CICLO_4",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 4,
+        "steps": {
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T17:23:09.177Z",
+        "durationMs": 63600
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 17:24:12.851409+00"
+    },
+    {
+      "id": 406,
+      "title": "HEARTBEAT_CICLO_3",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 3,
+        "steps": {
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T17:19:03.806Z",
+        "durationMs": 63912
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 17:20:07.786023+00"
+    },
+    {
+      "id": 405,
+      "title": "HEARTBEAT_CICLO_2",
+      "target": "LOCAL_PC",
+      "payload": {
+        "cycle": 2,
+        "steps": {
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
+          "testers": {
+            "total": 1,
+            "latest": [
+              "teste.beta.vip@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 19
+          },
+          "supabase": "OK"
+        },
+        "timestamp": "2026-11-11T17:15:01.931Z",
+        "durationMs": 61079
+      },
+      "status": "DONE",
+      "created_at": "2026-11-11 17:16:03.079419+00"
     }
   ],
   "commits": [
     {
-      "hash": "8ca61d7",
-      "msg": "feat(autonomous-factory): [cycle-40] Entrega Cognitiva do Ciclo #40",
-      "time": "3 hours ago",
+      "hash": "2235c24",
+      "msg": "fix(pricing): enforce official prices R$ 14,99 / R$ 79,99 / R$ 149,99",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "a3d3a9b",
-      "msg": "feat(autonomous-factory): [cycle-39] Entrega Cognitiva do Ciclo #39",
-      "time": "3 hours ago",
+      "hash": "dc1bc48",
+      "msg": "fix(pricing): enforce official prices R$ 14.99 / R$ 79.99 / R$ 149.99",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "14d730c",
-      "msg": "feat(autonomous-factory): [cycle-38] Entrega Cognitiva do Ciclo #38",
-      "time": "3 hours ago",
+      "hash": "84f6846",
+      "msg": "fix(ci): remove hardcoded java home for github actions compatibility",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "31a4a71",
-      "msg": "feat(autonomous-factory): [cycle-37] Kit de Outreach para Comunidades Tech: 'Automatize a Limpeza do WhatsApp com 1 Toque - Programa de Testadores Exclusivo'",
-      "time": "3 hours ago",
+      "hash": "dc86406",
+      "msg": "feat(telemetry): sync live activity feed to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "0f9df47",
-      "msg": "feat(autonomous-factory): [cycle-36] Entrega Cognitiva do Ciclo #36",
-      "time": "3 hours ago",
+      "hash": "cac3ad2",
+      "msg": "feat(pricing): update official pricing and viral funnel links to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "80adb9e",
-      "msg": "feat(autonomous-factory): [cycle-35] Roteiro Viral Reels/TikTok: 'Seu WhatsApp Trava? Libere 5GB em 30s sem Apagar Conversas'",
-      "time": "3 hours ago",
+      "hash": "e8e93a2",
+      "msg": "feat(growth): add WhatsApp viral diagnostic calculator to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "92d0d3c",
-      "msg": "feat(autonomous-factory): [cycle-34] Entrega Cognitiva do Ciclo #34",
-      "time": "3 hours ago",
+      "hash": "e994055",
+      "msg": "feat(ui): add painel redirect to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "131bedd",
-      "msg": "feat(autonomous-factory): [cycle-33] Entrega Cognitiva do Ciclo #33",
-      "time": "3 hours ago",
+      "hash": "98cff59",
+      "msg": "feat(ui): add live terminal 24h dashboard to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "4aee0db",
-      "msg": "feat(autonomous-factory): [cycle-32] Entrega Cognitiva do Ciclo #32",
-      "time": "3 hours ago",
+      "hash": "b4b355b",
+      "msg": "feat(trinity): add Trindade IA multi-model engine with Gemini 4 Carbon and Claude Fable to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "3dd3d68",
-      "msg": "feat(autonomous-factory): [cycle-31] Entrega Cognitiva do Ciclo #31",
-      "time": "3 hours ago",
+      "hash": "8376c32",
+      "msg": "feat(orchestrator): add Carbon, Opus and Fable to native-orchestrator on main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "0a8670f",
-      "msg": "feat(autonomous-factory): [cycle-30] Entrega Cognitiva do Ciclo #30",
-      "time": "4 hours ago",
+      "hash": "85c3b2d",
+      "msg": "feat(equipe): add Carbon, Opus 5.5 and Fable 5.2 to equipe-ia on main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
-      "hash": "ac8a4f8",
-      "msg": "feat(autonomous-factory): [cycle-29] Entrega Cognitiva do Ciclo #29",
-      "time": "4 hours ago",
+      "hash": "319248a",
+      "msg": "feat(audit): add implacable auto-evolving auditor to main",
+      "time": "9 hours ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
   "artifacts": {
-    "artigos": [
-      {
-        "name": "como-liberar-espaco-whatsapp.html",
-        "url": "/artigos/como-liberar-espaco-whatsapp.html",
-        "sizeKb": "7.7",
-        "modifiedAt": "2026-11-10T14:59:57.084Z"
-      },
-      {
-        "name": "como-limpar-whatsapp-liberar-espaco-android.md",
-        "url": "/artigos/como-limpar-whatsapp-liberar-espaco-android.md",
-        "sizeKb": "1.4",
-        "modifiedAt": "2026-11-11T05:45:58.887Z"
-      },
-      {
-        "name": "como-limpar-whatsapp-liberar-memoria-android-fotos-duplicadas.md",
-        "url": "/artigos/como-limpar-whatsapp-liberar-memoria-android-fotos-duplicadas.md",
-        "sizeKb": "1.5",
-        "modifiedAt": "2026-11-11T07:57:19.616Z"
-      },
-      {
-        "name": "como_excluir_fotos_duplicadas.md",
-        "url": "/artigos/como_excluir_fotos_duplicadas.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T23:45:57.531Z"
-      },
-      {
-        "name": "como_liberar_5gb_android.md",
-        "url": "/artigos/como_liberar_5gb_android.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-10T23:42:11.244Z"
-      },
-      {
-        "name": "como_liberar_espaco_whatsapp_android.md",
-        "url": "/artigos/como_liberar_espaco_whatsapp_android.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T22:24:32.504Z"
-      },
-      {
-        "name": "como_limpar_cache_whatsapp_android.md",
-        "url": "/artigos/como_limpar_cache_whatsapp_android.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-10T23:50:38.271Z"
-      },
-      {
-        "name": "como_limpar_whatsapp_liberar_espaco_android.md",
-        "url": "/artigos/como_limpar_whatsapp_liberar_espaco_android.md",
-        "sizeKb": "1.7",
-        "modifiedAt": "2026-11-10T23:58:49.350Z"
-      },
-      {
-        "name": "faq_performance_android_midiastore.md",
-        "url": "/artigos/faq_performance_android_midiastore.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T22:27:31.236Z"
-      },
-      {
-        "name": "guia-limpar-whatsapp-liberar-espaco-android.md",
-        "url": "/artigos/guia-limpar-whatsapp-liberar-espaco-android.md",
-        "sizeKb": "2.8",
-        "modifiedAt": "2026-11-11T06:35:11.761Z"
-      },
-      {
-        "name": "guia_liberacao_armazenamento_android.md",
-        "url": "/artigos/guia_liberacao_armazenamento_android.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T22:36:32.433Z"
-      },
-      {
-        "name": "guia_liberar_espaco_android.md",
-        "url": "/artigos/guia_liberar_espaco_android.md",
-        "sizeKb": "1.7",
-        "modifiedAt": "2026-11-10T23:25:59.460Z"
-      },
-      {
-        "name": "guia_liberar_espaco_android_2026.md",
-        "url": "/artigos/guia_liberar_espaco_android_2026.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T23:03:32.129Z"
-      },
-      {
-        "name": "guia_liberar_espaco_android_limpar_whatsapp_fotos_duplicadas.md",
-        "url": "/artigos/guia_liberar_espaco_android_limpar_whatsapp_fotos_duplicadas.md",
-        "sizeKb": "2.2",
-        "modifiedAt": "2026-11-11T00:08:18.196Z"
-      },
-      {
-        "name": "guia_limpar_whatsapp_android.md",
-        "url": "/artigos/guia_limpar_whatsapp_android.md",
-        "sizeKb": "2.3",
-        "modifiedAt": "2026-11-11T00:02:54.273Z"
-      },
-      {
-        "name": "guia_limpeza_android_whatsapp_fotos.md",
-        "url": "/artigos/guia_limpeza_android_whatsapp_fotos.md",
-        "sizeKb": "2.1",
-        "modifiedAt": "2026-11-11T00:13:25.999Z"
-      },
-      {
-        "name": "guia_limpeza_espaco_android_whatsapp_fotos_duplicadas.md",
-        "url": "/artigos/guia_limpeza_espaco_android_whatsapp_fotos_duplicadas.md",
-        "sizeKb": "1.9",
-        "modifiedAt": "2026-11-11T00:17:08.070Z"
-      },
-      {
-        "name": "guia_limpeza_whatsapp_memoria_android.md",
-        "url": "/artigos/guia_limpeza_whatsapp_memoria_android.md",
-        "sizeKb": "2.4",
-        "modifiedAt": "2026-11-11T00:25:50.129Z"
-      },
-      {
-        "name": "guia_limpeza_whatsapp_storage.md",
-        "url": "/artigos/guia_limpeza_whatsapp_storage.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-10T22:39:31.417Z"
-      },
-      {
-        "name": "guia_otimizacao_armazenamento_android.md",
-        "url": "/artigos/guia_otimizacao_armazenamento_android.md",
-        "sizeKb": "2.3",
-        "modifiedAt": "2026-11-11T00:42:07.758Z"
-      },
-      {
-        "name": "guia_otimizacao_desempenho_android.md",
-        "url": "/artigos/guia_otimizacao_desempenho_android.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-11T00:31:46.565Z"
-      },
-      {
-        "name": "liberar-espaco-android-whatsapp-fotos-cache.md",
-        "url": "/artigos/liberar-espaco-android-whatsapp-fotos-cache.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-11T04:47:54.685Z"
-      },
-      {
-        "name": "liberar-memoria-android-limpar-whatsapp-fotos-duplicadas-5-minutos.md",
-        "url": "/artigos/liberar-memoria-android-limpar-whatsapp-fotos-duplicadas-5-minutos.md",
-        "sizeKb": "0.5",
-        "modifiedAt": "2026-11-11T04:55:00.740Z"
-      },
-      {
-        "name": "limpeza_whatsapp_android_2026.md",
-        "url": "/artigos/limpeza_whatsapp_android_2026.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-10T23:06:32.694Z"
-      },
-      {
-        "name": "limpeza_whatsapp_android_performance.md",
-        "url": "/artigos/limpeza_whatsapp_android_performance.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-10T22:51:31.691Z"
-      },
-      {
-        "name": "otimizacao_desempenho_android_completo.md",
-        "url": "/artigos/otimizacao_desempenho_android_completo.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-11T00:37:36.810Z"
-      }
-    ],
+    "artigos": [],
     "campaigns": [
-      {
-        "name": "android-cleanup-conversion-kit.md",
-        "url": "/campaigns/android-cleanup-conversion-kit.md",
-        "sizeKb": "1.7",
-        "modifiedAt": "2026-11-11T06:29:06.071Z"
-      },
-      {
-        "name": "criativos-video",
-        "url": "/campaigns/criativos-video",
-        "sizeKb": "0.0",
-        "modifiedAt": "2026-11-10T05:37:32.372Z"
-      },
-      {
-        "name": "entrega-ciclo-1.md",
-        "url": "/campaigns/entrega-ciclo-1.md",
-        "sizeKb": "0.4",
-        "modifiedAt": "2026-11-11T02:43:39.527Z"
-      },
-      {
-        "name": "entrega-ciclo-10.md",
-        "url": "/campaigns/entrega-ciclo-10.md",
-        "sizeKb": "0.9",
-        "modifiedAt": "2026-11-11T03:46:29.932Z"
-      },
-      {
-        "name": "entrega-ciclo-11.md",
-        "url": "/campaigns/entrega-ciclo-11.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T03:51:55.475Z"
-      },
-      {
-        "name": "entrega-ciclo-12.md",
-        "url": "/campaigns/entrega-ciclo-12.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T03:59:46.433Z"
-      },
-      {
-        "name": "entrega-ciclo-13.md",
-        "url": "/campaigns/entrega-ciclo-13.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-11T04:15:32.960Z"
-      },
-      {
-        "name": "entrega-ciclo-14.md",
-        "url": "/campaigns/entrega-ciclo-14.md",
-        "sizeKb": "1.0",
-        "modifiedAt": "2026-11-11T04:24:40.686Z"
-      },
-      {
-        "name": "entrega-ciclo-15.md",
-        "url": "/campaigns/entrega-ciclo-15.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-11T04:28:50.526Z"
-      },
-      {
-        "name": "entrega-ciclo-16.md",
-        "url": "/campaigns/entrega-ciclo-16.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T04:34:18.979Z"
-      },
-      {
-        "name": "entrega-ciclo-17.md",
-        "url": "/campaigns/entrega-ciclo-17.md",
-        "sizeKb": "0.6",
-        "modifiedAt": "2026-11-11T04:38:34.929Z"
-      },
-      {
-        "name": "entrega-ciclo-18.md",
-        "url": "/campaigns/entrega-ciclo-18.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T04:43:12.616Z"
-      },
-      {
-        "name": "entrega-ciclo-19.md",
-        "url": "/campaigns/entrega-ciclo-19.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-11T01:08:34.538Z"
-      },
-      {
-        "name": "entrega-ciclo-2.md",
-        "url": "/campaigns/entrega-ciclo-2.md",
-        "sizeKb": "1.0",
-        "modifiedAt": "2026-11-11T02:48:04.387Z"
-      },
-      {
-        "name": "entrega-ciclo-20.md",
-        "url": "/campaigns/entrega-ciclo-20.md",
-        "sizeKb": "1.6",
-        "modifiedAt": "2026-11-11T05:57:27.412Z"
-      },
-      {
-        "name": "entrega-ciclo-21.md",
-        "url": "/campaigns/entrega-ciclo-21.md",
-        "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T06:01:41.648Z"
-      },
-      {
-        "name": "entrega-ciclo-22.md",
-        "url": "/campaigns/entrega-ciclo-22.md",
-        "sizeKb": "0.3",
-        "modifiedAt": "2026-11-11T01:49:58.328Z"
-      },
-      {
-        "name": "entrega-ciclo-23.md",
-        "url": "/campaigns/entrega-ciclo-23.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-11T06:11:20.544Z"
-      },
-      {
-        "name": "entrega-ciclo-24.md",
-        "url": "/campaigns/entrega-ciclo-24.md",
-        "sizeKb": "0.2",
-        "modifiedAt": "2026-11-11T02:18:41.557Z"
-      },
-      {
-        "name": "entrega-ciclo-25.md",
-        "url": "/campaigns/entrega-ciclo-25.md",
-        "sizeKb": "0.4",
-        "modifiedAt": "2026-11-11T02:34:46.973Z"
-      },
-      {
-        "name": "entrega-ciclo-26.md",
-        "url": "/campaigns/entrega-ciclo-26.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-11T02:43:10.616Z"
-      },
-      {
-        "name": "entrega-ciclo-3.md",
-        "url": "/campaigns/entrega-ciclo-3.md",
-        "sizeKb": "0.3",
-        "modifiedAt": "2026-11-11T04:51:26.725Z"
-      },
-      {
-        "name": "entrega-ciclo-38.md",
-        "url": "/campaigns/entrega-ciclo-38.md",
-        "sizeKb": "2.4",
-        "modifiedAt": "2026-11-11T07:27:38.118Z"
-      },
-      {
-        "name": "entrega-ciclo-4.md",
-        "url": "/campaigns/entrega-ciclo-4.md",
-        "sizeKb": "0.2",
-        "modifiedAt": "2026-11-11T03:03:26.771Z"
-      },
-      {
-        "name": "entrega-ciclo-40.md",
-        "url": "/campaigns/entrega-ciclo-40.md",
-        "sizeKb": "3.1",
-        "modifiedAt": "2026-11-11T07:35:35.456Z"
-      },
-      {
-        "name": "entrega-ciclo-44.md",
-        "url": "/campaigns/entrega-ciclo-44.md",
-        "sizeKb": "0.6",
-        "modifiedAt": "2026-11-11T07:50:24.636Z"
-      },
-      {
-        "name": "entrega-ciclo-48.md",
-        "url": "/campaigns/entrega-ciclo-48.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T08:05:47.578Z"
-      },
-      {
-        "name": "entrega-ciclo-49.md",
-        "url": "/campaigns/entrega-ciclo-49.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T08:10:10.278Z"
-      },
-      {
-        "name": "entrega-ciclo-5.md",
-        "url": "/campaigns/entrega-ciclo-5.md",
-        "sizeKb": "0.9",
-        "modifiedAt": "2026-11-11T03:11:13.184Z"
-      },
-      {
-        "name": "entrega-ciclo-50.md",
-        "url": "/campaigns/entrega-ciclo-50.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T08:15:53.475Z"
-      },
-      {
-        "name": "entrega-ciclo-51.md",
-        "url": "/campaigns/entrega-ciclo-51.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T08:20:42.402Z"
-      },
-      {
-        "name": "entrega-ciclo-52.md",
-        "url": "/campaigns/entrega-ciclo-52.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T08:27:10.103Z"
-      },
-      {
-        "name": "entrega-ciclo-53.md",
-        "url": "/campaigns/entrega-ciclo-53.md",
-        "sizeKb": "0.6",
-        "modifiedAt": "2026-11-11T08:32:26.377Z"
-      },
-      {
-        "name": "entrega-ciclo-54.md",
-        "url": "/campaigns/entrega-ciclo-54.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T08:36:35.888Z"
-      },
-      {
-        "name": "entrega-ciclo-55.md",
-        "url": "/campaigns/entrega-ciclo-55.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T08:41:01.310Z"
-      },
-      {
-        "name": "entrega-ciclo-56.md",
-        "url": "/campaigns/entrega-ciclo-56.md",
-        "sizeKb": "0.6",
-        "modifiedAt": "2026-11-11T08:45:14.857Z"
-      },
-      {
-        "name": "entrega-ciclo-57.md",
-        "url": "/campaigns/entrega-ciclo-57.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T08:49:35.445Z"
-      },
-      {
-        "name": "entrega-ciclo-58.md",
-        "url": "/campaigns/entrega-ciclo-58.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T08:53:18.910Z"
-      },
-      {
-        "name": "entrega-ciclo-59.md",
-        "url": "/campaigns/entrega-ciclo-59.md",
-        "sizeKb": "0.6",
-        "modifiedAt": "2026-11-11T08:57:49.123Z"
-      },
-      {
-        "name": "entrega-ciclo-6.md",
-        "url": "/campaigns/entrega-ciclo-6.md",
-        "sizeKb": "0.3",
-        "modifiedAt": "2026-11-11T05:02:56.844Z"
-      },
-      {
-        "name": "entrega-ciclo-60.md",
-        "url": "/campaigns/entrega-ciclo-60.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T09:02:15.364Z"
-      },
-      {
-        "name": "entrega-ciclo-61.md",
-        "url": "/campaigns/entrega-ciclo-61.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-11T09:06:00.902Z"
-      },
-      {
-        "name": "entrega-ciclo-62.md",
-        "url": "/campaigns/entrega-ciclo-62.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T09:10:30.807Z"
-      },
-      {
-        "name": "entrega-ciclo-63.md",
-        "url": "/campaigns/entrega-ciclo-63.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T09:14:28.186Z"
-      },
-      {
-        "name": "entrega-ciclo-64.md",
-        "url": "/campaigns/entrega-ciclo-64.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T09:19:10.383Z"
-      },
-      {
-        "name": "entrega-ciclo-65.md",
-        "url": "/campaigns/entrega-ciclo-65.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T09:22:59.831Z"
-      },
-      {
-        "name": "entrega-ciclo-66.md",
-        "url": "/campaigns/entrega-ciclo-66.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T09:27:20.515Z"
-      },
-      {
-        "name": "entrega-ciclo-67.md",
-        "url": "/campaigns/entrega-ciclo-67.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T09:31:37.159Z"
-      },
-      {
-        "name": "entrega-ciclo-68.md",
-        "url": "/campaigns/entrega-ciclo-68.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T09:35:51.623Z"
-      },
-      {
-        "name": "entrega-ciclo-69.md",
-        "url": "/campaigns/entrega-ciclo-69.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T09:40:07.384Z"
-      },
-      {
-        "name": "entrega-ciclo-7.md",
-        "url": "/campaigns/entrega-ciclo-7.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-11T03:22:42.233Z"
-      },
-      {
-        "name": "entrega-ciclo-70.md",
-        "url": "/campaigns/entrega-ciclo-70.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T09:44:34.308Z"
-      },
-      {
-        "name": "entrega-ciclo-71.md",
-        "url": "/campaigns/entrega-ciclo-71.md",
-        "sizeKb": "0.9",
-        "modifiedAt": "2026-11-11T09:48:49.677Z"
-      },
-      {
-        "name": "entrega-ciclo-72.md",
-        "url": "/campaigns/entrega-ciclo-72.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T09:52:54.815Z"
-      },
-      {
-        "name": "entrega-ciclo-73.md",
-        "url": "/campaigns/entrega-ciclo-73.md",
-        "sizeKb": "1.0",
-        "modifiedAt": "2026-11-11T09:56:58.883Z"
-      },
-      {
-        "name": "entrega-ciclo-74.md",
-        "url": "/campaigns/entrega-ciclo-74.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T10:01:11.367Z"
-      },
-      {
-        "name": "entrega-ciclo-75.md",
-        "url": "/campaigns/entrega-ciclo-75.md",
-        "sizeKb": "0.9",
-        "modifiedAt": "2026-11-11T10:05:09.284Z"
-      },
-      {
-        "name": "entrega-ciclo-76.md",
-        "url": "/campaigns/entrega-ciclo-76.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T10:09:37.904Z"
-      },
-      {
-        "name": "entrega-ciclo-77.md",
-        "url": "/campaigns/entrega-ciclo-77.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T10:13:56.209Z"
-      },
-      {
-        "name": "entrega-ciclo-78.md",
-        "url": "/campaigns/entrega-ciclo-78.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T10:18:05.463Z"
-      },
-      {
-        "name": "entrega-ciclo-79.md",
-        "url": "/campaigns/entrega-ciclo-79.md",
-        "sizeKb": "0.8",
-        "modifiedAt": "2026-11-11T10:22:23.718Z"
-      },
-      {
-        "name": "entrega-ciclo-8.md",
-        "url": "/campaigns/entrega-ciclo-8.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-11T03:29:30.346Z"
-      },
-      {
-        "name": "entrega-ciclo-80.md",
-        "url": "/campaigns/entrega-ciclo-80.md",
-        "sizeKb": "0.7",
-        "modifiedAt": "2026-11-11T10:26:38.484Z"
-      },
-      {
-        "name": "entrega-ciclo-9.md",
-        "url": "/campaigns/entrega-ciclo-9.md",
-        "sizeKb": "0.3",
-        "modifiedAt": "2026-11-11T03:40:02.994Z"
-      },
-      {
-        "name": "estrategia-aquisicao-pro.md",
-        "url": "/campaigns/estrategia-aquisicao-pro.md",
-        "sizeKb": "7.4",
-        "modifiedAt": "2026-11-10T04:12:59.314Z"
-      },
-      {
-        "name": "instagram-28k-estrategia.md",
-        "url": "/campaigns/instagram-28k-estrategia.md",
-        "sizeKb": "6.1",
-        "modifiedAt": "2026-11-10T14:59:22.899Z"
-      },
-      {
-        "name": "kit-anuncios-8-idiomas.md",
-        "url": "/campaigns/kit-anuncios-8-idiomas.md",
-        "sizeKb": "14.1",
-        "modifiedAt": "2026-11-10T06:10:24.361Z"
-      },
-      {
-        "name": "kit-mensagens-conversao-comunidades-tecnologia.md",
-        "url": "/campaigns/kit-mensagens-conversao-comunidades-tecnologia.md",
-        "sizeKb": "1.5",
-        "modifiedAt": "2026-11-11T05:53:25.109Z"
-      },
-      {
-        "name": "kit-outreach-comunidades-tech-testadores.md",
-        "url": "/campaigns/kit-outreach-comunidades-tech-testadores.md",
-        "sizeKb": "2.6",
-        "modifiedAt": "2026-11-11T07:23:07.750Z"
-      },
-      {
-        "name": "kit_abordagem_comunidades_testadores.md",
-        "url": "/campaigns/kit_abordagem_comunidades_testadores.md",
-        "sizeKb": "1.8",
-        "modifiedAt": "2026-11-10T22:33:31.873Z"
-      },
-      {
-        "name": "kit_conversao_comunidades.md",
-        "url": "/campaigns/kit_conversao_comunidades.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-10T23:32:45.211Z"
-      },
-      {
-        "name": "kit_outreach_comunidades_v1.md",
-        "url": "/campaigns/kit_outreach_comunidades_v1.md",
-        "sizeKb": "1.3",
-        "modifiedAt": "2026-11-10T22:57:32.147Z"
-      },
-      {
-        "name": "kit_recrutamento_20_testadores_playstore.md",
-        "url": "/campaigns/kit_recrutamento_20_testadores_playstore.md",
-        "sizeKb": "4.5",
-        "modifiedAt": "2026-11-10T21:26:29.234Z"
-      },
-      {
-        "name": "latest-campaign.json",
-        "url": "/campaigns/latest-campaign.json",
-        "sizeKb": "7.4",
-        "modifiedAt": "2026-11-10T03:16:05.132Z"
-      },
       {
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T10:25:41.638Z"
+        "modifiedAt": "2026-11-12T00:15:28.733Z"
       },
       {
-        "name": "postagens-comunidades-t4t.md",
-        "url": "/campaigns/postagens-comunidades-t4t.md",
-        "sizeKb": "3.8",
-        "modifiedAt": "2026-11-10T19:22:43.442Z"
-      },
-      {
-        "name": "prospeccao-ativa-testadores.md",
-        "url": "/campaigns/prospeccao-ativa-testadores.md",
-        "sizeKb": "11.8",
-        "modifiedAt": "2026-11-10T06:30:10.318Z"
-      },
-      {
-        "name": "recrutamento-20-testadores.md",
-        "url": "/campaigns/recrutamento-20-testadores.md",
-        "sizeKb": "4.0",
-        "modifiedAt": "2026-11-10T06:06:52.542Z"
-      },
-      {
-        "name": "reels-fotos-duplicadas-500-1gb.md",
-        "url": "/campaigns/reels-fotos-duplicadas-500-1gb.md",
-        "sizeKb": "1.7",
-        "modifiedAt": "2026-11-11T05:13:15.370Z"
-      },
-      {
-        "name": "reels-limpar-whatsapp-3-truques-30s.md",
-        "url": "/campaigns/reels-limpar-whatsapp-3-truques-30s.md",
-        "sizeKb": "1.8",
-        "modifiedAt": "2026-11-11T04:58:54.900Z"
-      },
-      {
-        "name": "reels-optimiza-android.md",
-        "url": "/campaigns/reels-optimiza-android.md",
-        "sizeKb": "0.9",
-        "modifiedAt": "2026-11-11T04:44:15.815Z"
-      },
-      {
-        "name": "respostas-formulario-producao-google-play.md",
-        "url": "/campaigns/respostas-formulario-producao-google-play.md",
-        "sizeKb": "2.8",
-        "modifiedAt": "2026-11-10T16:31:28.500Z"
-      },
-      {
-        "name": "roteiro-reels-viral-limpeza-whatsapp.md",
-        "url": "/campaigns/roteiro-reels-viral-limpeza-whatsapp.md",
-        "sizeKb": "2.1",
-        "modifiedAt": "2026-11-11T07:15:17.631Z"
-      },
-      {
-        "name": "roteiro-viral-liberar-espaco-android.md",
-        "url": "/campaigns/roteiro-viral-liberar-espaco-android.md",
-        "sizeKb": "1.1",
-        "modifiedAt": "2026-11-11T05:42:19.394Z"
-      },
-      {
-        "name": "roteiro_reels_5gb_em_1_minuto.md",
-        "url": "/campaigns/roteiro_reels_5gb_em_1_minuto.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T22:54:32.816Z"
-      },
-      {
-        "name": "roteiro_reels_galeria_lenta.md",
-        "url": "/campaigns/roteiro_reels_galeria_lenta.md",
-        "sizeKb": "1.4",
-        "modifiedAt": "2026-11-10T22:48:32.045Z"
-      },
-      {
-        "name": "roteiro_tiktok_solucao_automatica_espaco.md",
-        "url": "/campaigns/roteiro_tiktok_solucao_automatica_espaco.md",
-        "sizeKb": "1.0",
-        "modifiedAt": "2026-11-10T23:00:32.619Z"
-      },
-      {
-        "name": "roteiro_viral_armazenamento_oculto.md",
-        "url": "/campaigns/roteiro_viral_armazenamento_oculto.md",
-        "sizeKb": "1.4",
-        "modifiedAt": "2026-11-10T23:12:33.722Z"
-      },
-      {
-        "name": "roteiro_viral_liberacao_espaco.md",
-        "url": "/campaigns/roteiro_viral_liberacao_espaco.md",
+        "name": "roteiro_viral_whatsapp_cleaner.md",
+        "url": "/campaigns/roteiro_viral_whatsapp_cleaner.md",
         "sizeKb": "1.5",
-        "modifiedAt": "2026-11-10T22:30:32.295Z"
-      },
-      {
-        "name": "roteiro_viral_pastas_ocultas.md",
-        "url": "/campaigns/roteiro_viral_pastas_ocultas.md",
-        "sizeKb": "1.2",
-        "modifiedAt": "2026-11-10T22:42:32.542Z"
-      },
-      {
-        "name": "roteiro_viral_reels_limpeza.md",
-        "url": "/campaigns/roteiro_viral_reels_limpeza.md",
-        "sizeKb": "0.9",
-        "modifiedAt": "2026-11-10T23:29:24.406Z"
-      },
-      {
-        "name": "roteiro_viral_whatsapp.md",
-        "url": "/campaigns/roteiro_viral_whatsapp.md",
-        "sizeKb": "1.6",
-        "modifiedAt": "2026-11-10T23:37:34.446Z"
+        "modifiedAt": "2026-11-12T00:15:22.295Z"
       }
     ]
   }
