@@ -2003,3 +2003,18 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #241
 
 ---
+
+### 📍 [12/11/2026, 04:55:00] Resolução P0: Botão Liberar Espaço + Funil Web Multi-idioma + 20 Testadores
+- **📖 Estudou / Leu:** Reclamação do usuário sobre o botão 'Liberar Espaço' do app (que só navegava sem acionar limpeza), o funil web internacional em inglês/outros idiomas (com elementos não traduzidos) e o status dos 20 testadores vinculados no Google Play Console.
+- **⚙️ Tentou / Executou:** 
+  1. No app Android (`MainActivity.kt`): Implementação de `AlertDialog` nativo no botão hero orb que confirma a ação com contagem de arquivos e tamanho exato, oferecendo "Excluir permanentemente" (acionando `requestPermanentDeleteSelected()` para o consentimento nativo do Android), "Mover para Lixeira" (API 30+) ou "Arquivos" para revisão; ativação de `homeDirectCleanRow` na Home.
+  2. Localização: Sincronização da chave `home_cleanup_confirm_prompt` nos 8 idiomas do app (PT, EN, ES, DE, FR, HI, JA, ZH).
+  3. No Funil Web: Tradução completa dos módulos interativos (calculadora de lixo oculto, testes de WhatsApp e CTAs) em todos os 8 idiomas e deploy no Firebase Hosting com HTTP 200.
+  4. Testes e CI: Execução bem-sucedida de `./gradlew :domain:test :app:testDebugUnitTest` (BUILD SUCCESSFUL) e push do commit `438cbfd` para a branch `codex/midiastore-release-audit`.
+  5. Testadores: Documentação da vinculação dos 20/20 testadores na Play Console.
+- **⚠️ Erros Encontrados:** Zero erros na compilação e testes unitários.
+- **🔧 Como Corrigiu:** Rigor técnico de ponta a ponta sem meia-bomba.
+- **🎯 Conclusão:** Todas as pendências P0 sanadas com verificação e testes aprovados.
+- *Registro Supabase:* Memory #242
+
+---
