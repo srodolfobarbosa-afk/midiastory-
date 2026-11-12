@@ -2057,3 +2057,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #247
 
 ---
+
+### 📍 [12/11/2026, 19:43:46] Release Midiastore v2.4.0 e Estúdio de Mídia
+- **📖 Estudou / Leu:** Google Play Developer API v3, MediaStore, PdfDocument, ColorMatrix, ExifInterface
+- **⚙️ Tentou / Executou:** Geração de AAB assinado com sweep-upload.jks, upload tracks internal e alpha, atualização de fichas em 8 idiomas, deploy Firebase e instalação ADB
+- **⚠️ Erros Encontrados:** Título do app em espanhol excedia 30 caracteres por 1 caractere (403)
+- **🔧 Como Corrigiu:** Ajustado título para Midiastore: Limpiador Estudio e reexecutado commit da listagem
+- **🎯 Conclusão:** VersionCode 21 publicado na Google Play com sucesso, site ferramentas.html publicado no Firebase e APK instalado no Motorola
+- *Registro Supabase:* Memory #249
+
+---
