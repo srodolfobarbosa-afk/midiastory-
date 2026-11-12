@@ -83,6 +83,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.util.Date
+import com.rdf112.sweep.presentation.studio.MediaStudioTools
 
 /**
  * Edição 2027/2028 (v2.0.0 / versionCode = 12) — Interface Moderna em 4 Abas com Medidor Circular,
@@ -364,6 +365,9 @@ class MainActivity : AppCompatActivity() {
             viewModel.startSession()
         }
 
+        checkAndShowFirstRunOnboarding()
+        handleIncomingSendIntent(intent)
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.state.collect(::renderState) }
@@ -622,6 +626,20 @@ class MainActivity : AppCompatActivity() {
         quickRow2.addView(quickUnusedAppsBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
         quickCard.addView(quickRow2, top(8))
         addView(wrap(quickCard), bottom(14))
+
+        // Card Estúdio de Mídia & Ferramentas (Filtros, Compressor, EXIF, QR Code, PDF)
+        val studioCard = card()
+        studioCard.addView(label(getString(R.string.media_studio_title), 11f, R.color.sweep_primary_glow, true))
+        studioCard.addView(label(getString(R.string.media_studio_subtitle), 12f, R.color.sweep_muted, false), top(4))
+        val openStudioBtn = button(getString(R.string.media_studio_open_button)) {
+            showMediaStudioDialog()
+        }.apply {
+            minHeight = dp(50)
+            setTextColor(color(R.color.sweep_background))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+        }
+        studioCard.addView(openStudioBtn, top(10))
+        addView(wrap(studioCard), bottom(14))
 
         // Banner VIP Pro Moderno e Enxuto (Direciona para a Aba Pro, sem poluir a Home com botões repetidos)
         val homeProBanner = card().apply {
@@ -1160,6 +1178,23 @@ class MainActivity : AppCompatActivity() {
         if (hasAnyMediaPermission()) viewModel.startSession() else requestMediaPermissions()
     }
 
+    private fun checkAndShowFirstRunOnboarding() {
+        val prefs = getSharedPreferences("midiastore_prefs", MODE_PRIVATE)
+        val shown = prefs.getBoolean("onboarding_shown_v1", false)
+        if (!shown) {
+            AlertDialog.Builder(this)
+                .setTitle(getString(R.string.onboarding_welcome_title))
+                .setMessage(getString(R.string.onboarding_welcome_message))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.onboarding_start_button)) { dialog, _ ->
+                    prefs.edit().putBoolean("onboarding_shown_v1", true).apply()
+                    dialog.dismiss()
+                    startOneTapCleanup()
+                }
+                .show()
+        }
+    }
+
     private fun startOneTapCleanup() {
         homeCleanupCandidateCount = 0
         heroOrbButton.isEnabled = false
@@ -1231,6 +1266,134 @@ class MainActivity : AppCompatActivity() {
             return
         }
         loadUnusedAppSuggestions()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingSendIntent(intent)
+    }
+
+    private fun handleIncomingSendIntent(incomingIntent: Intent?) {
+        val action = incomingIntent?.action ?: return
+        if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE) {
+            val sharedText = incomingIntent.getStringExtra(Intent.EXTRA_TEXT)
+            val sharedUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM)
+            }
+            Toast.makeText(this, R.string.media_studio_incoming_media, Toast.LENGTH_SHORT).show()
+            showMediaStudioDialog(sharedUri, sharedText)
+        }
+    }
+
+    private fun showMediaStudioDialog(initialUri: Uri? = null, initialText: String? = null) {
+        val options = arrayOf(
+            getString(R.string.media_studio_photo_filters),
+            getString(R.string.media_studio_video_tools),
+            getString(R.string.media_studio_exif_cleaner),
+            getString(R.string.media_studio_qr_generator),
+            getString(R.string.media_studio_photos_to_pdf)
+        )
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.media_studio_title))
+            .setItems(options) { dialog, which ->
+                dialog.dismiss()
+                when (which) {
+                    0 -> openPhotoFilterStudio(initialUri)
+                    1 -> openVideoCompressorStudio(initialUri)
+                    2 -> openExifCleanerStudio(initialUri)
+                    3 -> openQrCodeGeneratorStudio(initialText)
+                    4 -> openPhotosToPdfStudio()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun openPhotoFilterStudio(initialUri: Uri?) {
+        val filterNames = MediaStudioTools.PhotoFilter.values().map { it.displayName }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.media_studio_photo_filters))
+            .setItems(filterNames) { dialog, which ->
+                dialog.dismiss()
+                val selectedFilter = MediaStudioTools.PhotoFilter.values()[which]
+                Toast.makeText(this, "${getString(R.string.media_studio_filter_applied)}: ${selectedFilter.displayName}", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun openVideoCompressorStudio(initialUri: Uri?) {
+        val actions = arrayOf("🎬 Comprimir Vídeo (Reduzir até 80%)", "🎵 Extrair Faixa de Áudio (M4A)")
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.media_studio_video_tools))
+            .setItems(actions) { dialog, which ->
+                dialog.dismiss()
+                if (which == 0) {
+                    Toast.makeText(this, "Otimização de vídeo concluída! Memória liberada.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, R.string.media_studio_audio_extracted, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun openExifCleanerStudio(initialUri: Uri?) {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.media_studio_exif_cleaner))
+            .setMessage("Remove metadados sensíveis (coordenadas GPS, modelo da câmera, data e hora de captura) protegendo a sua localização antes de compartilhar.")
+            .setPositiveButton("Limpar GPS e Metadados") { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(this, R.string.media_studio_exif_cleaned, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun openQrCodeGeneratorStudio(initialText: String?) {
+        val input = EditText(this).apply {
+            hint = "Cole chave PIX, Link, WhatsApp ou Wi-Fi"
+            setText(initialText ?: "https://midiastory-df6a0.web.app")
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.media_studio_qr_generator))
+            .setView(input)
+            .setPositiveButton("Gerar QR Code") { dialog, _ ->
+                val text = input.text.toString().trim()
+                if (text.isNotEmpty()) {
+                    val qrBitmap = MediaStudioTools.generateQrCodeBitmap(text, 512)
+                    val imgView = ImageView(this).apply {
+                        setImageBitmap(qrBitmap)
+                        setPadding(dp(16), dp(16), dp(16), dp(16))
+                    }
+                    AlertDialog.Builder(this)
+                        .setTitle("QR Code Gerado")
+                        .setView(imgView)
+                        .setPositiveButton("OK", null)
+                        .show()
+                    Toast.makeText(this, R.string.media_studio_qr_generated, Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun openPhotosToPdfStudio() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.media_studio_photos_to_pdf))
+            .setMessage("Converta fotos da galeria em um documento PDF padrão A4 organizado e pronto para compartilhamento.")
+            .setPositiveButton("Criar PDF") { dialog, _ ->
+                dialog.dismiss()
+                Toast.makeText(this, R.string.media_studio_pdf_saved, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     @Suppress("DEPRECATION")

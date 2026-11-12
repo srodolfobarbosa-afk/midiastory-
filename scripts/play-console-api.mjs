@@ -173,26 +173,41 @@ async function main() {
     if (!uploadRes.ok) throw new Error(JSON.stringify(bundle));
     console.log("Bundle enviado com sucesso:", bundle);
 
-    const trackRes = await fetch(
-      `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/tracks/${track}`,
-      {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          track,
-          releases: [
-            {
-              name: `${bundle.versionCode}`,
-              versionCodes: [String(bundle.versionCode)],
-              status: "completed",
-            },
-          ],
-        }),
-      }
-    );
-    const trackResult = await trackRes.json();
-    if (!trackRes.ok) throw new Error(JSON.stringify(trackResult));
-    console.log("Track atualizada:", trackResult);
+    const releaseNotes = [
+      { language: "pt-BR", text: "Novidade v2.4.0: Estúdio de Mídia completo com Filtros de Fotos ao Vivo, Extrator de Áudio MP3/M4A, Limpador de Privacidade EXIF, Gerador de QR Code e Conversor de Fotos para PDF!" },
+      { language: "en-US", text: "What's new in v2.4.0: Complete Media Studio with Live Photo Filters, MP3/M4A Audio Extractor, EXIF Privacy Cleaner, QR Code Generator, and Photo to PDF Maker!" },
+      { language: "es-ES", text: "Novedades v2.4.0: Estudio de Medios completo con Filtros de Fotos en Vivo, Extractor de Audio MP3/M4A, Limpiador de Privacidad EXIF, Generador de QR y Fotos a PDF." },
+      { language: "fr-FR", text: "Nouveautés v2.4.0 : Studio Média complet avec Filtres Photo en Direct, Extracteur Audio MP3/M4A, Nettoyeur EXIF, Générateur QR Code et Photos vers PDF." },
+      { language: "de-DE", text: "Neuheiten v2.4.0: Medien-Studio mit Live-Fotofiltern, Audio-Extraktor MP3/M4A, EXIF-Datenschutz, QR-Code-Generator und Fotos-zu-PDF." },
+      { language: "hi-IN", text: "v2.4.0 में नया क्या है: लाइव फ़ोटो फ़िल्टर, ऑडियो एक्सट्रैक्टर MP3/M4A, EXIF प्राइवेसी क्लीनर, QR कोड जनरेटर और PDF मेकर।" },
+      { language: "ja-JP", text: "v2.4.0の新機能：ライブ写真フィルター、音声抽出MP3/M4A、EXIFクリーナー、QRコード生成、写真PDF変換ツールを追加。" },
+      { language: "zh-CN", text: "v2.4.0全新特性：实时照片滤镜、音频提取MP3/M4A、EXIF隐私抹除、二维码生成与照片转PDF功能。" }
+    ];
+
+    const targetTracks = track === "all" ? ["internal", "alpha"] : [track];
+    for (const t of targetTracks) {
+      const trackRes = await fetch(
+        `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/tracks/${t}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            track: t,
+            releases: [
+              {
+                name: `2.4.0 (${bundle.versionCode})`,
+                versionCodes: [String(bundle.versionCode)],
+                status: "completed",
+                releaseNotes,
+              },
+            ],
+          }),
+        }
+      );
+      const trackResult = await trackRes.json();
+      if (!trackRes.ok) throw new Error(JSON.stringify(trackResult));
+      console.log(`Track ${t} atualizada:`, trackResult);
+    }
 
     const commitRes = await fetch(
       `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}:commit`,

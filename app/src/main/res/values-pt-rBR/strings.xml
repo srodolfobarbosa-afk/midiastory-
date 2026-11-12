@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="onboarding_welcome_title">Bem-vindo ao Midiastore</string>
+    <string name="onboarding_welcome_message">🔒 100%% Privado: Suas fotos e vídeos são analisados offline no seu aparelho e nunca saem do seu celular.\n\n⚡ Análise Inteligente SHA-256: Localiza duplicatas exatas com precisão matemática, mantendo seus arquivos originais a salvo.\n\n🚀 Pronto para recuperar espaço: Inicie sua análise gratuita agora.</string>
+    <string name="onboarding_start_button">Iniciar Análise Gratuita</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Seu celular mais leve. Seu espaço de volta.</string>
     <string name="hero_title">Recupere espaço no seu celular.</string>
@@ -209,4 +212,19 @@ Total: %3$s</string>
     <string name="pro_debug_preview_disabled">Prévia de desenvolvimento Pro desativada.</string>
     <string name="pro_debug_preview_badge">Prévia Pro · versão de desenvolvimento</string>
     <string name="pro_debug_preview_note">Prévia exclusiva para verificar recursos Pro. Não entra na versão de publicação e não simula uma compra na Play.</string>
+    <!-- Estúdio de Mídia & Ferramentas -->
+    <string name="media_studio_title">Estúdio de Mídia &amp; Ferramentas</string>
+    <string name="media_studio_subtitle">Filtros ao Vivo, Compressor de Vídeo, Limpador EXIF, QR Code e PDF</string>
+    <string name="media_studio_open_button">Abrir Estúdio Completo</string>
+    <string name="media_studio_photo_filters">Filtros de Fotos (Cinema, Nitidez, Vintage, P&amp;B)</string>
+    <string name="media_studio_video_tools">Compressor de Vídeo e Extrator de Áudio</string>
+    <string name="media_studio_exif_cleaner">Limpador de Privacidade EXIF (Remove GPS oculto)</string>
+    <string name="media_studio_qr_generator">Gerador de QR Code (PIX, Links, Wi-Fi)</string>
+    <string name="media_studio_photos_to_pdf">Conversor de Fotos para PDF</string>
+    <string name="media_studio_incoming_media">Mídia recebida para otimização!</string>
+    <string name="media_studio_qr_generated">QR Code gerado com sucesso!</string>
+    <string name="media_studio_pdf_saved">PDF salvo com sucesso!</string>
+    <string name="media_studio_filter_applied">Filtro aplicado com sucesso!</string>
+    <string name="media_studio_exif_cleaned">Coordenadas de GPS removidas da foto!</string>
+    <string name="media_studio_audio_extracted">Faixa de áudio extraída para M4A!</string>
 </resources>

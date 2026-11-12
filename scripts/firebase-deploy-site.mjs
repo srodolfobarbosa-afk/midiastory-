@@ -24,6 +24,18 @@ function loadFirebaseKey() {
 const key = loadFirebaseKey();
 const siteId = "midiastory-df6a0";
 
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fetch(url, options);
+    } catch (e) {
+      if (i === maxRetries - 1) throw e;
+      console.warn(`[Retry ${i + 1}/${maxRetries}] Falha de socket/rede (${e.message}), tentando novamente em 2s...`);
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+}
+
 async function getAccessToken() {
   const now = Math.floor(Date.now() / 1000);
   const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
@@ -42,7 +54,7 @@ async function getAccessToken() {
   const signature = sign.sign(key.private_key, "base64url");
   const jwt = `${header}.${payload}.${signature}`;
 
-  const res = await fetch(key.token_uri, {
+  const res = await fetchWithRetry(key.token_uri, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,

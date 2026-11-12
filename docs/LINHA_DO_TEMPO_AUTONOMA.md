@@ -2047,3 +2047,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #244
 
 ---
+
+### 📍 [12/11/2026, 18:10:42] Auditoria e Validacao de Compilacao/APIs
+- **📖 Estudou / Leu:** Gradle cache transform no Windows, Google Play Developer Reporting API, OpenRouter max_tokens e status dos beta testers
+- **⚙️ Tentou / Executou:** Execucao de compileDebugKotlin, testDebugUnitTest e check-google-apis.mjs
+- **⚠️ Erros Encontrados:** 1. Cache corrompido de transforms do Gradle no Windows. 2. Erro 402 no check-google-apis por ausencia de max_tokens.
+- **🔧 Como Corrigiu:** 1. Purgado diretorio corrompido do Gradle. 2. Fixado max_tokens: 30 em check-google-apis (HTTP 200 a custo de .00000795).
+- **🎯 Conclusão:** Compilacao e testes unitarios 100% verdes. Google Play Developer Reporting API ativa (HTTP 200). OpenRouter operando com custo microscopico.
+- *Registro Supabase:* Memory #247
+
+---

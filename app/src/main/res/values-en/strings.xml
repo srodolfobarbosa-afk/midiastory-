@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="onboarding_welcome_title">Welcome to Midiastore</string>
+    <string name="onboarding_welcome_message">🔒 100%% Private: Your photos and videos are analyzed offline on your device and never leave your phone.\n\n⚡ Smart SHA-256 Analysis: Locates exact duplicate files with mathematical precision, keeping originals safe.\n\n🚀 Ready to reclaim space: Start your free analysis now.</string>
+    <string name="onboarding_start_button">Start Free Analysis</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">A cleaner phone. More space back.</string>
     <string name="hero_title">Free up space on your phone.</string>

@@ -81,6 +81,7 @@ async function main() {
       },
       body: JSON.stringify({
         model: "openai/gpt-4o-mini",
+        max_tokens: 30,
         messages: [{ role: "user", content: "Responda em 5 palavras: Midiastore OpenRouter ativo!" }],
       }),
     });

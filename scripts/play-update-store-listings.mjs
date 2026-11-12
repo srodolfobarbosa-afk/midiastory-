@@ -178,102 +178,144 @@ async function getAccessToken() {
 
 const listingsByLanguage = {
   "pt-BR": {
-    title: "Midiastore: Limpador de Espaço",
-    shortDescription: "Libere espaço com segurança: arquivos grandes, cópias exatas e antigos.",
+    title: "Midiastore: Limpador & Estúdio",
+    shortDescription: "Libere espaço com segurança: Estúdio de Mídia, duplicatas e arquivos grandes.",
     fullDescription:
-      "Midiastore é o limpador e organizador inteligente de armazenamento para Android, projetado com transparência e processamento 100% no seu aparelho.\n\n" +
-      "PRINCIPAIS RECURSOS:\n" +
-      "• Medidor Real de Armazenamento: Visualize imediatamente quanto espaço está ocupado e livre no armazenamento principal.\n" +
-      "• Limpeza de Arquivos Grandes (>10 MB): Encontre vídeos, fotos e áudios pesados em segundos e revise antes de remover.\n" +
-      "• Detector de Cópias Exatas (SHA-256 · Pro): Identifica arquivos duplicados reais byte a byte usando verificação criptográfica SHA-256, mantendo sempre uma cópia original protegida.\n" +
-      "• Arquivos Antigos (+30 dias · Pro): Localize mídias antigas que ocupam espaço sem necessidade.\n" +
-      "• Sugestão de Apps sem Uso (+90 dias · Pro): Descubra aplicativos instalados que você não abre há mais de 3 meses.\n" +
-      "• Segurança Oficial do Android: Nada é apagado sem a sua revisão e confirmação no diálogo oficial do sistema Android (suporte à Lixeira do Android 11+ com restauração e exclusão verificada).\n\n" +
-      "PRIVACIDADE EM PRIMEIRO LUGAR:\n" +
-      "Suas fotos, vídeos e áudios são analisados localmente no seu dispositivo.",
+      "Midiastore é o limpador inteligente de armazenamento e estúdio de mídia para Android, projetado com transparência e processamento 100% no seu aparelho.\n\n" +
+      "NOVIDADE — ESTÚDIO DE MÍDIA & FERRAMENTAS:\n" +
+      "• Filtros de Fotos ao Vivo: Aplique efeitos Cinema, Vintage, P&B e Nitidez instantaneamente.\n" +
+      "• Extrator de Áudio (MP3/M4A): Extraia faixas de áudio cristalinas de vídeos salvos.\n" +
+      "• Limpador de Privacidade EXIF: Remova localização GPS oculta e metadados de suas fotos antes de compartilhar.\n" +
+      "• Gerador de QR Code: Crie códigos QR para PIX, links, WhatsApp e redes Wi-Fi em segundos.\n" +
+      "• Fotos para PDF: Converta e agrupe fotos em documentos PDF prontos para impressão.\n" +
+      "• Importação Rápida por Compartilhamento: Abra qualquer mídia ou link diretamente no app pelo menu de compartilhamento do Android.\n\n" +
+      "RECURSOS ESSENCIAIS DE LIMPEZA:\n" +
+      "• Medidor Real de Armazenamento: Visualize imediatamente o espaço ocupado e livre.\n" +
+      "• Limpeza de Arquivos Grandes (>10 MB): Encontre vídeos, fotos e áudios pesados em segundos.\n" +
+      "• Detector de Cópias Exatas (SHA-256 · Pro): Identifica arquivos duplicados reais byte a byte com verificação criptográfica SHA-256, protegendo o original.\n" +
+      "• Arquivos Antigos (+30 dias · Pro) e Sugestão de Apps sem Uso (+90 dias · Pro).\n" +
+      "• Segurança Oficial do Android: Nada é apagado sem a sua confirmação no diálogo oficial do sistema Android.\n\n" +
+      "PRIVACIDADE TOTAL:\n" +
+      "Seus arquivos são analisados 100% localmente no seu dispositivo.",
   },
   "en-US": {
-    title: "Midiastore: Storage Cleaner",
-    shortDescription: "Safely free up space: find large files, exact duplicates, and old media.",
+    title: "Midiastore: Cleaner & Studio",
+    shortDescription: "Safely free up space: Media Studio, exact duplicates, and large files.",
     fullDescription:
-      "Midiastore is a transparent, privacy-first storage cleaner and media organizer for Android with 100% on-device analysis.\n\n" +
-      "KEY FEATURES:\n" +
-      "• Real-Time Storage Gauge: Instantly see used and free space on your primary shared storage.\n" +
-      "• Large File Finder (>10 MB): Quickly spot heavy videos, photos, and audio files to review before removal.\n" +
-      "• Exact Duplicate Finder (SHA-256 · Pro): Finds true byte-for-byte duplicate files using SHA-256 cryptographic hashing while automatically protecting one original copy.\n" +
-      "• Older Media Finder (30+ days · Pro): Locate older media files taking up valuable storage.\n" +
-      "• Unused App Suggestions (90+ days · Pro): Identify installed apps you haven't opened in over 90 days.\n" +
-      "• Official Android Safety: Nothing is ever deleted automatically. You review every candidate and confirm via Android's official system dialog (supports Android 11+ Trash & restore).\n\n" +
+      "Midiastore is a transparent, privacy-first storage cleaner and media studio suite for Android with 100% on-device processing.\n\n" +
+      "NEW — MEDIA STUDIO & PRODUCTIVITY TOOLS:\n" +
+      "• Live Photo Filters: Apply Cinematic, Vintage, B&W, and Sharpness effects instantly.\n" +
+      "• Video-to-Audio Extractor (MP3/M4A): Extract crystal-clear audio tracks from your videos.\n" +
+      "• EXIF Privacy Cleaner: Strip hidden GPS coordinates and sensitive metadata before sharing photos.\n" +
+      "• QR Code Generator: Generate fast QR codes for URLs, Wi-Fi, WhatsApp, and text.\n" +
+      "• Photos to PDF: Convert and bundle multiple photos into clean, printable PDF documents.\n" +
+      "• Quick Share Import: Open media directly into tools via Android's native share menu.\n\n" +
+      "CORE CLEANING FEATURES:\n" +
+      "• Real-Time Storage Gauge: Instantly see used and free space on your storage.\n" +
+      "• Large File Finder (>10 MB): Spot heavy videos, photos, and audio files before removal.\n" +
+      "• Exact Duplicate Finder (SHA-256 · Pro): Detect true byte-for-byte duplicates using cryptographic SHA-256 while protecting the original.\n" +
+      "• Older Media Finder (30+ days · Pro) & Unused App Suggestions (90+ days · Pro).\n" +
+      "• Official Android Safety: Nothing is ever deleted automatically without your explicit confirmation.\n\n" +
       "PRIVACY FIRST:\n" +
-      "Your photos, videos, and audio are analyzed locally on your device.",
+      "Your photos, videos, and files are analyzed locally on your device.",
   },
   "es-ES": {
-    title: "Midiastore: Limpiador Espacio",
-    shortDescription: "Libera espacio seguro: archivos grandes, copias exactas y antiguos.",
+    title: "Midiastore: Limpiador Estudio",
+    shortDescription: "Libera espacio seguro: Estudio de Medios, duplicatas y archivos grandes.",
     fullDescription:
-      "Midiastore es un limpiador y organizador de almacenamiento para Android con análisis 100% local en tu dispositivo.\n\n" +
-      "FUNCIONES PRINCIPALES:\n" +
-      "• Medidor de Almacenamiento Real: Consulta al instante el espacio usado y libre.\n" +
-      "• Archivos Grandes (>10 MB): Encuentra vídeos, fotos y audios pesados y revísalos antes de eliminarlos.\n" +
-      "• Copias Exactas (SHA-256 · Pro): Detecta archivos duplicados reales mediante verificación SHA-256 protegiendo siempre el original.\n" +
+      "Midiastore es un limpiador de almacenamiento y suite de herramientas multimedia para Android con análisis 100% local.\n\n" +
+      "NOVEDAD — ESTUDIO DE MEDIOS Y HERRAMIENTAS:\n" +
+      "• Filtros de Fotos en Vivo: Aplica efectos Cine, Vintage, Blanco y Negro y Nitidez al instante.\n" +
+      "• Extractor de Audio (MP3/M4A): Extrae pistas de audio nítidas de cualquier vídeo.\n" +
+      "• Limpiador de Privacidad EXIF: Elimina coordenadas GPS y metadatos ocultos de tus imágenes.\n" +
+      "• Generador de Códigos QR: Crea códigos QR rápidos para enlaces, Wi-Fi y texto.\n" +
+      "• Fotos a PDF: Convierte y agrupa fotos en documentos PDF de alta calidad.\n\n" +
+      "FUNCIONES DE LIMPIEZA:\n" +
+      "• Medidor de Almacenamiento Real: Espacio usado y libre al instante.\n" +
+      "• Archivos Grandes (>10 MB) y Copias Exactas (SHA-256 · Pro).\n" +
       "• Archivos Antiguos (+30 días · Pro) y Apps sin Uso (+90 días · Pro).\n" +
-      "• Seguridad Oficial de Android: Nada se borra sin tu confirmación en el diálogo oficial de Android.",
+      "• Seguridad Oficial de Android: Confirmación obligatoria del sistema antes de cualquier borrado.",
   },
   "fr-FR": {
-    title: "Midiastore : Nettoyeur Espace",
-    shortDescription: "Libérez de l'espace : fichiers lourds, doublons exacts et anciens.",
+    title: "Midiastore: Nettoyeur Studio",
+    shortDescription: "Libérez de l'espace : Studio Média, doublons exacts et gros fichiers.",
     fullDescription:
-      "Midiastore est un nettoyeur de stockage transparent pour Android avec analyse 100 % locale sur votre appareil.\n\n" +
-      "FONCTIONNALITÉS CLÉS :\n" +
-      "• Jauge de Stockage Réelle : Visualisez l'espace utilisé et libre.\n" +
-      "• Fichiers Volumineux (>10 Mo) : Repérez les vidéos, photos et audios lourds avant de les supprimer.\n" +
-      "• Doublons Exacts (SHA-256 · Pro) : Détection par empreinte SHA-256 avec protection automatique de l'original.\n" +
+      "Midiastore est un nettoyeur de stockage et studio multimédia pour Android avec traitement 100 % local sur votre appareil.\n\n" +
+      "NOUVEAU — STUDIO MÉDIA & OUTILS :\n" +
+      "• Filtres Photo en Direct : Effets Cinéma, Vintage, Noir & Blanc et Netteté instantanés.\n" +
+      "• Extracteur Audio (MP3/M4A) : Isolez le son de vos vidéos en haute qualité.\n" +
+      "• Nettoyeur de Confidentialité EXIF : Supprimez les coordonnées GPS de vos photos.\n" +
+      "• Générateur de QR Code : Créez des QR codes pour liens, Wi-Fi et messages.\n" +
+      "• Photos vers PDF : Assemblez des photos en documents PDF nets et imprimables.\n\n" +
+      "FONCTIONNALITÉS DE NETTOYAGE :\n" +
+      "• Jauge de Stockage Réelle : Espace disponible en un coup d'œil.\n" +
+      "• Fichiers Volumineux (>10 Mo) et Doublons Exacts (SHA-256 · Pro).\n" +
       "• Fichiers Anciens (+30 jours · Pro) et Applications Inutilisées (+90 jours · Pro).\n" +
-      "• Sécurité Android Officielle : Aucune suppression automatique sans votre confirmation système.",
+      "• Sécurité Android Officielle : Confirmation système obligatoire avant toute action.",
   },
   "de-DE": {
-    title: "Midiastore: Speicher-Reiniger",
-    shortDescription: "Speicherplatz freigeben: Große Dateien, Duplikate & alte Medien.",
+    title: "Midiastore: Reiniger & Studio",
+    shortDescription: "Speicher freigeben: Medien-Studio, Duplikate & große Dateien.",
     fullDescription:
-      "Midiastore ist ein transparenter Speicher-Reiniger für Android mit 100 % lokaler Analyse auf Ihrem Gerät.\n\n" +
-      "HAUPTFUNKTIONEN:\n" +
-      "• Echtzeit-Speicheranzeige: Belegter und freier Speicherplatz auf einen Blick.\n" +
-      "• Große Dateien (>10 MB): Finden und prüfen Sie große Videos, Fotos und Audiodateien.\n" +
-      "• Exakte Duplikate (SHA-256 · Pro): Erkennt echte Duplikate per SHA-256-Prüfsumme und schützt das Original.\n" +
+      "Midiastore ist ein transparenter Speicher-Reiniger und Medien-Studio für Android mit 100 % lokaler Analyse.\n\n" +
+      "NEU — MEDIEN-STUDIO & WERKZEUGE:\n" +
+      "• Live-Fotofilter: Wenden Sie Kino-, Vintage-, S/W- und Schärfe-Effekte an.\n" +
+      "• Audio-Extraktor (MP3/M4A): Kristallklare Audiospuren aus Videos extrahieren.\n" +
+      "• EXIF-Datenschutzbereinigung: Entfernt GPS-Daten und Metadaten vor dem Teilen.\n" +
+      "• QR-Code-Generator: Erstellen Sie QR-Codes für Links, WLAN und Text.\n" +
+      "• Fotos zu PDF: Fotos schnell in saubere PDF-Dokumente umwandeln.\n\n" +
+      "HAUPTREINIGUNGSFUNKTIONEN:\n" +
+      "• Echtzeit-Speicheranzeige: Sofortige Übersicht über freien Speicherplatz.\n" +
+      "• Große Dateien (>10 MB) und Exakte Duplikate (SHA-256 · Pro).\n" +
       "• Alte Dateien (+30 Tage · Pro) & Ungenutzte Apps (+90 Tage · Pro).\n" +
-      "• Offizielle Android-Sicherheit: Nichts wird ohne Ihre Bestätigung im Android-Systemdialog gelöscht.",
+      "• Offizielle Android-Sicherheit: Bestätigung über das Android-Systemfenster.",
   },
   "hi-IN": {
-    title: "Midiastore: स्टोरेज क्लीनर",
-    shortDescription: "सुरक्षित रूप से स्पेस खाली करें: बड़ी फ़ाइलें और डुप्लिकेट खोजें।",
+    title: "Midiastore: क्लीनर स्टूडियो",
+    shortDescription: "सुरक्षित स्टोरेज क्लीनर: मीडिया स्टूडियो, डुप्लिकेट और बड़ी फ़ाइलें।",
     fullDescription:
-      "Midiastore Android के लिए एक पारदर्शी और सुरक्षित स्टोरेज क्लीनर है जो 100% आपके फ़ोन पर काम करता है।\n\n" +
-      "मुख्य विशेषताएं:\n" +
-      "• रियल-टाइम स्टोरेज मीटर: इस्तेमाल और खाली जगह तुरंत देखें।\n" +
-      "• बड़ी फ़ाइलें (>10 MB): भारी वीडियो, फ़ोटो और ऑडियो फ़ाइलें खोजें।\n" +
-      "• सटीक डुप्लिकेट (SHA-256 · Pro): मूल फ़ाइल को सुरक्षित रखते हुए डुप्लिकेट कॉपी पहचानें।\n" +
+      "Midiastore Android के लिए एक सुरक्षित स्टोरेज क्लीनर और मीडिया स्टूडियो टूलकिट है जो 100% फ़ोन पर काम करता है।\n\n" +
+      "नया — मीडिया स्टूडियो टूल्स:\n" +
+      "• लाइव फ़ोटो फ़िल्टर: सिनेमा, विंटेज, B&W और शार्पनेस इफ़ेक्ट।\n" +
+      "• ऑडियो एक्सट्रैक्टर (MP3/M4A): वीडियो से साफ़ ऑडियो निकालें।\n" +
+      "• EXIF प्राइवेसी क्लीनर: शेयर करने से पहले फ़ोटो से GPS लोकेशन हटाएं।\n" +
+      "• QR कोड जनरेटर: लिंक, वाई-फ़ाई और टेक्स्ट के लिए तुरंत QR कोड बनाएं।\n" +
+      "• फ़ोटो से PDF: फ़ोटो को तुरंत PDF दस्तावेज़ में बदलें।\n\n" +
+      "सफ़ाई विशेषताएं:\n" +
+      "• रियल-टाइम स्टोरेज मीटर: इस्तेमाल और खाली जगह देखें।\n" +
+      "• बड़ी फ़ाइलें (>10 MB) और सटीक डुप्लिकेट (SHA-256 · Pro)।\n" +
       "• पुरानी फ़ाइलें (+30 दिन · Pro) और बिना उपयोग वाले ऐप्स (+90 दिन · Pro)।",
   },
   "ja-JP": {
-    title: "Midiastore: ストレージクリーナー",
-    shortDescription: "安全に容量を確保：大容量ファイル、重複コピー、古いメディアを検出。",
+    title: "Midiastore: クリーナー＆スタジオ",
+    shortDescription: "安全に容量確保：メディアスタジオ、完全重複検出、大容量整理。",
     fullDescription:
-      "Midiastoreは、端末内で100%ローカル解析を行う透明性の高いAndroid向けストレージクリーナーです。\n\n" +
-      "主な機能：\n" +
-      "• リアルタイム容量メーター：使用中・空き容量を一目で確認。\n" +
-      "• 大容量ファイル検出（10MB以上）：大きな動画・写真・音声を確認して整理。\n" +
-      "• 完全一致の重複ファイル検出（SHA-256・Pro）：原本を保護しながら重複コピーを特定。\n" +
+      "Midiastoreは、端末内100%ローカルで動作するAndroid向けストレージ整理＆メディアスタジオです。\n\n" +
+      "新機能 — メディアスタジオ＆便利機能：\n" +
+      "• ライブ写真フィルター：シネマ、ヴィンテージ、モノクロ、鮮明化。\n" +
+      "• 音声抽出（MP3/M4A）：動画から高音質な音声を簡単抽出。\n" +
+      "• EXIFプライバシークリーナー：共有前に位置情報（GPS）とメタデータを消去。\n" +
+      "• QRコード生成：リンク、Wi-Fi、テキストのQRコードを作成。\n" +
+      "• 写真PDF変換：写真をまとめて綺麗なPDF文書へ変換。\n\n" +
+      "主な整理機能：\n" +
+      "• リアルタイム容量メーター：空き容量と使用状況を可視化。\n" +
+      "• 大容量ファイル検出（10MB以上）＆完全一致の重複ファイル検出（SHA-256・Pro）。\n" +
       "• 古いファイル（30日以上・Pro）＆未使用アプリ検出（90日以上・Pro）。",
   },
   "zh-CN": {
-    title: "Midiastore：存储空间清理工具",
-    shortDescription: "安全释放手机空间：查找大文件、SHA-256精确重复项和旧媒体。",
+    title: "Midiastore：清理管家与媒体工坊",
+    shortDescription: "安全释放空间：媒体工作室、精确重复文件与大文件清理。",
     fullDescription:
-      "Midiastore 是一款透明、安全的 Android 存储清理与媒体整理工具，100% 在设备本地完成分析。\n\n" +
-      "核心功能：\n" +
-      "• 实时存储仪表盘：直观查看已用空间与可用空间。\n" +
-      "• 大文件查找（>10 MB）：快速定位占用空间的大视频、照片与音频。\n" +
-      "• 精确重复文件检测（SHA-256 · Pro）：通过 SHA-256 校验识别完全相同的副本并自动保护原件。\n" +
+      "Midiastore 是一款透明安全的 Android 存储清理与媒体处理工坊，100% 在本地运行。\n\n" +
+      "全新功能 — 媒体工坊与实用工具：\n" +
+      "• 实时照片滤镜：电影色调、复古、黑白与清晰度提升。\n" +
+      "• 音频提取（MP3/M4A）：一键将视频原声提取为高品质音频。\n" +
+      "• EXIF 隐私清理：分享前一键抹除照片中隐藏的 GPS 位置与元数据。\n" +
+      "• 二维码生成：快速制作链接、Wi-Fi与文本二维码。\n" +
+      "• 照片转 PDF：将多张照片合并为标准清晰 PDF 文档。\n\n" +
+      "核心清理能力：\n" +
+      "• 实时存储仪表盘：一目了然已用与可用空间。\n" +
+      "• 大文件查找（>10 MB）与精确重复文件检测（SHA-256 · Pro）。\n" +
       "• 旧文件清理（30天以上 · Pro）与闲置应用建议（90天未用 · Pro）。",
   },
 };

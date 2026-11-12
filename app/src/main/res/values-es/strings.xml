@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="onboarding_welcome_title">Bienvenido a Midiastore</string>
+    <string name="onboarding_welcome_message">🔒 100%% Privado: Tus fotos y videos se analizan sin conexión en tu dispositivo y nunca salen de tu teléfono.\n\n⚡ Análisis Inteligente SHA-256: Localiza duplicados exactos con precisión matemática, manteniendo a salvo tus archivos originales.\n\n🚀 Listo para recuperar espacio: Inicia tu análisis gratuito ahora.</string>
+    <string name="onboarding_start_button">Iniciar Análisis Gratuito</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Almacenamiento bajo tu control.</string>
     <string name="hero_title">Descubre qué ocupa espacio en tu teléfono.</string>

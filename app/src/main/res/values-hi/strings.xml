@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
+    <string name="onboarding_welcome_title">Midiastore में आपका स्वागत है</string>
+    <string name="onboarding_welcome_message">🔒 100%% निजी: आपकी तस्वीरें और वीडियो आपके डिवाइस पर ऑफ़लाइन विश्लेषित होते हैं और कभी फ़ोन से बाहर नहीं जाते।\n\n⚡ स्मार्ट SHA-256 विश्लेषण: सटीक डुप्लिकेट फ़ाइलों को खोजता है और मूल फ़ाइलों को सुरक्षित रखता है।\n\n🚀 स्टोरेज खाली करने के लिए तैयार: अभी मुफ़्त विश्लेषण शुरू करें।</string>
+    <string name="onboarding_start_button">मुफ़्त विश्लेषण शुरू करें</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">आपका स्टोरेज, आपके नियंत्रण में।</string>
     <string name="hero_title">जानें कि आपके फ़ोन की जगह कौन ले रहा है।</string>
