@@ -619,72 +619,35 @@ class MainActivity : AppCompatActivity() {
         quickCard.addView(quickRow2, top(8))
         addView(wrap(quickCard), bottom(14))
 
-        // Card de Atalhos Diretos por Categoria (Fotos, Vídeos, Áudios)
-        val mediaKindsCard = card()
-        mediaKindsCard.addView(label(getString(R.string.media_kind_title), 11f, R.color.sweep_primary_glow, true))
-        mediaKindsCard.addView(label(getString(R.string.tap_to_scan_media_types), 12f, R.color.sweep_muted, false), top(4))
-        val kindsRow = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.HORIZONTAL }
-        val homePhotosBtn = button(getString(R.string.photos_tab)) {
-            switchTab(AppTab.FILES)
-            viewModel.selectKind(MediaKind.IMAGE)
-            startScanOrRequestAccess()
+        // Banner VIP Pro Moderno e Enxuto (Direciona para a Aba Pro, sem poluir a Home com botões repetidos)
+        val homeProBanner = card().apply {
+            setOnClickListener { switchTab(AppTab.PRO) }
         }
-        val homeVideosBtn = button(getString(R.string.videos_tab)) {
-            switchTab(AppTab.FILES)
-            viewModel.selectKind(MediaKind.VIDEO)
-            startScanOrRequestAccess()
-        }
-        val homeAudioBtn = button(getString(R.string.audio_tab)) {
-            switchTab(AppTab.FILES)
-            viewModel.selectKind(MediaKind.AUDIO)
-            startScanOrRequestAccess()
-        }
-        kindsRow.addView(homePhotosBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
-        kindsRow.addView(homeVideosBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
-        kindsRow.addView(homeAudioBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
-        mediaKindsCard.addView(kindsRow, top(10))
-        addView(wrap(mediaKindsCard), bottom(14))
-
-        val homePlansCard = card()
-        val homePlansHeader = LinearLayout(this@MainActivity).apply {
+        val proBannerRow = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        val homePlansLogo = ImageView(this@MainActivity).apply {
+        val proBadge = ImageView(this@MainActivity).apply {
             setImageResource(R.mipmap.ic_launcher)
             contentDescription = getString(R.string.app_name)
         }
-        homePlansHeader.addView(homePlansLogo, LinearLayout.LayoutParams(dp(36), dp(36)).apply { marginEnd = dp(10) })
-        val homePlansTitles = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        homePlansTitles.addView(label(getString(R.string.home_plans_title), 16f, R.color.sweep_text, true))
-        homePlansTitles.addView(label(getString(R.string.home_plans_subtitle), 12f, R.color.sweep_muted, false), top(2))
-        homePlansHeader.addView(homePlansTitles, LinearLayout.LayoutParams(0, -2, 1f))
-        homePlansCard.addView(homePlansHeader)
-
-        homePlanMonthlyButton = button(getString(R.string.plan_monthly_default)) {
-            requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
-        }.apply { minHeight = dp(48) }
-        stylePlanPurchaseButton(homePlanMonthlyButton, isProductAvailable = false)
-        homePlansCard.addView(homePlanMonthlyButton, top(10))
-
-        homePlanAnnualButton = button(getString(R.string.plan_annual_default)) {
-            requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
-        }.apply { minHeight = dp(48) }
-        stylePlanPurchaseButton(homePlanAnnualButton, isProductAvailable = false)
-        homePlansCard.addView(homePlanAnnualButton, top(6))
-
-        homePlanLifetimeButton = button(getString(R.string.plan_lifetime_default)) {
-            requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
-        }.apply { minHeight = dp(48) }
-        stylePlanPurchaseButton(homePlanLifetimeButton, isProductAvailable = false)
-        homePlansCard.addView(homePlanLifetimeButton, top(6))
-        if (!billingGateway.securePurchaseVerificationAvailable()) {
-            homePlansCard.addView(
-                label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false),
-                top(8),
-            )
+        proBannerRow.addView(proBadge, LinearLayout.LayoutParams(dp(36), dp(36)).apply { marginEnd = dp(10) })
+        val proBannerCopy = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+        proBannerCopy.addView(label(getString(R.string.home_plans_title), 15f, R.color.sweep_primary_glow, true))
+        proBannerCopy.addView(label(getString(R.string.home_plans_subtitle), 12f, R.color.sweep_muted, false), top(2))
+        proBannerRow.addView(proBannerCopy, LinearLayout.LayoutParams(0, -2, 1f))
+        val proCtaBtn = button(getString(R.string.premium_area_button)) { switchTab(AppTab.PRO) }.apply {
+            minHeight = dp(38)
+            textSize = 12f
         }
-        addView(wrap(homePlansCard), bottom(14))
+        proBannerRow.addView(proCtaBtn, LinearLayout.LayoutParams(-2, dp(38)).apply { marginStart = dp(6) })
+        homeProBanner.addView(proBannerRow)
+        addView(wrap(homeProBanner), bottom(14))
+
+        // Mantém as referências dos botões inicializadas para compatibilidade com renderCatalogPrices
+        homePlanMonthlyButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY) }.apply { visibility = View.GONE }
+        homePlanAnnualButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL) }.apply { visibility = View.GONE }
+        homePlanLifetimeButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME) }.apply { visibility = View.GONE }
 
         val shareAppButton = button(getString(R.string.share_app_button)) { shareApp() }.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
