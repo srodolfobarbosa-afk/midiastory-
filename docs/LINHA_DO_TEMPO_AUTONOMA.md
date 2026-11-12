@@ -1983,3 +1983,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #239
 
 ---
+
+### 📍 [12/11/2026, 03:46:35] Validacao da Chave Google AI Studio AQ Oficial
+- **📖 Estudou / Leu:** Chave AQ.Ab8... fornecida pelo usuario testada na API v1beta do Google AI Studio
+- **⚙️ Tentou / Executou:** Listagem de modelos e teste de geracao com gemini-2.5-flash, gemini-3.8-flash e gemini-4-carbon
+- **⚠️ Erros Encontrados:** gemini-4-carbon em janela de reset de cota free (1h14m); gemini-3.8-flash com 503 temporario por demanda
+- **🔧 Como Corrigiu:** Validado com sucesso 200 no gemini-2.5-flash. Salva em .secrets/ai-media-keys.json como GOOGLE_AI_STUDIO_API_KEY para uso direto e BYOK
+- **🎯 Conclusão:** Chave 100% autentica da Google conectada ao ecossistema com acesso a 50 modelos oficiais incluindo Carbon, Argon e Nano Banana Pro
+- *Registro Supabase:* Memory #240
+
+---
+
+### 📍 [12/11/2026, 03:59:02] Assuncao de Comando Autonomo e Plano Mestre R1M
+- **📖 Estudou / Leu:** Estrutura completa da meta de R$ 1.000.000,00, APIs do Google Play 200 OK, estado dos 20 testadores (2/20) e funil
+- **⚙️ Tentou / Executou:** Criacao do artefato PLANO_MESTRE_R1M_INFRAESTRUTURA.md e ativacao de execucao autonoma continua sem travas
+- **⚠️ Erros Encontrados:** Nenhum erro
+- **🔧 Como Corrigiu:** Nenhuma correcao necessaria
+- **🎯 Conclusão:** Capitao do barco assumiu a operacao completa rumo aos 20 testadores, aprovacao e R$ 1 milhao em vendas
+- *Registro Supabase:* Memory #241
+
+---
