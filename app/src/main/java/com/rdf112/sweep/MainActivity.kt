@@ -58,6 +58,7 @@ import com.rdf112.sweep.data.media.AndroidMediaPageRepository
 import com.rdf112.sweep.data.media.AndroidTrashOperationCoordinator
 import com.rdf112.sweep.data.media.Api29DeleteAttempt
 import com.rdf112.sweep.data.oaas.AndroidOutcomeTelemetryStore
+import com.rdf112.sweep.util.InAppReviewCoordinator
 import com.rdf112.sweep.domain.billing.BillingStatePolicy
 import com.rdf112.sweep.domain.billing.ProAccessSummaryState
 import com.rdf112.sweep.domain.grouping.SmartFilterMode
@@ -205,6 +206,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (confirmedBytes > 0L) {
                 outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
+                inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes)
             }
             refreshStorageStats()
             refreshFlywheelSummary()
@@ -239,6 +241,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var billingGateway: AndroidPlayBillingGateway
     private lateinit var trashCoordinator: AndroidTrashOperationCoordinator
     private lateinit var outcomeTelemetry: AndroidOutcomeTelemetryStore
+    private lateinit var inAppReviewCoordinator: InAppReviewCoordinator
     private var pendingOperationUris: List<String> = emptyList()
     private var pendingOperationBytesByUri: Map<String, Long> = emptyMap()
     private val pendingApi29DeleteQueue = mutableListOf<String>()
@@ -344,6 +347,7 @@ class MainActivity : AppCompatActivity() {
         billingGateway = AndroidPlayBillingGateway(applicationContext)
         trashCoordinator = AndroidTrashOperationCoordinator(applicationContext)
         outcomeTelemetry = AndroidOutcomeTelemetryStore(applicationContext)
+        inAppReviewCoordinator = InAppReviewCoordinator(this)
         viewModel = ViewModelProvider(
             this,
             MediaScanViewModel.Factory(AndroidMediaPageRepository(applicationContext)),
@@ -1979,7 +1983,10 @@ class MainActivity : AppCompatActivity() {
         val attempted = pendingApi29TotalCount
         val verifiedUris = trashCoordinator.verifyPostDeleteUris(pendingApi29DeletedUris)
         val confirmedBytes = verifiedUris.sumOf { pendingApi29BytesByUri[it] ?: 0L }
-        if (confirmedBytes > 0L) outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
+        if (confirmedBytes > 0L) {
+            outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
+            inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes)
+        }
         refreshStorageStats()
         refreshFlywheelSummary()
         updateSpaceMetricsCard(viewModel.state.value)
