@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-11-11T07:35:38.664Z",
+  "generatedAt": "2026-11-12T04:59:50.437Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
     "appPackage": "com.rdf112.midiastore",
     "version": "v2.3.1 (vc20)",
     "targetTesters": 20,
-    "currentTesters": 1,
-    "testersProgressPercent": 5,
+    "currentTesters": 2,
+    "testersProgressPercent": 10,
     "supabaseSizeMb": 11.92,
     "supabaseLimitMb": 500,
     "runners": {
@@ -22,109 +22,115 @@
       "source": "landing_page_test",
       "status": "READY_FOR_CONSOLE_INVITE",
       "created_at": "2026-11-10 06:05:04.465442+00"
+    },
+    {
+      "id": 3,
+      "email": "rjvsb22@gmail.com",
+      "source": "landing_page_pt",
+      "status": "PENDING_PLAY_INVITE",
+      "created_at": "2026-11-11 23:17:33.552846+00"
     }
   ],
   "memories": [],
   "tasks": [
     {
-      "id": 266,
-      "title": "HEARTBEAT_CICLO_39",
+      "id": 422,
+      "title": "HEARTBEAT_CICLO_2",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 39,
+        "cycle": 2,
         "steps": {
           "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #39",
-            "filename": "docs/campaigns/entrega-ciclo-39.md",
+            "action": "Script Viral no TikTok: Como Conseguir 20 Testadores Fechados e Impulsionar R$ 1 Milhões em Vendas",
+            "filename": "docs/campaigns/viral-tiktok-get-20-testers.md",
             "provider": "openrouter/free"
           },
           "testers": {
-            "total": 1,
+            "total": 2,
             "latest": [
-              "teste.beta.vip@gmail.com"
+              "teste.beta.vip@gmail.com",
+              "rjvsb22@gmail.com"
             ],
             "target": 20,
-            "remaining": 19
+            "remaining": 18
           },
           "supabase": "OK",
           "firebaseDeploy": "DEPLOY_SUCCESS"
         },
-        "timestamp": "2026-11-11T07:31:14.133Z",
-        "durationMs": 54377
+        "timestamp": "2026-11-12T04:50:06.171Z",
+        "durationMs": 127251
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:32:07.470139+00"
+      "created_at": "2026-11-12 04:52:11.748357+00"
     },
     {
-      "id": 265,
-      "title": "HEARTBEAT_CICLO_38",
+      "id": 421,
+      "title": "HEARTBEAT_CICLO_1",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 38,
+        "cycle": 1,
         "steps": {
           "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #38",
-            "filename": "docs/campaigns/entrega-ciclo-38.md",
+            "action": "Entrega Cognitiva do Ciclo #1",
+            "filename": "docs/campaigns/entrega-ciclo-1.md",
             "provider": "openrouter/free"
           },
           "testers": {
-            "total": 1,
+            "total": 2,
             "latest": [
-              "teste.beta.vip@gmail.com"
+              "teste.beta.vip@gmail.com",
+              "rjvsb22@gmail.com"
             ],
             "target": 20,
-            "remaining": 19
+            "remaining": 18
           },
           "supabase": "OK",
           "firebaseDeploy": "DEPLOY_SUCCESS"
         },
-        "timestamp": "2026-11-11T07:27:06.086Z",
-        "durationMs": 63238
+        "timestamp": "2026-11-12T04:46:23.950Z",
+        "durationMs": 37600
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:28:08.303927+00"
+      "created_at": "2026-11-12 04:46:58.917126+00"
     },
     {
-      "id": 264,
-      "title": "HEARTBEAT_CICLO_37",
-      "target": "LOCAL_PC",
+      "id": 420,
+      "title": "HEARTBEAT_CICLO_1",
+      "target": "UBUNTU_CLOUD",
       "payload": {
-        "cycle": 37,
+        "cycle": 1,
         "steps": {
           "aiFleet": {
-            "action": "Kit de Outreach para Comunidades Tech: 'Automatize a Limpeza do WhatsApp com 1 Toque - Programa de Testadores Exclusivo'",
-            "filename": "docs/campaigns/kit-outreach-comunidades-tech-testadores.md",
+            "action": "Entrega Cognitiva do Ciclo #1",
+            "filename": "docs/campaigns/entrega-ciclo-1.md",
             "provider": "openrouter/free"
           },
           "testers": {
-            "total": 1,
+            "total": 2,
             "latest": [
-              "teste.beta.vip@gmail.com"
+              "teste.beta.vip@gmail.com",
+              "rjvsb22@gmail.com"
             ],
             "target": 20,
-            "remaining": 19
+            "remaining": 18
           },
           "supabase": "OK",
           "firebaseDeploy": "DEPLOY_SUCCESS"
         },
-        "timestamp": "2026-11-11T07:22:36.180Z",
-        "durationMs": 84750
+        "timestamp": "2026-11-12T00:15:28.076Z",
+        "durationMs": 46827
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:23:59.919162+00"
+      "created_at": "2026-11-12 00:16:15.068207+00"
     },
     {
-      "id": 263,
-      "title": "HEARTBEAT_CICLO_36",
+      "id": 419,
+      "title": "HEARTBEAT_CICLO_15",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 36,
+        "cycle": 15,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #36",
-            "filename": "docs/campaigns/entrega-ciclo-36.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -133,27 +139,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T07:18:43.865Z",
-        "durationMs": 47576
+        "timestamp": "2026-11-11T18:04:01.444Z",
+        "durationMs": 17844
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:19:30.534018+00"
+      "created_at": "2026-11-11 18:04:19.285284+00"
     },
     {
-      "id": 262,
-      "title": "HEARTBEAT_CICLO_35",
+      "id": 418,
+      "title": "HEARTBEAT_CICLO_14",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 35,
+        "cycle": 14,
         "steps": {
-          "aiFleet": {
-            "action": "Roteiro Viral Reels/TikTok: 'Seu WhatsApp Trava? Libere 5GB em 30s sem Apagar Conversas'",
-            "filename": "docs/campaigns/roteiro-reels-viral-limpeza-whatsapp.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -162,27 +163,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T07:14:28.177Z",
-        "durationMs": 74857
+        "timestamp": "2026-11-11T18:00:48.871Z",
+        "durationMs": 11001
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:15:42.08759+00"
+      "created_at": "2026-11-11 18:00:59.862815+00"
     },
     {
-      "id": 261,
-      "title": "HEARTBEAT_CICLO_34",
+      "id": 417,
+      "title": "HEARTBEAT_CICLO_13",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 34,
+        "cycle": 13,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #34",
-            "filename": "docs/campaigns/entrega-ciclo-34.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -191,27 +187,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T07:10:40.665Z",
-        "durationMs": 44935
+        "timestamp": "2026-11-11T17:57:26.609Z",
+        "durationMs": 16597
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:11:24.592337+00"
+      "created_at": "2026-11-11 17:57:43.246484+00"
     },
     {
-      "id": 260,
-      "title": "HEARTBEAT_CICLO_33",
+      "id": 416,
+      "title": "HEARTBEAT_CICLO_12",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 33,
+        "cycle": 12,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #33",
-            "filename": "docs/campaigns/entrega-ciclo-33.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -220,27 +211,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T07:06:37.987Z",
-        "durationMs": 57968
+        "timestamp": "2026-11-11T17:54:11.965Z",
+        "durationMs": 13984
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:07:34.967005+00"
+      "created_at": "2026-11-11 17:54:25.990051+00"
     },
     {
-      "id": 259,
-      "title": "HEARTBEAT_CICLO_32",
+      "id": 415,
+      "title": "HEARTBEAT_CICLO_11",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 32,
+        "cycle": 11,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #32",
-            "filename": "docs/campaigns/entrega-ciclo-32.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -249,27 +235,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T07:02:16.587Z",
-        "durationMs": 79146
+        "timestamp": "2026-11-11T17:50:59.764Z",
+        "durationMs": 11155
       },
       "status": "DONE",
-      "created_at": "2026-11-11 07:03:34.852373+00"
+      "created_at": "2026-11-11 17:51:10.947646+00"
     },
     {
-      "id": 258,
-      "title": "HEARTBEAT_CICLO_31",
+      "id": 414,
+      "title": "HEARTBEAT_CICLO_10",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 31,
+        "cycle": 10,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #31",
-            "filename": "docs/campaigns/entrega-ciclo-31.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -278,27 +259,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:57:20.208Z",
-        "durationMs": 115912
+        "timestamp": "2026-11-11T17:47:45.549Z",
+        "durationMs": 13029
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:59:14.140163+00"
+      "created_at": "2026-11-11 17:47:58.594653+00"
     },
     {
-      "id": 257,
-      "title": "HEARTBEAT_CICLO_30",
-      "target": "LOCAL_PC",
+      "id": 413,
+      "title": "HEARTBEAT_CICLO_1",
+      "target": "UBUNTU_CLOUD",
       "payload": {
-        "cycle": 30,
+        "cycle": 1,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #30",
-            "filename": "docs/campaigns/entrega-ciclo-30.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -307,27 +283,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:51:37.174Z",
-        "durationMs": 160652
+        "timestamp": "2026-11-11T17:45:51.347Z",
+        "durationMs": 1613
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:54:15.509246+00"
+      "created_at": "2026-11-11 17:45:53.477307+00"
     },
     {
-      "id": 256,
-      "title": "HEARTBEAT_CICLO_29",
+      "id": 412,
+      "title": "HEARTBEAT_CICLO_9",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 29,
+        "cycle": 9,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #29",
-            "filename": "docs/campaigns/entrega-ciclo-29.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -336,27 +307,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:46:49.685Z",
-        "durationMs": 103399
+        "timestamp": "2026-11-11T17:43:41.759Z",
+        "durationMs": 58145
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:48:32.281527+00"
+      "created_at": "2026-11-11 17:44:39.937052+00"
     },
     {
-      "id": 255,
-      "title": "HEARTBEAT_CICLO_28",
+      "id": 411,
+      "title": "HEARTBEAT_CICLO_8",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 28,
+        "cycle": 8,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #28",
-            "filename": "docs/campaigns/entrega-ciclo-28.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -365,27 +331,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:40:25.889Z",
-        "durationMs": 199550
+        "timestamp": "2026-11-11T17:39:36.916Z",
+        "durationMs": 62958
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:43:44.627725+00"
+      "created_at": "2026-11-11 17:40:39.926985+00"
     },
     {
-      "id": 254,
-      "title": "HEARTBEAT_CICLO_27",
+      "id": 410,
+      "title": "HEARTBEAT_CICLO_7",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 27,
+        "cycle": 7,
         "steps": {
-          "aiFleet": {
-            "action": "Artigo SEO: Guia Definitivo para Limpar WhatsApp e Liberar GBs no Android sem Perder Dados",
-            "filename": "docs/artigos/guia-limpar-whatsapp-liberar-espaco-android.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -394,27 +355,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:34:14.983Z",
-        "durationMs": 192311
+        "timestamp": "2026-11-11T17:35:27.918Z",
+        "durationMs": 62749
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:37:23.569085+00"
+      "created_at": "2026-11-11 17:36:30.712237+00"
     },
     {
-      "id": 253,
-      "title": "HEARTBEAT_CICLO_26",
+      "id": 409,
+      "title": "HEARTBEAT_CICLO_6",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 26,
+        "cycle": 6,
         "steps": {
-          "aiFleet": {
-            "action": "Kit de Conversão: Limpeza de Android em 3 Passos para Atingir a Meta de 20 Testadores e R$ 1M",
-            "filename": "docs/campaigns/android-cleanup-conversion-kit.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -423,27 +379,22 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:28:53.021Z",
-        "durationMs": 135400
+        "timestamp": "2026-11-11T17:31:23.678Z",
+        "durationMs": 62983
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:31:07.665535+00"
+      "created_at": "2026-11-11 17:32:26.714644+00"
     },
     {
-      "id": 252,
-      "title": "HEARTBEAT_CICLO_25",
+      "id": 408,
+      "title": "HEARTBEAT_CICLO_5",
       "target": "LOCAL_PC",
       "payload": {
-        "cycle": 25,
+        "cycle": 5,
         "steps": {
-          "aiFleet": {
-            "action": "Entrega Cognitiva do Ciclo #25",
-            "filename": "docs/campaigns/entrega-ciclo-25.md",
-            "provider": "openrouter/free"
-          },
+          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
           "testers": {
             "total": 1,
             "latest": [
@@ -452,87 +403,86 @@
             "target": 20,
             "remaining": 19
           },
-          "supabase": "OK",
-          "firebaseDeploy": "DEPLOY_SUCCESS"
+          "supabase": "OK"
         },
-        "timestamp": "2026-11-11T06:20:52.541Z",
-        "durationMs": 307908
+        "timestamp": "2026-11-11T17:27:18.563Z",
+        "durationMs": 63167
       },
       "status": "DONE",
-      "created_at": "2026-11-11 06:25:50.978416+00"
+      "created_at": "2026-11-11 17:28:21.794497+00"
     }
   ],
   "commits": [
     {
+      "hash": "8ca61d7",
+      "msg": "feat(autonomous-factory): [cycle-40] Entrega Cognitiva do Ciclo #40",
+      "time": "21 hours ago",
+      "author": "srodolfobarbosa-afk"
+    },
+    {
       "hash": "a3d3a9b",
       "msg": "feat(autonomous-factory): [cycle-39] Entrega Cognitiva do Ciclo #39",
-      "time": "4 minutes ago",
+      "time": "21 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "14d730c",
       "msg": "feat(autonomous-factory): [cycle-38] Entrega Cognitiva do Ciclo #38",
-      "time": "8 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "31a4a71",
       "msg": "feat(autonomous-factory): [cycle-37] Kit de Outreach para Comunidades Tech: 'Automatize a Limpeza do WhatsApp com 1 Toque - Programa de Testadores Exclusivo'",
-      "time": "12 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0f9df47",
       "msg": "feat(autonomous-factory): [cycle-36] Entrega Cognitiva do Ciclo #36",
-      "time": "16 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "80adb9e",
       "msg": "feat(autonomous-factory): [cycle-35] Roteiro Viral Reels/TikTok: 'Seu WhatsApp Trava? Libere 5GB em 30s sem Apagar Conversas'",
-      "time": "20 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "92d0d3c",
       "msg": "feat(autonomous-factory): [cycle-34] Entrega Cognitiva do Ciclo #34",
-      "time": "24 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "131bedd",
       "msg": "feat(autonomous-factory): [cycle-33] Entrega Cognitiva do Ciclo #33",
-      "time": "28 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "4aee0db",
       "msg": "feat(autonomous-factory): [cycle-32] Entrega Cognitiva do Ciclo #32",
-      "time": "32 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "3dd3d68",
       "msg": "feat(autonomous-factory): [cycle-31] Entrega Cognitiva do Ciclo #31",
-      "time": "37 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "0a8670f",
       "msg": "feat(autonomous-factory): [cycle-30] Entrega Cognitiva do Ciclo #30",
-      "time": "42 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "ac8a4f8",
       "msg": "feat(autonomous-factory): [cycle-29] Entrega Cognitiva do Ciclo #29",
-      "time": "48 minutes ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "257d7ec",
-      "msg": "feat(autonomous-factory): [cycle-28] Entrega Cognitiva do Ciclo #28",
-      "time": "53 minutes ago",
+      "time": "22 hours ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
@@ -549,6 +499,12 @@
         "url": "/artigos/como-limpar-whatsapp-liberar-espaco-android.md",
         "sizeKb": "1.4",
         "modifiedAt": "2026-11-11T05:45:58.887Z"
+      },
+      {
+        "name": "como-limpar-whatsapp-liberar-memoria-android-fotos-duplicadas.md",
+        "url": "/artigos/como-limpar-whatsapp-liberar-memoria-android-fotos-duplicadas.md",
+        "sizeKb": "1.5",
+        "modifiedAt": "2026-11-11T07:57:19.616Z"
       },
       {
         "name": "como_excluir_fotos_duplicadas.md",
@@ -841,10 +797,88 @@
         "modifiedAt": "2026-11-11T07:35:35.456Z"
       },
       {
+        "name": "entrega-ciclo-44.md",
+        "url": "/campaigns/entrega-ciclo-44.md",
+        "sizeKb": "0.6",
+        "modifiedAt": "2026-11-11T07:50:24.636Z"
+      },
+      {
+        "name": "entrega-ciclo-48.md",
+        "url": "/campaigns/entrega-ciclo-48.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T08:05:47.578Z"
+      },
+      {
+        "name": "entrega-ciclo-49.md",
+        "url": "/campaigns/entrega-ciclo-49.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T08:10:10.278Z"
+      },
+      {
         "name": "entrega-ciclo-5.md",
         "url": "/campaigns/entrega-ciclo-5.md",
         "sizeKb": "0.9",
         "modifiedAt": "2026-11-11T03:11:13.184Z"
+      },
+      {
+        "name": "entrega-ciclo-50.md",
+        "url": "/campaigns/entrega-ciclo-50.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T08:15:53.475Z"
+      },
+      {
+        "name": "entrega-ciclo-51.md",
+        "url": "/campaigns/entrega-ciclo-51.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T08:20:42.402Z"
+      },
+      {
+        "name": "entrega-ciclo-52.md",
+        "url": "/campaigns/entrega-ciclo-52.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T08:27:10.103Z"
+      },
+      {
+        "name": "entrega-ciclo-53.md",
+        "url": "/campaigns/entrega-ciclo-53.md",
+        "sizeKb": "0.6",
+        "modifiedAt": "2026-11-11T08:32:26.377Z"
+      },
+      {
+        "name": "entrega-ciclo-54.md",
+        "url": "/campaigns/entrega-ciclo-54.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T08:36:35.888Z"
+      },
+      {
+        "name": "entrega-ciclo-55.md",
+        "url": "/campaigns/entrega-ciclo-55.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T17:13:54.875Z"
+      },
+      {
+        "name": "entrega-ciclo-56.md",
+        "url": "/campaigns/entrega-ciclo-56.md",
+        "sizeKb": "0.6",
+        "modifiedAt": "2026-11-11T08:45:14.857Z"
+      },
+      {
+        "name": "entrega-ciclo-57.md",
+        "url": "/campaigns/entrega-ciclo-57.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T08:49:35.445Z"
+      },
+      {
+        "name": "entrega-ciclo-58.md",
+        "url": "/campaigns/entrega-ciclo-58.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T08:53:18.910Z"
+      },
+      {
+        "name": "entrega-ciclo-59.md",
+        "url": "/campaigns/entrega-ciclo-59.md",
+        "sizeKb": "0.6",
+        "modifiedAt": "2026-11-11T08:57:49.123Z"
       },
       {
         "name": "entrega-ciclo-6.md",
@@ -853,16 +887,142 @@
         "modifiedAt": "2026-11-11T05:02:56.844Z"
       },
       {
+        "name": "entrega-ciclo-60.md",
+        "url": "/campaigns/entrega-ciclo-60.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T09:02:15.364Z"
+      },
+      {
+        "name": "entrega-ciclo-61.md",
+        "url": "/campaigns/entrega-ciclo-61.md",
+        "sizeKb": "1.2",
+        "modifiedAt": "2026-11-11T09:06:00.902Z"
+      },
+      {
+        "name": "entrega-ciclo-62.md",
+        "url": "/campaigns/entrega-ciclo-62.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T09:10:30.807Z"
+      },
+      {
+        "name": "entrega-ciclo-63.md",
+        "url": "/campaigns/entrega-ciclo-63.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T09:14:28.186Z"
+      },
+      {
+        "name": "entrega-ciclo-64.md",
+        "url": "/campaigns/entrega-ciclo-64.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T09:19:10.383Z"
+      },
+      {
+        "name": "entrega-ciclo-65.md",
+        "url": "/campaigns/entrega-ciclo-65.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T09:22:59.831Z"
+      },
+      {
+        "name": "entrega-ciclo-66.md",
+        "url": "/campaigns/entrega-ciclo-66.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T09:27:20.515Z"
+      },
+      {
+        "name": "entrega-ciclo-67.md",
+        "url": "/campaigns/entrega-ciclo-67.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T09:31:37.159Z"
+      },
+      {
+        "name": "entrega-ciclo-68.md",
+        "url": "/campaigns/entrega-ciclo-68.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T09:35:51.623Z"
+      },
+      {
+        "name": "entrega-ciclo-69.md",
+        "url": "/campaigns/entrega-ciclo-69.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T09:40:07.384Z"
+      },
+      {
         "name": "entrega-ciclo-7.md",
         "url": "/campaigns/entrega-ciclo-7.md",
         "sizeKb": "1.1",
         "modifiedAt": "2026-11-11T03:22:42.233Z"
       },
       {
+        "name": "entrega-ciclo-70.md",
+        "url": "/campaigns/entrega-ciclo-70.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T09:44:34.308Z"
+      },
+      {
+        "name": "entrega-ciclo-71.md",
+        "url": "/campaigns/entrega-ciclo-71.md",
+        "sizeKb": "0.9",
+        "modifiedAt": "2026-11-11T09:48:49.677Z"
+      },
+      {
+        "name": "entrega-ciclo-72.md",
+        "url": "/campaigns/entrega-ciclo-72.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T09:52:54.815Z"
+      },
+      {
+        "name": "entrega-ciclo-73.md",
+        "url": "/campaigns/entrega-ciclo-73.md",
+        "sizeKb": "1.0",
+        "modifiedAt": "2026-11-11T09:56:58.883Z"
+      },
+      {
+        "name": "entrega-ciclo-74.md",
+        "url": "/campaigns/entrega-ciclo-74.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T10:01:11.367Z"
+      },
+      {
+        "name": "entrega-ciclo-75.md",
+        "url": "/campaigns/entrega-ciclo-75.md",
+        "sizeKb": "0.9",
+        "modifiedAt": "2026-11-11T10:05:09.284Z"
+      },
+      {
+        "name": "entrega-ciclo-76.md",
+        "url": "/campaigns/entrega-ciclo-76.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T10:09:37.904Z"
+      },
+      {
+        "name": "entrega-ciclo-77.md",
+        "url": "/campaigns/entrega-ciclo-77.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T10:13:56.209Z"
+      },
+      {
+        "name": "entrega-ciclo-78.md",
+        "url": "/campaigns/entrega-ciclo-78.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T10:18:05.463Z"
+      },
+      {
+        "name": "entrega-ciclo-79.md",
+        "url": "/campaigns/entrega-ciclo-79.md",
+        "sizeKb": "0.8",
+        "modifiedAt": "2026-11-11T10:22:23.718Z"
+      },
+      {
         "name": "entrega-ciclo-8.md",
         "url": "/campaigns/entrega-ciclo-8.md",
         "sizeKb": "1.1",
         "modifiedAt": "2026-11-11T03:29:30.346Z"
+      },
+      {
+        "name": "entrega-ciclo-80.md",
+        "url": "/campaigns/entrega-ciclo-80.md",
+        "sizeKb": "0.7",
+        "modifiedAt": "2026-11-11T10:26:38.484Z"
       },
       {
         "name": "entrega-ciclo-9.md",
@@ -934,7 +1094,7 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-11T07:35:10.702Z"
+        "modifiedAt": "2026-11-12T04:59:38.415Z"
       },
       {
         "name": "postagens-comunidades-t4t.md",
@@ -1037,6 +1197,12 @@
         "url": "/campaigns/roteiro_viral_whatsapp.md",
         "sizeKb": "1.6",
         "modifiedAt": "2026-11-10T23:37:34.446Z"
+      },
+      {
+        "name": "viral-tiktok-get-20-testers.md",
+        "url": "/campaigns/viral-tiktok-get-20-testers.md",
+        "sizeKb": "1.3",
+        "modifiedAt": "2026-11-12T04:51:33.922Z"
       }
     ]
   }

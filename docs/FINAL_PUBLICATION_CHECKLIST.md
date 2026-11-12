@@ -15,7 +15,7 @@ Updated 2026-11-07. This checklist records the current local build and release g
 
 - [x] Free: find large media files and review candidates before removal.
 - [x] Pro monthly, annual, and lifetime feature split and source IDs are documented in `PRICING_AND_PLAN_MATRIX.md`.
-- [x] Suggested Brazil prices are documented and displayed as proposed, not active: R$ 14.90/month, R$ 79.90/year, and R$ 149.90 once. Google Play must return the actual localized price before checkout is enabled.
+- [x] Suggested Brazil prices are documented and displayed as proposed, not active: R$ 14.99/month, R$ 79.99/year, and R$ 149.99 once. Google Play must return the actual localized price before checkout is enabled.
 - [ ] The three products currently return unavailable in the app. Configure/activate their base plans, prices, countries, and license testers in Play Console, then verify a real test purchase.
 - [ ] Deploy trusted server-side purchase-token verification and test purchase, pending, restore, acknowledgement, refund, and expiry before enabling paid access.
 

@@ -36,7 +36,7 @@ Objetivo do produto: uma pessoa com o telefone cheio abre o Midiastore, entende 
 
 ## 5. Planos e pagamentos
 
-Valores sugeridos para o Brasil no source: R$ 14,90/mês, R$ 79,90/ano e R$ 149,90 pagamento único. Eles ainda não estão configurados nem confirmados na Play Console.
+Valores sugeridos para o Brasil no source: R$ 14,99/mês, R$ 79,99/ano e R$ 149,99 pagamento único. Eles ainda não estão configurados nem confirmados na Play Console.
 
 - [ ] Na Play Console, confirmar os IDs e tipos: `sweep_pro_monthly` e `sweep_pro_annual` como assinaturas; `sweep_pro_lifetime` como compra única.
 - [ ] Configurar produtos, planos-base/ofertas, países, preços e contas de teste. A interface deve exibir o preço localizado retornado pela Google Play, não tratar sugestão local como preço ativo.

@@ -1,0 +1,3 @@
+Iniciei a triagem do Midiastore e consultei as cinco memórias mais recentes do Supabase. O histórico e os documentos confirmam que a publicação segue bloqueada por validação de API 29, CI no commit atual, verificação de compras no backend e testes/configuração na Play Console.
+
+O checkout está na branch `codex/midiastore-release-audit`, 123 commits à frente da referência remota indicada, com muitas alterações locais preexistentes. Preservei esse estado: não editei arquivos, troquei de branch, fiz commit nem publiquei. O próximo passo seguro é reconciliar essas alterações e identificar quais são intencionais antes de escolher uma mudança concreta. Esta sessão não fica ativa 24/7 entre turnos.

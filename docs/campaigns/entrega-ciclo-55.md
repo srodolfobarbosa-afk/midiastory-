@@ -1,0 +1,3 @@
+Fiz a triagem e atualizei em [RELEASE_BLOCKERS.md](/C:/Users/rodolfo/midiastory-/docs/RELEASE_BLOCKERS.md) os valores propostos para R$ 14,99 / R$ 79,99 / R$ 149,99, alinhando o documento às strings e à matriz de preços. Registrei a rodada na [linha do tempo](/C:/Users/rodolfo/midiastory-/docs/LINHA_DO_TEMPO_AUTONOMA.md).
+
+Preservei as alterações locais existentes. Não consegui consultar ou gravar em `public.memories`: esta sessão não tem conector Supabase, e não usei credenciais locais. Os bloqueios de CI no SHA atual, testes API29 e de consentimento, validação server-side do Billing, configuração da Play Console e progresso dos 20 testadores continuam sem comprovação nesta sessão.

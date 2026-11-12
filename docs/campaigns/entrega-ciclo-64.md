@@ -1,0 +1,3 @@
+Consultei `public.memories` até a entrada #190 e registrei esta triagem como memória #191. Preservei as alterações existentes e não mexi em código ou branch.
+
+O checkout está em `codex/midiastore-release-audit`, 123 commits à frente da referência indicada, com alterações locais preexistentes em 80 caminhos. Antes de uma mudança de engenharia, é preciso reconciliar esses diffs. Continuam sem comprovação atual os gates de CI no HEAD, validação de limpeza em API 29 e do consentimento, verificação de compras pelo backend, configuração da Play Console e progresso dos 20 testadores. A publicação segue bloqueada; esta sessão não executa trabalho entre turnos.

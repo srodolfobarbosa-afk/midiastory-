@@ -15,11 +15,11 @@ Monthly, annual, and lifetime are purchase terms for the same Pro entitlement. T
 
 | Product ID | Suggested price | Product type |
 |---|---:|---|
-| `sweep_pro_monthly` | R$ 14,90 per month | Subscription |
-| `sweep_pro_annual` | R$ 79,90 per year | Subscription |
-| `sweep_pro_lifetime` | R$ 149,90 once | One-time product |
+| `sweep_pro_monthly` | R$ 14,99 per month | Subscription |
+| `sweep_pro_annual` | R$ 79,99 per year | Subscription |
+| `sweep_pro_lifetime` | R$ 149,99 once | One-time product |
 
-This is an initial pricing recommendation, not a Play Console configuration. It positions the annual plan below a R$ 14,90 monthly renewal total of R$ 178,80, while placing lifetime near two annual terms. Public comparison points include Avast's Brazilian store listing annual cleanup prices around R$ 99–119 and CCleaner's Brazilian App Store listing subscriptions around R$ 19,90 and annual offers around R$ 119,90. These are directional anchors; they are not a verified Android Play price quote for the Midiastore account.
+This is an initial pricing recommendation, not a Play Console configuration. It positions the annual plan below a R$ 14,99 monthly renewal total of R$ 178,80, while placing lifetime near two annual terms. Public comparison points include Avast's Brazilian store listing annual cleanup prices around R$ 99–119 and CCleaner's Brazilian App Store listing subscriptions around R$ 19,90 and annual offers around R$ 119,90. These are directional anchors; they are not a verified Android Play price quote for the Midiastore account.
 
 Google Play is the source of the charged price. Configure these amounts and subscription base plans/offers in Play Console; the app reads and displays the localized price from Play Billing rather than hard-coding R$ values. Keep the three product IDs and types aligned with the source.
 

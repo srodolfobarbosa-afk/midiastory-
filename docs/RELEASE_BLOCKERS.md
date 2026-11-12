@@ -7,8 +7,14 @@
 - O botão de compartilhamento abriu o Sharesheet nativo e foi fechado sem publicação.
 - `:app:assembleDebug` passou no Windows para a versão instalada no aparelho. Essa verificação manual não substitui CI, lint e instrumentação.
 - Produtos Google Play mensal/anual/vitalício continuam indisponíveis na consulta Billing. Valores propostos foram documentados, mas não são preços ativos na Play Console. Não há backend confiável de validação de purchaseToken.
-- O app exibe os valores propostos (R$14,90/mês, R$79,90/ano, R$149,90 vitalício), identificados como ainda não ativos até a Play retornar os preços oficiais. Home/limpeza/compartilhamento foram localizados em ES, FR, DE, HI, JA e zh-CN; as demais telas ainda não têm tradução completa nesses idiomas.
+- O app exibe os valores propostos (R$ 14,99/mês, R$ 79,99/ano, R$ 149,99 vitalício), identificados como ainda não ativos até a Play retornar os preços oficiais. Home/limpeza/compartilhamento foram localizados em ES, FR, DE, HI, JA e zh-CN; as demais telas ainda não têm tradução completa nesses idiomas. Os valores são recomendações de preço, não configuração ativa da Play Console.
 - Publicação pública permanece **NÃO LIBERADA**. Consulte `docs/FINAL_PUBLICATION_CHECKLIST.md` para o resumo atualizado e os gates ainda abertos.
+
+## Triagem local — 2026-11-11
+
+- Branch `codex/midiastore-release-audit`, 123 commits à frente de `origin/fix/p0-sweep-permissions-missions-billing`; a árvore já continha alterações e arquivos não rastreados. Nenhuma dessas alterações foi descartada ou sobrescrita.
+- Os diffs de strings atualizam os valores propostos para R$ 14,99 / R$ 79,99 / R$ 149,99 e estão alinhados ao README e à matriz de preços. Não há confirmação de produtos, preços ativos ou vendas na Play Console.
+- Permanecem sem prova nesta sessão os gates de CI no SHA local, API29/consentimento, validação server-side de purchaseToken e progresso atual dos 20 testadores.
 
 ## Reavaliação da retomada — 2026-11-06
 

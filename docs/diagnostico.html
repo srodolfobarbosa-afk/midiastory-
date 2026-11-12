@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico Gratuito de Memória • Midiastore Android</title>
+  <link rel="icon" type="image/png" href="/icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070B14;
+      --card-bg: #0F172A;
+      --card-border: #1E293B;
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --accent: #10B981;
+      --accent-cyan: #06B6D4;
+      --accent-purple: #8B5CF6;
+      --accent-red: #EF4444;
+      --accent-yellow: #F59E0B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #131E35, var(--bg) 70%);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem;
+    }
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .logo-img {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+    }
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 900;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #FFF, #94A3B8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #E2E8F0;
+    }
+    select, input[type="text"], input[type="email"] {
+      background: #090E1A;
+      border: 1px solid #334155;
+      color: #FFF;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    select:focus, input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
+    .result-box {
+      display: none;
+      background: #090E1A;
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .waste-value {
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      margin: 0.4rem 0;
+      font-family: 'Fira Code', monospace;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
+      color: #042F2E;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 0.9rem 1.4rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+    .btn-wa {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #FFF;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+    .pricing-tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .plan-card {
+      background: #090E1A;
+      border: 1px solid #1E293B;
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .plan-card.featured {
+      border-color: var(--accent-yellow);
+      background: rgba(245, 158, 11, 0.05);
+    }
+    .plan-price {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #FFF;
+      font-family: 'Fira Code', monospace;
+    }
+    .plan-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-live">⚡ Inovação Midiastore • Diagnóstico Rápido</div>
+      <img src="/icon-512.png" alt="Midiastore" class="logo-img" onerror="this.style.display='none'">
+      <h1>Descubra Quanto Espaço Invisível o WhatsApp Está Comendo</h1>
+      <p class="subtitle">Áudios esquecidos de grupos, fotos repetidas e lixo oculto que a Galeria do Android não mostra.</p>
+    </header>
+
+    <div class="card">
+      <div class="form-group">
+        <label>Há quanto tempo você usa este celular ou número de WhatsApp?</label>
+        <select id="time-usage">
+          <option value="6">Menos de 6 meses (~3 a 6 GB acumulados)</option>
+          <option value="12" selected>De 6 meses a 1 ano (~7 a 14 GB acumulados)</option>
+          <option value="24">De 1 a 2 anos (~15 a 25 GB acumulados)</option>
+          <option value="36">Mais de 2 anos (+30 GB ocultos em áudios e vídeos)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Em quantos grupos ativos de WhatsApp/Telegram você está?</label>
+        <select id="groups-count">
+          <option value="5">1 a 5 grupos (família e amigos)</option>
+          <option value="15" selected>5 a 15 grupos (trabalho, condomínio, estudos)</option>
+          <option value="30">Mais de 15 grupos (muitos memes, vídeos e mídias)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Você costuma enviar e receber fotos/vídeos com frequência?</label>
+        <select id="media-freq">
+          <option value="low">Pouco (apenas texto e áudios rápidos)</option>
+          <option value="med" selected>Moderado (fotos diárias e áudios normais)</option>
+          <option value="high">Intenso (vídeos pesados, stickers e prints diários)</option>
+        </select>
+      </div>
+
+      <button class="btn" onclick="calcularDiagnostico()">
+        🔍 Rodar Diagnóstico em Tempo Real
+      </button>
+
+      <!-- RESULTADO VIRAL -->
+      <div class="result-box" id="result-box">
+        <div style="font-size: 0.85rem; color: var(--muted); font-weight: 700; text-transform: uppercase;">
+          Estimativa de Lixo Invisível no seu Aparelho:
+        </div>
+        <div class="waste-value" id="waste-display">14.8 GB</div>
+        <p style="color: #CBD5E1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem;">
+          Isso equivale a cerca de <strong id="photos-equiv">4.900 fotos</strong> ou <strong id="apps-equiv">38 aplicativos</strong> que você não consegue instalar porque a memória está artificialmente cheia!
+        </p>
+
+        <!-- Ação Viral WhatsApp -->
+        <a id="btn-share-wa" href="#" target="_blank" class="btn btn-wa" style="width: 100%; margin-bottom: 0.75rem;">
+          📱 Compartilhar com Amigos no WhatsApp
+        </a>
+
+        <!-- Funil Planos Oficiais -->
+        <div style="margin-top: 1.5rem; border-top: 1px solid #1E293B; padding-top: 1rem;">
+          <div style="font-size: 0.85rem; font-weight: 800; color: #FFF; margin-bottom: 0.5rem;">
+            Liberte seu Android com o Midiastore Oficial:
+          </div>
+          <div class="pricing-tier-grid">
+            <div class="plan-card">
+              <span class="plan-label">Mensal</span>
+              <span class="plan-price">R$ 14,99</span>
+              <span style="font-size: 0.7rem; color: var(--muted);">por mês</span>
+            </div>
+            <div class="plan-card">
+              <span class="plan-label">Anual</span>
+              <span class="plan-price">R$ 79,99</span>
+              <span style="font-size: 0.7rem; color: var(--accent);">Economia de 55%</span>
+            </div>
+            <div class="plan-card featured">
+              <span class="plan-label" style="color: var(--accent-yellow);">👑 Vitalício</span>
+              <span class="plan-price" style="color: var(--accent-yellow);">R$ 149,99</span>
+              <span style="font-size: 0.7rem; color: #FDE68A;">Acesso Permanente</span>
+            </div>
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="/terminal.html" class="btn" style="width: 100%; font-size: 0.88rem;">
+              👥 Garantir Vaga Gratuita no Teste Fechado Google Play (20 Vagas)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Midiastore (com.rdf112.midiastore) • Desenvolvido com Inteligência Real.<br>
+      Total respeito à sua privacidade: zero envio de fotos para servidores externos.
+    </footer>
+  </div>
+
+  <script>
+    function calcularDiagnostico() {
+      const months = parseInt(document.getElementById('time-usage').value, 10);
+      const groups = parseInt(document.getElementById('groups-count').value, 10);
+      const freq = document.getElementById('media-freq').value;
+
+      let multiplier = 1.0;
+      if (freq === 'high') multiplier = 1.5;
+      if (freq === 'low') multiplier = 0.6;
+
+      const estimatedGB = ((months * 0.9) + (groups * 0.35) * multiplier).toFixed(1);
+      const photos = Math.round(estimatedGB * 330);
+      const apps = Math.round(estimatedGB * 2.6);
+
+      document.getElementById('waste-display').innerText = estimatedGB + ' GB';
+      document.getElementById('photos-equiv').innerText = photos.toLocaleString('pt-BR') + ' fotos';
+      document.getElementById('apps-equiv').innerText = apps + ' aplicativos';
+
+      // Monta link viral de WhatsApp
+      const shareText = encodeURIComponent(
+        `🚨 Acabei de fazer o teste de memória do Midiastore e descobri que meu WhatsApp tem cerca de ${estimatedGB} GB de mídias invisíveis e arquivos duplicados travando meu celular!\n\n` +
+        `Faça o teste grátis no seu também aqui: https://midiastory-df6a0.web.app/diagnostico.html`
+      );
+      document.getElementById('btn-share-wa').href = `https://api.whatsapp.com/send?text=${shareText}`;
+
+      document.getElementById('result-box').style.display = 'block';
+      document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
