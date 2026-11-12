@@ -1212,12 +1212,32 @@ class MainActivity : AppCompatActivity() {
     private fun onHomeCleanupButtonClicked() {
         if (!heroOrbButton.isEnabled) return
         if (homeCleanupCandidateCount > 0) {
-            switchTab(AppTab.FILES)
-            filesReviewCard.post {
-                filesReviewCard.requestRectangleOnScreen(
-                    android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height), true,
-                )
+            val selected = viewModel.state.value.selection.records
+            val totalBytes = viewModel.state.value.selection.totalBytesOrNull() ?: 0L
+            val formattedBytes = android.text.format.Formatter.formatFileSize(this, totalBytes)
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(getString(R.string.home_cleanup_review_button, if (selected.isNotEmpty()) selected.size else homeCleanupCandidateCount, formattedBytes))
+            builder.setMessage(getString(R.string.home_cleanup_confirm_prompt))
+            builder.setPositiveButton(R.string.permanent_delete_button) { dialog, _ ->
+                dialog.dismiss()
+                requestPermanentDeleteSelected()
             }
+            builder.setNegativeButton(R.string.nav_files) { dialog, _ ->
+                dialog.dismiss()
+                switchTab(AppTab.FILES)
+                filesReviewCard.post {
+                    filesReviewCard.requestRectangleOnScreen(
+                        android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height), true,
+                    )
+                }
+            }
+            if (trashCoordinator.supportsSystemTrash()) {
+                builder.setNeutralButton(R.string.move_to_trash_button) { dialog, _ ->
+                    dialog.dismiss()
+                    requestMoveSelectedToTrash()
+                }
+            }
+            builder.show()
         } else {
             startOneTapCleanup()
         }
@@ -1825,6 +1845,9 @@ class MainActivity : AppCompatActivity() {
                     homeCleanupCandidateCount,
                     formattedBytes,
                 )
+                if (::homeDirectCleanRow.isInitialized) {
+                    homeDirectCleanRow.visibility = View.VISIBLE
+                }
                 val messageId = if (progress.coverageComplete) {
                     R.string.home_cleanup_candidates_found
                 } else {
@@ -1833,6 +1856,9 @@ class MainActivity : AppCompatActivity() {
                 showHomeCleanupMessage(getString(messageId, homeCleanupCandidateCount, formattedBytes))
             } else {
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
+                if (::homeDirectCleanRow.isInitialized) {
+                    homeDirectCleanRow.visibility = View.GONE
+                }
                 showHomeCleanupMessage(
                     if (progress.coverageComplete) getString(R.string.home_cleanup_no_candidates)
                     else getString(R.string.home_cleanup_no_candidates_partial),

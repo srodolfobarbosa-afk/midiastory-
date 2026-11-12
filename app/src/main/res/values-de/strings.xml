@@ -80,6 +80,7 @@
     <string name="home_cleanup_candidates_found">%1$d Dateien mit insgesamt %2$s zur Prüfung gefunden. Nichts wurde gelöscht.</string>
     <string name="home_cleanup_candidates_partial">%1$d Dateien (%2$s) gefunden, aber die Suche war unvollständig. Vor dem Entfernen prüfen.</string>
     <string name="home_cleanup_no_candidates">Keine großen Dateien gefunden. Nichts wurde gelöscht.</string>
+    <string name="home_cleanup_confirm_prompt">Möchten Sie diesen Speicherplatz jetzt mit nativer Android-Bestätigung freigeben oder zuerst die gesamte Liste überprüfen?</string>
     <string name="home_cleanup_no_candidates_partial">In den zugänglichen Dateien wurden keine Kandidaten gefunden. Die Suche war unvollständig.</string>
     <string name="home_cleanup_permission_denied">Medienzugriff nicht erlaubt. Es wurden keine Dateien geändert.</string>
     <string name="home_cleanup_scan_failed">Dateien konnten nicht geprüft werden. Bitte erneut versuchen.</string>

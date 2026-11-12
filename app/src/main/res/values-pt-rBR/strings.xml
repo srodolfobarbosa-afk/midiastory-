@@ -102,6 +102,7 @@ Total: %3$s</string>
     <string name="home_cleanup_candidates_found">Encontramos %1$d arquivos para revisar, somando %2$s. Nada foi apagado.</string>
     <string name="home_cleanup_candidates_partial">Encontramos %1$d arquivos (%2$s), mas a análise foi parcial. Revise antes de remover.</string>
     <string name="home_cleanup_no_candidates">Não encontramos arquivos grandes nesta busca. Nada foi apagado.</string>
+    <string name="home_cleanup_confirm_prompt">Deseja liberar este espaço agora com a confirmação do Android ou prefere revisar a lista completa primeiro?</string>
     <string name="home_cleanup_no_candidates_partial">Não encontramos candidatos nos arquivos acessíveis. A análise foi parcial.</string>
     <string name="home_cleanup_permission_denied">Acesso à mídia não autorizado. Nenhum arquivo foi alterado.</string>
     <string name="home_cleanup_scan_failed">Não foi possível analisar os arquivos. Tente novamente.</string>

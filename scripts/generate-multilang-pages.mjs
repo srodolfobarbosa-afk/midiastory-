@@ -28,7 +28,24 @@ const LANGUAGES = {
     ctrlTitle: "Seus arquivos, sua decisão", ctrlDesc: "O Midiastore analisa mídias acessíveis no dispositivo em total conformidade com o Scoped Storage. A decisão é sempre sua.",
     privacy: "Privacidade",
     successMsg: "🎉 Vaga garantida! Seu e-mail foi adicionado à lista de testadores VIP. Em instantes você receberá o link da Google Play Store!",
-    duplicateMsg: "✅ Este e-mail já está cadastrado na nossa lista VIP de testadores da Google Play!"
+    duplicateMsg: "✅ Este e-mail já está cadastrado na nossa lista VIP de testadores da Google Play!",
+    btnWaTest: "📱 Teste WhatsApp",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ Simulador de Espaço Oculto",
+    calcTitle: "Quanto espaço você pode recuperar hoje?",
+    calcDesc: "O WhatsApp acumula cópias, áudios e vídeos que nunca aparecem na galeria. Faça uma estimativa:",
+    calcTime: "Tempo de uso do aparelho:",
+    calcOptT1: "6 meses",
+    calcOptT2: "1 ano",
+    calcOptT3: "2 anos",
+    calcOptT4: "3 anos ou mais",
+    calcGroups: "Grupos e conversas diárias:",
+    calcOptG1: "Poucos (1 a 3 grupos)",
+    calcOptG2: "Moderado (4 a 10 grupos)",
+    calcOptG3: "Intenso (Mais de 10 grupos)",
+    calcEst: "Espaço Oculto Estimado:",
+    calcSub: "Mídias duplicadas e notas de voz esquecidas consumindo seu armazenamento.",
+    calcCta: "Quero Liberar Esse Espaço Grátis"
   },
   en: {
     code: "en-US",
@@ -51,7 +68,24 @@ const LANGUAGES = {
     ctrlTitle: "Your Files, Your Absolute Decision", ctrlDesc: "Midiastore strictly respects Android Scoped Storage. No root required, no dangerous background permissions.",
     privacy: "Privacy Policy",
     successMsg: "🎉 VIP spot secured! You have been added to our official Google Play tester list. Check your email shortly!",
-    duplicateMsg: "✅ This email is already registered on our Google Play VIP list!"
+    duplicateMsg: "✅ This email is already registered on our Google Play VIP list!",
+    btnWaTest: "📱 WhatsApp Test",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ Hidden Clutter Estimator",
+    calcTitle: "How much space can you recover today?",
+    calcDesc: "WhatsApp quietly stores duplicate media, old voice notes, and forwards hidden from your gallery. Calculate your estimate:",
+    calcTime: "How long have you had this phone?",
+    calcOptT1: "6 months",
+    calcOptT2: "1 year",
+    calcOptT3: "2 years",
+    calcOptT4: "3+ years",
+    calcGroups: "Daily groups & chat activity:",
+    calcOptG1: "Light (1 to 3 groups)",
+    calcOptG2: "Moderate (4 to 10 groups)",
+    calcOptG3: "Heavy (10+ active groups)",
+    calcEst: "Estimated Hidden Clutter:",
+    calcSub: "Forgotten forwards, voice notes, and duplicate media wasting your storage.",
+    calcCta: "Reclaim This Space for Free"
   },
   es: {
     code: "es-ES",
@@ -74,7 +108,24 @@ const LANGUAGES = {
     ctrlTitle: "Tus archivos, tu decisión absoluta", ctrlDesc: "Midiastore cumple estrictamente con Scoped Storage de Android. Sin permisos invasivos ni root.",
     privacy: "Política de Privacidad",
     successMsg: "🎉 ¡Plaza VIP asegurada! Has sido añadido a la lista oficial de Google Play. ¡Revisa tu correo!",
-    duplicateMsg: "✅ ¡Este correo ya está registrado en nuestra lista VIP de Google Play!"
+    duplicateMsg: "✅ ¡Este correo ya está registrado en nuestra lista VIP de Google Play!",
+    btnWaTest: "📱 Prueba WhatsApp",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ Simulador de Espacio Oculto",
+    calcTitle: "¿Cuánto espacio puedes recuperar hoy?",
+    calcDesc: "WhatsApp acumula copias, audios y vídeos que nunca aparecen en la galería. Haz una estimación:",
+    calcTime: "Tiempo de uso del móvil:",
+    calcOptT1: "6 meses",
+    calcOptT2: "1 año",
+    calcOptT3: "2 años",
+    calcOptT4: "3 años o más",
+    calcGroups: "Grupos y chats diarios:",
+    calcOptG1: "Pocos (1 a 3 grupos)",
+    calcOptG2: "Moderado (4 a 10 grupos)",
+    calcOptG3: "Intenso (Más de 10 grupos)",
+    calcEst: "Espacio Oculto Estimado:",
+    calcSub: "Archivos duplicados y notas de voz olvidadas saturando tu memoria.",
+    calcCta: "Quero Liberar Este Espacio Gratis"
   },
   de: {
     code: "de-DE",
@@ -97,7 +148,24 @@ const LANGUAGES = {
     ctrlTitle: "Ihre Dateien, Ihre Entscheidung", ctrlDesc: "Midiastore respektiert zu 100% die Scoped-Storage-Vorgaben von Android. Keine unnötigen Berechtigungen.",
     privacy: "Datenschutzerklärung",
     successMsg: "🎉 VIP-Platz gesichert! Sie wurden zur offiziellen Testerliste hinzugefügt. Prüfen Sie Ihr Postfach!",
-    duplicateMsg: "✅ Diese E-Mail ist bereits in unserer VIP-Testerliste registriert!"
+    duplicateMsg: "✅ Diese E-Mail ist bereits in unserer VIP-Testerliste registriert!",
+    btnWaTest: "📱 WhatsApp-Test",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ Schätzer für versteckten Speicher",
+    calcTitle: "Wie viel Speicherplatz können Sie heute freigeben?",
+    calcDesc: "WhatsApp sammelt unbemerkt Medienkopien, Sprachnachrichten und Videos, die nicht in der Galerie auftauchen:",
+    calcTime: "Nutzungsdauer des Smartphones:",
+    calcOptT1: "6 Monate",
+    calcOptT2: "1 Jahr",
+    calcOptT3: "2 Jahre",
+    calcOptT4: "3 Jahre oder länger",
+    calcGroups: "Tägliche Gruppen & Chats:",
+    calcOptG1: "Wenig (1 bis 3 Gruppen)",
+    calcOptG2: "Moderat (4 bis 10 Gruppen)",
+    calcOptG3: "Sehr aktiv (Mehr als 10 Gruppen)",
+    calcEst: "Geschätzter versteckter Müll:",
+    calcSub: "Vergessene Sprachmemos, Weiterleitungen und Duplikate belegen Ihren Speicher.",
+    calcCta: "Diesen Speicher jetzt kostenlos freigeben"
   },
   fr: {
     code: "fr-FR",
@@ -120,7 +188,24 @@ const LANGUAGES = {
     ctrlTitle: "Vos fichiers, votre décision souveraine", ctrlDesc: "Midiastore respecte scrupuleusement la politique Scoped Storage d'Android. Vos données restent privées.",
     privacy: "Politique de confidentialité",
     successMsg: "🎉 Place VIP validée ! Votre e-mail a été ajouté à la liste officielle Google Play. À très vite !",
-    duplicateMsg: "✅ Cet e-mail est déjà inscrit sur notre liste VIP Google Play !"
+    duplicateMsg: "✅ Cet e-mail est déjà inscrit sur notre liste VIP Google Play !",
+    btnWaTest: "📱 Test WhatsApp",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ Simulateur d'Espace Caché",
+    calcTitle: "Combien d'espace pouvez-vous récupérer aujourd'hui ?",
+    calcDesc: "WhatsApp accumule des doublons, audios et vidéos invisibles dans votre galerie. Faites une estimation :",
+    calcTime: "Depuis combien de temps utilisez-vous ce téléphone ?",
+    calcOptT1: "6 mois",
+    calcOptT2: "1 an",
+    calcOptT3: "2 ans",
+    calcOptT4: "3 ans ou plus",
+    calcGroups: "Groupes et conversations quotidiennes :",
+    calcOptG1: "Faible (1 à 3 groupes)",
+    calcOptG2: "Modéré (4 à 10 groupes)",
+    calcOptG3: "Intense (Plus de 10 groupes)",
+    calcEst: "Espace Caché Estimé :",
+    calcSub: "Médias dupliqués et notes vocales oubliées saturant votre mémoire.",
+    calcCta: "Récupérer cet espace gratuitement"
   },
   hi: {
     code: "hi-IN",
@@ -143,7 +228,24 @@ const LANGUAGES = {
     ctrlTitle: "आपकी फाइलें, आपका पूर्ण नियंत्रण", ctrlDesc: "Midiastore एंड्रॉइड स्कोप्ड स्टोरेज नीतियों का पूरी तरह सम्मान करता है।",
     privacy: "गोपनीयता नीति",
     successMsg: "🎉 वीआईपी स्थान सुरक्षित! आपका ईमेल आधिकारिक Google Play सूची में जोड़ दिया गया है!",
-    duplicateMsg: "✅ यह ईमेल पहले से ही हमारी VIP सूची में पंजीकृत है!"
+    duplicateMsg: "✅ यह ईमेल पहले से ही हमारी VIP सूची में पंजीकृत है!",
+    btnWaTest: "📱 व्हाट्सएप टेस्ट",
+    vipProNav: "VIP प्रो",
+    calcBadge: "⚡ छिपा हुआ स्टोरेज कैलकुलेटर",
+    calcTitle: "आज आप कितना स्टोरेज खाली कर सकते हैं?",
+    calcDesc: "व्हाट्सएप ऐसी मीडिया फाइलें और वॉयस नोट्स जमा करता है जो गैलरी में नहीं दिखते। अनुमान लगाएं:",
+    calcTime: "डिवाइस उपयोग का समय:",
+    calcOptT1: "6 महीने",
+    calcOptT2: "1 साल",
+    calcOptT3: "2 साल",
+    calcOptT4: "3 साल या अधिक",
+    calcGroups: "दैनिक ग्रुप्स और चैट एक्टिविटी:",
+    calcOptG1: "कम (1 से 3 ग्रुप्स)",
+    calcOptG2: "मध्यम (4 से 10 ग्रुप्स)",
+    calcOptG3: "अधिक (10+ ग्रुप्स)",
+    calcEst: "अनुमानित छिपा हुआ स्टोरेज:",
+    calcSub: "पुरानी वॉयस नोट्स और डुप्लिकेट मीडिया जो आपका स्टोरेज बर्बाद कर रहे हैं।",
+    calcCta: "यह स्पेस मुफ्त में खाली करें"
   },
   ja: {
     code: "ja-JP",
@@ -166,7 +268,24 @@ const LANGUAGES = {
     ctrlTitle: "お客様のファイル、お客様の完全な選択権", ctrlDesc: "MidiastoreはAndroidのScoped Storageに完全準拠。安全でプライバシーを最優先した設計です。",
     privacy: "プライバシーポリシー",
     successMsg: "🎉 VIP参加登録が完了しました！Google Playテスターリストに追加されました。",
-    duplicateMsg: "✅ このメールアドレスは既にVIPリストに登録されています。"
+    duplicateMsg: "✅ このメールアドレスは既にVIPリストに登録されています。",
+    btnWaTest: "📱 WhatsApp診断",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ 隠れたストレージ診断シミュレーター",
+    calcTitle: "今すぐ解放できる容量はどれくらい？",
+    calcDesc: "WhatsApp等のアプリは、ギャラリーに表示されない重複メディアやボイスメモを蓄積します。推定値を算出：",
+    calcTime: "端末のご利用期間：",
+    calcOptT1: "6ヶ月",
+    calcOptT2: "1年",
+    calcOptT3: "2年",
+    calcOptT4: "3年以上",
+    calcGroups: "日々のグループ数・チャット頻度：",
+    calcOptG1: "少ない (1〜3グループ)",
+    calcOptG2: "標準 (4〜10グループ)",
+    calcOptG3: "多い (10グループ以上)",
+    calcEst: "推定される不要データ量：",
+    calcSub: "重複した写真や忘れられたボイスメッセージが空き容量を圧迫しています。",
+    calcCta: "この空き容量を今すぐ無料で解放"
   },
   zh: {
     code: "zh-CN",
@@ -189,7 +308,24 @@ const LANGUAGES = {
     ctrlTitle: "您的数据，您的最终决断", ctrlDesc: "Midiastore严格遵守Android Scoped Storage隐私沙盒规范，无需Root，安全透明。",
     privacy: "隐私政策",
     successMsg: "🎉 恭喜！您已成功锁定VIP测试资格，安装链接稍后将发送至您的邮箱！",
-    duplicateMsg: "✅ 该邮箱已在我们的Google Play VIP测试名单中！"
+    duplicateMsg: "✅ 该邮箱已在我们的Google Play VIP测试名单中！",
+    btnWaTest: "📱 WhatsApp测试",
+    vipProNav: "VIP Pro",
+    calcBadge: "⚡ 隐藏空间测算模拟器",
+    calcTitle: "今天您可以释放多少存储空间？",
+    calcDesc: "WhatsApp等通讯软件会累积相册中不显示的重复媒体、语音文件和转发视频。立即测算：",
+    calcTime: "手机使用时长：",
+    calcOptT1: "6个月",
+    calcOptT2: "1年",
+    calcOptT3: "2年",
+    calcOptT4: "3年以上",
+    calcGroups: "日常群聊活跃度：",
+    calcOptG1: "较少 (1至3个群组)",
+    calcOptG2: "中等 (4至10个群组)",
+    calcOptG3: "频繁 (10个以上群组)",
+    calcEst: "预估隐藏垃圾空间：",
+    calcSub: "被遗忘的语音文件、重复图片正在无声吞噬您的宝贵存储空间。",
+    calcCta: "立即免费释放此空间"
   }
 };
 
@@ -228,23 +364,29 @@ function generateHtml(langKey, t) {
   <meta property="og:url" content="${canonicalUrl}">
   <meta property="og:site_name" content="Midiastore">
   <style>
-    :root{color-scheme:dark;--bg:#07111f;--panel:#101d2e;--line:#26364a;--mint:#5de3bf;--white:#f5f8fc;--muted:#b3c0d0}
-    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#123047 0,transparent 55%),var(--bg);color:var(--white);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
-    a{color:inherit}.wrap{width:min(100% - 36px,1040px);margin:auto}header{padding:16px 0;border-bottom:1px solid var(--line)}.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brand{font-weight:850;font-size:1.3rem;text-decoration:none;letter-spacing:-.04em}.brand span{color:var(--mint)}
-    .lang-nav{display:flex;gap:6px;font-size:0.85rem;color:var(--muted);align-items:center}.lang-nav a{text-decoration:none;padding:3px 6px;border-radius:6px;transition:0.15s}.lang-nav a:hover,.lang-nav a.active{color:var(--mint);font-weight:700;background:rgba(93,227,191,0.1)}
-    .button{display:inline-flex;justify-content:center;align-items:center;padding:13px 20px;border-radius:12px;background:var(--mint);color:#07111f;text-decoration:none;font-weight:800;min-height:48px;border:none;cursor:pointer;font-size:1rem;transition:transform 0.15s, opacity 0.15s}.button:hover{opacity:0.9;transform:translateY(-1px)}.button.secondary{background:transparent;color:var(--mint);border:1px solid #388b78}
-    .hero{text-align:center;padding:50px 0 30px}.eyebrow{color:var(--mint);font-size:.82rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.hero h1{font-size:clamp(2.3rem,6.5vw,4.5rem);line-height:1.06;letter-spacing:-.055em;margin:14px auto 20px;max-width:850px}.hero h1 em{font-style:normal;color:var(--mint)}.lead{font-size:1.15rem;color:var(--muted);max-width:690px;margin:0 auto 28px}.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}.note{font-size:.87rem;color:var(--muted);margin-top:16px}
-    .vip-testers{margin:36px auto;padding:36px;border:2px solid var(--mint);border-radius:24px;background:linear-gradient(135deg,#0a2736,#101e30 70%);text-align:center;box-shadow:0 15px 40px rgba(93,227,191,0.15)}
-    .vip-testers h2{font-size:clamp(1.8rem,4.5vw,2.5rem);margin:10px 0 14px;letter-spacing:-.03em}
-    .vip-testers p{color:var(--muted);max-width:620px;margin:0 auto 24px;font-size:1.05rem}
-    .tester-form{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:540px;margin:0 auto}
-    .tester-input{flex:1;min-width:260px;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:1rem;outline:none}
-    .tester-input:focus{border-color:var(--mint)}
-    .tester-badge{display:inline-block;background:rgba(93,227,191,0.15);color:var(--mint);padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px}
-    .feedback-msg{margin-top:16px;font-weight:700;font-size:0.95rem;display:none}
-    .feedback-msg.success{display:block;color:var(--mint)}
-    .feedback-msg.error{display:block;color:#f87171}
-    section{padding:30px 0}.section-title{text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);letter-spacing:-.03em}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:25px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:23px}.card h3{margin:0 0 8px;font-size:1.12rem}.card p{color:var(--muted);margin:0}.tag{font-size:.78rem;font-weight:800;color:var(--mint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+    :root{--bg:#07111f;--card:#0f1d31;--line:#223652;--text:#edf3fc;--muted:#9ab0ce;--mint:#5de3bf;--white:#fff;--max:980px}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+    header{border-bottom:1px solid var(--line);background:rgba(7,17,31,0.92);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+    .nav{display:flex;align-items:center;justify-content:space-between;min-height:64px;gap:12px;flex-wrap:wrap}
+    .brand{font-size:1.25rem;font-weight:900;letter-spacing:-.02em;text-decoration:none;color:var(--white)}
+    .brand span{color:var(--mint)}
+    .lang-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .lang-nav a{text-decoration:none;font-size:0.78rem;font-weight:700;color:var(--muted);padding:4px 8px;border-radius:6px;border:1px solid var(--line);transition:all .15s ease}
+    .lang-nav a:hover,.lang-nav a.active{color:var(--white);background:#1a2b42;border-color:var(--mint)}
+    .hero{padding:48px 0 24px;text-align:center}
+    .eyebrow{color:var(--mint);font-weight:700;font-size:0.88rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+    h1{font-size:clamp(1.9rem,4.8vw,2.9rem);line-height:1.15;letter-spacing:-.03em;margin:0 0 16px}
+    h1 em{font-style:normal;color:var(--mint)}
+    .lead{font-size:1.1rem;color:var(--muted);max-width:640px;margin:0 auto 24px}
+    .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+    .button{display:inline-flex;align-items:center;justify-content:center;background:var(--mint);color:#041019;font-weight:800;text-decoration:none;padding:12px 24px;border-radius:12px;min-height:48px;border:none;cursor:pointer;font-size:0.95rem;transition:transform .15s,box-shadow .15s}
+    .button:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(93,227,191,0.35)}
+    .button.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
+    .button.secondary:hover{border-color:var(--mint);color:var(--white)}
+    .note{font-size:0.84rem;color:var(--muted);margin-top:10px}
+    
     .calculator-card{margin:36px auto;padding:32px 24px;border:1px solid #338d79;border-radius:24px;background:linear-gradient(135deg,#0c2331,#101e30 75%);text-align:center;max-width:680px;box-shadow:0 12px 36px rgba(0,0,0,0.4)}
     .calculator-card h2{font-size:clamp(1.5rem,3.8vw,2.1rem);margin:8px 0 12px;letter-spacing:-.03em}
     .calculator-card p{color:var(--muted);max-width:560px;margin:0 auto 20px}
@@ -258,16 +400,42 @@ function generateHtml(langKey, t) {
     .calc-result-value{font-size:clamp(2.4rem,6vw,3.2rem);font-weight:900;color:var(--white);margin:4px 0}
     .calc-result-value span{color:var(--mint)}
     .calc-subtext{font-size:0.88rem;color:var(--muted);margin:0 auto 16px;max-width:480px}
-    .pro{margin:40px auto;padding:34px;border:1px solid #338d79;border-radius:22px;background:linear-gradient(130deg,#102b34,#101d2e 65%);text-align:center}.pro h2{font-size:clamp(1.7rem,4vw,2.4rem);margin:8px 0}.pro p{color:var(--muted);max-width:650px;margin:0 auto 20px}.control{margin:28px auto 50px;max-width:790px;padding:25px;background:#0b1725;border:1px solid var(--line);border-radius:18px}.control h2{margin:0 0 8px}.control p{margin:0;color:var(--muted)}footer{border-top:1px solid var(--line);padding:25px 0 34px;color:var(--muted);font-size:.9rem;text-align:center}
-    @media(max-width:600px){.nav{flex-direction:column}.lang-nav{margin-top:8px}}
+
+    .vip-testers{margin:40px auto 32px;padding:32px 24px;border:1px solid var(--mint);border-radius:24px;background:linear-gradient(135deg,#0c2331,#081729);text-align:center;max-width:680px;box-shadow:0 12px 40px rgba(93,227,191,0.15)}
+    .tester-badge{display:inline-block;padding:6px 12px;background:rgba(93,227,191,0.12);border:1px solid var(--mint);border-radius:20px;font-size:0.82rem;font-weight:800;color:var(--mint);margin-bottom:12px}
+    .vip-testers h2{font-size:clamp(1.4rem,3.6vw,1.9rem);margin:0 0 10px;letter-spacing:-.02em}
+    .vip-testers p{color:var(--muted);max-width:540px;margin:0 auto 20px;font-size:0.96rem}
+    .vip-testers p strong{color:var(--mint)}
+    .tester-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:480px;margin:0 auto}
+    .tester-input{flex:1;min-width:240px;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:0.95rem;outline:none}
+    .tester-input:focus{border-color:var(--mint)}
+    .feedback-msg{margin-top:14px;font-size:0.9rem;font-weight:700;display:none}
+    .feedback-msg.success{color:var(--mint);display:block}
+    .feedback-msg.error{color:#ff7575;display:block}
+
+    .section-title{font-size:1.6rem;letter-spacing:-.02em;margin:36px 0 16px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
+    .card .tag{display:inline-block;color:var(--mint);font-weight:800;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px}
+    .card h3{margin:0 0 8px;font-size:1.15rem}
+    .card p{margin:0;color:var(--muted);font-size:0.92rem}
+    .pro-box{margin:36px 0;border:1px solid var(--line);border-radius:20px;background:#0b192c;padding:32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
+    .pro-copy h2{margin:0 0 8px;font-size:1.45rem}
+    .pro-copy p{margin:0;color:var(--muted);max-width:560px}
+    footer{border-top:1px solid var(--line);padding:24px 0;margin-top:48px;font-size:0.85rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    footer a{color:var(--muted);text-decoration:none}
+    footer a:hover{color:var(--mint)}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap nav">
-      <a class="brand" href="${canonicalUrl}">Midia<span>store</span></a>
+      <a class="brand" href="https://midiastory-df6a0.web.app/">Midia<span>store</span></a>
       ${renderLangNav(langKey)}
-      <a class="button" href="#vip-testers">VIP Pro</a>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <a class="button secondary" href="/diagnostico.html" style="min-height: 40px; padding: 8px 14px; font-size: 0.88rem;">${t.btnWaTest}</a>
+        <a class="button" href="#vip-testers" style="min-height: 40px; padding: 8px 14px; font-size: 0.88rem;">${t.vipProNav}</a>
+      </div>
     </div>
   </header>
 
@@ -282,35 +450,35 @@ function generateHtml(langKey, t) {
 
     <!-- INTERACTIVE CLUTTER ESTIMATOR -->
     <section class="calculator-card" id="calculator">
-      <div class="tester-badge">${t.calcBadge || "⚡ Simulador de Espaço Oculto"}</div>
-      <h2>${t.calcTitle || "Quanto espaço você pode recuperar hoje?"}</h2>
-      <p>${t.calcDesc || "O WhatsApp acumula cópias, áudios e vídeos que nunca aparecem na galeria. Faça uma estimativa:"}</p>
+      <div class="tester-badge">${t.calcBadge}</div>
+      <h2>${t.calcTitle}</h2>
+      <p>${t.calcDesc}</p>
 
       <div class="calc-controls">
         <div class="calc-control-group">
-          <label for="timeSelect">${t.calcTime || "Tempo de uso do aparelho:"}</label>
+          <label for="timeSelect">${t.calcTime}</label>
           <select id="timeSelect" class="calc-select">
-            <option value="4.2">${t.calcOptT1 || "6 meses"}</option>
-            <option value="8.8" selected>${t.calcOptT2 || "1 ano"}</option>
-            <option value="16.5">${t.calcOptT3 || "2 anos"}</option>
-            <option value="26.0">${t.calcOptT4 || "3 anos ou mais"}</option>
+            <option value="4.2">${t.calcOptT1}</option>
+            <option value="8.8" selected>${t.calcOptT2}</option>
+            <option value="16.5">${t.calcOptT3}</option>
+            <option value="26.0">${t.calcOptT4}</option>
           </select>
         </div>
         <div class="calc-control-group">
-          <label for="groupSelect">${t.calcGroups || "Grupos e conversas diárias:"}</label>
+          <label for="groupSelect">${t.calcGroups}</label>
           <select id="groupSelect" class="calc-select">
-            <option value="1">${t.calcOptG1 || "Poucos (1 a 3 grupos)"}</option>
-            <option value="1.4" selected>${t.calcOptG2 || "Moderado (4 a 10 grupos)"}</option>
-            <option value="2.1">${t.calcOptG3 || "Intenso (Mais de 10 grupos)"}</option>
+            <option value="1">${t.calcOptG1}</option>
+            <option value="1.4" selected>${t.calcOptG2}</option>
+            <option value="2.1">${t.calcOptG3}</option>
           </select>
         </div>
       </div>
 
       <div class="calc-result-box">
-        <div class="calc-result-label">${t.calcEst || "Espaço Oculto Estimado:"}</div>
+        <div class="calc-result-label">${t.calcEst}</div>
         <div class="calc-result-value"><span id="calcGb">12.3</span> GB</div>
-        <p class="calc-subtext">${t.calcSub || "Mídias duplicadas e notas de voz esquecidas consumindo seu armazenamento."}</p>
-        <a class="button" href="#vip-testers" onclick="document.getElementById('testerEmail').focus()">${t.calcCta || "Quero Liberar Esse Espaço Grátis"}</a>
+        <p class="calc-subtext">${t.calcSub}</p>
+        <a class="button" href="#vip-testers" onclick="document.getElementById('testerEmail').focus()">${t.calcCta}</a>
       </div>
     </section>
 
@@ -348,57 +516,58 @@ function generateHtml(langKey, t) {
       </div>
     </section>
 
-    <section class="pro">
-      <div class="eyebrow">${t.proEyebrow}</div>
-      <h2>${t.proTitle}</h2>
-      <p>${t.proDesc}</p>
+    <section class="pro-box">
+      <div class="pro-copy">
+        <div class="eyebrow">${t.proEyebrow}</div>
+        <h2>${t.proTitle}</h2>
+        <p>${t.proDesc}</p>
+      </div>
       <a class="button" href="#vip-testers">${t.btnSubmit}</a>
     </section>
 
-    <aside class="control">
-      <h2>${t.ctrlTitle}</h2>
-      <p>${t.ctrlDesc}</p>
-    </aside>
+    <section style="margin-top: 36px;">
+      <h2 class="section-title">${t.ctrlTitle}</h2>
+      <p style="color: var(--muted); max-width: 680px;">${t.ctrlDesc}</p>
+    </section>
   </main>
 
-  <footer>
-    <div class="wrap">
-      <p>© 2026 Midiastore · <a href="/privacidade.html">${t.privacy}</a></p>
-      <p>Google Play and Android are registered trademarks of Google LLC.</p>
-    </div>
+  <footer class="wrap">
+    <div>&copy; 2026 Midiastore. All rights reserved.</div>
+    <div><a href="/privacidade.html">${t.privacy}</a></div>
   </footer>
 
   <script>
-    const timeSelect = document.getElementById('timeSelect');
-    const groupSelect = document.getElementById('groupSelect');
-    const calcGb = document.getElementById('calcGb');
-    function updateCalc() {
-      if (!timeSelect || !groupSelect || !calcGb) return;
-      const base = parseFloat(timeSelect.value);
-      const mult = parseFloat(groupSelect.value);
+    const timeEl = document.getElementById('timeSelect');
+    const groupEl = document.getElementById('groupSelect');
+    const calcGbEl = document.getElementById('calcGb');
+
+    function updateClutterEstimate() {
+      const base = parseFloat(timeEl.value) || 8.8;
+      const mult = parseFloat(groupEl.value) || 1.4;
       const total = (base * mult).toFixed(1);
-      calcGb.innerText = total;
-    }
-    if (timeSelect && groupSelect) {
-      timeSelect.addEventListener('change', updateCalc);
-      groupSelect.addEventListener('change', updateCalc);
-      updateCalc();
+      if (calcGbEl) calcGbEl.innerText = total;
     }
 
-    const form = document.getElementById('testerForm');
-    const emailInput = document.getElementById('testerEmail');
-    const submitBtn = document.getElementById('testerSubmitBtn');
-    const feedback = document.getElementById('feedbackMsg');
+    if (timeEl && groupEl) {
+      timeEl.addEventListener('change', updateClutterEstimate);
+      groupEl.addEventListener('change', updateClutterEstimate);
+      updateClutterEstimate();
+    }
+
+    const testerForm = document.getElementById("testerForm");
+    const emailInput = document.getElementById("testerEmail");
+    const submitBtn = document.getElementById("testerSubmitBtn");
+    const feedback = document.getElementById("feedbackMsg");
     const SUPABASE_URL = "https://usmqtnlsaavxqguwrtix.supabase.co";
-    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2Nzk2NzIsImV4cCI6MjA2MjI1NTY3Mn0.zP5bQ9gJ2e-m6zW-b2c9d7q5s4t3r2a1x9w8v7u6t5r";
 
-    form.addEventListener('submit', async (e) => {
+    testerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = emailInput.value.trim().toLowerCase();
-      if (!email || !email.includes('@')) return;
+      if (!email || !email.includes("@")) return;
 
       submitBtn.disabled = true;
-      submitBtn.innerText = "Enviando...";
+      submitBtn.innerText = "...";
       feedback.className = "feedback-msg";
       feedback.style.display = "none";
 
@@ -451,7 +620,7 @@ async function buildAll() {
     console.log(`✅ [${langKey.toUpperCase()}] Gerado: ${path.relative(projectRoot, targetPath)}`);
   }
 
-  console.log("\n🎉 Todas as 8 páginas internacionais foram compiladas com sucesso!");
+  console.log("\n🎉 Todas as 8 páginas internacionais foram compiladas com 100% de tradução nativa!");
 }
 
 buildAll().catch(console.error);

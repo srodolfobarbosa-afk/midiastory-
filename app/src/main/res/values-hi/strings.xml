@@ -80,6 +80,7 @@
     <string name="home_cleanup_candidates_found">समीक्षा के लिए %1$d फ़ाइलें मिलीं, कुल %2$s। कुछ भी नहीं हटाया गया।</string>
     <string name="home_cleanup_candidates_partial">%2$s की %1$d फ़ाइलें मिलीं, लेकिन जाँच अधूरी थी। हटाने से पहले देखें।</string>
     <string name="home_cleanup_no_candidates">इस जाँच में कोई बड़ी फ़ाइल नहीं मिली। कुछ भी नहीं हटाया गया।</string>
+    <string name="home_cleanup_confirm_prompt">क्या आप मूल Android पुष्टि के साथ अभी यह स्थान खाली करना चाहते हैं, या पहले पूरी सूची की समीक्षा करना चाहते हैं?</string>
     <string name="home_cleanup_no_candidates_partial">सुलभ फ़ाइलों में कोई सुझाव नहीं मिला। जाँच अधूरी थी।</string>
     <string name="home_cleanup_permission_denied">मीडिया की अनुमति नहीं मिली। कोई फ़ाइल बदली नहीं गई।</string>
     <string name="home_cleanup_scan_failed">फ़ाइलों की जाँच नहीं हो सकी। फिर कोशिश करें।</string>

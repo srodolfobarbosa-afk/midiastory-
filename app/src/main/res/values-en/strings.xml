@@ -102,6 +102,7 @@ Total: %3$s</string>
     <string name="home_cleanup_candidates_found">Found %1$d files to review, totaling %2$s. Nothing was deleted.</string>
     <string name="home_cleanup_candidates_partial">Found %1$d files (%2$s), but the scan was partial. Review before removal.</string>
     <string name="home_cleanup_no_candidates">No large files found in this scan. Nothing was deleted.</string>
+    <string name="home_cleanup_confirm_prompt">Would you like to free this space now with native Android confirmation, or review the full list first?</string>
     <string name="home_cleanup_no_candidates_partial">No candidates found in accessible files. The scan was partial.</string>
     <string name="home_cleanup_permission_denied">Media access was not allowed. No files were changed.</string>
     <string name="home_cleanup_scan_failed">Could not scan files. Please try again.</string>

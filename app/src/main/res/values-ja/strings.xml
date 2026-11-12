@@ -80,6 +80,7 @@
     <string name="home_cleanup_candidates_found">確認用のファイルが%1$d件（合計%2$s）見つかりました。削除はしていません。</string>
     <string name="home_cleanup_candidates_partial">%1$d件（%2$s）が見つかりましたが、検索は一部のみです。削除前に確認してください。</string>
     <string name="home_cleanup_no_candidates">大きなファイルは見つかりませんでした。削除はしていません。</string>
+    <string name="home_cleanup_confirm_prompt">ネイティブのAndroid確認画面で今すぐ空き容量を確保しますか？それとも先に全リストを確認しますか？</string>
     <string name="home_cleanup_no_candidates_partial">アクセス可能なファイルに候補はありませんでした。検索は一部のみです。</string>
     <string name="home_cleanup_permission_denied">メディアへのアクセスが許可されていません。ファイルは変更していません。</string>
     <string name="home_cleanup_scan_failed">ファイルを確認できませんでした。もう一度お試しください。</string>

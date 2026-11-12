@@ -80,6 +80,7 @@
     <string name="home_cleanup_candidates_found">%1$d fichiers à vérifier, pour un total de %2$s. Rien n’a été supprimé.</string>
     <string name="home_cleanup_candidates_partial">%1$d fichiers (%2$s) trouvés, mais l’analyse est partielle. Vérifiez-les avant suppression.</string>
     <string name="home_cleanup_no_candidates">Aucun gros fichier trouvé. Rien n’a été supprimé.</string>
+    <string name="home_cleanup_confirm_prompt">Souhaitez-vous libérer cet espace maintenant avec la confirmation native d\'Android, ou examiner d\'abord la liste complète ?</string>
     <string name="home_cleanup_no_candidates_partial">Aucun candidat dans les fichiers accessibles. L’analyse est partielle.</string>
     <string name="home_cleanup_permission_denied">Accès aux médias refusé. Aucun fichier n’a été modifié.</string>
     <string name="home_cleanup_scan_failed">Impossible d’analyser les fichiers. Réessayez.</string>
