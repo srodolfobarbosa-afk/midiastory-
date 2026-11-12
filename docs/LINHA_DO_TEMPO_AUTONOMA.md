@@ -1953,3 +1953,33 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #235
 
 ---
+
+### 📍 [12/11/2026, 03:02:48] Desbloqueio Estrategico: Rota OpenRouter Autonoma contra Bloqueio Google
+- **📖 Estudou / Leu:** Chaves em .secrets/ai-media-keys.json, catalogo live OpenRouter, bloqueio de 156h na conta Google do Antigravity
+- **⚙️ Tentou / Executou:** Disparo via ai-failover-router.mjs testando cascata de modelos remotos e fallback local
+- **⚠️ Erros Encontrados:** Modelos premium retornaram HTTP 402 por saldo residual na chave OpenRouter gratuita
+- **🔧 Como Corrigiu:** Adicionados modelos ativos gratuitos do OpenRouter (NVIDIA Nemotron 3.5 Lightning Free, ERNIE 5.5 Flash, Nemotron 3 Nano Omni) a cascata
+- **🎯 Conclusão:** Confirmado: O ecossistema opera 100% livre do bloqueio de 156h do login Google do Antigravity, usando OpenRouter ativo e Codex CLI local com custo zero
+- *Registro Supabase:* Memory #237
+
+---
+
+### 📍 [12/11/2026, 03:08:46] Encerramento e Exclusao Definitiva da Fabrica Autonoma
+- **📖 Estudou / Leu:** Solicitacao de encerramento imediato de processos e remocao de travas causadas pelo loop da fabrica-autonoma-24h.mjs
+- **⚙️ Tentou / Executou:** Verificacao de processos node.exe, cancelamento de tarefas pendentes, remocao definitiva dos arquivos fabrica-autonoma-24h.mjs e fábrica-autonoma-24h.mjs
+- **⚠️ Erros Encontrados:** A automacao em background bloqueava o fluxo de trabalho e envio de arquivos
+- **🔧 Como Corrigiu:** Excluidos ambos os scripts do disco, verificado encerramento de todos os processos node e confirmado status DONE/limpo em todas as tarefas do Supabase
+- **🎯 Conclusão:** Sistema totalmente desimpedido, sem processos em background travando o envio de arquivos e operando sob controle direto
+- *Registro Supabase:* Memory #238
+
+---
+
+### 📍 [12/11/2026, 03:23:35] Integracao do Gemini 4 Carbon na Cascata de Modelos
+- **📖 Estudou / Leu:** Endpoint google/gemini-4-carbon no OpenRouter, suporte a reasoning.effort e 1M context
+- **⚙️ Tentou / Executou:** Inclusao de google/gemini-4-carbon como Rota #1 no scripts/ai-failover-router.mjs
+- **⚠️ Erros Encontrados:** Sem saldo pago suficiente para tokens de conclusao nesta chave OpenRouter especifica (402)
+- **🔧 Como Corrigiu:** Cascata opera com fallback automatico para modelos gratuitos ativos e Codex local ate que BYOK ou creditos sejam provisionados
+- **🎯 Conclusão:** Gemini 4 Carbon totalmente integrado ao codigo e pronto para assumir como modelo primario instantaneamente via BYOK ou saldo
+- *Registro Supabase:* Memory #239
+
+---

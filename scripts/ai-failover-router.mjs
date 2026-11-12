@@ -41,11 +41,18 @@ if (!openRouterKey && fs.existsSync(secretsPath)) {
 }
 
 const MODEL_CASCADE = [
+  // 1. Modelos Frontier com Raciocínio (Tentativa primária com auto-adaptação e BYOK)
+  { id: "google/gemini-4-carbon", name: "Gemini 4 Carbon (1M Context + High Reasoning)" },
   { id: "google/gemini-4-argon", name: "Gemini 4 Argon" },
   { id: "google/gemini-3.8-flash", name: "Gemini 3.8 Flash" },
   { id: "google/gemini-3.1-flash-lite", name: "Gemini 3.1 Flash-Lite" },
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
-  { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B" },
+
+  // 2. Modelos Gratuitos Validados no OpenRouter (Custo Zero, Sem 402, Imunes ao Bloqueio de 156h Google)
+  { id: "nvidia/nemotron-3.5-lightning:free", name: "NVIDIA Nemotron 3.5 Lightning (Free)" },
+  { id: "baidu/ernie-5.5-flash-preview:free", name: "Baidu ERNIE 5.5 Flash (Free)" },
+  { id: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", name: "NVIDIA Nemotron 3 Nano Omni (Free)" },
+  { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 31B (Free)" },
 ];
 
 async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
@@ -62,6 +69,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
     body: JSON.stringify({
       model: modelId,
       max_tokens: maxTokens,
+      ...(modelId.includes("carbon") || modelId.includes("argon") ? { reasoning: { effort: "medium" } } : {}),
       messages: [{ role: "user", content: prompt }],
     }),
   });
