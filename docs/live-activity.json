@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T07:34:33.797Z",
+  "generatedAt": "2026-11-12T16:40:37.928Z",
   "system": {
     "status": "ONLINE",
     "goalValue": "R$ 1.000.000,00",
@@ -33,6 +33,36 @@
   ],
   "memories": [],
   "tasks": [
+    {
+      "id": 425,
+      "title": "HEARTBEAT_CICLO_1",
+      "target": "UBUNTU_CLOUD",
+      "payload": {
+        "cycle": 1,
+        "steps": {
+          "aiFleet": {
+            "action": "Kit de conversão de limpeza do WhatsApp e Android para comunidades de tecnologia",
+            "filename": "docs/campaigns/whatsapp_android_cleanup_conversion_kit.md",
+            "provider": "openrouter/free"
+          },
+          "testers": {
+            "total": 2,
+            "latest": [
+              "teste.beta.vip@gmail.com",
+              "rjvsb22@gmail.com"
+            ],
+            "target": 20,
+            "remaining": 18
+          },
+          "supabase": "OK",
+          "firebaseDeploy": "DEPLOY_SUCCESS"
+        },
+        "timestamp": "2026-11-12T07:34:19.369Z",
+        "durationMs": 21601
+      },
+      "status": "DONE",
+      "created_at": "2026-11-12 07:34:41.086226+00"
+    },
     {
       "id": 424,
       "title": "HEARTBEAT_CICLO_2",
@@ -398,103 +428,79 @@
       },
       "status": "DONE",
       "created_at": "2026-11-11 17:40:39.926985+00"
-    },
-    {
-      "id": 410,
-      "title": "HEARTBEAT_CICLO_7",
-      "target": "LOCAL_PC",
-      "payload": {
-        "cycle": 7,
-        "steps": {
-          "aiFleet": "ERROR: Falha total de failover. Último erro de API: HTTP 402: {\"error\":{\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\",\"code\":402,\"metadata\":{\"limit_source\":\"openrouter_credits\",\"remedy_hint\":\"Add credits at https://openrouter.ai/settings/credits, or lower max_tokens / prompt size to fit your remaining balance.\",\"provider_name\":null,\"previous_errors\":[{\"code\":402,\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 60 tokens, but can only afford 30. To increase, visit https://openrouter.ai/workspaces/default/keys/fffc226b40f7547b0ffa9b4c6f86193296caa05974ce13ed9fbcbe846a69a7be and adjust the key's total limit\"}]}},\"user_id\":\"user_3LKvd2XO4tVDU7YMtrl7DndCPMb\"}",
-          "testers": {
-            "total": 1,
-            "latest": [
-              "teste.beta.vip@gmail.com"
-            ],
-            "target": 20,
-            "remaining": 19
-          },
-          "supabase": "OK"
-        },
-        "timestamp": "2026-11-11T17:35:27.918Z",
-        "durationMs": 62749
-      },
-      "status": "DONE",
-      "created_at": "2026-11-11 17:36:30.712237+00"
     }
   ],
   "commits": [
     {
+      "hash": "40f7121",
+      "msg": "feat(autonomous-factory): [cycle-1] Kit de conversão de limpeza do WhatsApp e Android para comunidades de tecnologia",
+      "time": "9 hours ago",
+      "author": "github-actions[bot]"
+    },
+    {
       "hash": "70cc823",
       "msg": "feat(autonomous-factory): [cycle-1] Entrega Cognitiva do Ciclo #1",
-      "time": "7 hours ago",
+      "time": "16 hours ago",
       "author": "github-actions[bot]"
     },
     {
       "hash": "2235c24",
       "msg": "fix(pricing): enforce official prices R$ 14,99 / R$ 79,99 / R$ 149,99",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "dc1bc48",
       "msg": "fix(pricing): enforce official prices R$ 14.99 / R$ 79.99 / R$ 149.99",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "84f6846",
       "msg": "fix(ci): remove hardcoded java home for github actions compatibility",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "dc86406",
       "msg": "feat(telemetry): sync live activity feed to main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "cac3ad2",
       "msg": "feat(pricing): update official pricing and viral funnel links to main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e8e93a2",
       "msg": "feat(growth): add WhatsApp viral diagnostic calculator to main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "e994055",
       "msg": "feat(ui): add painel redirect to main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "98cff59",
       "msg": "feat(ui): add live terminal 24h dashboard to main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "b4b355b",
       "msg": "feat(trinity): add Trindade IA multi-model engine with Gemini 4 Carbon and Claude Fable to main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     },
     {
       "hash": "8376c32",
       "msg": "feat(orchestrator): add Carbon, Opus and Fable to native-orchestrator on main",
-      "time": "16 hours ago",
-      "author": "srodolfobarbosa-afk"
-    },
-    {
-      "hash": "85c3b2d",
-      "msg": "feat(equipe): add Carbon, Opus 5.5 and Fable 5.2 to equipe-ia on main",
-      "time": "16 hours ago",
+      "time": "26 hours ago",
       "author": "srodolfobarbosa-afk"
     }
   ],
@@ -505,19 +511,19 @@
         "name": "lista-20-testadores-google-play.txt",
         "url": "/campaigns/lista-20-testadores-google-play.txt",
         "sizeKb": "0.0",
-        "modifiedAt": "2026-11-12T07:34:19.937Z"
+        "modifiedAt": "2026-11-12T16:40:18.716Z"
       },
       {
         "name": "roteiro_viral_whatsapp_cleaner.md",
         "url": "/campaigns/roteiro_viral_whatsapp_cleaner.md",
         "sizeKb": "1.5",
-        "modifiedAt": "2026-11-12T07:34:15.161Z"
+        "modifiedAt": "2026-11-12T16:40:10.761Z"
       },
       {
         "name": "whatsapp_android_cleanup_conversion_kit.md",
         "url": "/campaigns/whatsapp_android_cleanup_conversion_kit.md",
         "sizeKb": "2.8",
-        "modifiedAt": "2026-11-12T07:34:33.100Z"
+        "modifiedAt": "2026-11-12T16:40:10.761Z"
       }
     ]
   }
