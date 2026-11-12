@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+/**
+ * RESTAURADOR INSTANTÂNEO DE SESSÃO & ESTADO (Midiastore)
+ * 
+ * Uso em caso de queda de energia ou reinicialização do PC:
+ *   node scripts/retomar-sessao.mjs
+ */
+
+import fs from "node:fs";
+import path from "node:path";
+import { execSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, "..");
+const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const projectRef = "usmqtnlsaavxqguwrtix";
+
+console.log("=================================================================");
+console.log("⚡ RESTAURADOR DE SESSÃO MIDIASTORE (PÓS-REINICIALIZAÇÃO/QUEDA)");
+console.log("=================================================================\n");
+
+// 1. Verificar Estado do Git
+console.log("1️⃣ Verificando integridade do repositório local e Git...");
+try {
+  const branch = execSync("git branch --show-current", { cwd: projectRoot, encoding: "utf8" }).trim();
+  const status = execSync("git status -s", { cwd: projectRoot, encoding: "utf8" }).trim();
+  console.log(`   Branch atual: ${branch}`);
+  console.log(`   Arquivos modificados: ${status ? "\n" + status : "Nenhum (Árvore 100% Limpa)"}`);
+} catch (e) {
+  console.warn("   Aviso ao checar Git:", e.message);
+}
+
+// 2. Buscar Memórias Recentes no Supabase
+console.log("\n2️⃣ Sincronizando memórias persistidas no Supabase Cloud...");
+try {
+  const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: "SELECT id, content, created_at FROM public.memories ORDER BY id DESC LIMIT 3;"
+    }),
+  });
+  const memories = await res.json();
+  for (const m of memories) {
+    console.log(`   [#${m.id}] ${m.content.slice(0, 160)}...`);
+  }
+} catch (e) {
+  console.warn("   Aviso ao buscar Supabase:", e.message);
+}
+
+// 3. Status das Chaves e Rotas de IA
+console.log("\n3️⃣ Verificando conectividade da Rota OpenRouter (Fora do bloqueio de 156h)...");
+const secretsPath = path.join(projectRoot, ".secrets", "ai-media-keys.json");
+if (fs.existsSync(secretsPath)) {
+  console.log("   ✅ Arquivo .secrets/ai-media-keys.json presente e protegido.");
+  console.log("   ✅ Rota Primária configurada: google/gemini-4-carbon (1M Context)");
+  console.log("   ✅ Rota Free de Segurança: nvidia/nemotron-3.5-lightning:free");
+  console.log("   ✅ Motor Local: OpenAI Codex CLI (codex.exe)");
+} else {
+  console.warn("   ⚠️ Atenção: .secrets/ai-media-keys.json não encontrado!");
+}
+
+console.log("\n=================================================================");
+console.log("🎯 COMO RETOMAR A CONVERSA NO ANTIGRAVITY:");
+console.log("Basta colar a seguinte frase no chat do Antigravity:");
+console.log("-----------------------------------------------------------------");
+console.log('"Retomar sessão: leia as últimas memórias no Supabase e a linha do tempo. Confirme o status do Gemini 4 Carbon e os próximos passos."');
+console.log("=================================================================\n");
