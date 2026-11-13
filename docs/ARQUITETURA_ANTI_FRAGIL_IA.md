@@ -129,14 +129,25 @@ Para sustentar a operação de ponta a ponta, o Midiastore opera sobre 5 pilares
 
 ## 6. A Suíte de Poder Computacional & Ferramentas Google Enterprise
 
-Para assegurar vazão máxima e zero gargalos de processamento, a operação conta com o mais alto nível de infraestrutura:
+Para assegurar vazão máxima e zero gargalos de processamento, a operação conta com o mais alto nível de infraestrutura, com impacto prático direto na linha de frente do Midiastore:
 
-* 🌐 **Acesso Irrestrito ao Gemini 4 Carbon e Argon:** Disponível no app Gemini e no Modo IA da Busca para inteligência de mercado, ASO (App Store Optimization) e auditoria de políticas em tempo real.
-* ⚡ **Limites Máximos na Trindade Google:**
-  * **Google Antigravity:** Orquestração de agentes locais, IDE integrada, terminal nativo e `/swarm` massivo sem restrições de throttling.
-  * **Google AI Studio:** Endpoint corporativo de altíssima vazão (RPM/TPM) alimentando scripts 24/7 a custo zero.
-  * **Agente de Código Jules:** Engenheiro assíncrono na nuvem atuando diretamente em Pull Requests e refatorações no GitHub.
-* 🚀 **2.000 Unidades de Computação Mensais no Google Colab:** Instâncias com GPUs aceleradas (A100/L4/T4) prontas para rodar benchmarks pesados de compressão de mídia, vetorização em massa no `pgvector` e modelos open-source sem sobrecarregar o hardware local.
+### 1. Limites Máximos no Antigravity e Google AI Studio
+* ⚡ **Fim Definitivo dos Bloqueios de Cota:** Aquele contador de 156h desaparece ou se torna irrelevante, permitindo operar com raciocínio profundo no Gemini 4 Argon e Gemini 4 Carbon/Hydrogen sem medo de esgotar o teto semanal.
+* 🚀 **Vazão Brutal de Tokens:** O Google AI Studio libera milhares de requisições por minuto com altíssima concorrência para nossos scripts e Edge Functions no Supabase.
+
+### 2. O Agente de Código Jules (Nosso Engenheiro Assíncrono no GitHub)
+O Jules é o agente autônomo do Google conectado diretamente ao repositório GitHub (`srodolfobarbosa-afk/midiastory-`). Enquanto trabalhamos na IDE, podemos delegar para o Jules tarefas como:
+* 🛠️ Resolver pendências de Lint do Android (`:app:lintDebug`);
+* 🌐 Sincronizar chaves de idiomas no `strings.xml` (Português, Inglês, Espanhol, Alemão, Francês, Hindi, Japonês, Chinês);
+* 🐙 Abrir Pull Requests automáticos e revisados diretamente no GitHub, acelerando a esteira de desenvolvimento.
+
+### 3. 2.000 Unidades de Computação no Google Colab (Poder de GPU/Nuvem)
+Em vez de estressar o processador e a memória do computador local com compilações pesadas ou emuladores Android:
+* 🧪 **Fábrica de Builds e Testes na Nuvem:** Podemos rodar pipelines de build e testes instrumentados de múltiplos emuladores em instâncias aceleradas (GPUs L4/A100 no Colab).
+* 🎞️ **Processamento e Quantização de Mídias:** Testar algoritmos de compressão e hashing de duplicatas em lotes massivos de arquivos de teste sem travar o seu PC.
+
+### 4. Acesso Irrestrito ao Gemini 4 Carbon e Argon
+* 🧠 **Máxima Validação Lógica e Matemática:** Raciocínio de fronteira disponível tanto na interface web/mobile quanto nas APIs do sistema, garantindo que qualquer decisão de arquitetura, política da Google Play ou faturamento tenha a máxima validação matemática e lógica disponível no planeta.
 
 ---
 
