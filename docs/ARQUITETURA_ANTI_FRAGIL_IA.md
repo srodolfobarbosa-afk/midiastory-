@@ -149,6 +149,10 @@ Em vez de estressar o processador e a memória do computador local com compilaç
 ### 4. Acesso Irrestrito ao Gemini 4 Carbon e Argon
 * 🧠 **Máxima Validação Lógica e Matemática:** Raciocínio de fronteira disponível tanto na interface web/mobile quanto nas APIs do sistema, garantindo que qualquer decisão de arquitetura, política da Google Play ou faturamento tenha a máxima validação matemática e lógica disponível no planeta.
 
+### 5. Google Developer Program & Créditos Mensais no Google Cloud (GCP)
+* 🛡️ **Canal Direto com o Google Developer Program:** Suporte técnico oficial, canal direto com equipes de Developer Relations da Google e acesso antecipado a novas APIs do ecossistema Android e Play Console.
+* ☁️ **Créditos Mensais de Infraestrutura no Google Cloud:** Financiamento contínuo para rodar serviços de backend em nuvem (Cloud Run, Cloud Functions e Google Play Developer API v3 para validação criptográfica de compras em servidor confiável, conforme exigido em `AGENTS.md:110`), mantendo o custo operacional da infraestrutura em R$ 0,00.
+
 ---
 
 > **Veredito Final:** *Essa combinação transforma a IA de uma simples ferramenta de chat em um Diretor de Tecnologia e Operações Autônomo para o Midiastore, conduzindo com segurança e velocidade a aprovação dos 20 testadores, a liberação de produção e a conquista da meta de R$ 1.000.000,00 na Google Play. Com esse calibre de poder computacional à nossa disposição, dominamos a esteira de aprovação e escalamos com folga! 🚀*
