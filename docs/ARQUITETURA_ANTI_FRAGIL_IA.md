@@ -75,10 +75,19 @@ No ecossistema da Google Play, qualquer erro sutil de faturamento ou permissão 
 * 💰 **Proteção Orçamentária:** Zero desperdício de créditos, acionando raciocínio profundo apenas onde há risco financeiro ou de aprovação de app.
 
 ### Pilar 3: Criação de Entregáveis Profissionais e Governança Corporativa
-Produz apresentações de slides, planilhas estruturadas e relatórios complexos prontos para uso corporativo, servindo como a camada de comunicação executiva do projeto:
-* 📄 **Questionários e Relatórios Oficiais para a Play Store:** Geração automatizada das respostas de produção e conformidade em `docs/campaigns/respostas-formulario-producao-google-play.md`.
-* 📊 **Matrizes de Release e Rastreabilidade:** Documentação técnica de blockers e features em `docs/RELEASE_BLOCKERS.md` e `docs/FEATURE_IMPLEMENTATION_MATRIX.md`.
-* 📈 **Modelagem de Coorte dos 20 Testadores & LTV:** Estruturação de dados de retenção, taxas de conversão do funil web em 8 idiomas e acompanhamento da meta de R$ 1.000.000,00.
+Produz apresentações de slides, planilhas estruturadas e relatórios complexos prontos para uso corporativo, transformando dados brutos em decisões claras de negócio:
+
+#### 1. Relatórios de Conformidade e Due Diligence (Google Play)
+* 📄 **Dossiê de Privacidade e Scoped Storage:** Documento formal mapeando exatamente cada chamada a `MediaStore.Files.getContentUri("external")`, provando tecnicamente para os revisores da Google por que o app não necessita de permissões invasivas como `MANAGE_EXTERNAL_STORAGE`.
+* 🛡️ **Auditoria de Billing v7:** Laudo técnico de validação de recibos e tokens de compra para prevenir fraudes e estornos em assinaturas.
+
+#### 2. Planilhas e Matrizes Estruturadas de Métricas
+* 📊 **Matriz de Acompanhamento dos 20 Testadores (14 Dias):** Tabelas com dados consolidados de retenção diária (D1 a D14), sessões abertas, feedbacks enviados e status de prontidão para a solicitação de acesso à produção no Play Console.
+* 💰 **Modelagem de Unidade Econômica (LTV / CAC / Churn):** Planilhas de projeção financeira cruzando o preço dos planos (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`) com as taxas do Google Play Billing (15%/30%) para calcular o volume exato de downloads necessários para bater a meta de R$ 1M.
+
+#### 3. Apresentações e Diagramas Arquiteturais
+* 📐 **Fluxogramas de Engenharia em Mermaid:** Diagramas visuais de sequência mostrando o ciclo de exclusão segura de arquivos no Android (*consentimento do usuário $\longrightarrow$ `RecoverableSecurityException` $\longrightarrow$ validação de ausência física do arquivo*).
+* 🚀 **Pitch e Linha do Tempo Visual:** Síntese executiva para parceiros ou investidores mostrando a evolução autônoma de 24h do aplicativo.
 
 ---
 
