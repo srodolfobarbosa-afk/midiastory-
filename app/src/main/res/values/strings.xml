@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">Welcome to Midiastore</string>
-    <string name="onboarding_welcome_message">🔒 100%% Private: Your photos and videos are analyzed offline on your device and never leave your phone.\n\n⚡ Smart SHA-256 Analysis: Locates exact duplicate files with mathematical precision, keeping originals safe.\n\n🚀 Ready to reclaim space: Start your free analysis now.</string>
+    <string name="onboarding_welcome_message">🔒 100%% Private: Your photos and videos are analyzed locally on your device and never leave your phone.\n\n⚡ Smart SHA-256 Analysis: Locates exact duplicate files with mathematical precision, keeping originals safe.\n\n🚀 Ready to reclaim space: Start your free analysis now.</string>
     <string name="onboarding_start_button">Start Free Analysis</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">A cleaner phone. More space back.</string>
@@ -112,9 +112,9 @@ Total: %3$s</string>
     <string name="home_plans_title">Pro plans</string>
     <string name="home_plans_subtitle">The same Pro tools in every plan. Choose how to pay.</string>
     <string name="premium_area_button">Pro area</string>
-    <string name="plan_monthly_unavailable">Monthly · proposed R$14.90/month · not active</string>
-    <string name="plan_annual_unavailable">Annual · proposed R$79.90/year · not active</string>
-    <string name="plan_lifetime_unavailable">Lifetime · proposed R$149.90 once · not active</string>
+    <string name="plan_monthly_unavailable">Monthly · ref. R$14.99/month · awaiting Google Play</string>
+    <string name="plan_annual_unavailable">Annual · ref. R$79.99/year · awaiting Google Play</string>
+    <string name="plan_lifetime_unavailable">Lifetime · ref. R$149.99 once · awaiting Google Play</string>
     <string name="pro_feature_requires_pro">This cleanup tool is part of Midiastore Pro.</string>
     <string name="pro_unused_apps_button">Find apps not used for 90 days · Pro</string>
     <string name="pro_unused_apps_title">Apps not used for 90 days</string>
@@ -124,14 +124,14 @@ Total: %3$s</string>
     <string name="pro_unused_apps_last_used">Last opened %1$s</string>
     <string name="pro_unused_apps_never_used">Not opened in the last 90 days</string>
     <string name="pro_unused_apps_permission_denied">Usage access was not allowed.</string>
-    <string name="pro_purchase_unavailable_notice">Plans are not available to buy yet.</string>
+    <string name="pro_purchase_unavailable_notice">Plans could not be loaded from Google Play right now.</string>
     <string name="storage_ring_used">USED</string>
-    <string name="plan_annual_default">Annual · R$79.90/year (proposed)</string>
+    <string name="plan_annual_default">Annual · R$79.99/year</string>
     <string name="plan_annual_with_price">Midiastore Pro Annual · %1$s/year</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro Annual (-%2$d%% real savings) · %1$s/year</string>
-    <string name="plan_monthly_default">Monthly · R$14.90/month (proposed)</string>
+    <string name="plan_monthly_default">Monthly · R$14.99/month</string>
     <string name="plan_monthly_with_price">Midiastore Pro Monthly · %1$s/month</string>
-    <string name="plan_lifetime_default">Lifetime · R$149.90 once (proposed)</string>
+    <string name="plan_lifetime_default">Lifetime · R$149.99 once</string>
     <string name="plan_lifetime_with_price">Midiastore Pro Lifetime (One-Time) · %1$s</string>
     <string name="restore_purchases_button">Restore purchases</string>
     <string name="restoring_purchases_status">Reconciling active purchases with Google Play Billing…</string>
@@ -185,11 +185,12 @@ Total: %3$s</string>
     <string name="oaas_global_scan_failed">The check could not be completed. No files were changed.</string>
     <string name="oaas_global_scan_limit">Safety limit reached. Results are partial. Narrow the search or try a more specific check.</string>
     <string name="nav_home">Home</string>
+    <string name="nav_files">Files</string>
+    <string name="nav_studio">Studio</string>
+    <string name="nav_missions">Cleanup</string>
     <string name="nav_pro">Pro plans</string>
     <string name="pro_advanced_cleanup_button">Advanced cleanup tools · Pro</string>
     <string name="pro_browse_files_button">Browse files · Pro</string>
-    <string name="nav_files">Files</string>
-    <string name="nav_missions">Cleanup</string>
     <string name="analyze_now">FIND WHAT TO CLEAN</string>
     <string name="tap_to_scan_media">See what is taking up space and choose what to clean.</string>
     <string name="hero_scan_ready">Tap to review cleanup suggestions.</string>

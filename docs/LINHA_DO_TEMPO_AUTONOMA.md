@@ -2067,3 +2067,73 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #249
 
 ---
+
+### 📍 [12/11/2026, 22:35:18] Blindagem da Memoria Historica e Entrega de Alto Valor no Modelo Gratuito
+- **📖 Estudou / Leu:** Memorias #240 a #249 no Supabase, docs/LINHA_DO_TEMPO_AUTONOMA.md, AGENTS.md e diretriz do usuario de entregar valor massivo gratuito
+- **⚙️ Tentou / Executou:** Consolidacao das 5 abas com cores exclusivas, Extrator de Video com Colar Link de 1 toque, Editor Pro 60fps, QR ZXing real e sincronizacao no Supabase
+- **⚠️ Erros Encontrados:** Descartes historicos documentados: 1. QR code XOR (substituido por ZXing ISO). 2. Salvar HTML como video (bloqueado com validacao de streaming). 3. Botoes sem acao (ligados a fluxos reais do MediaStore).
+- **🔧 Como Corrigiu:** Construcao em cima do que ja deu certo, eliminacao de simulacoes e registro sincronizado no Postgres e Markdown
+- **🎯 Conclusão:** Memoria historica consolidada. App focado em entregar valor gratuito espetacular para bater 20 testadores, retencao maxima e avaliacoes 5 estrelas
+- *Registro Supabase:* Memory #250
+
+---
+
+### 📍 [12/11/2026, 23:24:47] Diretriz Executiva Maxima: Alinhamento Estruturado em Metas Rumo a R$ 1.000.000,00
+- **📖 Estudou / Leu:** Ensino do fundador: cada palavra e uma acao real, foco na meta de faturamento e construcao do futuro lendo o passado
+- **⚙️ Tentou / Executou:** Desenho da escada de marcos mensuraveis: 20 testadores (14 dias) -> Producao Aberta -> 1a Venda Validada -> Escala Organica de R$ 1M
+- **⚠️ Erros Encontrados:** Risco de dispersao em micro-tecnicismos que nao geram receita
+- **🔧 Como Corrigiu:** Foco exclusivo em acoes reais que destravam os 20 testadores, a aprovacao global e as vendas
+- **🎯 Conclusão:** Compromisso absoluto com o resultado final: R$ 1 milhao em vendas com execucao passo a passo organizada
+- *Registro Supabase:* Memory #251
+
+---
+
+### 📍 [13/11/2026, 00:30:16] Integracao da Lei Cognitiva dos Verbos e Guia de Identificacao Anti-Erro no AGENTS.md
+- **📖 Estudou / Leu:** Gramatica dos verbos de acao, conjugacoes (-AR, -ER, -IR, -OR), triade Querer/Poder/Dever e tecnicas de NLP para imunidade a erros ortograficos
+- **⚙️ Tentou / Executou:** Inclusao do Principio 7 na Constituicao do AGENTS.md com Guia de Identificacao de Verbos em 3 Linhas Mestras
+- **⚠️ Erros Encontrados:** Risco de IA processar mensagens com grafia incorreta ou ficar presa em substantivos estaticos sem executar acoes reais
+- **🔧 Como Corrigiu:** Blindagem cognitiva estabelecida: foco na intencao fonetica, normalizacao para infinitivo canonico e extracao do verbo como ordem executavel
+- **🎯 Conclusão:** Principio 7 constitucional gravado no AGENTS.md. Toda IA agora opera sob o mandamento da acao real rumo a R$ 1.000.000,00
+- *Registro Supabase:* Memory #253
+
+---
+
+### 📍 [13/11/2026, 00:34:39] Atualizacao do Guia de Identificacao de Verbos com Exemplo Pratico forma_base no AGENTS.md
+- **📖 Estudou / Leu:** Regra formal de extracao morfologica do infinitivo e armazenamento no atributo forma_base com exemplo 'eles mandaram' -> 'mandar'
+- **⚙️ Tentou / Executou:** Incorporacao no AGENTS.md das regras 1, 2 com exemplo pratico de conjugacao e regra 3 de execucao real
+- **⚠️ Erros Encontrados:** Extracoes sem forma_base normalizada causavam dispersao semantica entre diferentes tempos verbais
+- **🔧 Como Corrigiu:** Adicionado exemplo mandatorio no prompt constitucional do AGENTS.md garantindo conversao automatica de qualquer conjugacao para o infinitivo canonico
+- **🎯 Conclusão:** Guia de verbos blindado com exemplo pratico no AGENTS.md e sincronizado no Supabase
+- *Registro Supabase:* Memory #254
+
+---
+
+### 📍 [13/11/2026, 01:28:53] Criacao do CONTEXTO_MESTRE.md e Integracao da Matriz de Pesos e Linha de Montagem Financeira
+- **📖 Estudou / Leu:** Teoria de Agentes Autonomos: Estado Atual vs Desejado, Matriz de Peso (1.00 Vender/Meta R$ 1M, 0.95 Falhas, 0.90 Publicar, 0.85 Reter), Linha de Montagem Financeira (GitHub Fabrica, Supabase Cerebro/Cofre, Google Play Vitrine/Caixa) e Engenharia Financeira Reversa
+- **⚙️ Tentou / Executou:** Criacao do arquivo CONTEXTO_MESTRE.md na raiz e vinculacao mandatoria no AGENTS.md para orientar todos os agentes e subagentes
+- **⚠️ Erros Encontrados:** Risco de IAs operarem de forma passiva esperando comandos 'faca isso', tratando tarefas triviais com a mesma prioridade de tarefas financeiras
+- **🔧 Como Corrigiu:** Instituido o Documento de Contexto Estrategico com matriz de pesos matematicos de impacto financeiro e cadeia logica de acao e reacao
+- **🎯 Conclusão:** CONTEXTO_MESTRE.md ativo na raiz. Agentes agora operam com postura de socio tecnico e estrategista rumo a R$ 1.000.000,00
+- *Registro Supabase:* Memory #255
+
+---
+
+### 📍 [13/11/2026, 01:38:58] Finalizacao da Secao 4 do CONTEXTO_MESTRE.md com Comando Executivo de Gatilho Autonomo
+- **📖 Estudou / Leu:** Mudanca de paradigma operacional: de microgerenciamento 'faca tal codigo' para lideranca estrategica 'leia o contexto, analise o estado e execute a acao de maior peso'
+- **⚙️ Tentou / Executou:** Inclusao dos 3 passos operacionais em CONTEXTO_MESTRE.md e CONTEXTO_ESTRATEGICO.md e conexao ativa com public.aprendizado_ia
+- **⚠️ Erros Encontrados:** Risco de dependencia de comandos pontuais travando a autonomia
+- **🔧 Como Corrigiu:** Adicionada a pergunta gatilho que dispara a analise da linha de montagem financeira e da matriz de pesos
+- **🎯 Conclusão:** Secao 4 concluida e gravada. Sistema 100% pronto para operar como socio tecnico e estrategista
+- *Registro Supabase:* Memory #256
+
+---
+
+### 📍 [13/11/2026, 08:27:10] Desacoplamento Multi-Gateway de IA, Rota Nativa Google AI Studio e Compilacao Verde Android
+- **📖 Estudou / Leu:** Principio 1 da Constituicao AGENTS.md, rotas OpenRouter vs Google AI Studio v1beta, Scoped Storage e limites de quota semanais
+- **⚙️ Tentou / Executou:** Integracao direta da chave GOOGLE_AI_STUDIO_API_KEY no ai-failover-router.mjs e compilacao Gradle :domain:test :app:testDebugUnitTest :app:assembleDebug
+- **⚠️ Erros Encontrados:** HTTP 402 no OpenRouter por falta de saldo pre-pago para modelos comerciais e bloqueio de 156h na interface CLI
+- **🔧 Como Corrigiu:** Implementada rota direta do Google AI Studio a custo zero (gemini-2.5-flash 200 OK) e contingencia tripla (Studio -> OpenRouter -> Codex local)
+- **🎯 Conclusão:** Principio 1 cumprido na pratica. Sistema 100% blindado contra bloqueios, testes Android verdes (BUILD SUCCESSFUL in 11m 11s) e infraestrutura imune a quedas
+- *Registro Supabase:* Memory #258
+
+---

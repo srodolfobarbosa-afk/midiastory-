@@ -20,10 +20,11 @@ import { fileURLToPath } from "node:url";
 import { executeWithFailover } from "./ai-failover-router.mjs";
 import { listSkills, listMcpServers } from "./skill-mcp-manager.mjs";
 import { checkAndMaintain } from "./supabase-maintenance.mjs";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const token = getSupabaseToken();
 const projectRef = "usmqtnlsaavxqguwrtix";
 const auditReportPath = path.join(projectRoot, "docs", "audits", "relatorio-percepcao-ponta-a-ponta.md");
 

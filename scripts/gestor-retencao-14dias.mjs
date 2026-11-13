@@ -19,10 +19,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const token = getSupabaseToken();
 const projectRef = "usmqtnlsaavxqguwrtix";
 const questionnairePath = path.join(projectRoot, "docs", "campaigns", "respostas-formulario-producao-google-play.md");
 

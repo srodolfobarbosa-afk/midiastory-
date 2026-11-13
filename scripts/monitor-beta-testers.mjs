@@ -12,31 +12,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const mcpConfigPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
 const projectRef = "usmqtnlsaavxqguwrtix";
 const GOAL = 20;
 
-function getToken() {
-  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
-  if (fs.existsSync(mcpConfigPath)) {
-    try {
-      const raw = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
-      const envToken = raw?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN;
-      if (envToken) return envToken.trim();
-      const auth = raw?.mcpServers?.supabase?.headers?.Authorization || "";
-      return auth.replace(/^Bearer\s+/i, "").trim();
-    } catch {
-      // fallback
-    }
-  }
-  return "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
-}
-
 async function runSql(query) {
-  const token = getToken();
+  const token = getSupabaseToken();
   const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
     method: "POST",
     headers: {

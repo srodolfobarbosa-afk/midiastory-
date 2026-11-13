@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">Midiastore में आपका स्वागत है</string>
-    <string name="onboarding_welcome_message">🔒 100%% निजी: आपकी तस्वीरें और वीडियो आपके डिवाइस पर ऑफ़लाइन विश्लेषित होते हैं और कभी फ़ोन से बाहर नहीं जाते।\n\n⚡ स्मार्ट SHA-256 विश्लेषण: सटीक डुप्लिकेट फ़ाइलों को खोजता है और मूल फ़ाइलों को सुरक्षित रखता है।\n\n🚀 स्टोरेज खाली करने के लिए तैयार: अभी मुफ़्त विश्लेषण शुरू करें।</string>
+    <string name="onboarding_welcome_message">🔒 100%% निजी: आपकी तस्वीरें और वीडियो आपके डिवाइस पर स्थानीय रूप से विश्लेषित होते हैं और कभी फ़ोन से बाहर नहीं जाते।\n\n⚡ स्मार्ट SHA-256 विश्लेषण: सटीक डुप्लिकेट फ़ाइलों को खोजता है और मूल फ़ाइलों को सुरक्षित रखता है।\n\n🚀 स्टोरेज खाली करने के लिए तैयार: अभी मुफ़्त विश्लेषण शुरू करें।</string>
     <string name="onboarding_start_button">मुफ़्त विश्लेषण शुरू करें</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">आपका स्टोरेज, आपके नियंत्रण में।</string>
@@ -52,6 +52,7 @@
     <string name="oaas_card_subtitle">आपकी फ़ाइलें इसी डिवाइस पर रहती हैं। परिणाम देखें और हर कार्रवाई की अनुमति दें।</string>
     <string name="nav_home">होम</string>
     <string name="nav_files">फ़ाइलें</string>
+    <string name="nav_studio">स्टूडियो</string>
     <string name="nav_missions">क्लीनअप</string>
     <string name="nav_pro">Pro</string>
     <string name="analyze_now">स्टोरेज जाँचें</string>
@@ -90,13 +91,13 @@
     <string name="home_plans_title">Pro प्लान</string>
     <string name="home_plans_subtitle">हर प्लान में वही Pro सुविधाएँ हैं। भुगतान का तरीका चुनें।</string>
     <string name="premium_area_button">Pro क्षेत्र</string>
-    <string name="plan_monthly_unavailable">मासिक · सुझाया R$14.90/माह · सक्रिय नहीं</string>
-    <string name="plan_annual_unavailable">वार्षिक · सुझाया R$79.90/वर्ष · सक्रिय नहीं</string>
-    <string name="plan_lifetime_unavailable">लाइफ़टाइम · सुझाया R$149.90 एक बार · सक्रिय नहीं</string>
-    <string name="plan_monthly_default">मासिक · R$14.90/माह (सुझाया)</string>
-    <string name="plan_annual_default">वार्षिक · R$79.90/वर्ष (सुझाया)</string>
-    <string name="plan_lifetime_default">लाइफ़टाइम · R$149.90 एक बार (सुझाया)</string>
+    <string name="plan_monthly_unavailable">मासिक · संदर्भ R$14.99/माह · Google Play की प्रतीक्षा</string>
+    <string name="plan_annual_unavailable">वार्षिक · संदर्भ R$79.99/वर्ष · Google Play की प्रतीक्षा</string>
+    <string name="plan_lifetime_unavailable">लाइफ़टाइम · संदर्भ R$149.99 एक बार · Google Play की प्रतीक्षा</string>
+    <string name="plan_monthly_default">मासिक · R$14.99/माह</string>
+    <string name="plan_annual_default">वार्षिक · R$79.99/वर्ष</string>
+    <string name="plan_lifetime_default">लाइफ़टाइम · R$149.99 एक बार</string>
     <string name="pro_free_included">मुफ़्त · बड़ी फ़ाइलें ढूँढें और हटाने से पहले समीक्षा करें।</string>
     <string name="pro_paid_included">PRO · सटीक प्रतियाँ और पुरानी फ़ाइलें ढूँढें, कम इस्तेमाल वाले ऐप सुझाएँ और रिपोर्ट निर्यात करें।</string>
-    <string name="pro_purchase_unavailable_notice">अभी प्लान खरीदने के लिए उपलब्ध नहीं हैं।</string>
+    <string name="pro_purchase_unavailable_notice">अभी Google Play से प्लान लोड नहीं हो सके।</string>
 </resources>

@@ -82,9 +82,9 @@ android {
             versionNameSuffix = "-debug"
         }
         release {
-            // Ativa R8 para eliminar o aviso de tabela de símbolos de desobfuscação na Google Play Console
-            isMinifyEnabled = false
-            isShrinkResources = false
+            // Ativa o otimizador R8 oficial do Google para redução de APK e geração de símbolos
+            isMinifyEnabled = true
+            isShrinkResources = true
             if (uploadSigningReady) {
                 signingConfig = signingConfigs.getByName("upload")
             }
@@ -127,6 +127,7 @@ dependencies {
     implementation("com.google.android.material:material:1.14.0")
     implementation("com.android.billingclient:billing:8.3.0")
     implementation("com.google.android.play:review-ktx:2.0.2")
+    implementation("com.google.zxing:core:3.5.3")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")

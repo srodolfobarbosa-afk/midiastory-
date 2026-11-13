@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { execSync } from "node:child_process";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const projectDir = "C:/Users/rodolfo/midiastory-";
 const repo = "srodolfobarbosa-afk/midiastory-";
@@ -13,7 +14,7 @@ function setSecret(name, value) {
 }
 
 function main() {
-  const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+  const token = getSupabaseToken();
   const projectRef = "usmqtnlsaavxqguwrtix";
   const aiKeys = fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8");
   const playAccount = fs.readFileSync(`${projectDir}/.secrets/play-service-account.json`, "utf8");

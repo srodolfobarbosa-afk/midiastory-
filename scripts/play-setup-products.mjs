@@ -198,7 +198,7 @@ async function createAndActivateOneTimeProduct(token, productId, optionId, title
   };
 
   const patchRes = await fetch(
-    `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/onetimeproducts/${productId}?regionsVersion.version=${encodeURIComponent(regionsVersion)}&allowMissing=true&updateMask=listings,purchaseOptions`,
+    `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/oneTimeProducts/${productId}?regionsVersion.version=${encodeURIComponent(regionsVersion)}&allowMissing=true&updateMask=listings,purchaseOptions`,
     {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -213,7 +213,7 @@ async function createAndActivateOneTimeProduct(token, productId, optionId, title
   }
 
   const actRes = await fetch(
-    `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/onetimeproducts/${productId}/purchaseOptions:batchUpdateStates`,
+    `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/oneTimeProducts/${productId}/purchaseOptions:batchUpdateStates`,
     {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -246,7 +246,7 @@ async function main() {
     "Midiastore Pro Monthly",
     "Full monthly access to Midiastore Pro cleanup and report tools.",
     14,
-    900000000
+    990000000
   );
 
   await createAndActivateSubscription(
@@ -259,7 +259,7 @@ async function main() {
     "Midiastore Pro Annual",
     "Full annual access to Midiastore Pro cleanup and report tools.",
     79,
-    900000000
+    990000000
   );
 
   await createAndActivateOneTimeProduct(
@@ -271,7 +271,7 @@ async function main() {
     "Midiastore Pro Lifetime",
     "One-time purchase for lifetime access to Midiastore Pro tools.",
     149,
-    900000000
+    990000000
   );
 }
 

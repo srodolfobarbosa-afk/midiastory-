@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">Bem-vindo ao Midiastore</string>
-    <string name="onboarding_welcome_message">🔒 100%% Privado: Suas fotos e vídeos são analisados offline no seu aparelho e nunca saem do seu celular.\n\n⚡ Análise Inteligente SHA-256: Localiza duplicatas exatas com precisão matemática, mantendo seus arquivos originais a salvo.\n\n🚀 Pronto para recuperar espaço: Inicie sua análise gratuita agora.</string>
+    <string name="onboarding_welcome_message">🔒 100%% Privado: Suas fotos e vídeos são analisados localmente no seu aparelho e nunca saem do seu celular.\n\n⚡ Análise Inteligente SHA-256: Localiza duplicatas exatas com precisão matemática, mantendo seus arquivos originais a salvo.\n\n🚀 Pronto para recuperar espaço: Inicie sua análise gratuita agora.</string>
     <string name="onboarding_start_button">Iniciar Análise Gratuita</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Seu celular mais leve. Seu espaço de volta.</string>
@@ -112,9 +112,9 @@ Total: %3$s</string>
     <string name="home_plans_title">Planos Pro</string>
     <string name="home_plans_subtitle">Os mesmos recursos Pro em todos os planos. Escolha como pagar.</string>
     <string name="premium_area_button">Área Pro</string>
-    <string name="plan_monthly_unavailable">Mensal · preço sugerido R$ 14,90/mês · ainda não ativo</string>
-    <string name="plan_annual_unavailable">Anual · preço sugerido R$ 79,90/ano · ainda não ativo</string>
-    <string name="plan_lifetime_unavailable">Vitalício · preço sugerido R$ 149,90 · ainda não ativo</string>
+    <string name="plan_monthly_unavailable">Mensal · ref. R$ 14,99/mês · aguardando Google Play</string>
+    <string name="plan_annual_unavailable">Anual · ref. R$ 79,99/ano · aguardando Google Play</string>
+    <string name="plan_lifetime_unavailable">Vitalício · ref. R$ 149,99 · aguardando Google Play</string>
     <string name="pro_feature_requires_pro">Esta ferramenta de limpeza faz parte do Midiastore Pro.</string>
     <string name="pro_unused_apps_button">Encontrar apps sem uso há 90 dias · Pro</string>
     <string name="pro_unused_apps_title">Apps sem uso há 90 dias</string>
@@ -124,14 +124,14 @@ Total: %3$s</string>
     <string name="pro_unused_apps_last_used">Aberto pela última vez em %1$s</string>
     <string name="pro_unused_apps_never_used">Não foi aberto nos últimos 90 dias</string>
     <string name="pro_unused_apps_permission_denied">O acesso ao uso dos apps não foi autorizado.</string>
-    <string name="pro_purchase_unavailable_notice">Os planos ainda não estão disponíveis para compra.</string>
+    <string name="pro_purchase_unavailable_notice">Não foi possível carregar os planos no Google Play neste momento.</string>
     <string name="storage_ring_used">USADO</string>
-    <string name="plan_annual_default">Anual · R$ 79,90/ano (preço sugerido)</string>
+    <string name="plan_annual_default">Anual · R$ 79,99/ano</string>
     <string name="plan_annual_with_price">Midiastore Pro Anual · %1$s/ano</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro Anual (-%2$d%% de economia real) · %1$s/ano</string>
-    <string name="plan_monthly_default">Mensal · R$ 14,90/mês (preço sugerido)</string>
+    <string name="plan_monthly_default">Mensal · R$ 14,99/mês</string>
     <string name="plan_monthly_with_price">Midiastore Pro Mensal · %1$s/mês</string>
-    <string name="plan_lifetime_default">Vitalício · R$ 149,90 uma vez (preço sugerido)</string>
+    <string name="plan_lifetime_default">Vitalício · R$ 149,99 pagamento único</string>
     <string name="plan_lifetime_with_price">Midiastore Pro Vitalício (Compra Única) · %1$s</string>
     <string name="restore_purchases_button">Restaurar compras</string>
     <string name="restoring_purchases_status">Reconciliando compras ativas junto ao Google Play Billing…</string>
@@ -185,11 +185,12 @@ Total: %3$s</string>
     <string name="oaas_global_scan_failed">Não foi possível concluir a verificação. Nenhum arquivo foi alterado.</string>
     <string name="oaas_global_scan_limit">Limite de segurança atingido. O resultado é parcial. Reduza a busca ou tente uma análise mais específica.</string>
     <string name="nav_home">Início</string>
+    <string name="nav_files">Arquivos</string>
+    <string name="nav_studio">Estúdio</string>
+    <string name="nav_missions">Limpeza</string>
     <string name="nav_pro">Planos Pro</string>
     <string name="pro_advanced_cleanup_button">Limpeza avançada · Pro</string>
     <string name="pro_browse_files_button">Explorar arquivos · Pro</string>
-    <string name="nav_files">Arquivos</string>
-    <string name="nav_missions">Limpeza</string>
     <string name="analyze_now">ENCONTRAR O QUE LIMPAR</string>
     <string name="tap_to_scan_media">Veja o que ocupa espaço e escolha o que limpar.</string>
     <string name="hero_scan_ready">Toque para revisar sugestões de limpeza.</string>

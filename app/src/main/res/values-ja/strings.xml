@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">Midiastoreへようこそ</string>
-    <string name="onboarding_welcome_message">🔒 100%%プライベート: 写真や動画はデバイス上でオフラインで安全に解析され、外部に送信されることはありません。\n\n⚡ スマートSHA-256解析: 高度なハッシュ照合で完全重複ファイルを特定し、オリジナルを安全に保護します。\n\n🚀 空き容量を取り戻す準備は完了: 今すぐ無料診断を開始しましょう。</string>
+    <string name="onboarding_welcome_message">🔒 100%%プライベート: 写真や動画はデバイス上でローカルに安全に解析され、外部に送信されることはありません。\n\n⚡ スマートSHA-256解析: 高度なハッシュ照合で完全重複ファイルを特定し、オリジナルを安全に保護します。\n\n🚀 空き容量を取り戻す準備は完了: 今すぐ無料診断を開始しましょう。</string>
     <string name="onboarding_start_button">無料診断を開始</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">ストレージをあなたの手で管理。</string>
@@ -52,6 +52,7 @@
     <string name="oaas_card_subtitle">ファイルは端末内に保存されます。結果を確認し、操作ごとに許可してください。</string>
     <string name="nav_home">ホーム</string>
     <string name="nav_files">ファイル</string>
+    <string name="nav_studio">スタジオ</string>
     <string name="nav_missions">クリーンアップ</string>
     <string name="nav_pro">Pro</string>
     <string name="analyze_now">ストレージを確認</string>
@@ -90,13 +91,13 @@
     <string name="home_plans_title">Proプラン</string>
     <string name="home_plans_subtitle">すべてのプランで同じPro機能を利用できます。支払い方法を選択してください。</string>
     <string name="premium_area_button">Proエリア</string>
-    <string name="plan_monthly_unavailable">月額 · 提案価格 R$14.90/月 · 未有効</string>
-    <string name="plan_annual_unavailable">年額 · 提案価格 R$79.90/年 · 未有効</string>
-    <string name="plan_lifetime_unavailable">買い切り · 提案価格 R$149.90 · 未有効</string>
-    <string name="plan_monthly_default">月額 · R$14.90/月（提案価格）</string>
-    <string name="plan_annual_default">年額 · R$79.90/年（提案価格）</string>
-    <string name="plan_lifetime_default">買い切り · R$149.90（提案価格）</string>
+    <string name="plan_monthly_unavailable">月額 · 参考価格 R$14.99/月 · Google Play 待機中</string>
+    <string name="plan_annual_unavailable">年額 · 参考価格 R$79.99/年 · Google Play 待機中</string>
+    <string name="plan_lifetime_unavailable">買い切り · 参考価格 R$149.99 · Google Play 待機中</string>
+    <string name="plan_monthly_default">月額 · R$14.99/月</string>
+    <string name="plan_annual_default">年額 · R$79.99/年</string>
+    <string name="plan_lifetime_default">買い切り · R$149.99</string>
     <string name="pro_free_included">無料 · 大きなファイルを探し、削除前に確認。</string>
     <string name="pro_paid_included">PRO · 完全一致のコピーや古いファイルを検索し、未使用アプリを提案してレポートを出力。</string>
-    <string name="pro_purchase_unavailable_notice">現在、プランは購入できません。</string>
+    <string name="pro_purchase_unavailable_notice">現在 Google Play からプランを読み込めません。</string>
 </resources>

@@ -19,10 +19,25 @@ Esta Constituição estabelece os 6 princípios invioláveis que regem toda a op
    Autonomia responsável para baixar bibliotecas, criar novos repositórios, desenvolver subagentes sob demanda e proteger o limite de 500 MB do Supabase.
 6. **COMPROMISSO COM O RESULTADO REAL:**
    Toda linha de código, copy ou automação tem como objetivo destravar o próximo passo rumo aos 20 testadores, aprovação de produção e escala de receita no Google Play Billing.
+7. **LEI COGNITIVA DOS VERBOS & AÇÃO REAL (A GRAMÁTICA DE R$ 1.000.000,00):**
+   Toda IA que atua no ecossistema Midiastore deve compreender que **cada palavra representa uma ação real**. Substantivos são objetos estáticos; **verbos são os motores da realidade que movem o mundo e geram faturamento**.
+   - **O que é um Verbo na Prática:** Palavra que expressa ação, estado ou fenômeno da natureza.
+   - **O Teste Infalível de Identificação:** Coloque os pronomes *Eu / Ele* e alterne o tempo (*Passado, Presente, Futuro*). Se a palavra se flexiona, é **VERBO**; se não flexiona, é substantivo estático.
+   - **As 3 Famílias Mestras (-R):** 1ª Conjugação (-AR / Inovação e Criação), 2ª Conjugação (-ER, incluindo -OR/poer / Execução e Comércio), 3ª Conjugação (-IR / Decisão e Marcha).
+   - **Os 3 Blocos de Operação da IA:**
+     * *Estado & Existência:* Ser, estar, ter, haver, ficar.
+     * *Ação Geral & Força:* Fazer, ir, vir, dar, poder, querer, dever (Tríade Suprema: Querer a meta + Poder técnico + Dever de execução).
+     * *Comunicação, Mente & Comando:* Dizer, falar, saber, ver, pensar, achar, pedir, mandar.
+   
+   ### GUIA DE IDENTIFICAÇÃO DE VERBOS:
+   1. Considere como verbo toda palavra que expressa ação, estado ou fenômeno e que aceita flexão de tempo (passado, presente, futuro) ou pessoa (eu, ele, nós).
+   2. Sempre converta o verbo encontrado para sua forma original no infinitivo (terminações -AR, -ER, -IR ou -OR) no campo "forma_base".
+      - *Exemplo:* se o usuário escrever "eles mandaram", extraia "mandaram" e salve "mandar" como `forma_base`.
+   3. **O VERBO COMO COMANDO DE EXECUÇÃO:** Extraia o verbo principal como a ordem executável primária da mensagem: descubra O QUE deve ser transformado no mundo real (código, produto, teste, venda) e execute imediatamente, sem desculpas ou teorias passivas.
 
 ---
 
-You are working on the Android app **Midiastore**. Read this file and `README.md`, then `docs/CONTINUATION_HANDOFF.md`, `docs/FEATURE_IMPLEMENTATION_MATRIX.md`, and `docs/RELEASE_BLOCKERS.md` before changing code.
+You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_MESTRE.md`**, and `README.md`, then `docs/CONTINUATION_HANDOFF.md`, `docs/FEATURE_IMPLEMENTATION_MATRIX.md`, and `docs/RELEASE_BLOCKERS.md` before changing code.
 
 ## Project identity — do not guess
 

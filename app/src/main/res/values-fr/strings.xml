@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">Bienvenue sur Midiastore</string>
-    <string name="onboarding_welcome_message">🔒 100%% Privé: Vos photos et vidéos sont analysées hors ligne sur votre appareil et ne quittent jamais votre téléphone.\n\n⚡ Analyse Intelligente SHA-256: Détecte les doublons exacts avec une précision mathématique, en protégeant vos originaux.\n\n🚀 Prêt à libérer de l\'espace: Démarrez votre analyse gratuite dès maintenant.</string>
+    <string name="onboarding_welcome_message">🔒 100%% Privé: Vos photos et vidéos sont analysées localement sur votre appareil et ne quittent jamais votre téléphone.\n\n⚡ Analyse Intelligente SHA-256: Détecte les doublons exacts avec une précision mathématique, en protégeant vos originaux.\n\n🚀 Prêt à libérer de l\'espace: Démarrez votre analyse gratuite dès maintenant.</string>
     <string name="onboarding_start_button">Démarrer l\'analyse gratuite</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Votre stockage, sous votre contrôle.</string>
@@ -52,6 +52,7 @@
     <string name="oaas_card_subtitle">Vos fichiers restent sur cet appareil. Vérifiez les résultats et approuvez chaque action.</string>
     <string name="nav_home">Accueil</string>
     <string name="nav_files">Fichiers</string>
+    <string name="nav_studio">Studio</string>
     <string name="nav_missions">Nettoyage</string>
     <string name="nav_pro">Pro</string>
     <string name="analyze_now">ANALYSER MON STOCKAGE</string>
@@ -90,13 +91,13 @@
     <string name="home_plans_title">Offres Pro</string>
     <string name="home_plans_subtitle">Les mêmes outils Pro dans chaque offre. Choisissez le paiement.</string>
     <string name="premium_area_button">Espace Pro</string>
-    <string name="plan_monthly_unavailable">Mensuel · proposé R$14,90/mois · non actif</string>
-    <string name="plan_annual_unavailable">Annuel · proposé R$79,90/an · non actif</string>
-    <string name="plan_lifetime_unavailable">À vie · proposé R$149,90 en une fois · non actif</string>
-    <string name="plan_monthly_default">Mensuel · R$14,90/mois (proposé)</string>
-    <string name="plan_annual_default">Annuel · R$79,90/an (proposé)</string>
-    <string name="plan_lifetime_default">À vie · R$149,90 en une fois (proposé)</string>
+    <string name="plan_monthly_unavailable">Mensuel · réf. R$14,99/mois · en attente de Google Play</string>
+    <string name="plan_annual_unavailable">Annuel · réf. R$79,99/an · en attente de Google Play</string>
+    <string name="plan_lifetime_unavailable">À vie · réf. R$149,99 en une fois · en attente de Google Play</string>
+    <string name="plan_monthly_default">Mensuel · R$14,99/mois</string>
+    <string name="plan_annual_default">Annuel · R$79,99/an</string>
+    <string name="plan_lifetime_default">À vie · R$149,99 en une fois</string>
     <string name="pro_free_included">GRATUIT · Repérez les gros fichiers et vérifiez-les avant suppression.</string>
     <string name="pro_paid_included">PRO · Repérez les copies exactes et anciens fichiers, suggérez les apps inutilisées et exportez des rapports.</string>
-    <string name="pro_purchase_unavailable_notice">Les offres ne sont pas encore disponibles à l’achat.</string>
+    <string name="pro_purchase_unavailable_notice">Les offres ne peuvent pas être chargées depuis Google Play pour le moment.</string>
 </resources>

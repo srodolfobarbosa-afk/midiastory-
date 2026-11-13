@@ -6,8 +6,9 @@
  */
 import fs from "node:fs";
 import { execSync } from "node:child_process";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
-const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const token = getSupabaseToken();
 const projectRef = "usmqtnlsaavxqguwrtix";
 const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/native-orchestrator`;
 

@@ -11,4 +11,12 @@
     <color name="sweep_success">#10B981</color>
     <color name="sweep_warning">#F59E0B</color>
     <color name="sweep_danger">#EF4444</color>
+
+    <!-- Cores Vibrantes dos Ambientes do Estúdio de Mídia -->
+    <color name="studio_accent">#E040FB</color>
+    <color name="studio_photo_neon">#FF4081</color>
+    <color name="studio_video_cyan">#00E5FF</color>
+    <color name="studio_exif_emerald">#00E676</color>
+    <color name="studio_qr_amber">#FFAB00</color>
+    <color name="studio_pdf_indigo">#7C4DFF</color>
 </resources>

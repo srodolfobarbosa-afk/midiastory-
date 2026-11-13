@@ -15,3 +15,8 @@ keystore.properties
 *service-account*.json
 play-console-key.json
 .secrets/
+.kotlin/
+*.dump.xml
+*_dump.xml
+fresh_dump.xml
+motorola_*.png

@@ -14,12 +14,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 const codexPath = "C:\\Users\\rodolfo\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe";
 const supabaseRef = "usmqtnlsaavxqguwrtix";
-const supabaseToken = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const supabaseToken = getSupabaseToken();
 
 async function runSql(query) {
   const res = await fetch(`https://api.supabase.com/v1/projects/${supabaseRef}/database/query`, {

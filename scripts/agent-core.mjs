@@ -18,6 +18,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -27,7 +28,7 @@ const datasetPath = path.join(projectRoot, "docs", "datasets", "fine-tuning-traj
 
 // Configurações do Supabase
 const supabaseRef = "usmqtnlsaavxqguwrtix";
-const supabaseToken = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const supabaseToken = getSupabaseToken();
 
 // -------------------------------------------------------------
 // 1. BANCO DE DADOS, SQL E MEMÓRIA VETORIAL (PGVECTOR 1536D)

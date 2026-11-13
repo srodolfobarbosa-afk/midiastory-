@@ -31,10 +31,10 @@ async function main() {
   });
   const token = (await tokenRes.json()).access_token;
 
-  const res = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/monetization/onetimeproducts`, {
+  const res = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/oneTimeProducts`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  console.log("Monetization Onetimeproducts Status:", res.status);
+  console.log("OneTimeProducts Status:", res.status);
   const data = await res.json();
   console.log(JSON.stringify(data, null, 2));
 }

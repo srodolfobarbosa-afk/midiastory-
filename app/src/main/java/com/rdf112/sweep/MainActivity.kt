@@ -4,11 +4,14 @@ import android.Manifest
 import android.app.Activity
 import android.app.AppOpsManager
 import android.app.usage.UsageStatsManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -18,9 +21,13 @@ import android.os.CancellationSignal
 import android.os.Environment
 import android.os.Process
 import android.os.StatFs
+import android.provider.OpenableColumns
 import android.provider.Settings
+import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextWatcher
+import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
 import android.util.Size
 import android.view.Gravity
@@ -31,6 +38,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -79,8 +87,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.text.DateFormat
 import java.util.Date
 import com.rdf112.sweep.presentation.studio.MediaStudioTools
@@ -90,7 +101,7 @@ import com.rdf112.sweep.presentation.studio.MediaStudioTools
  * Orbe Central de 1 Toque, Missões OaaS Automatizadas e Compatibilidade MediaStore Universal.
  */
 class MainActivity : AppCompatActivity() {
-    private enum class AppTab { HOME, FILES, OAAS, PRO }
+    private enum class AppTab { HOME, FILES, STUDIO, OAAS, PRO }
     private data class UnusedAppInfo(
         val packageName: String,
         val displayName: String,
@@ -206,6 +217,9 @@ class MainActivity : AppCompatActivity() {
                 sessionAuthorizedBytes += totalBatchBytes
             }
             if (confirmedBytes > 0L) {
+                try {
+                    window.decorView.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
+                } catch (_: Exception) {}
                 outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
                 inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes)
             }
@@ -238,6 +252,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val photoFilterPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { openInteractivePhotoFilterEditor(it) }
+    }
+
+    private val videoAudioPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { openVideoAudioStudio(it) }
+    }
+
+    private val exifPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { openInteractiveExifCleaner(it) }
+    }
+
+    private val photosToPdfPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (!uris.isNullOrEmpty()) {
+            processPhotosToPdf(uris)
+        } else {
+            Toast.makeText(this, "Nenhuma foto selecionada.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private lateinit var viewModel: MediaScanViewModel
     private lateinit var billingGateway: AndroidPlayBillingGateway
     private lateinit var trashCoordinator: AndroidTrashOperationCoordinator
@@ -259,15 +301,17 @@ class MainActivity : AppCompatActivity() {
     private var pendingOutcomeMission: DesiredOutcomeMission? = null
     private var lastRecordedMissionProgress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress? = null
 
-    // Containers das 4 Abas
+    // Containers das 5 Abas
     private lateinit var homeSection: LinearLayout
     private lateinit var filesSection: LinearLayout
+    private lateinit var studioSection: LinearLayout
     private lateinit var oaasSection: LinearLayout
     private lateinit var proSection: LinearLayout
 
     // Botões da Barra de Navegação Inferior
     private lateinit var navHomeBtn: MaterialButton
     private lateinit var navFilesBtn: MaterialButton
+    private lateinit var navStudioBtn: MaterialButton
     private lateinit var navOaasBtn: MaterialButton
     private lateinit var navProBtn: MaterialButton
     private lateinit var bottomNavContainer: LinearLayout
@@ -474,33 +518,37 @@ class MainActivity : AppCompatActivity() {
         }
         bodyContainer.addView(statusText)
 
-        // Construção das 4 Seções Separadas
+        // Construção das 5 Seções Separadas
         homeSection = buildHomeDashboardSection()
         filesSection = buildFilesExplorerSection()
+        studioSection = buildStudioToolsSection()
         oaasSection = buildOaasMissionsSection()
         proSection = buildProPaywallSection()
 
         bodyContainer.addView(homeSection)
         bodyContainer.addView(filesSection)
+        bodyContainer.addView(studioSection)
         bodyContainer.addView(oaasSection)
         bodyContainer.addView(proSection)
 
-        // 3. BARRA DE NAVEGAÇÃO INFERIOR (4 Abas limpas estilo 2027)
+        // 3. BARRA DE NAVEGAÇÃO INFERIOR (5 Abas vibrantes com Cores de Ambiente)
         bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             setBackgroundColor(color(R.color.sweep_surface))
-            setPadding(dp(10), dp(8), dp(10), dp(10))
+            setPadding(dp(6), dp(8), dp(6), dp(10))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
         navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
+        navStudioBtn = navTabButton(getString(R.string.nav_studio)) { switchTab(AppTab.STUDIO) }
         navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
 
-        bottomNavContainer.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
-        bottomNavContainer.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
-        bottomNavContainer.addView(navOaasBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(4) })
-        bottomNavContainer.addView(navProBtn, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginStart = dp(4) })
+        bottomNavContainer.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
+        bottomNavContainer.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
+        bottomNavContainer.addView(navStudioBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
+        bottomNavContainer.addView(navOaasBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
+        bottomNavContainer.addView(navProBtn, LinearLayout.LayoutParams(0, dp(48), 1f))
         root.addView(bottomNavContainer, LinearLayout.LayoutParams(-1, -2))
 
         return root
@@ -576,6 +624,7 @@ class MainActivity : AppCompatActivity() {
         }.apply {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            visibility = if (trashCoordinator.supportsSystemTrash()) View.VISIBLE else View.GONE
         }
         val homeDeleteBtn = button(getString(R.string.permanent_delete_button)) {
             requestPermanentDeleteSelected()
@@ -629,17 +678,17 @@ class MainActivity : AppCompatActivity() {
 
         // Card Estúdio de Mídia & Ferramentas (Filtros, Compressor, EXIF, QR Code, PDF)
         val studioCard = card()
-        studioCard.addView(label(getString(R.string.media_studio_title), 11f, R.color.sweep_primary_glow, true))
+        studioCard.addView(label(getString(R.string.media_studio_title), 11f, R.color.studio_accent, true))
         studioCard.addView(label(getString(R.string.media_studio_subtitle), 12f, R.color.sweep_muted, false), top(4))
         val openStudioBtn = button(getString(R.string.media_studio_open_button)) {
-            showMediaStudioDialog()
+            switchTab(AppTab.STUDIO)
         }.apply {
             minHeight = dp(50)
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.studio_accent))
         }
         studioCard.addView(openStudioBtn, top(10))
-        addView(wrap(studioCard), bottom(14))
+        addView(themedCard(studioCard, Color.parseColor("#120E1E"), color(R.color.studio_accent)), bottom(14))
 
         // Banner VIP Pro Moderno e Enxuto (Direciona para a Aba Pro, sem poluir a Home com botões repetidos)
         val homeProBanner = card().apply {
@@ -1040,24 +1089,223 @@ class MainActivity : AppCompatActivity() {
         addView(wrap(privacy))
     }
 
+    private fun buildStudioToolsSection(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        visibility = View.GONE
+        setPadding(dp(2), dp(2), dp(2), dp(16))
+
+        // Hero Header do Estúdio de Mídia
+        val header = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(4), dp(2), dp(4), dp(12))
+        }
+        val heroBadge = TextView(this@MainActivity).apply {
+            text = "⚡ NOVO AMBIENTE CRIATIVO & MULTIMÍDIA"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(color(R.color.studio_accent))
+            includeFontPadding = false
+        }
+        header.addView(heroBadge)
+        header.addView(label("Estúdio & Ferramentas Pro", 20f, R.color.sweep_text, true), top(4))
+        header.addView(
+            label(
+                "Ferramentas avançadas para transformar, proteger e encolher suas mídias. Cada função conta com ambiente visual exclusivo.",
+                12f,
+                R.color.sweep_muted,
+                false
+            ),
+            top(4)
+        )
+        addView(header)
+
+        // AMBIENTE 0: Baixador de Vídeos da Web & Redes (Rose Neon #F50057)
+        val dlCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val dlBadge = TextView(this@MainActivity).apply {
+            text = "🎬 DOWNLOADER REAL • LINKS DIRETOS MP4 & MÍDIA WEB"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#F50057"))
+        }
+        dlCard.addView(dlBadge)
+        dlCard.addView(label("Baixador de Mídia por Link", 16f, R.color.sweep_text, true), top(4))
+        dlCard.addView(
+            label("Insira o link de vídeos ou mídias da web e baixe com streaming direto para a sua Galeria.", 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openDlBtn = button("📥 BAIXAR VÍDEO POR LINK") {
+            openVideoDownloaderStudio()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F50057"))
+            setTextColor(Color.WHITE)
+            minHeight = dp(46)
+        }
+        dlCard.addView(openDlBtn, top(12))
+        addView(themedCard(dlCard, Color.parseColor("#1B0C14"), Color.parseColor("#F50057")), bottom(14))
+
+        // AMBIENTE 1: Filtros de Fotos (Neon Sunset #FF4081)
+        val photoCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val photoBadge = TextView(this@MainActivity).apply {
+            text = "🎨 AMBIENTE VISUAL • FILTROS AO VIVO"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#FF4081"))
+        }
+        photoCard.addView(photoBadge)
+        photoCard.addView(label("Estúdio de Filtros de Foto", 16f, R.color.sweep_text, true), top(4))
+        photoCard.addView(
+            label("Aplique efeitos Cinema Teal & Orange, Nitidez HD, Sépia Vintage, P&B e Cores Vibrantes com prévia em tempo real.", 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openFiltersBtn = button("✨ ABRIR FILTROS DA GALERIA") {
+            photoFilterPickerLauncher.launch("image/*")
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FF4081"))
+            setTextColor(Color.WHITE)
+            minHeight = dp(46)
+        }
+        photoCard.addView(openFiltersBtn, top(12))
+        addView(themedCard(photoCard, Color.parseColor("#150C1B"), Color.parseColor("#FF4081")), bottom(14))
+
+        // AMBIENTE 2: Áudio & Vídeo (Electric Cyan #00E5FF)
+        val videoCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val videoBadge = TextView(this@MainActivity).apply {
+            text = "🎵 AMBIENTE ACÚSTICO • M4A & COMPRESSÃO"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#00E5FF"))
+        }
+        videoCard.addView(videoBadge)
+        videoCard.addView(label("Extrator de Áudio & Otimizador", 16f, R.color.sweep_text, true), top(4))
+        videoCard.addView(
+            label("Extraia a trilha de áudio cristalina de vídeos do WhatsApp e Reels, liberando até 80% de memória no aparelho.", 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openVideoBtn = button("🎵 SELECIONAR VÍDEO PARA EXTRAIR") {
+            videoAudioPickerLauncher.launch("video/*")
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#00E5FF"))
+            setTextColor(Color.parseColor("#070B14"))
+            minHeight = dp(46)
+        }
+        videoCard.addView(openVideoBtn, top(12))
+        addView(themedCard(videoCard, Color.parseColor("#091724"), Color.parseColor("#00E5FF")), bottom(14))
+
+        // AMBIENTE 3: Limpador de Privacidade EXIF (Matrix Emerald #00E676)
+        val exifCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val exifBadge = TextView(this@MainActivity).apply {
+            text = "🛡️ AMBIENTE DE BLINDAGEM • ZERO GPS"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#00E676"))
+        }
+        exifCard.addView(exifBadge)
+        exifCard.addView(label("Higienizador de Privacidade EXIF", 16f, R.color.sweep_text, true), top(4))
+        exifCard.addView(
+            label("Detecte e remova coordenadas GPS exatas, modelo do aparelho e data antes de compartilhar suas fotos na web.", 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openExifBtn = button("🛡️ ESCANEAR & PROTEGER FOTO") {
+            exifPickerLauncher.launch("image/*")
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#00E676"))
+            setTextColor(Color.parseColor("#070B14"))
+            minHeight = dp(46)
+        }
+        exifCard.addView(openExifBtn, top(12))
+        addView(themedCard(exifCard, Color.parseColor("#091A14"), Color.parseColor("#00E676")), bottom(14))
+
+        // AMBIENTE 4: Gerador de QR Code (Golden Amber #FFAB00)
+        val qrCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val qrBadge = TextView(this@MainActivity).apply {
+            text = "⚡ AMBIENTE DE CONEXÃO • QR CODE DINÂMICO"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#FFAB00"))
+        }
+        qrCard.addView(qrBadge)
+        qrCard.addView(label("Gerador de Códigos QR", 16f, R.color.sweep_text, true), top(4))
+        qrCard.addView(
+            label("Crie QR Codes de alta resolução para cobranças PIX, links de sites, WhatsApp e acesso rápido a redes Wi-Fi.", 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openQrBtn = button("⚡ CRIAR QR CODE") {
+            openQrCodeGeneratorStudio()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFAB00"))
+            setTextColor(Color.parseColor("#070B14"))
+            minHeight = dp(46)
+        }
+        qrCard.addView(openQrBtn, top(12))
+        addView(themedCard(qrCard, Color.parseColor("#1F180B"), Color.parseColor("#FFAB00")), bottom(14))
+
+        // AMBIENTE 5: Fotos para PDF (Royal Indigo #7C4DFF)
+        val pdfCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val pdfBadge = TextView(this@MainActivity).apply {
+            text = "📄 AMBIENTE DOCUMENTAL • PDF A4"
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#7C4DFF"))
+        }
+        pdfCard.addView(pdfBadge)
+        pdfCard.addView(label("Criador de Fotos para PDF", 16f, R.color.sweep_text, true), top(4))
+        pdfCard.addView(
+            label("Junte fotos de documentos, contratos e recibos em um único arquivo PDF padrão A4, pronto para envio.", 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openPdfBtn = button("📄 GERAR DOCUMENTO PDF") {
+            photosToPdfPickerLauncher.launch("image/*")
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#7C4DFF"))
+            setTextColor(Color.WHITE)
+            minHeight = dp(46)
+        }
+        pdfCard.addView(openPdfBtn, top(12))
+        addView(themedCard(pdfCard, Color.parseColor("#140E26"), Color.parseColor("#7C4DFF")), bottom(14))
+    }
+
     private fun switchTab(tab: AppTab) {
         activeTab = tab
-        statusText.visibility = if (tab == AppTab.FILES) View.VISIBLE else View.GONE
+        statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS || tab == AppTab.HOME)) View.VISIBLE else View.GONE
         homeSection.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
         filesSection.visibility = if (tab == AppTab.FILES) View.VISIBLE else View.GONE
+        studioSection.visibility = if (tab == AppTab.STUDIO) View.VISIBLE else View.GONE
         oaasSection.visibility = if (tab == AppTab.OAAS) View.VISIBLE else View.GONE
         proSection.visibility = if (tab == AppTab.PRO) View.VISIBLE else View.GONE
 
-        styleNavButton(navHomeBtn, tab == AppTab.HOME)
-        styleNavButton(navFilesBtn, tab == AppTab.FILES)
-        styleNavButton(navOaasBtn, tab == AppTab.OAAS)
-        styleNavButton(navProBtn, tab == AppTab.PRO)
+        // Cores temáticas exclusivas para cada ambiente ("sensação de ferramenta nova")
+        styleNavButton(navHomeBtn, tab == AppTab.HOME, customSelectedColor = Color.parseColor("#00E5FF")) // Cyan Tech
+        styleNavButton(navFilesBtn, tab == AppTab.FILES, customSelectedColor = Color.parseColor("#38BDF8")) // Sky Blue
+        styleNavButton(navStudioBtn, tab == AppTab.STUDIO, customSelectedColor = color(R.color.studio_accent)) // Neon Magenta #FF007F
+        styleNavButton(navOaasBtn, tab == AppTab.OAAS, customSelectedColor = Color.parseColor("#00E5B0")) // Mint Emerald
+        styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = Color.parseColor("#FFD700")) // Royal Gold
     }
 
-    private fun styleNavButton(btn: MaterialButton, selected: Boolean) {
+    private fun styleNavButton(btn: MaterialButton, selected: Boolean, customSelectedColor: Int? = null) {
         if (selected) {
-            btn.setTextColor(color(R.color.sweep_background))
-            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            val bg = customSelectedColor ?: color(R.color.sweep_primary)
+            // Se o fundo for claro (como Dourado, Ciano, Azul Claro ou Menta), usa texto escuro para contraste impecável
+            val isLightBg = (bg == Color.parseColor("#FFD700") || bg == Color.parseColor("#00E5FF") || bg == Color.parseColor("#00E5B0") || bg == Color.parseColor("#38BDF8"))
+            btn.setTextColor(if (isLightBg) Color.parseColor("#070B14") else Color.WHITE)
+            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(bg)
         } else {
             btn.setTextColor(color(R.color.sweep_muted))
             btn.backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
@@ -1068,6 +1316,7 @@ class MainActivity : AppCompatActivity() {
         if (!::proStatusBadge.isInitialized) return
         if (::bottomNavContainer.isInitialized) {
             navFilesBtn.visibility = View.VISIBLE
+            navStudioBtn.visibility = View.VISIBLE
             navOaasBtn.visibility = View.VISIBLE
         }
         if (isDevelopmentBuild && debugProPreviewEnabled) {
@@ -1278,6 +1527,22 @@ class MainActivity : AppCompatActivity() {
         val action = incomingIntent?.action ?: return
         if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE) {
             val sharedText = incomingIntent.getStringExtra(Intent.EXTRA_TEXT)
+            if (!sharedText.isNullOrBlank() && (sharedText.startsWith("http://") || sharedText.startsWith("https://") || sharedText.contains("http"))) {
+                val url = Regex("""https?://[^\s]+""").find(sharedText)?.value ?: sharedText
+                val actions = arrayOf(
+                    "📥 Baixar Mídia do Link",
+                    "⚡ Gerar QR Code deste Link"
+                )
+                AlertDialog.Builder(this)
+                    .setTitle("Link Recebido")
+                    .setItems(actions) { _, which ->
+                        if (which == 0) openVideoDownloaderStudio(url)
+                        else openQrCodeGeneratorStudio(url)
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                return
+            }
             val sharedUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
             } else {
@@ -1290,7 +1555,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showMediaStudioDialog(initialUri: Uri? = null, initialText: String? = null) {
+        if (initialUri != null) {
+            val mimeType = contentResolver.getType(initialUri) ?: ""
+            if (mimeType.startsWith("video/")) {
+                openVideoAudioStudio(initialUri)
+                return
+            } else if (mimeType.startsWith("image/")) {
+                val options = arrayOf(
+                    "🎨 Aplicar Filtros de Foto",
+                    "🛡️ Limpar Metadados EXIF e GPS",
+                    "📄 Converter para PDF"
+                )
+                AlertDialog.Builder(this)
+                    .setTitle("Mídia Recebida")
+                    .setItems(options) { _, which ->
+                        when (which) {
+                            0 -> openInteractivePhotoFilterEditor(initialUri)
+                            1 -> openInteractiveExifCleaner(initialUri)
+                            2 -> processPhotosToPdf(listOf(initialUri))
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                return
+            }
+        }
+
         val options = arrayOf(
+            "🎬 Baixar Vídeo por Link (Instagram, TikTok, Web)",
             getString(R.string.media_studio_photo_filters),
             getString(R.string.media_studio_video_tools),
             getString(R.string.media_studio_exif_cleaner),
@@ -1302,98 +1594,786 @@ class MainActivity : AppCompatActivity() {
             .setItems(options) { dialog, which ->
                 dialog.dismiss()
                 when (which) {
-                    0 -> openPhotoFilterStudio(initialUri)
-                    1 -> openVideoCompressorStudio(initialUri)
-                    2 -> openExifCleanerStudio(initialUri)
-                    3 -> openQrCodeGeneratorStudio(initialText)
-                    4 -> openPhotosToPdfStudio()
+                    0 -> openVideoDownloaderStudio(initialText)
+                    1 -> photoFilterPickerLauncher.launch("image/*")
+                    2 -> videoAudioPickerLauncher.launch("video/*")
+                    3 -> exifPickerLauncher.launch("image/*")
+                    4 -> openQrCodeGeneratorStudio(initialText)
+                    5 -> photosToPdfPickerLauncher.launch("image/*")
                 }
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
-    private fun openPhotoFilterStudio(initialUri: Uri?) {
-        val filterNames = MediaStudioTools.PhotoFilter.values().map { it.displayName }.toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.media_studio_photo_filters))
-            .setItems(filterNames) { dialog, which ->
-                dialog.dismiss()
-                val selectedFilter = MediaStudioTools.PhotoFilter.values()[which]
-                Toast.makeText(this, "${getString(R.string.media_studio_filter_applied)}: ${selectedFilter.displayName}", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
+    private fun openVideoDownloaderStudio(initialUrl: String? = null) {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
 
-    private fun openVideoCompressorStudio(initialUri: Uri?) {
-        val actions = arrayOf("🎬 Comprimir Vídeo (Reduzir até 80%)", "🎵 Extrair Faixa de Áudio (M4A)")
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.media_studio_video_tools))
-            .setItems(actions) { dialog, which ->
-                dialog.dismiss()
-                if (which == 0) {
-                    Toast.makeText(this, "Otimização de vídeo concluída! Memória liberada.", Toast.LENGTH_SHORT).show()
+        val title = TextView(this).apply {
+            text = "🎬 Baixador de Vídeos da Web"
+            textSize = 16f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(color(R.color.sweep_text))
+        }
+        container.addView(title)
+
+        val subtitle = TextView(this).apply {
+            text = "Cole o link de um vídeo do Instagram Reels, TikTok, Facebook ou link direto .mp4 para salvar na sua Galeria."
+            textSize = 12f
+            setTextColor(color(R.color.sweep_muted))
+        }
+        container.addView(subtitle, top(4))
+
+        val inputRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val input = EditText(this).apply {
+            hint = "Cole o link aqui (https://...)"
+            setText(initialUrl ?: "")
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            background = GradientDrawable().apply {
+                setColor(0xFF141C2E.toInt())
+                cornerRadius = dp(8).toFloat()
+                setStroke(dp(1), 0xFF2A3A5A.toInt())
+            }
+        }
+        val pasteBtn = button("📋 COLAR") {
+            try {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                val clipText = clipboard?.primaryClip?.getItemAt(0)?.text?.toString()?.trim()
+                if (!clipText.isNullOrBlank()) {
+                    val urlMatch = Regex("""https?://[^\s]+""").find(clipText)?.value ?: clipText
+                    input.setText(urlMatch)
+                    input.setSelection(input.text.length)
+                    Toast.makeText(this@MainActivity, "Link colado da área de transferência!", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, R.string.media_studio_audio_extracted, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Nenhum link encontrado na área de transferência.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Não foi possível acessar a área de transferência.", Toast.LENGTH_SHORT).show()
+            }
+        }.apply {
+            textSize = 12f
+            minHeight = dp(48)
+        }
+        inputRow.addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+        inputRow.addView(pasteBtn, LinearLayout.LayoutParams(-2, -2))
+        container.addView(inputRow, top(10))
+
+        val presetsRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val samples = listOf(
+            "Vídeo Exemplo (MP4)" to "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            "Mídia Web" to "https://"
+        )
+        for ((label, urlSample) in samples) {
+            val btn = button(label) {
+                input.setText(urlSample)
+                input.setSelection(input.text.length)
+            }.apply {
+                textSize = 11f
+                minHeight = dp(48)
+            }
+            presetsRow.addView(btn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        }
+        container.addView(presetsRow, top(8))
+
+        val progressText = TextView(this).apply {
+            text = "Pronto para baixar"
+            textSize = 11f
+            setTextColor(color(R.color.sweep_muted))
+            visibility = View.GONE
+        }
+        val progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            isIndeterminate = false
+            max = 100
+            progress = 0
+            visibility = View.GONE
+        }
+        container.addView(progressText, top(12))
+        container.addView(progressBar, top(4))
+
+        var downloadJob: Job? = null
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(container)
+            .setPositiveButton("📥 Baixar Vídeo", null)
+            .setNegativeButton("Fechar", null)
+            .create()
+
+        dialog.setOnDismissListener {
+            downloadJob?.cancel()
+        }
+
+        dialog.setOnShowListener {
+            val downloadBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            downloadBtn.setOnClickListener {
+                val urlToDownload = input.text.toString().trim()
+                if (urlToDownload.isBlank() || (!urlToDownload.startsWith("http://") && !urlToDownload.startsWith("https://"))) {
+                    Toast.makeText(this@MainActivity, "Por favor, insira um link válido com https://", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                downloadBtn.isEnabled = false
+                progressText.visibility = View.VISIBLE
+                progressBar.visibility = View.VISIBLE
+                progressText.text = "Conectando e baixando mídia..."
+
+                downloadJob = lifecycleScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        MediaStudioTools.resolveAndDownloadVideo(
+                            context = this@MainActivity,
+                            rawUrl = urlToDownload,
+                            shouldCancel = { !isActive }
+                        ) { percent, bytesRead, totalBytes ->
+                            runOnUiThread {
+                                if (percent >= 0) {
+                                    progressBar.isIndeterminate = false
+                                    progressBar.progress = percent
+                                    val currentMb = String.format("%.2f", bytesRead / 1048576.0)
+                                    val totalMb = String.format("%.2f", totalBytes / 1048576.0)
+                                    progressText.text = "Baixando: $percent% ($currentMb MB / $totalMb MB)"
+                                } else {
+                                    progressBar.isIndeterminate = true
+                                    val currentMb = String.format("%.2f", bytesRead / 1048576.0)
+                                    progressText.text = "Baixando: $currentMb MB..."
+                                }
+                            }
+                        }
+                    }
+
+                    downloadBtn.isEnabled = true
+                    if (result.success && result.savedUri != null) {
+                        dialog.dismiss()
+                        val sizeStr = Formatter.formatFileSize(this@MainActivity, result.bytesDownloaded)
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle("🎬 Vídeo Salvo na Galeria!")
+                            .setMessage("Arquivo: ${result.fileName}\nTamanho: $sizeStr\nSalvo em Movies/Midiastore com sucesso!")
+                            .setPositiveButton("Assistir Vídeo") { _, _ ->
+                                try {
+                                    val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(result.savedUri, "video/mp4")
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    startActivity(viewIntent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@MainActivity, "Nenhum reprodutor de vídeo encontrado.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            .setNeutralButton("Compartilhar") { _, _ ->
+                                try {
+                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "video/mp4"
+                                        putExtra(Intent.EXTRA_STREAM, result.savedUri)
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    startActivity(Intent.createChooser(shareIntent, "Compartilhar Vídeo"))
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@MainActivity, "Erro ao compartilhar vídeo.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            .setNegativeButton("OK", null)
+                            .show()
+                    } else {
+                        progressText.text = "Erro: ${result.errorMessage ?: "Falha ao baixar vídeo."}"
+                        Toast.makeText(this@MainActivity, result.errorMessage ?: "Erro ao baixar vídeo.", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        }
+        dialog.show()
     }
 
-    private fun openExifCleanerStudio(initialUri: Uri?) {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.media_studio_exif_cleaner))
-            .setMessage("Remove metadados sensíveis (coordenadas GPS, modelo da câmera, data e hora de captura) protegendo a sua localização antes de compartilhar.")
-            .setPositiveButton("Limpar GPS e Metadados") { dialog, _ ->
-                dialog.dismiss()
-                Toast.makeText(this, R.string.media_studio_exif_cleaned, Toast.LENGTH_SHORT).show()
+    private fun getFilterColorMatrix(filter: MediaStudioTools.PhotoFilter): ColorMatrix {
+        return MediaStudioTools.buildFilterMatrix(filter)
+    }
+
+    private fun openInteractivePhotoFilterEditor(uri: Uri) {
+        lifecycleScope.launch {
+            val progress = AlertDialog.Builder(this@MainActivity)
+                .setMessage("Carregando imagem...")
+                .setCancelable(false)
+                .show()
+
+            val sourceBitmap = withContext(Dispatchers.IO) {
+                MediaStudioTools.loadSampledBitmap(this@MainActivity, uri, 1280)
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            progress.dismiss()
+
+            if (sourceBitmap == null) {
+                Toast.makeText(this@MainActivity, "Não foi possível carregar a imagem.", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            var currentFilter = MediaStudioTools.PhotoFilter.NORMAL
+            var currentBrightness = 0f
+            var currentContrast = 1.0f
+            var currentSaturation = 1.0f
+            var currentRotation = 0
+
+            val rootLayout = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(16), dp(16), dp(16), dp(16))
+            }
+
+            val previewImage = ImageView(this@MainActivity).apply {
+                setImageBitmap(sourceBitmap)
+                adjustViewBounds = true
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                setBackgroundColor(Color.parseColor("#121212"))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(260)
+                ).apply {
+                    bottomMargin = dp(12)
+                }
+            }
+            rootLayout.addView(previewImage)
+
+            fun updatePreview() {
+                previewImage.colorFilter = ColorMatrixColorFilter(
+                    MediaStudioTools.buildCompositeColorMatrix(
+                        currentFilter,
+                        currentBrightness,
+                        currentContrast,
+                        currentSaturation
+                    )
+                )
+                previewImage.rotation = currentRotation.toFloat()
+            }
+
+            val filtersTitle = TextView(this@MainActivity).apply {
+                text = "Filtros Cinematográficos"
+                textSize = 12f
+                setTextColor(color(R.color.sweep_muted))
+            }
+            rootLayout.addView(filtersTitle, top(4))
+
+            val scroll = HorizontalScrollView(this@MainActivity).apply {
+                isHorizontalScrollBarEnabled = false
+            }
+            val buttonsRow = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.HORIZONTAL
+            }
+
+            for (filter in MediaStudioTools.PhotoFilter.values()) {
+                val btn = button(filter.displayName) {
+                    currentFilter = filter
+                    updatePreview()
+                }.apply {
+                    textSize = 11f
+                    minHeight = dp(48)
+                }
+                buttonsRow.addView(btn, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(6) })
+            }
+            scroll.addView(buttonsRow)
+            rootLayout.addView(scroll, top(4))
+
+            val toolsTitle = TextView(this@MainActivity).apply {
+                text = "Ajustes & Transformação"
+                textSize = 12f
+                setTextColor(color(R.color.sweep_muted))
+            }
+            rootLayout.addView(toolsTitle, top(10))
+
+            val toolsRow = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.HORIZONTAL
+            }
+
+            val rotateBtn = button("🔄 Girar 90°") {
+                currentRotation = (currentRotation + 90) % 360
+                updatePreview()
+            }.apply {
+                textSize = 11f
+                minHeight = dp(48)
+            }
+            val brightBtn = button("☀️ Brilho +") {
+                currentBrightness = if (currentBrightness < 40f) currentBrightness + 20f else -20f
+                updatePreview()
+                Toast.makeText(this@MainActivity, "Brilho: ${currentBrightness.toInt()}", Toast.LENGTH_SHORT).show()
+            }.apply {
+                textSize = 11f
+                minHeight = dp(48)
+            }
+            val contrastBtn = button("⚡ Contraste") {
+                currentContrast = if (currentContrast < 1.4f) currentContrast + 0.2f else 0.8f
+                updatePreview()
+                Toast.makeText(this@MainActivity, "Contraste: ${String.format("%.1f", currentContrast)}x", Toast.LENGTH_SHORT).show()
+            }.apply {
+                textSize = 11f
+                minHeight = dp(48)
+            }
+            val saturationBtn = button("🎨 Saturação") {
+                currentSaturation = if (currentSaturation < 1.9f) ((currentSaturation + 0.5f).coerceAtMost(2.0f)) else 0.0f
+                updatePreview()
+                Toast.makeText(this@MainActivity, "Saturação: ${String.format("%.1f", currentSaturation)}x", Toast.LENGTH_SHORT).show()
+            }.apply {
+                textSize = 11f
+                minHeight = dp(48)
+            }
+            val resetBtn = button("↺ Reset") {
+                currentFilter = MediaStudioTools.PhotoFilter.NORMAL
+                currentBrightness = 0f
+                currentContrast = 1.0f
+                currentSaturation = 1.0f
+                currentRotation = 0
+                updatePreview()
+            }.apply {
+                textSize = 11f
+                minHeight = dp(48)
+            }
+
+            toolsRow.addView(rotateBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+            toolsRow.addView(brightBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+            toolsRow.addView(contrastBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+            toolsRow.addView(saturationBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+            toolsRow.addView(resetBtn, LinearLayout.LayoutParams(0, -2, 1f))
+            rootLayout.addView(toolsRow, top(4))
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(getString(R.string.media_studio_photo_filters))
+                .setView(rootLayout)
+                .setPositiveButton("💾 Salvar na Galeria") { _, _ ->
+                    lifecycleScope.launch {
+                        val savingDialog = AlertDialog.Builder(this@MainActivity)
+                            .setMessage("Aplicando transformações e salvando em alta qualidade...")
+                            .setCancelable(false)
+                            .show()
+
+                        val savedUri = withContext(Dispatchers.IO) {
+                            val exportSource = MediaStudioTools.loadSampledBitmap(this@MainActivity, uri, 4096) ?: sourceBitmap
+                            var filtered: Bitmap? = null
+                            try {
+                                filtered = MediaStudioTools.applyTransformations(
+                                    exportSource,
+                                    filter = currentFilter,
+                                    brightness = currentBrightness,
+                                    contrast = currentContrast,
+                                    saturation = currentSaturation,
+                                    rotationDeg = currentRotation
+                                )
+                                MediaStudioTools.saveBitmapToGallery(this@MainActivity, filtered, "Midiastore_Studio_${currentFilter.name}")
+                            } finally {
+                                if (filtered != null && filtered !== exportSource) {
+                                    filtered.recycle()
+                                }
+                                if (exportSource !== sourceBitmap) {
+                                    exportSource.recycle()
+                                }
+                            }
+                        }
+                        savingDialog.dismiss()
+
+                        if (savedUri != null) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Foto com ajustes salva na Galeria (Pictures/Midiastore)!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(this@MainActivity, "Erro ao salvar foto editada.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .setNeutralButton("📤 Compartilhar") { _, _ ->
+                    lifecycleScope.launch {
+                        val shareFile = withContext(Dispatchers.IO) {
+                            val exportSource = MediaStudioTools.loadSampledBitmap(this@MainActivity, uri, 4096) ?: sourceBitmap
+                            var filtered: Bitmap? = null
+                            try {
+                                filtered = MediaStudioTools.applyTransformations(
+                                    exportSource,
+                                    filter = currentFilter,
+                                    brightness = currentBrightness,
+                                    contrast = currentContrast,
+                                    saturation = currentSaturation,
+                                    rotationDeg = currentRotation
+                                )
+                                val file = File(cacheDir, "filtered_${System.currentTimeMillis()}.jpg")
+                                FileOutputStream(file).use { out ->
+                                    filtered.compress(Bitmap.CompressFormat.JPEG, 95, out)
+                                }
+                                file
+                            } finally {
+                                if (filtered != null && filtered !== exportSource) {
+                                    filtered.recycle()
+                                }
+                                if (exportSource !== sourceBitmap) {
+                                    exportSource.recycle()
+                                }
+                            }
+                        }
+                        try {
+                            val shareIntent = MediaStudioTools.getShareIntent(
+                                this@MainActivity,
+                                shareFile,
+                                "image/jpeg",
+                                "Compartilhar Imagem"
+                            )
+                            startActivity(Intent.createChooser(shareIntent, "Compartilhar Imagem"))
+                        } catch (e: Exception) {
+                            Toast.makeText(this@MainActivity, "Erro ao compartilhar imagem.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .setNegativeButton("Fechar", null)
+                .show()
+        }
+    }
+
+    private fun openVideoAudioStudio(uri: Uri) {
+        lifecycleScope.launch {
+            var fileName = "video.mp4"
+            var fileSize = 0L
+            withContext(Dispatchers.IO) {
+                contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val nameIdx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        val sizeIdx = cursor.getColumnIndex(OpenableColumns.SIZE)
+                        if (nameIdx >= 0) fileName = cursor.getString(nameIdx) ?: fileName
+                        if (sizeIdx >= 0) fileSize = cursor.getLong(sizeIdx)
+                    }
+                }
+            }
+            val sizeStr = Formatter.formatFileSize(this@MainActivity, fileSize)
+
+            val actions = arrayOf(
+                "🎵 Extrair Faixa de Áudio (Converter para M4A)",
+                "🎬 Otimizar e Encolher Vídeo (Diagnóstico)"
+            )
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("Vídeo: $fileName")
+                .setMessage("Tamanho original: $sizeStr\nSelecione a ação desejada:")
+                .setItems(actions) { _, which ->
+                    if (which == 0) {
+                        processVideoAudioExtraction(uri, fileName)
+                    } else {
+                        processVideoOptimization(uri, fileName, fileSize)
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun processVideoAudioExtraction(uri: Uri, fileName: String) {
+        lifecycleScope.launch {
+            val progress = AlertDialog.Builder(this@MainActivity)
+                .setTitle("Extraindo Áudio Cristalino")
+                .setMessage("Processando faixa de áudio M4A do vídeo $fileName...")
+                .setCancelable(false)
+                .show()
+
+            val extractedFile = withContext(Dispatchers.IO) {
+                MediaStudioTools.extractAudioToCache(this@MainActivity, uri)
+            }
+            progress.dismiss()
+
+            if (extractedFile != null && extractedFile.exists()) {
+                val audioSize = Formatter.formatFileSize(this@MainActivity, extractedFile.length())
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle("🎵 Áudio Extraído com Sucesso!")
+                    .setMessage("Arquivo: ${extractedFile.name}\nTamanho: $audioSize\nA faixa de áudio foi convertida em alta fidelidade.")
+                    .setPositiveButton("Ouvir Áudio") { _, _ ->
+                        try {
+                            val audioUri = androidx.core.content.FileProvider.getUriForFile(
+                                this@MainActivity,
+                                "${packageName}.fileprovider",
+                                extractedFile
+                            )
+                            val playIntent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(audioUri, "audio/mp4")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            startActivity(playIntent)
+                        } catch (e: Exception) {
+                            Toast.makeText(this@MainActivity, "Nenhum reprodutor de áudio encontrado.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNeutralButton("Compartilhar") { _, _ ->
+                        try {
+                            val shareIntent = MediaStudioTools.getShareIntent(
+                                this@MainActivity,
+                                extractedFile,
+                                "audio/mp4",
+                                "Compartilhar Áudio Extraído"
+                            )
+                            startActivity(Intent.createChooser(shareIntent, "Compartilhar Áudio"))
+                        } catch (e: Exception) {
+                            Toast.makeText(this@MainActivity, "Erro ao compartilhar áudio.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("OK", null)
+                    .show()
+            } else {
+                Toast.makeText(this@MainActivity, "Não foi possível extrair a faixa de áudio.", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun processVideoOptimization(uri: Uri, fileName: String, fileSize: Long) {
+        val originalStr = Formatter.formatFileSize(this, fileSize)
+
+        AlertDialog.Builder(this)
+            .setTitle("🎬 Diagnóstico de Armazenamento de Vídeo")
+            .setMessage(
+                "Vídeo: $fileName\nTamanho Atual: $originalStr\n\n" +
+                "💡 Dica de Otimização Real: Vídeos gravados ou recebidos costumam ocupar a maior parte do armazenamento do aparelho. Se você precisa apenas do áudio (música, aula, podcast ou voz), extrair a faixa M4A economiza até 90% da memória mantendo fidelidade cristalina.\n\nDeseja extrair a faixa de áudio agora?"
+            )
+            .setPositiveButton("🎵 Extrair Áudio (M4A)") { _, _ ->
+                processVideoAudioExtraction(uri, fileName)
+            }
+            .setNegativeButton("Fechar", null)
             .show()
     }
 
-    private fun openQrCodeGeneratorStudio(initialText: String?) {
+    private fun openInteractiveExifCleaner(uri: Uri) {
+        lifecycleScope.launch {
+            val progress = AlertDialog.Builder(this@MainActivity)
+                .setMessage("Analisando metadados de privacidade...")
+                .setCancelable(false)
+                .show()
+
+            val summary = withContext(Dispatchers.IO) {
+                MediaStudioTools.readExifSummary(this@MainActivity, uri)
+            }
+            progress.dismiss()
+
+            val msg = buildString {
+                if (summary.hasGps && summary.latitude != null && summary.longitude != null) {
+                    append("⚠️ ALERTA DE PRIVACIDADE CRÍTICO:\n")
+                    append("Esta foto contém coordenadas GPS exatas!\n")
+                    append("📍 Latitude: %.5f\n".format(summary.latitude))
+                    append("📍 Longitude: %.5f\n".format(summary.longitude))
+                    append("Ao postar esta imagem na internet, qualquer pessoa pode rastrear seu endereço exato.\n\n")
+                } else {
+                    append("✅ Nenhum dado de localização GPS detectado nesta foto.\n\n")
+                }
+                if (!summary.camera.isNullOrBlank()) {
+                    append("📷 Modelo da Câmera: ${summary.camera}\n")
+                }
+                if (!summary.dateTime.isNullOrBlank()) {
+                    append("📅 Data e Hora de Captura: ${summary.dateTime}\n")
+                }
+                append("\nDeseja gerar uma cópia 100% higienizada e segura na sua Galeria (sem GPS nem dados do dispositivo)?")
+            }
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("🛡️ Limpador de Privacidade EXIF")
+                .setMessage(msg)
+                .setPositiveButton("Limpar e Salvar Foto Segura") { _, _ ->
+                    lifecycleScope.launch {
+                        val cleanProgress = AlertDialog.Builder(this@MainActivity)
+                            .setMessage("Removendo GPS e gerando foto segura...")
+                            .setCancelable(false)
+                            .show()
+
+                        val savedUri = withContext(Dispatchers.IO) {
+                            MediaStudioTools.cleanExifAndSave(this@MainActivity, uri)
+                        }
+                        cleanProgress.dismiss()
+
+                        if (savedUri != null) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Foto segura salva na Galeria (Pictures/Midiastore)!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(this@MainActivity, "Erro ao salvar foto higienizada.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun openQrCodeGeneratorStudio(initialText: String? = null) {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+
+        val inputRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
         val input = EditText(this).apply {
             hint = "Cole chave PIX, Link, WhatsApp ou Wi-Fi"
             setText(initialText ?: "https://midiastory-df6a0.web.app")
-            setPadding(dp(16), dp(16), dp(16), dp(16))
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            background = GradientDrawable().apply {
+                setColor(0xFF141C2E.toInt())
+                cornerRadius = dp(8).toFloat()
+                setStroke(dp(1), 0xFF2A3A5A.toInt())
+            }
         }
+        val pasteBtn = button("📋 COLAR") {
+            try {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                val clipText = clipboard?.primaryClip?.getItemAt(0)?.text?.toString()?.trim()
+                if (!clipText.isNullOrBlank()) {
+                    input.setText(clipText)
+                    input.setSelection(input.text.length)
+                    Toast.makeText(this@MainActivity, "Texto colado!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@MainActivity, "Área de transferência vazia.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Não foi possível acessar a área de transferência.", Toast.LENGTH_SHORT).show()
+            }
+        }.apply {
+            textSize = 12f
+            minHeight = dp(44)
+        }
+        inputRow.addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+        inputRow.addView(pasteBtn, LinearLayout.LayoutParams(-2, -2))
+        container.addView(inputRow)
+
+        val chipsRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val presets = listOf(
+            "PIX" to "00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-4266141740005204000053039865802BR5913Midiastore6008BRASILIA62070503***6304",
+            "Link" to "https://midiastory-df6a0.web.app",
+            "WhatsApp" to "https://wa.me/5511999999999",
+            "Wi-Fi" to "WIFI:S:Midiastore_WiFi;T:WPA;P:internet123;;"
+        )
+        for ((name, sample) in presets) {
+            val btn = button(name) {
+                input.setText(sample)
+            }.apply {
+                textSize = 11f
+                minHeight = dp(44)
+            }
+            chipsRow.addView(btn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        }
+        container.addView(chipsRow, top(8))
+
+        var currentBitmap = MediaStudioTools.generateQrCodeBitmap(input.text.toString().ifBlank { "Midiastore" }, 512)
+
+        val qrImageView = ImageView(this).apply {
+            setImageBitmap(currentBitmap)
+            adjustViewBounds = true
+            layoutParams = LinearLayout.LayoutParams(dp(220), dp(220)).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                topMargin = dp(12)
+                bottomMargin = dp(12)
+            }
+        }
+        container.addView(qrImageView)
+
+        input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val content = s?.toString()?.ifBlank { "Midiastore" } ?: "Midiastore"
+                currentBitmap = MediaStudioTools.generateQrCodeBitmap(content, 512)
+                qrImageView.setImageBitmap(currentBitmap)
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.media_studio_qr_generator))
-            .setView(input)
-            .setPositiveButton("Gerar QR Code") { dialog, _ ->
-                val text = input.text.toString().trim()
-                if (text.isNotEmpty()) {
-                    val qrBitmap = MediaStudioTools.generateQrCodeBitmap(text, 512)
-                    val imgView = ImageView(this).apply {
-                        setImageBitmap(qrBitmap)
-                        setPadding(dp(16), dp(16), dp(16), dp(16))
+            .setView(container)
+            .setPositiveButton("💾 Salvar na Galeria") { _, _ ->
+                lifecycleScope.launch {
+                    val uri = withContext(Dispatchers.IO) {
+                        MediaStudioTools.saveBitmapToGallery(this@MainActivity, currentBitmap, "Midiastore_QRCode")
                     }
-                    AlertDialog.Builder(this)
-                        .setTitle("QR Code Gerado")
-                        .setView(imgView)
-                        .setPositiveButton("OK", null)
-                        .show()
-                    Toast.makeText(this, R.string.media_studio_qr_generated, Toast.LENGTH_SHORT).show()
+                    if (uri != null) {
+                        Toast.makeText(this@MainActivity, "QR Code salvo na Galeria (Pictures/Midiastore)!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Erro ao salvar QR Code.", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNeutralButton("📤 Compartilhar") { _, _ ->
+                lifecycleScope.launch {
+                    val tempFile = withContext(Dispatchers.IO) {
+                        val file = File(cacheDir, "qrcode_${System.currentTimeMillis()}.png")
+                        FileOutputStream(file).use { out ->
+                            currentBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+                        file
+                    }
+                    try {
+                        val shareIntent = MediaStudioTools.getShareIntent(this@MainActivity, tempFile, "image/png", "Compartilhar QR Code")
+                        startActivity(Intent.createChooser(shareIntent, "Compartilhar QR Code"))
+                    } catch (e: Exception) {
+                        Toast.makeText(this@MainActivity, "Erro ao compartilhar QR Code.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Fechar", null)
             .show()
     }
 
-    private fun openPhotosToPdfStudio() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.media_studio_photos_to_pdf))
-            .setMessage("Converta fotos da galeria em um documento PDF padrão A4 organizado e pronto para compartilhamento.")
-            .setPositiveButton("Criar PDF") { dialog, _ ->
-                dialog.dismiss()
-                Toast.makeText(this, R.string.media_studio_pdf_saved, Toast.LENGTH_SHORT).show()
+    private fun processPhotosToPdf(uris: List<Uri>) {
+        lifecycleScope.launch {
+            val progress = AlertDialog.Builder(this@MainActivity)
+                .setTitle("Criando Documento PDF")
+                .setMessage("Convertendo ${uris.size} foto(s) em formato A4...")
+                .setCancelable(false)
+                .show()
+
+            val pdfFile = withContext(Dispatchers.IO) {
+                val cachePdf = File(cacheDir, "Documento_Midiastore_${System.currentTimeMillis()}.pdf")
+                val ok = MediaStudioTools.createPdfFromUris(this@MainActivity, uris, cachePdf)
+                if (ok && cachePdf.exists()) cachePdf else null
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+            progress.dismiss()
+
+            if (pdfFile != null) {
+                val sizeStr = Formatter.formatFileSize(this@MainActivity, pdfFile.length())
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle("📄 PDF Gerado com Sucesso!")
+                    .setMessage("Arquivo: ${pdfFile.name}\nTamanho: $sizeStr\nPáginas geradas: ${uris.size}")
+                    .setPositiveButton("Abrir PDF") { _, _ ->
+                        try {
+                            val pdfUri = androidx.core.content.FileProvider.getUriForFile(
+                                this@MainActivity,
+                                "${packageName}.fileprovider",
+                                pdfFile
+                            )
+                            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(pdfUri, "application/pdf")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            startActivity(viewIntent)
+                        } catch (e: Exception) {
+                            Toast.makeText(this@MainActivity, "Nenhum visualizador de PDF encontrado.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNeutralButton("Compartilhar PDF") { _, _ ->
+                        try {
+                            val shareIntent = MediaStudioTools.getShareIntent(
+                                this@MainActivity,
+                                pdfFile,
+                                "application/pdf",
+                                "Compartilhar PDF"
+                            )
+                            startActivity(Intent.createChooser(shareIntent, "Compartilhar PDF"))
+                        } catch (e: Exception) {
+                            Toast.makeText(this@MainActivity, "Erro ao compartilhar PDF.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("OK", null)
+                    .show()
+            } else {
+                Toast.makeText(this@MainActivity, "Erro ao converter fotos para PDF.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -2147,6 +3127,9 @@ class MainActivity : AppCompatActivity() {
         val verifiedUris = trashCoordinator.verifyPostDeleteUris(pendingApi29DeletedUris)
         val confirmedBytes = verifiedUris.sumOf { pendingApi29BytesByUri[it] ?: 0L }
         if (confirmedBytes > 0L) {
+            try {
+                window.decorView.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
+            } catch (_: Exception) {}
             outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
             inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes)
         }
@@ -2281,6 +3264,19 @@ class MainActivity : AppCompatActivity() {
         addView(content, ViewGroup.LayoutParams(-1, -2))
     }
 
+    private fun themedCard(
+        content: LinearLayout,
+        bgColor: Int,
+        strokeCol: Int
+    ): MaterialCardView = MaterialCardView(this).apply {
+        radius = dp(22).toFloat()
+        cardElevation = 0f
+        setCardBackgroundColor(bgColor)
+        strokeWidth = dp(2)
+        strokeColor = strokeCol
+        addView(content, ViewGroup.LayoutParams(-1, -2))
+    }
+
     private fun label(text: String, size: Float, colorId: Int, bold: Boolean): TextView = TextView(this).apply {
         this.text = text
         textSize = size
@@ -2295,10 +3291,14 @@ class MainActivity : AppCompatActivity() {
         isAllCaps = false
         textSize = 12f
         cornerRadius = dp(16)
+        minHeight = dp(44)
         setPadding(dp(10), dp(8), dp(10), dp(8))
         backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         setTextColor(color(R.color.sweep_text))
-        setOnClickListener { onClick() }
+        setOnClickListener {
+            try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+            onClick()
+        }
     }
 
     private fun navTabButton(text: String, onClick: () -> Unit): MaterialButton = MaterialButton(this).apply {
@@ -2306,8 +3306,12 @@ class MainActivity : AppCompatActivity() {
         isAllCaps = false
         textSize = 11f
         cornerRadius = dp(14)
-        setPadding(dp(4), 0, dp(4), 0)
-        setOnClickListener { onClick() }
+        minHeight = dp(48)
+        setPadding(dp(2), 0, dp(2), 0)
+        setOnClickListener {
+            try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+            onClick()
+        }
     }
 
     private fun fullButton(height: Int, bottom: Int): LinearLayout.LayoutParams =

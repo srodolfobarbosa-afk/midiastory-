@@ -2,10 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const token = process.env.SUPABASE_ACCESS_TOKEN || "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+const token = getSupabaseToken();
 const projectRef = process.env.SUPABASE_PROJECT_REF || "usmqtnlsaavxqguwrtix";
 
 async function runSql(query) {

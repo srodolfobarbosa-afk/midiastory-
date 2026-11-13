@@ -1,18 +1,2 @@
-# LISTA DE 20 TESTADORES FECHADOS - GOOGLE PLAY CONSOLE
-# Pacote: com.rdf112.midiastore
-# Status: 20/20 TESTADORES CADASTRADOS E VINCULADOS NO CONSOLE GOOGLE PLAY
-# Requisito: 14 dias ininterruptos de teste fechado ativo
-# Atualizado em: 2026-11-12
-
-[STATUS_GERAL]
-meta_atingida: true
-total_requerido: 20
-total_cadastrado_console: 20
-track_ativa: alpha (closed_testing)
-painel_console: "Teste Fechado > Testadores vinculados via Google Play Console"
-status_requisito_14_dias: "Em andamento / aguardando tempo de propagação e contagem contínua do Google Play"
-
-[REGISTRO_TESTADORES_PRINCIPAIS]
-1. teste.beta.vip@gmail.com
-2. rjvsb22@gmail.com
-(E demais 18 contas vinculadas diretamente pela Play Console do desenvolvedor)
+teste.beta.vip@gmail.com
+rjvsb22@gmail.com

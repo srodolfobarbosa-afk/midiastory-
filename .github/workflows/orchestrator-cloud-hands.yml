@@ -54,7 +54,7 @@ jobs:
           {
             "mcpServers": {
               "supabase": {
-                "command": "npx.cmd",
+                "command": "npx",
                 "args": ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref=usmqtnlsaavxqguwrtix"],
                 "env": {
                   "SUPABASE_ACCESS_TOKEN": "$SUPABASE_TOKEN"

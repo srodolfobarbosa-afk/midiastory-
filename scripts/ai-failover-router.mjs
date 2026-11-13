@@ -25,19 +25,46 @@ const codexPath = "C:\\Users\\rodolfo\\AppData\\Local\\Programs\\OpenAI\\Codex\\
 
 // Carregar chaves
 let openRouterKey = process.env.OPENROUTER_API_KEY || "";
+let googleStudioKey = process.env.GOOGLE_AI_STUDIO_API_KEY || process.env.GOOGLE_AQ_API_KEY || "";
+
 if (process.env.AI_MEDIA_KEYS_JSON) {
   try {
     const parsed = JSON.parse(process.env.AI_MEDIA_KEYS_JSON);
     if (parsed.OPENROUTER_API_KEY) openRouterKey = parsed.OPENROUTER_API_KEY;
+    if (parsed.GOOGLE_AI_STUDIO_API_KEY) googleStudioKey = parsed.GOOGLE_AI_STUDIO_API_KEY;
+    else if (parsed.GOOGLE_AQ_API_KEY) googleStudioKey = parsed.GOOGLE_AQ_API_KEY;
   } catch (e) {}
 }
-if (!openRouterKey && fs.existsSync(secretsPath)) {
+if (fs.existsSync(secretsPath)) {
   try {
     const raw = JSON.parse(fs.readFileSync(secretsPath, "utf8"));
-    if (raw.OPENROUTER_API_KEY) openRouterKey = raw.OPENROUTER_API_KEY;
+    if (!openRouterKey && raw.OPENROUTER_API_KEY) openRouterKey = raw.OPENROUTER_API_KEY;
+    if (!googleStudioKey) {
+      if (raw.GOOGLE_AI_STUDIO_API_KEY) googleStudioKey = raw.GOOGLE_AI_STUDIO_API_KEY;
+      else if (raw.GOOGLE_AQ_API_KEY) googleStudioKey = raw.GOOGLE_AQ_API_KEY;
+    }
   } catch (e) {
     console.warn("Aviso ao ler segredos:", e.message);
   }
+}
+
+async function callGoogleAIStudio(modelName, prompt) {
+  if (!googleStudioKey) throw new Error("Chave GOOGLE_AI_STUDIO_API_KEY não encontrada.");
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${googleStudioKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    const error = new Error(`HTTP ${res.status}: ${errText}`);
+    error.status = res.status;
+    throw error;
+  }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 }
 
 const MODEL_CASCADE = [
@@ -131,6 +158,21 @@ export async function executeWithFailover(prompt, options = {}) {
   const isCode = options.isCode || false;
 
   console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"})...`);
+
+  // 1. Prioridade Nativa: Google AI Studio Direto (Custo Zero, sem intermediários)
+  if (googleStudioKey) {
+    const studioModels = ["gemini-2.5-flash", "gemini-3.8-flash"];
+    for (const sm of studioModels) {
+      console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm}...`);
+      try {
+        const response = await callGoogleAIStudio(sm, prompt);
+        console.log(`✅ Sucesso no Google AI Studio Direto (${sm})!`);
+        return { source: `google_ai_studio/${sm}`, content: response };
+      } catch (err) {
+        console.warn(`⚠️ Google AI Studio (${sm}) falhou: ${err.message.slice(0, 140)}`);
+      }
+    }
+  }
 
   let lastError = null;
 

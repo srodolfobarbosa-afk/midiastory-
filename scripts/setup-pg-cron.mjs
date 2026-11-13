@@ -1,4 +1,6 @@
-const token = "sbp_v0_d61bbc0f218c0c8ae5d530431302f765df7d0815";
+import { getSupabaseToken } from "./lib/supabase-auth.mjs";
+
+const token = getSupabaseToken();
 const projectRef = "usmqtnlsaavxqguwrtix";
 
 const sql = `

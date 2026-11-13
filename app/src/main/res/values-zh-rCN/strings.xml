@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">欢迎使用 Midiastore</string>
-    <string name="onboarding_welcome_message">🔒 100%% 私密安全：您的照片和视频完全在设备本地离线分析，绝不上传到任何云端。\n\n⚡ 智能 SHA-256 比对：毫厘不差精准识别重复文件，绝不误删重要原件。\n\n🚀 准备释放储存空间：立即开启免费智能扫描。</string>
+    <string name="onboarding_welcome_message">🔒 100%% 私密安全：您的照片和视频完全在设备本地安全分析，绝不上传到任何云端。\n\n⚡ 智能 SHA-256 比对：毫厘不差精准识别重复文件，绝不误删重要原件。\n\n🚀 准备释放储存空间：立即开启免费智能扫描。</string>
     <string name="onboarding_start_button">立即开启免费扫描</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">存储空间，由你掌控。</string>
@@ -52,6 +52,7 @@
     <string name="oaas_card_subtitle">文件保留在本设备上。请检查结果并批准每项操作。</string>
     <string name="nav_home">首页</string>
     <string name="nav_files">文件</string>
+    <string name="nav_studio">工作室</string>
     <string name="nav_missions">清理</string>
     <string name="nav_pro">Pro</string>
     <string name="analyze_now">检查存储空间</string>
@@ -90,13 +91,13 @@
     <string name="home_plans_title">Pro 方案</string>
     <string name="home_plans_subtitle">所有方案包含相同的 Pro 功能。请选择付款方式。</string>
     <string name="premium_area_button">Pro 专区</string>
-    <string name="plan_monthly_unavailable">月付 · 建议价 R$14.90/月 · 尚未启用</string>
-    <string name="plan_annual_unavailable">年付 · 建议价 R$79.90/年 · 尚未启用</string>
-    <string name="plan_lifetime_unavailable">终身 · 建议价 R$149.90 一次性 · 尚未启用</string>
-    <string name="plan_monthly_default">月付 · R$14.90/月（建议价）</string>
-    <string name="plan_annual_default">年付 · R$79.90/年（建议价）</string>
-    <string name="plan_lifetime_default">终身 · R$149.90 一次性（建议价）</string>
+    <string name="plan_monthly_unavailable">月付 · 参考价 R$14.99/月 · 等待 Google Play</string>
+    <string name="plan_annual_unavailable">年付 · 参考价 R$79.99/年 · 等待 Google Play</string>
+    <string name="plan_lifetime_unavailable">终身 · 参考价 R$149.99 一次性 · 等待 Google Play</string>
+    <string name="plan_monthly_default">月付 · R$14.99/月</string>
+    <string name="plan_annual_default">年付 · R$79.99/年</string>
+    <string name="plan_lifetime_default">终身 · R$149.99 一次性</string>
     <string name="pro_free_included">免费 · 查找大文件，并在删除前检查。</string>
     <string name="pro_paid_included">PRO · 查找完全重复文件和旧文件，建议卸载未使用的应用并导出报告。</string>
-    <string name="pro_purchase_unavailable_notice">方案目前还不能购买。</string>
+    <string name="pro_purchase_unavailable_notice">暂无法从 Google Play 加载方案。</string>
 </resources>

@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Midiastore</string>
     <string name="onboarding_welcome_title">Bienvenido a Midiastore</string>
-    <string name="onboarding_welcome_message">🔒 100%% Privado: Tus fotos y videos se analizan sin conexión en tu dispositivo y nunca salen de tu teléfono.\n\n⚡ Análisis Inteligente SHA-256: Localiza duplicados exactos con precisión matemática, manteniendo a salvo tus archivos originales.\n\n🚀 Listo para recuperar espacio: Inicia tu análisis gratuito ahora.</string>
+    <string name="onboarding_welcome_message">🔒 100%% Privado: Tus fotos y videos se analizan localmente en tu dispositivo y nunca salen de tu teléfono.\n\n⚡ Análisis Inteligente SHA-256: Localiza duplicados exactos con precisión matemática, manteniendo a salvo tus archivos originales.\n\n🚀 Listo para recuperar espacio: Inicia tu análisis gratuito ahora.</string>
     <string name="onboarding_start_button">Iniciar Análisis Gratuito</string>
     <string name="pro_badge">PRO</string>
     <string name="brand_tagline">Almacenamiento bajo tu control.</string>
@@ -52,6 +52,7 @@
     <string name="oaas_card_subtitle">Tus archivos permanecen en este dispositivo. Revisa los resultados y aprueba cada acción.</string>
     <string name="nav_home">Inicio</string>
     <string name="nav_files">Archivos</string>
+    <string name="nav_studio">Estudio</string>
     <string name="nav_missions">Limpieza</string>
     <string name="nav_pro">Pro</string>
     <string name="analyze_now">ANALIZAR MI ALMACENAMIENTO</string>
@@ -90,13 +91,13 @@
     <string name="home_plans_title">Planes Pro</string>
     <string name="home_plans_subtitle">Las mismas funciones Pro en todos los planes. Elige cómo pagar.</string>
     <string name="premium_area_button">Área Pro</string>
-    <string name="plan_monthly_unavailable">Mensual · propuesto R$14,90/mes · aún no activo</string>
-    <string name="plan_annual_unavailable">Anual · propuesto R$79,90/año · aún no activo</string>
-    <string name="plan_lifetime_unavailable">Vitalicio · propuesto R$149,90 una vez · aún no activo</string>
-    <string name="plan_monthly_default">Mensual · R$14,90/mes (propuesto)</string>
-    <string name="plan_annual_default">Anual · R$79,90/año (propuesto)</string>
-    <string name="plan_lifetime_default">Vitalicio · R$149,90 una vez (propuesto)</string>
+    <string name="plan_monthly_unavailable">Mensual · ref. R$14,99/mes · esperando a Google Play</string>
+    <string name="plan_annual_unavailable">Anual · ref. R$79,99/año · esperando a Google Play</string>
+    <string name="plan_lifetime_unavailable">Vitalicio · ref. R$149,99 una vez · esperando a Google Play</string>
+    <string name="plan_monthly_default">Mensual · R$14,99/mes</string>
+    <string name="plan_annual_default">Anual · R$79,99/año</string>
+    <string name="plan_lifetime_default">Vitalicio · R$149,99 una vez</string>
     <string name="pro_free_included">GRATIS · Encuentra archivos grandes y revísalos antes de borrarlos.</string>
     <string name="pro_paid_included">PRO · Encuentra copias exactas y archivos antiguos, sugiere apps sin uso y exporta informes.</string>
-    <string name="pro_purchase_unavailable_notice">Los planes aún no están disponibles para comprar.</string>
+    <string name="pro_purchase_unavailable_notice">Los planes no están disponibles ahora en Google Play.</string>
 </resources>
