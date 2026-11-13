@@ -1,7 +1,7 @@
 # Respostas Oficiais para o Formulário de Acesso à Produção (Google Play)
 *Aplicativo:* Midiastore (`com.rdf112.midiastore`)  
 *Versão Auditada:* v2.3.1 (versionCode 20)  
-*Data de Geração:* 10/11/2026
+*Data de Geração:* 13/11/2026
 
 ---
 
