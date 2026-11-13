@@ -2137,3 +2137,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #258
 
 ---
+
+### 📍 [13/11/2026, 08:54:43] Consolidacao do Commit 95261bc e Auditoria de Seguranca/Billing/Studio
+- **📖 Estudou / Leu:** AGENTS.md, scripts/lib/supabase-auth.mjs, Play Console pricing v21, MediaStudioTools.kt e MainActivity.kt
+- **⚙️ Tentou / Executou:** Higienizacao total de tokens PAT, commit de 44 arquivos com zero segredos, desacoplamento de gateway de IA direto com Google AI Studio e adicao de cancelamento cooperativo no downloader
+- **⚠️ Erros Encontrados:** Token sbp exposto em scripts antigos, falha 402 no OpenRouter por falta de creditos prepagos, download ininterruptivel no Studio
+- **🔧 Como Corrigiu:** Centralizacao do auth Supabase via supabase-auth.mjs, rota direta Google AI Studio com gemini-2.5-flash funcional a custo zero, coroutine isActive cancellation check no MediaStudioTools
+- **🎯 Conclusão:** Branch codex/midiastore-release-audit com working tree 100% limpa, suite de testes e build compilando verde, app v2.4.0 (versionCode 21) robusto e pronto para validacao com 20 testadores
+- *Registro Supabase:* Memory #259
+
+---
