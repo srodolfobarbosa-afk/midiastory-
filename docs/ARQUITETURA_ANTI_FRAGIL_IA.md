@@ -174,6 +174,10 @@ Um dos maiores gargalos de apps na Play Store é o material visual de marketing.
 * 🎬 **Vídeo Promocional da Ficha da Play Store:** Uma ficha na Google Play com um vídeo promocional em alta conversão aumenta a taxa de instalação em até 35% a 40%.
 * 📱 **Máquina de Aquisição Viral (Shorts, TikTok e Reels):** Gerar vídeos curtos com IA mostrando a dor real do usuário: *"Memória cheia no WhatsApp?"* $\longrightarrow$ Demonstração do Midiastore encontrando 15 GB de vídeos duplicados e liberando o celular com 1 toque.
 
+### 3. Gemini Notebook & Project Genie (Auditoria e Prototipagem)
+* 📓 **Gemini Notebook (NotebookLM Avançado):** Podemos alimentar um caderno com todas as políticas da Google Play (Scoped Storage, Família, Assinaturas, LGPD/GDPR) e a base de código do Midiastore. O notebook funciona como um auditor jurídico/técnico 24 horas, apontando qualquer risco de conformidade antes de enviarmos a versão para a loja.
+* 🌌 **Project Genie:** Prototipagem interativa e simulação de fluxos de usuário para prever comportamentos de retenção no app antes de escrever código no Jetpack Compose.
+
 > *Resultado Prático:* Isso gera um fluxo ininterrupto de usuários orgânicos e candidatos a testadores para o nosso funil, acelerando a coorte dos 20 testadores fechados e convertendo tráfego qualificado em receita recorrente!
 
 ---
