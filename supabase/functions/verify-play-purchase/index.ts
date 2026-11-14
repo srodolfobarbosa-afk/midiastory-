@@ -1,8 +1,16 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 
 const CANONICAL_PACKAGE = "com.rdf112.midiastore";
 const SUBS_PRODUCTS = new Set(["sweep_pro_monthly", "sweep_pro_annual"]);
 const INAPP_PRODUCTS = new Set(["sweep_pro_lifetime"]);
+
+async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 function base64UrlEncode(data: Uint8Array | string): string {
   const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
@@ -72,7 +80,7 @@ async function getGoogleAccessToken(sa: {
   return data.access_token;
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   if (req.method !== "POST") {
     return new Response(
       JSON.stringify({ verified: false, entitlementActive: false, reason: "METHOD_NOT_ALLOWED" }),
@@ -110,8 +118,16 @@ serve(async (req: Request) => {
 
     const sa = JSON.parse(saRaw);
     const accessToken = await getGoogleAccessToken(sa);
+    const productType = SUBS_PRODUCTS.has(productId) ? "SUBS" : "INAPP";
 
-    if (SUBS_PRODUCTS.has(productId)) {
+    let entitlementActive = false;
+    let acknowledged = false;
+    let orderId: string | null = null;
+    let expiryTime: string | null = null;
+    let rawStatus = "UNKNOWN";
+    let purchaseState: number | null = null;
+
+    if (productType === "SUBS") {
       const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
         CANONICAL_PACKAGE,
       )}/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`;
@@ -129,49 +145,80 @@ serve(async (req: Request) => {
         );
       }
       const subData = await playRes.json();
-      const state = String(subData?.subscriptionState || "");
+      rawStatus = String(subData?.subscriptionState || "UNKNOWN");
       const lineItems = Array.isArray(subData?.lineItems) ? subData.lineItems : [];
-      const matchesProduct = lineItems.some((item: { productId?: string }) => item?.productId === productId);
-      const isActive =
+      const matchedItem = lineItems.find(
+        (item: { productId?: string; expiryTime?: string }) => item?.productId === productId,
+      );
+      const matchesProduct = Boolean(matchedItem);
+      entitlementActive =
         matchesProduct &&
-        (state === "SUBSCRIPTION_STATE_ACTIVE" || state === "SUBSCRIPTION_STATE_IN_GRACE_PERIOD");
-
-      return new Response(
-        JSON.stringify({
-          verified: isActive,
-          entitlementActive: isActive,
-          subscriptionState: state,
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      );
+        (rawStatus === "SUBSCRIPTION_STATE_ACTIVE" || rawStatus === "SUBSCRIPTION_STATE_IN_GRACE_PERIOD");
+      acknowledged = subData?.acknowledgementState === "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED";
+      orderId = subData?.latestOrderId || null;
+      expiryTime = matchedItem?.expiryTime || lineItems[0]?.expiryTime || null;
+    } else {
+      // One-time product (sweep_pro_lifetime)
+      const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
+        CANONICAL_PACKAGE,
+      )}/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}`;
+      const playRes = await fetch(url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!playRes.ok) {
+        return new Response(
+          JSON.stringify({
+            verified: false,
+            entitlementActive: false,
+            reason: `PLAY_API_${playRes.status}`,
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      const prodData = await playRes.json();
+      // purchaseState === 0 means Purchased in Google Play Developer API v3 purchases.products
+      purchaseState = typeof prodData?.purchaseState === "number" ? prodData.purchaseState : null;
+      rawStatus = purchaseState !== null ? `PURCHASE_STATE_${purchaseState}` : "UNKNOWN";
+      entitlementActive = purchaseState === 0;
+      acknowledged = prodData?.acknowledgementState === 1;
+      orderId = prodData?.orderId || null;
     }
 
-    // One-time product (sweep_pro_lifetime)
-    const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
-      CANONICAL_PACKAGE,
-    )}/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}`;
-    const playRes = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (!playRes.ok) {
-      return new Response(
-        JSON.stringify({
-          verified: false,
-          entitlementActive: false,
-          reason: `PLAY_API_${playRes.status}`,
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
+    const tokenHash = await sha256Hex(purchaseToken);
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const { error: dbError } = await supabase.from("play_purchases").upsert(
+        {
+          package_name: CANONICAL_PACKAGE,
+          product_id: productId,
+          product_type: productType,
+          purchase_token_hash: tokenHash,
+          order_id: orderId,
+          entitlement_active: entitlementActive,
+          acknowledged,
+          expiry_time: expiryTime,
+          raw_status: rawStatus,
+          verified_at: new Date().toISOString(),
+        },
+        { onConflict: "purchase_token_hash" },
       );
+      if (dbError) {
+        console.error("Failed to persist play_purchases audit row:", dbError.message);
+      }
     }
-    const prodData = await playRes.json();
-    // purchaseState === 0 means Purchased in Google Play Developer API v3 purchases.products
-    const isPurchased = prodData?.purchaseState === 0;
 
     return new Response(
       JSON.stringify({
-        verified: isPurchased,
-        entitlementActive: isPurchased,
-        purchaseState: prodData?.purchaseState ?? null,
+        verified: entitlementActive,
+        entitlementActive,
+        acknowledged,
+        productId,
+        productType,
+        status: rawStatus,
+        ...(productType === "SUBS" ? { subscriptionState: rawStatus } : { purchaseState }),
+        expiryTime,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } },
     );

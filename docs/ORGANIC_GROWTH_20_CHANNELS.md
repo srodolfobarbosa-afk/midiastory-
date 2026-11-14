@@ -27,7 +27,7 @@ Documento mestre consolidando as **20 frentes exatas** de escala orgânica e aut
 ## 🤝 BLOCO 3 — Parcerias e Engajamento Direto (11 a 14)
 
 11. **Prospecção de Micro-Influenciadores via IA (5k a 20k seguidores):** Usar agentes para escanear perfis de 5 mil a 20 mil seguidores que combinam com o nicho de Android/tecnologia e disparar propostas de permuta no automático (acesso **Midiastore Pro Vitalício**).
-12. **Parcerias com Portais de Cupons e Achadinhos (Promobit / Pelando):** Automatizar o envio da versão gratuita (limpador de arquivos grandes `>10 MB` sem anúncios invasivos) e de ofertas dos planos **Pro Mensal (R$ 9,90)** e **Vitalício** no **Promobit** e **Pelando**.
+12. **Parcerias com Portais de Cupons e Achadinhos (Promobit / Pelando):** Automatizar o envio da versão gratuita (limpador de arquivos grandes `>10 MB` sem anúncios invasivos) e de divulgação dos planos reais ativos na Play Console (**Pro Mensal R$ 14,99**, **Pro Anual R$ 79,99** e **Vitalício R$ 149,99**).
 13. **Inbound Marketing com Blogs Parceiros:** Usar agentes para gerar artigos e guias práticos em blogs parceiros, oferecendo uma solução imediata dentro do app com link direto para download.
 14. **Agente de Resposta de Valor em Comunidades (Reddit & Quora):** Responder tópicos reais sobre *"armazenamento cheio"* em `r/androidapps`, `r/Android`, `r/brasil` e Quora destacando a verificação criptográfica **SHA-256** do Midiastore.
 

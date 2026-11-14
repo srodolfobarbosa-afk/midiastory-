@@ -1,27 +1,12 @@
-import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken, SUPABASE_PROJECT_REF } from "./lib/supabase-auth.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const projectRoot = path.resolve(__dirname, "..");
-const mcpConfigPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
-const projectRef = "usmqtnlsaavxqguwrtix";
+const projectRef = SUPABASE_PROJECT_REF;
 const MAX_SAFE_MB = 400; // Limite de alerta (Free tier e 500 MB)
 
-function getToken() {
-  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
-  if (fs.existsSync(mcpConfigPath)) {
-    const raw = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
-    const envToken = raw?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN;
-    if (envToken) return envToken.trim();
-    const auth = raw?.mcpServers?.supabase?.headers?.Authorization || "";
-    return auth.replace(/^Bearer\s+/i, "").trim();
-  }
-  throw new Error("Token Supabase nao encontrado.");
-}
-
 async function runSql(query) {
-  const token = getToken();
+  const token = getSupabaseToken();
   const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
     method: "POST",
     headers: {
@@ -51,22 +36,29 @@ export async function checkAndMaintain() {
 
   if (Number(totalMb) > MAX_SAFE_MB) {
     console.warn(`⚠️ ALERTA: Armazenamento atingiu ${totalMb} MB! Iniciando limpeza profunda...`);
-    // Limpeza de logs antigos
+    // Limpeza de logs e telemetria antiga
     await runSql(`
       DELETE FROM public.orchestrator_logs WHERE created_at < NOW() - INTERVAL '7 days';
       DELETE FROM public.orchestrator_tasks WHERE status = 'DONE' AND created_at < NOW() - INTERVAL '14 days';
+      DELETE FROM public.web_page_events WHERE created_at < NOW() - INTERVAL '30 days';
     `);
-    console.log("Limpeza de logs e tarefas antigas executada.");
+    console.log("Limpeza de logs, telemetria antiga (>30d) e tarefas antigas executada.");
   }
 
-  // 2. Tabela de testadores
+  // 2. Tabela de testadores e funil pre-lancamento
   const countRes = await runSql(`
     SELECT 
       count(*) as total_rows,
       count(DISTINCT lower(trim(email))) as unique_emails
     FROM public.beta_testers;
   `);
-  console.log(`Testadores Cadastrados: ${countRes[0]?.total_rows} (${countRes[0]?.unique_emails} únicos)`);
+  console.log(`Testadores / Fila de Espera: ${countRes[0]?.total_rows} (${countRes[0]?.unique_emails} únicos)`);
+
+  const statsRes = await runSql(`SELECT public.get_prelaunch_stats() AS stats;`).catch(() => []);
+  if (statsRes[0]?.stats) {
+    const s = statsRes[0].stats;
+    console.log(`Telemetria Web: ${s.total_visits} visitas (${s.unique_visitors} únicos, ${s.visits_24h} em 24h, ${s.share_clicks} compartilhamentos)`);
+  }
 
   // 3. Deduplicação preventiva
   await runSql(`
@@ -75,6 +67,21 @@ export async function checkAndMaintain() {
     WHERE a.id > b.id 
       AND lower(trim(a.email)) = lower(trim(b.email));
   `);
+
+  // 4. Auditoria de RLS em tabelas public.*
+  const rlsMissing = await runSql(`
+    SELECT tablename
+    FROM pg_tables
+    WHERE schemaname = 'public' AND rowsecurity = false
+    ORDER BY tablename;
+  `);
+  if (rlsMissing.length > 0) {
+    console.warn(
+      `⚠️ ALERTA RLS: Tabelas public sem Row Level Security ativo: ${rlsMissing.map((r) => r.tablename).join(", ")}`
+    );
+  } else {
+    console.log("RLS Check: Todas as tabelas public.* possuem Row Level Security ativo.");
+  }
 
   console.log(`Status: Proteção ativa. Uso atual: ${((Number(totalMb) / 500) * 100).toFixed(1)}% da cota.`);
 }
@@ -96,7 +103,7 @@ async function main() {
   }
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   main().catch(err => {
     console.error("Erro na execucao:", err.message);
     process.exit(1);

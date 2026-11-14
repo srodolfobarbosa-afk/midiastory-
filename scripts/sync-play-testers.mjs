@@ -1,17 +1,37 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const keyPath = path.join(projectRoot, ".secrets", "play-service-account.json");
-const mcpConfigPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
 const packageName = "com.rdf112.midiastore";
 const projectRef = "usmqtnlsaavxqguwrtix";
 
+function resolveRepoFile(relPath) {
+  const localPath = path.join(projectRoot, relPath);
+  if (fs.existsSync(localPath)) return localPath;
+  try {
+    const gitCommonDir = execFileSync("git", ["rev-parse", "--git-common-dir"], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    if (gitCommonDir) {
+      const mainRepoRoot = path.resolve(projectRoot, gitCommonDir, "..");
+      const mainPath = path.join(mainRepoRoot, relPath);
+      if (fs.existsSync(mainPath)) return mainPath;
+    }
+  } catch {
+    // ignore
+  }
+  return localPath;
+}
+
 function getSupabaseToken() {
-  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
+  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN.trim();
+  const mcpConfigPath = resolveRepoFile(path.join(".agents", "plugins", "supabase", "mcp_config.json"));
   if (fs.existsSync(mcpConfigPath)) {
     const raw = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
     const envToken = raw?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN;
@@ -34,6 +54,7 @@ async function runSql(query) {
 }
 
 async function getPlayAccessToken() {
+  const keyPath = resolveRepoFile(path.join(".secrets", "play-service-account.json"));
   const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
   const now = Math.floor(Date.now() / 1000);
   const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
@@ -62,20 +83,25 @@ async function getPlayAccessToken() {
   return data.access_token;
 }
 
+function isSyntheticTestRow(row) {
+  const email = (row.email || "").toLowerCase();
+  const source = (row.source || "").toLowerCase();
+  return email.startsWith("teste_") || source === "automated_verification";
+}
+
 async function main() {
   console.log("=== SINCRONIZADOR 24/7 DE TESTADORES (SUPABASE -> GOOGLE PLAY) ===");
-  
-  // 1. Obter testadores do Supabase
+
   const testers = await runSql(`
-    SELECT id, email, status, created_at
+    SELECT id, email, source, status, created_at
     FROM public.beta_testers
     ORDER BY id ASC;
   `);
 
-  console.log(`Testadores cadastrados no banco: ${testers.length}`);
-  testers.forEach(t => console.log(` - [#${t.id}] ${t.email} (${t.status})`));
+  const realTesters = testers.filter(t => !isSyntheticTestRow(t));
+  console.log(`Testadores cadastrados no banco: ${testers.length} total (${realTesters.length} reais, ${testers.length - realTesters.length} sintéticos)`);
+  testers.forEach(t => console.log(` - [#${t.id}] ${t.email} [source=${t.source || "n/a"}] (${t.status})`));
 
-  // 2. Conectar com a Google Play Developer API
   const token = await getPlayAccessToken();
 
   const editRes = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits`, {
@@ -86,15 +112,21 @@ async function main() {
   const edit = await editRes.json();
   if (!editRes.ok) throw new Error(`Falha ao criar edit: ${JSON.stringify(edit)}`);
 
-  const testersRes = await fetch(
-    `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/testers/alpha`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  try {
+    const testersRes = await fetch(
+      `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/testers/alpha`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-  const currentTesters = await testersRes.json();
-  console.log(`Status Testers Track Alpha (${testersRes.status}):`, JSON.stringify(currentTesters));
+    const currentTesters = await testersRes.json();
+    console.log(`Status Testers Track Alpha (${testersRes.status}):`, JSON.stringify(currentTesters));
+  } finally {
+    await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
 
-  // 3. Atualizar status no Supabase
   if (testers.length > 0) {
     await runSql(`
       UPDATE public.beta_testers
@@ -104,11 +136,11 @@ async function main() {
     console.log("✅ Status atualizado no Supabase para READY_FOR_CONSOLE_INVITE!");
   }
 
-  // 4. Salvar lista formatada pronta para importação no Console
-  const emailsCsv = testers.map(t => t.email).join("\n");
+  const emailsCsv = realTesters.map(t => t.email).join("\n");
   const exportPath = path.join(projectRoot, "docs", "campaigns", "lista-20-testadores-google-play.txt");
+  fs.mkdirSync(path.dirname(exportPath), { recursive: true });
   fs.writeFileSync(exportPath, emailsCsv, "utf8");
-  console.log(`📄 Lista de e-mails exportada para: ${exportPath}`);
+  console.log(`📄 Lista de e-mails reais exportada para: ${exportPath}`);
 }
 
 main().catch(e => {

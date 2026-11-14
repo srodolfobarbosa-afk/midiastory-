@@ -112,49 +112,76 @@ Instruções Cruciais:
     }
   }
 
-  // 2. Fallback OpenRouter (Modelos Gratuitos Ativos + Calibragem de max_tokens)
-  const modelsToTry = [
-    "nvidia/nemotron-3.5-lightning:free",
-    "google/gemma-4-31b-it:free",
-    "baidu/ernie-5.5-flash-preview:free",
-    "openrouter/free",
-  ];
+  // 2. Fallback OpenRouter (Modelos Gratuitos Ativos + Calibragem de max_tokens e Auto-Adaptação 402)
+  if (openRouterKey) {
+    const modelsToTry = [
+      "nvidia/nemotron-3.5-lightning:free",
+      "google/gemma-4-31b-it:free",
+      "baidu/ernie-5.5-flash-preview:free",
+      "openrouter/free",
+    ];
 
-  for (const model of modelsToTry) {
-    try {
-      const res = await fetch(openRouterUrl, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${openRouterKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://midiastory-df6a0.web.app/",
-          "X-Title": "Midiastory-Native-Orchestrator",
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1200,
-          response_format: { type: "json_object" },
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userContext },
-          ],
-          temperature: 0.2,
-        }),
-      });
+    for (const model of modelsToTry) {
+      try {
+        let res = await fetch(openRouterUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${openRouterKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://midiastory-df6a0.web.app/",
+            "X-Title": "Midiastory-Native-Orchestrator",
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 1200,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userContext },
+            ],
+            temperature: 0.2,
+          }),
+        });
 
-      if (!res.ok) {
-        console.warn(`Model ${model} returned ${res.status}: ${await res.text()}`);
-        continue;
+        if (res.status === 402) {
+          const errText = await res.text();
+          const match = errText.match(/can only afford (\d+)/i);
+          const affordableTokens = match ? Math.max(60, parseInt(match[1], 10) - 15) : 480;
+          res = await fetch(openRouterUrl, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${openRouterKey}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "https://midiastory-df6a0.web.app/",
+              "X-Title": "Midiastory-Native-Orchestrator",
+            },
+            body: JSON.stringify({
+              model,
+              max_tokens: affordableTokens,
+              response_format: { type: "json_object" },
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userContext },
+              ],
+              temperature: 0.2,
+            }),
+          });
+        }
+
+        if (!res.ok) {
+          console.warn(`Model ${model} returned ${res.status}: ${await res.text()}`);
+          continue;
+        }
+
+        const data = await res.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (content) {
+          const parsed = JSON.parse(content) as LlmDecision;
+          return parsed;
+        }
+      } catch (err) {
+        console.warn(`Error trying model ${model}:`, err);
       }
-
-      const data = await res.json();
-      const content = data.choices?.[0]?.message?.content;
-      if (content) {
-        const parsed = JSON.parse(content) as LlmDecision;
-        return parsed;
-      }
-    } catch (err) {
-      console.warn(`Error trying model ${model}:`, err);
     }
   }
 
@@ -333,8 +360,44 @@ Deno.serve(async (req) => {
       if (state.status === "META_CONCLUIDA") {
         return new Response(
           JSON.stringify({
+            status: "NOOP_META_CONCLUIDA",
             message: "O objetivo já foi alcançado [META_CONCLUIDA]!",
             state,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Evita ruído e escritas redundantes quando o loop já está em PAUSED
+      if (state.status === "PAUSED") {
+        return new Response(
+          JSON.stringify({
+            status: "NOOP_PAUSED",
+            message: "Loop está pausado (PAUSED). Envie action: 'START' para iniciar novo ciclo.",
+            state,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Verifica limite de passos antes de consultar tarefas ou invocar LLM
+      if (state.step_count >= state.max_steps) {
+        const { data: pausedState } = await supabase
+          .from("orchestrator_state")
+          .update({
+            status: "PAUSED",
+            last_thought: `Limite máximo de ${state.max_steps} passos atingido. Loop pausado para revisão.`,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", state.id)
+          .select()
+          .maybeSingle();
+
+        return new Response(
+          JSON.stringify({
+            status: "PAUSED_MAX_STEPS",
+            message: "Limite de passos atingido. Loop pausado.",
+            state: pausedState || { ...state, status: "PAUSED" },
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
@@ -359,22 +422,6 @@ Deno.serve(async (req) => {
             state,
             running_tasks: recentTasks?.filter((t) => t.status === "RUNNING"),
           }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Verifica limite de passos
-      if (state.step_count >= state.max_steps) {
-        await supabase
-          .from("orchestrator_state")
-          .update({
-            status: "PAUSED",
-            last_thought: `Limite máximo de ${state.max_steps} passos atingido. Loop pausado para revisão.`,
-          })
-          .eq("id", state.id);
-
-        return new Response(
-          JSON.stringify({ message: "Limite de passos atingido. Loop pausado.", state }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }

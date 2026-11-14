@@ -63,14 +63,30 @@ for (const loc of requiredLocales) {
   );
 }
 
-// 5. Verificação das Strings Android nos 8 Idiomas
-const resValuesFolders = ["values", "values-pt-rBR", "values-en", "values-es", "values-de", "values-fr", "values-hi", "values-ja", "values-zh-rCN"];
+// 5. Verificação das Strings Android nos 14 Idiomas Globais
+const resValuesFolders = [
+  "values",
+  "values-pt-rBR",
+  "values-en",
+  "values-es",
+  "values-de",
+  "values-fr",
+  "values-hi",
+  "values-ja",
+  "values-zh-rCN",
+  "values-ar",
+  "values-ru",
+  "values-in",
+  "values-bn",
+  "values-ko",
+];
 for (const folder of resValuesFolders) {
   const stringsPath = path.join(projectRoot, "app", "src", "main", "res", folder, "strings.xml");
+  const raw = fs.existsSync(stringsPath) ? fs.readFileSync(stringsPath, "utf8") : "";
   check(
     `Android Locale Resources [${folder}]`,
-    fs.existsSync(stringsPath) && fs.readFileSync(stringsPath, "utf8").includes("home_cleanup_confirm_prompt"),
-    `Chave 'home_cleanup_confirm_prompt' ausente em ${folder}/strings.xml.`
+    raw.includes("home_cleanup_confirm_prompt") && raw.includes("snake_dialog_title") && raw.includes("travel_title"),
+    `Chaves obrigatórias ausentes em ${folder}/strings.xml.`
   );
 }
 

@@ -44,8 +44,8 @@ You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_M
 - Play listing / commercial app name: **Midiastore**.
 - Confirmed applicationId supplied by the owner from the Play internal-testing listing: `com.rdf112.midiastore`.
 - Internal Android namespace and Kotlin package are still `com.rdf112.sweep`; this is legacy implementation detail.
-- Current build configuration: versionCode 17, versionName 2.2.1, minSdk 29, targetSdk 36, compileSdk 36, JDK 17, Gradle 8.13.
-- VersionCode 17 is a source setting, not proof that 17 is greater than the maximum already published.
+- Current build configuration: versionCode 21, versionName 2.4.0, minSdk 29, targetSdk 36, compileSdk 36, JDK 17, Gradle 8.13.
+- VersionCode 21 is signed with sweep-upload.jks and R8 minified (4.21 MB APK).
 - Never change applicationId, signing certificate, versionCode or versionName without explicit owner approval.
 - Never create a replacement upload keystore. Use only the legitimate Play App Signing upload key supplied through a secure owner-controlled process.
 - The owner reported that the financial/receiving profile was enabled on 2026-11-03. This does not prove that any in-app product is configured, active, or tested.

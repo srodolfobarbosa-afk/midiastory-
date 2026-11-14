@@ -8,4 +8,9 @@
     <locale android:name="hi" />
     <locale android:name="ja" />
     <locale android:name="zh-CN" />
+    <locale android:name="ar" />
+    <locale android:name="ru" />
+    <locale android:name="id" />
+    <locale android:name="bn" />
+    <locale android:name="ko" />
 </locale-config>

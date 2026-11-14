@@ -6,9 +6,9 @@ Este documento define as regras, padrões arquiteturais e diretrizes operacionai
 
 ## 1. Escopo & Arquitetura Geral
 
-- **Aplicativo Android:** `com.rdf112.midiastore` (v2.3.1, versionCode 20).
-  - Stack: Kotlin, Jetpack Compose, Material 3, AndroidX MediaStore API, Room/SQLite.
-  - Missão: Limpeza e otimização de mídias (WhatsApp Cleaner Pro, detecção de duplicatas SHA-256 e arquivos gigantes).
+- **Aplicativo Android:** `com.rdf112.midiastore` (v2.4.0, versionCode 21).
+  - Stack: Kotlin, Android Views (Material Components), AndroidX MediaStore API, Google Play Billing KTX 8.0.0.
+  - Missão: Limpeza e otimização de mídias on-device (detecção de duplicatas SHA-256, arquivos gigantes, antigos e Estúdio de Mídia local).
 - **Funil Web Internacional:**
   - Hospedagem: Firebase Hosting (`https://midiastory-df6a0.web.app/`).
   - Suporte a 8 idiomas: PT, EN, ES, DE, FR, HI, JA, ZH e artigos de SEO.
@@ -25,7 +25,7 @@ Este documento define as regras, padrões arquiteturais e diretrizes operacionai
 1. **PROIBIDO `MANAGE_EXTERNAL_STORAGE`:** Sob nenhuma hipótese adicione esta permissão ao `AndroidManifest.xml`.
 2. **MediaStore Exclusivo:** Toda listagem deve utilizar `MediaStore.Files.getContentUri("external")` ou queries específicas de áudio/vídeo/imagem.
 3. **Exclusões de Mídia:** Utilize `MediaStore.createDeleteRequest(contentResolver, uris)` para exclusões em massa em Android 11+ (API 30+).
-4. **Requisito de 20 Testadores Fechados:** A liberação para produção na Google Play depende de 20 testadores humanos ativos durante 14 dias contínuos. A lista é gerada em `docs/campaigns/lista-20-testadores-google-play.txt`.
+4. **Requisito de Teste Fechado:** A liberação para produção na Google Play em contas pessoais exige mínimo oficial de 12 testadores humanos em opt-in contínuo durante 14 dias. A meta operacional de segurança (15–20 testadores) é gerada em `docs/campaigns/lista-20-testadores-google-play.txt`.
 
 ---
 

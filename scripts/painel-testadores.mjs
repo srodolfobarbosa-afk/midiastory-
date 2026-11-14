@@ -8,16 +8,37 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const mcpConfigPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
 const projectRef = "usmqtnlsaavxqguwrtix";
 const GOAL = 20;
 
+function resolveMcpConfigPath() {
+  const localPath = path.join(projectRoot, ".agents", "plugins", "supabase", "mcp_config.json");
+  if (fs.existsSync(localPath)) return localPath;
+  try {
+    const gitCommonDir = execFileSync("git", ["rev-parse", "--git-common-dir"], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    if (gitCommonDir) {
+      const mainRepoRoot = path.resolve(projectRoot, gitCommonDir, "..");
+      const mainPath = path.join(mainRepoRoot, ".agents", "plugins", "supabase", "mcp_config.json");
+      if (fs.existsSync(mainPath)) return mainPath;
+    }
+  } catch {
+    // ignore
+  }
+  return localPath;
+}
+
 function getToken() {
-  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
+  if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN.trim();
+  const mcpConfigPath = resolveMcpConfigPath();
   if (fs.existsSync(mcpConfigPath)) {
     const raw = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
     const envToken = raw?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN;
@@ -26,6 +47,12 @@ function getToken() {
     return auth.replace(/^Bearer\s+/i, "").trim();
   }
   throw new Error("Token Supabase nao encontrado.");
+}
+
+function isSyntheticTestRow(row) {
+  const email = (row.email || "").toLowerCase();
+  const source = (row.source || "").toLowerCase();
+  return email.startsWith("teste_") || source === "automated_verification";
 }
 
 async function runSql(query) {
@@ -66,12 +93,13 @@ async function renderDashboard() {
     ORDER BY id ASC;
   `);
 
-  const count = testers.length;
+  const realTesters = testers.filter(t => !isSyntheticTestRow(t));
+  const count = realTesters.length;
   const remaining = Math.max(GOAL - count, 0);
 
-  // Exportar automaticamente para arquivo de texto
   const exportPath = path.join(projectRoot, "docs", "campaigns", "lista-20-testadores-google-play.txt");
-  const emailsText = testers.map(t => t.email).join("\n");
+  const emailsText = realTesters.map(t => t.email).join("\n");
+  fs.mkdirSync(path.dirname(exportPath), { recursive: true });
   fs.writeFileSync(exportPath, emailsText, "utf8");
 
   console.clear();
@@ -80,17 +108,17 @@ async function renderDashboard() {
   console.log("║                  Meta Oficial Google Play: 20 Testadores                       ║");
   console.log("╚════════════════════════════════════════════════════════════════════════════════╝\n");
 
-  console.log(`📊 PROGRESSO DA META:`);
+  console.log(`📊 PROGRESSO DE TESTADORES REAIS NO FUNIL:`);
   console.log(`   ${renderProgressBar(count, GOAL, 35)}\n`);
 
   if (count >= GOAL) {
-    console.log(`   🎉 META DE 20 TESTADORES ATINGIDA COM SUCESSO!`);
-    console.log(`   👉 Pronto para submeter pedido de produção na Google Play Console!\n`);
+    console.log(`   🎉 META DE 20 TESTADORES REAIS ATINGIDA NO FUNIL!`);
+    console.log(`   👉 Mantenha 20 testadores ativos por 14 dias contínuos na Google Play Console!\n`);
   } else {
-    console.log(`   ⏳ FALTAM APENAS: ${remaining} testador(es) para atingir os ${GOAL} exigidos pelo Google.\n`);
+    console.log(`   ⏳ FALTAM: ${remaining} testador(es) reais no funil para atingir os ${GOAL} exigidos pelo Google.\n`);
   }
 
-  console.log(`📋 LISTA DE TESTADORES CADASTRADOS (${count}):`);
+  console.log(`📋 LISTA DE REGISTROS NO BANCO (${testers.length} total | ${count} reais):`);
   console.log("─".repeat(82));
   console.log(
     "ID".padEnd(5) +
@@ -107,8 +135,8 @@ async function renderDashboard() {
     testers.forEach(t => {
       const id = `#${t.id}`.padEnd(5);
       const email = (t.email.length > 32 ? t.email.slice(0, 29) + "..." : t.email).padEnd(35);
-      const src = (t.source || "site").padEnd(18);
-      const st = (t.status || "PENDING").padEnd(16);
+      const src = (t.source || "site").slice(0, 16).padEnd(18);
+      const st = (t.status || "PENDING").slice(0, 14).padEnd(16);
       const dt = formatDate(t.created_at);
       console.log(`${id}${email}${src}${st}${dt}`);
     });
@@ -116,7 +144,8 @@ async function renderDashboard() {
   console.log("─".repeat(82));
 
   console.log(`\n🔗 LINK DO FUNIL OFICIAL: https://midiastory-df6a0.web.app/#vip-testers`);
-  console.log(`📄 LISTA EXPORTADA PARA: docs/campaigns/lista-20-testadores-google-play.txt`);
+  console.log(`🔗 OPT-IN GOOGLE PLAY:    https://play.google.com/apps/testing/com.rdf112.midiastore`);
+  console.log(`📄 LISTA EXPORTADA PARA:  docs/campaigns/lista-20-testadores-google-play.txt`);
   console.log(`🔄 Sincronizar com Play Console: node scripts/sync-play-testers.mjs\n`);
   console.log(`Última atualização: ${new Date().toLocaleTimeString("pt-BR")}`);
 }

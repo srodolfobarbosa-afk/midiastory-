@@ -412,6 +412,84 @@ class MediaScanViewModelTest {
         }
     }
 
+    @Test
+    fun prepareExternalReviewSelection_loadsSelectableCandidatesAndRejectsProtected() = runTest {
+        val repository = FakePageRepository(overlapSecondPage = false)
+        val viewModel = MediaScanViewModel(repository)
+        val candidate1 = MediaRecord(
+            uri = "content://media/external/video/media/101",
+            volumeName = "external_primary",
+            kind = MediaKind.VIDEO,
+            displayName = "VID-20261114-WA0001.mp4",
+            mimeType = "video/mp4",
+            sizeBytes = 4_500_000L,
+            dateModifiedEpochSeconds = 1_700_000_000L,
+        )
+        val protectedRecord = MediaRecord(
+            uri = "content://media/external/images/media/102",
+            volumeName = "external_primary",
+            kind = MediaKind.IMAGE,
+            displayName = "IMG-20261114-WA0002.jpg",
+            mimeType = "image/jpeg",
+            sizeBytes = 500_000L,
+            dateModifiedEpochSeconds = 1_700_000_000L,
+            isProtected = true,
+        )
+
+        val count = viewModel.prepareExternalReviewSelection(listOf(candidate1, protectedRecord))
+        assertEquals(1, count)
+        assertEquals(1, viewModel.state.value.selection.records.size)
+        assertEquals(candidate1.uri, viewModel.state.value.selection.records.first().uri)
+
+        viewModel.setSelected(candidate1, false)
+        assertEquals(0, viewModel.state.value.selection.records.size)
+    }
+
+    @Test
+    fun mediaStudioTools_rejectsHtmlAndExtractsDirectVideoUrls() {
+        val htmlBytes = "<!DOCTYPE html><html><body>Login required</body></html>".toByteArray(Charsets.UTF_8)
+        assertEquals(
+            true,
+            com.rdf112.sweep.presentation.studio.MediaStudioTools.isLikelyHtmlOrInvalidMediaStream(
+                htmlBytes,
+                htmlBytes.size,
+                "application/octet-stream",
+            ),
+        )
+        assertEquals(
+            true,
+            com.rdf112.sweep.presentation.studio.MediaStudioTools.isLikelyHtmlOrInvalidMediaStream(
+                ByteArray(0),
+                0,
+                "video/mp4",
+            ),
+        )
+        val mp4Header = byteArrayOf(
+            0x00, 0x00, 0x00, 0x18,
+            'f'.code.toByte(), 't'.code.toByte(), 'y'.code.toByte(), 'p'.code.toByte(),
+            'm'.code.toByte(), 'p'.code.toByte(), '4'.code.toByte(), '2'.code.toByte(),
+        )
+        assertEquals(
+            false,
+            com.rdf112.sweep.presentation.studio.MediaStudioTools.isLikelyHtmlOrInvalidMediaStream(
+                mp4Header,
+                mp4Header.size,
+                "video/mp4",
+            ),
+        )
+
+        val sampleHtml = """
+            <html><head>
+            <meta content="https://cdn.example.com/media/clip.mp4?token=1&amp;hd=1" property="og:video:secure_url" />
+            </head></html>
+        """.trimIndent()
+        val extracted = com.rdf112.sweep.presentation.studio.MediaStudioTools.extractDirectVideoUrlFromHtml(
+            sampleHtml,
+            "https://example.com/post/123",
+        )
+        assertEquals("https://cdn.example.com/media/clip.mp4?token=1&hd=1", extracted)
+    }
+
     class MainDispatcherRule(
         val dispatcher: TestDispatcher = StandardTestDispatcher(),
     ) : TestWatcher() {

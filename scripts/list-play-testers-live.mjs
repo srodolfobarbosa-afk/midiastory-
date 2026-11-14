@@ -1,13 +1,38 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const keyPath = path.join(projectRoot, ".secrets", "play-service-account.json");
-const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
 const packageName = "com.rdf112.midiastore";
+
+function resolveSecretFile(relPath) {
+  const localPath = path.join(projectRoot, relPath);
+  if (fs.existsSync(localPath)) return localPath;
+  try {
+    const gitCommonDir = execFileSync("git", ["rev-parse", "--git-common-dir"], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    if (gitCommonDir) {
+      const mainRepoRoot = path.resolve(projectRoot, gitCommonDir, "..");
+      const mainPath = path.join(mainRepoRoot, relPath);
+      if (fs.existsSync(mainPath)) return mainPath;
+    }
+  } catch {
+    // ignore
+  }
+  return localPath;
+}
+
+const keyPath = resolveSecretFile(path.join(".secrets", "play-service-account.json"));
+if (!fs.existsSync(keyPath)) {
+  throw new Error(`Credencial Google Play não encontrada em .secrets/play-service-account.json`);
+}
+const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
 
 async function getToken() {
   const now = Math.floor(Date.now() / 1000);
@@ -28,14 +53,16 @@ async function getToken() {
     body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
   });
   const data = await res.json();
+  if (!data.access_token) {
+    throw new Error(`Falha ao obter token OAuth2 Google Play (HTTP ${res.status})`);
+  }
   return data.access_token;
 }
 
 async function run() {
   const token = await getToken();
   console.log("Token Google Play Developer obtido.");
-  
-  // Criar edit para leitura
+
   const editRes = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -47,32 +74,34 @@ async function run() {
   }
   console.log("Edit ID:", edit.id);
 
-  // Listar tracks
-  const tracksRes = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/tracks`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const tracksData = await tracksRes.json();
-  console.log("Tracks disponíveis:", tracksData.tracks?.map(t => `${t.track} (releases: ${t.releases?.length || 0})`));
-
-  // Verificar testers de cada track
-  for (const trackName of ["alpha", "internal", "beta"]) {
-    const tRes = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/testers/${trackName}`, {
+  try {
+    const tracksRes = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/tracks`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (tRes.ok) {
-      const tData = await tRes.json();
-      console.log(`\n=== TESTERS NA TRACK '${trackName}' ===`);
-      console.log(JSON.stringify(tData, null, 2));
-    } else {
-      console.log(`Track '${trackName}' testers status:`, tRes.status, await tRes.text());
-    }
-  }
+    const tracksData = await tracksRes.json();
+    console.log("Tracks disponíveis:", tracksData.tracks?.map(t => `${t.track} (releases: ${t.releases?.length || 0})`));
 
-  // Deletar o edit de leitura para não deixar pendente
-  await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+    for (const trackName of ["alpha", "internal", "beta"]) {
+      const tRes = await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/testers/${trackName}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (tRes.ok) {
+        const tData = await tRes.json();
+        console.log(`\n=== TESTERS NA TRACK '${trackName}' ===`);
+        console.log(JSON.stringify(tData, null, 2));
+      } else {
+        console.log(`Track '${trackName}' testers status:`, tRes.status, await tRes.text());
+      }
+    }
+  } finally {
+    await fetch(`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
 }
 
-run().catch(console.error);
+run().catch(e => {
+  console.error("Erro:", e.message);
+  process.exit(1);
+});

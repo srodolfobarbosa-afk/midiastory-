@@ -1,12 +1,27 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { executeWithFailover } from "./ai-failover-router.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const secrets = JSON.parse(fs.readFileSync(path.join(projectRoot, ".secrets", "ai-media-keys.json"), "utf8"));
 
-async function generateGrowthKit() {
+export function parseJsonFromModelOutput(rawText) {
+  const trimmed = String(rawText || "").trim();
+  const withoutFences = trimmed
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+  const firstBrace = withoutFences.indexOf("{");
+  const lastBrace = withoutFences.lastIndexOf("}");
+  const candidate =
+    firstBrace !== -1 && lastBrace > firstBrace
+      ? withoutFences.slice(firstBrace, lastBrace + 1)
+      : withoutFences;
+  return JSON.parse(candidate);
+}
+
+export async function generateGrowthKit() {
   const prompt = `Você é o Diretor de Growth AI do aplicativo Android "Midiastore: Limpador de Espaço" (pacote com.rdf112.midiastore, site oficial https://midiastory-df6a0.web.app/, link Play Store https://play.google.com/store/apps/details?id=com.rdf112.midiastore).
 Gere um pacote JSON estruturado cobrindo todas as 20 opções de divulgação orgânica, parcerias e retenção:
 1. "googleSearchKeywords": 10 palavras-chave transacionais de alta intenção em pt-BR e en-US.
@@ -24,31 +39,21 @@ Gere um pacote JSON estruturado cobrindo todas as 20 opções de divulgação or
 13. "gamificationDailyChallenges": 3 desafios diários automáticos in-app estilo streak (ex: "Abra o app por 5 dias seguidos e ganhe benefício especial no Plano Pro") para manter o usuário ativo sem gastar com mídia.
 Responda APENAS com JSON válido.`;
 
-  const res = await fetch(secrets.OPENROUTER_BASE_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${secrets.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-4o-mini",
-      response_format: { type: "json_object" },
-      messages: [{ role: "user", content: prompt }],
-    }),
+  const result = await executeWithFailover(prompt, {
+    maxTokens: 1500,
+    responseFormatJson: true,
   });
-
-  if (!res.ok) {
-    throw new Error(`OpenRouter status ${res.status}: ${await res.text()}`);
-  }
-  const data = await res.json();
-  const content = JSON.parse(data.choices[0].message.content);
+  const content = parseJsonFromModelOutput(result.content);
   const campaignsDir = path.join(projectRoot, "docs", "campaigns");
   fs.mkdirSync(campaignsDir, { recursive: true });
   fs.writeFileSync(path.join(campaignsDir, "latest-campaign.json"), JSON.stringify(content, null, 2));
-  console.log("Kit completo das 20 frentes (1 a 20) gerado em docs/campaigns/latest-campaign.json!");
+  console.log(`Kit completo das 20 frentes (1 a 20) gerado em docs/campaigns/latest-campaign.json via ${result.source}!`);
+  return content;
 }
 
-generateGrowthKit().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  generateGrowthKit().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

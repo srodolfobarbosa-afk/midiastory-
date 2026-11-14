@@ -81,6 +81,10 @@ export async function deploySite() {
   }
 
   function getDocsFiles(dir, baseDir = "") {
+    const EXCLUDED_DIRS = new Set(["campaigns", "datasets", "store", "reports", "audit", "ebook"]);
+    const ALLOWED_EXTS = new Set([".html", ".xml", ".css", ".js", ".png", ".jpg", ".jpeg", ".svg", ".webp", ".ico"]);
+    const ALLOWED_ROOT_FILES = new Set(["robots.txt", "llms.txt", "live-activity.json"]);
+
     let results = [];
     if (!fs.existsSync(dir)) return results;
     const list = fs.readdirSync(dir);
@@ -90,9 +94,13 @@ export async function deploySite() {
       const stat = fs.statSync(fullPath);
       const relPath = path.join(baseDir, file).replace(/\\/g, "/");
       if (stat.isDirectory()) {
+        if (EXCLUDED_DIRS.has(file.toLowerCase())) continue;
         results = results.concat(getDocsFiles(fullPath, relPath));
       } else {
-        results.push([`/${relPath}`, relPath]);
+        const ext = path.extname(file).toLowerCase();
+        if (ALLOWED_EXTS.has(ext) || (!baseDir && ALLOWED_ROOT_FILES.has(file))) {
+          results.push([`/${relPath}`, relPath]);
+        }
       }
     }
     return results;

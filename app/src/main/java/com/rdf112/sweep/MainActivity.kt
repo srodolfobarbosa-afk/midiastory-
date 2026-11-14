@@ -60,6 +60,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.rdf112.sweep.data.WhatsAppCleanerDataSource
+import com.rdf112.sweep.data.WhatsAppMediaCategory
+import com.rdf112.sweep.data.WhatsAppMediaItem
 import com.rdf112.sweep.data.billing.AndroidPlayBillingGateway
 import com.rdf112.sweep.data.billing.PlayCatalogProductUi
 import com.rdf112.sweep.data.media.AndroidMediaPageRepository
@@ -79,6 +82,7 @@ import com.rdf112.sweep.domain.operations.MediaOperationMode
 import com.rdf112.sweep.domain.operations.ObservedMediaPostState
 import com.rdf112.sweep.domain.permissions.MediaPermissionPolicy
 import com.rdf112.sweep.domain.storage.StorageUsageCalculator
+import com.rdf112.sweep.presentation.scan.GlobalMissionProgress
 import com.rdf112.sweep.presentation.scan.MediaScanUiState
 import com.rdf112.sweep.presentation.scan.MediaScanViewModel
 import com.rdf112.sweep.presentation.scan.ScanUiStatus
@@ -86,22 +90,37 @@ import com.rdf112.sweep.presentation.ui.StorageRingGaugeView
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.content.ClipData
+import android.content.ClipboardManager
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import java.security.SecureRandom
 import java.text.DateFormat
 import java.util.Date
+import java.util.Locale
+import com.rdf112.sweep.presentation.studio.CountryHubInfo
+import com.rdf112.sweep.presentation.studio.FallingBlocksGameView
+import com.rdf112.sweep.presentation.studio.GlobalHubTools
+import com.rdf112.sweep.presentation.studio.MagicDiceEngine
+import com.rdf112.sweep.presentation.studio.MagicRiddlesTools
 import com.rdf112.sweep.presentation.studio.MediaStudioTools
+import com.rdf112.sweep.presentation.studio.SnakeGameView
+import com.rdf112.sweep.presentation.studio.TwentyOneCardTrickEngine
 
 /**
- * Edição 2027/2028 (v2.0.0 / versionCode = 12) — Interface Moderna em 4 Abas com Medidor Circular,
- * Orbe Central de 1 Toque, Missões OaaS Automatizadas e Compatibilidade MediaStore Universal.
+ * Midiastore (`com.rdf112.midiastore`, namespace interno `com.rdf112.sweep`).
+ * Interface modular em abas espaçosas com Medidor Circular, Limpeza MediaStore Universal,
+ * Hub Mundial Offline (Cobrinha, Relógio, Moedas, Turismo) e Salão Secreto de Mágica & Charadas.
  */
 class MainActivity : AppCompatActivity() {
-    private enum class AppTab { HOME, FILES, STUDIO, OAAS, PRO }
+    private enum class AppTab { HOME, FILES, STUDIO, OAAS, GAMES, WORLD, PRO }
     private data class UnusedAppInfo(
         val packageName: String,
         val displayName: String,
@@ -122,12 +141,19 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
         val homeCleanupPending = pendingOutcomeMission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW
+        val whatsAppPending = pendingWhatsAppCleanerAfterPermission
+        pendingWhatsAppCleanerAfterPermission = false
         if (hasAnyMediaPermission()) {
             viewModel.startSession()
-            switchTab(if (homeCleanupPending) AppTab.HOME else if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
+            if (whatsAppPending) {
+                openWhatsAppCleanerFlow()
+            } else {
+                switchTab(if (homeCleanupPending) AppTab.HOME else if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
+            }
         } else {
             pendingKindAfterPermission = null
             pendingOutcomeMission = null
+            openInteractiveDialogOnMissionFinish = false
             statusText.text = getString(R.string.permission_denied)
             if (homeCleanupPending) {
                 heroOrbButton.isEnabled = true
@@ -163,9 +189,19 @@ class MainActivity : AppCompatActivity() {
             refreshFlywheelSummary()
             updateSpaceMetricsCard(viewModel.state.value)
             if (result.resultCode == Activity.RESULT_OK && confirmedCount > 0) {
+                homeInteractiveRecords = emptyList()
+                homeInteractiveFallback = false
+                homeCleanupCandidateCount = 0
+                heroOrbButton.isEnabled = true
+                heroOrbButton.text = getString(R.string.home_cleanup_primary)
+                if (::homeDirectCleanRow.isInitialized) {
+                    homeDirectCleanRow.visibility = View.GONE
+                }
+                showHomeCleanupMessage(getString(R.string.trash_operation_result, confirmedCount, uris.size))
                 viewModel.clearSelection()
                 viewModel.startSession()
                 statusText.text = getString(R.string.trash_operation_result, confirmedCount, uris.size)
+                Toast.makeText(this@MainActivity, getString(R.string.trash_operation_result, confirmedCount, uris.size), Toast.LENGTH_LONG).show()
             } else {
                 statusText.text = getString(R.string.trash_operation_cancelled_or_unconfirmed, confirmedCount, uris.size)
             }
@@ -228,8 +264,18 @@ class MainActivity : AppCompatActivity() {
             updateSpaceMetricsCard(viewModel.state.value)
             val freedFmt = android.text.format.Formatter.formatFileSize(this@MainActivity, confirmedBytes)
             if (result.resultCode == Activity.RESULT_OK && confirmedDeleted > 0) {
+                homeInteractiveRecords = emptyList()
+                homeInteractiveFallback = false
+                homeCleanupCandidateCount = 0
+                heroOrbButton.isEnabled = true
+                heroOrbButton.text = getString(R.string.home_cleanup_primary)
+                if (::homeDirectCleanRow.isInitialized) {
+                    homeDirectCleanRow.visibility = View.GONE
+                }
+                showHomeCleanupMessage(getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt))
                 viewModel.clearSelection()
                 viewModel.startSession()
+                Toast.makeText(this@MainActivity, getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt), Toast.LENGTH_LONG).show()
             }
             statusText.text = getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt)
         }
@@ -276,7 +322,7 @@ class MainActivity : AppCompatActivity() {
         if (!uris.isNullOrEmpty()) {
             processPhotosToPdf(uris)
         } else {
-            Toast.makeText(this, "Nenhuma foto selecionada.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.no_photos_selected_toast, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -285,6 +331,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var trashCoordinator: AndroidTrashOperationCoordinator
     private lateinit var outcomeTelemetry: AndroidOutcomeTelemetryStore
     private lateinit var inAppReviewCoordinator: InAppReviewCoordinator
+    private lateinit var whatsAppCleaner: WhatsAppCleanerDataSource
+    private var pendingWhatsAppCleanerAfterPermission: Boolean = false
     private var pendingOperationUris: List<String> = emptyList()
     private var pendingOperationBytesByUri: Map<String, Long> = emptyMap()
     private val pendingApi29DeleteQueue = mutableListOf<String>()
@@ -301,11 +349,13 @@ class MainActivity : AppCompatActivity() {
     private var pendingOutcomeMission: DesiredOutcomeMission? = null
     private var lastRecordedMissionProgress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress? = null
 
-    // Containers das 5 Abas
+    // Containers das 7 Abas Dedicadas (cada recurso separado com clareza)
     private lateinit var homeSection: LinearLayout
     private lateinit var filesSection: LinearLayout
     private lateinit var studioSection: LinearLayout
     private lateinit var oaasSection: LinearLayout
+    private lateinit var gamesSection: LinearLayout
+    private lateinit var worldSection: LinearLayout
     private lateinit var proSection: LinearLayout
 
     // Botões da Barra de Navegação Inferior
@@ -313,10 +363,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navFilesBtn: MaterialButton
     private lateinit var navStudioBtn: MaterialButton
     private lateinit var navOaasBtn: MaterialButton
+    private lateinit var navGamesBtn: MaterialButton
+    private lateinit var navWorldBtn: MaterialButton
     private lateinit var navProBtn: MaterialButton
+    private lateinit var bottomNavScroll: HorizontalScrollView
     private lateinit var bottomNavContainer: LinearLayout
+    private var logoEasterEggTapCount = 0
+    private var logoLastTapMs = 0L
 
     // Widgets da Aba Início (2027 Dashboard)
+    private lateinit var appRootView: LinearLayout
+    private lateinit var brandLockupCard: LinearLayout
+    private lateinit var brandWordmarkView: TextView
+    private lateinit var brandTaglineLabel: TextView
+    private lateinit var storageCardContainer: MaterialCardView
+    private lateinit var mainScrollView: ScrollView
+    private lateinit var topBarProButton: MaterialButton
+    private lateinit var easyModeButton: MaterialButton
+    private lateinit var homeGlobalHubTitleView: TextView
+    private lateinit var homeGlobalHubSubtitleView: TextView
     private lateinit var storageRingGauge: StorageRingGaugeView
     private lateinit var storageUsedHeadline: TextView
     private lateinit var storageFreeSubline: TextView
@@ -324,7 +389,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var heroOrbSubtitle: TextView
     private lateinit var homeCleanupResult: TextView
     private lateinit var homeDirectCleanRow: LinearLayout
+    private lateinit var homeProCtaCard: MaterialCardView
+    private lateinit var homeProCtaBadge: TextView
+    private lateinit var homeProCtaTitle: TextView
+    private lateinit var homeProCtaSubtitle: TextView
+    private lateinit var homeProSubscribeButton: MaterialButton
+    private var latestAnnualOfferText: String? = null
+    private var latestMonthlyOfferText: String? = null
+    private var latestLifetimeOfferText: String? = null
+    private var latestHeroPriceBadge: String? = null
     private var homeCleanupCandidateCount = 0
+    private var homeInteractiveRecords: List<MediaRecord> = emptyList()
+    private var homeInteractiveFallback: Boolean = false
+    private var openInteractiveDialogOnMissionFinish: Boolean = false
+    private var lastInteractivePromptProgress: GlobalMissionProgress? = null
+    private var testerVipButton: MaterialButton? = null
+    private lateinit var selectAllPageButton: MaterialButton
+    private var lastFilteredPageRecords: List<MediaRecord> = emptyList()
 
     // Widgets compartilhados e das demais abas
     private lateinit var storageText: TextView
@@ -393,6 +474,7 @@ class MainActivity : AppCompatActivity() {
         trashCoordinator = AndroidTrashOperationCoordinator(applicationContext)
         outcomeTelemetry = AndroidOutcomeTelemetryStore(applicationContext)
         inAppReviewCoordinator = InAppReviewCoordinator(this)
+        whatsAppCleaner = WhatsAppCleanerDataSource(applicationContext)
         viewModel = ViewModelProvider(
             this,
             MediaScanViewModel.Factory(AndroidMediaPageRepository(applicationContext)),
@@ -439,6 +521,7 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(color(R.color.sweep_background))
         }
+        appRootView = root
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(0, bars.top, 0, bars.bottom)
@@ -449,60 +532,116 @@ class MainActivity : AppCompatActivity() {
         val topBar = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(20), dp(14), dp(20), dp(10))
+            setPadding(dp(16), dp(12), dp(16), dp(6))
         }
         val brandLockup = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            background = roundedBackground(color(R.color.sweep_surface), dp(14))
-            setPadding(dp(8), dp(6), dp(14), dp(6))
+            background = borderedPill(
+                color(R.color.sweep_surface),
+                Color.parseColor("#4000E5FF"),
+                dp(16),
+                dp(1),
+            )
+            setPadding(dp(10), dp(6), dp(14), dp(6))
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                val now = System.currentTimeMillis()
+                if (now - logoLastTapMs > 1800L) logoEasterEggTapCount = 0
+                logoLastTapMs = now
+                logoEasterEggTapCount++
+                if (logoEasterEggTapCount in 3..4) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.logo_easter_egg_step, logoEasterEggTapCount, 5),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                } else if (logoEasterEggTapCount >= 5) {
+                    logoEasterEggTapCount = 0
+                    openMagicSecretLabDialog()
+                }
+            }
         }
+        brandLockupCard = brandLockup
         val mark = ImageView(this).apply {
             setImageResource(R.mipmap.ic_launcher)
             contentDescription = getString(R.string.app_name)
         }
-        brandLockup.addView(mark, LinearLayout.LayoutParams(dp(40), dp(40)))
+        brandLockup.addView(mark, LinearLayout.LayoutParams(dp(34), dp(34)))
 
         val brandCopy = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        val wordmark = label(getString(R.string.app_name), 22f, R.color.sweep_text, true).apply {
-            typeface = Typeface.create("sans-serif", Typeface.BOLD)
-            letterSpacing = -0.015f
-            val brandName = getString(R.string.app_name)
-            val accentStart = brandName.indexOf("store", ignoreCase = true)
-            if (accentStart >= 0) {
-                text = SpannableString(brandName).apply {
-                    setSpan(
-                        ForegroundColorSpan(color(R.color.sweep_primary)),
-                        accentStart,
-                        brandName.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
-                }
-            }
+        val wordmark = label(getString(R.string.app_name), 19.5f, R.color.sweep_text, true).apply {
+            typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
+            letterSpacing = -0.01f
+            maxLines = 1
+            isSingleLine = true
+            ellipsize = android.text.TextUtils.TruncateAt.END
         }
+        brandWordmarkView = wordmark
+        renderBrandWordmark(isPro = false)
         brandCopy.addView(wordmark)
-        brandLockup.addView(brandCopy, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(9) })
+        brandLockup.addView(brandCopy, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(8) })
         topBar.addView(brandLockup, LinearLayout.LayoutParams(0, -2, 1f))
-        val premiumAreaButton = button(getString(R.string.premium_area_button)) {
-            switchTab(AppTab.PRO)
+        easyModeButton = button(getString(if (isEasySeniorModeEnabled()) R.string.easy_mode_btn_on else R.string.easy_mode_btn_off)) {
+            val next = !isEasySeniorModeEnabled()
+            setEasySeniorModeEnabled(next)
+            applyEasySeniorMode(next)
+            Toast.makeText(
+                this,
+                if (next) R.string.easy_mode_on_toast else R.string.easy_mode_off_toast,
+                Toast.LENGTH_SHORT,
+            ).show()
         }.apply {
             minHeight = dp(38)
+            minWidth = dp(48)
+            cornerRadius = dp(18)
             setPadding(dp(12), 0, dp(12), 0)
-            textSize = 12f
+            textSize = 11f
+            typeface = Typeface.DEFAULT_BOLD
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            setTextColor(color(R.color.sweep_text))
         }
-        topBar.addView(premiumAreaButton, LinearLayout.LayoutParams(-2, dp(38)).apply { marginStart = dp(6) })
+        topBarProButton = button(getString(R.string.premium_area_button)) {
+            switchTab(AppTab.PRO)
+        }.apply {
+            minHeight = dp(44)
+            cornerRadius = dp(20)
+            setPadding(dp(14), 0, dp(14), 0)
+            textSize = 12f
+            maxLines = 1
+            isSingleLine = true
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#070B14"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+        }
+        topBar.addView(topBarProButton, LinearLayout.LayoutParams(-2, dp(44)).apply { marginStart = dp(10) })
         root.addView(topBar, LinearLayout.LayoutParams(-1, -2))
 
-        // Barra de progresso fina e status global
-        progress = ProgressBar(this).apply {
+        val topUtilityRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(18), dp(2), dp(16), dp(8))
+        }
+        brandTaglineLabel = label(getString(R.string.brand_tagline), 11f, R.color.sweep_primary_glow, true).apply {
+            maxLines = 2
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        topUtilityRow.addView(brandTaglineLabel, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(10) })
+        topUtilityRow.addView(easyModeButton, LinearLayout.LayoutParams(-2, dp(38)))
+        root.addView(topUtilityRow, LinearLayout.LayoutParams(-1, -2))
+
+        // Barra de progresso fina e moderna
+        progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
             isIndeterminate = true
             visibility = View.GONE
+            indeterminateTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
             contentDescription = getString(R.string.loading_page)
         }
-        root.addView(progress, LinearLayout.LayoutParams(-1, dp(28)))
+        root.addView(progress, LinearLayout.LayoutParams(-1, dp(4)))
 
         // 2. ÁREA CENTRAL ROLÁVEL (Exibe apenas a Aba ativa!)
-        val scroll = ScrollView(this).apply {
+        mainScrollView = ScrollView(this).apply {
             clipToPadding = false
             isFillViewport = true
         }
@@ -510,46 +649,65 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(8), dp(18), dp(24))
         }
-        scroll.addView(bodyContainer, ViewGroup.LayoutParams(-1, -2))
-        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        mainScrollView.addView(bodyContainer, ViewGroup.LayoutParams(-1, -2))
+        root.addView(mainScrollView, LinearLayout.LayoutParams(-1, 0, 1f))
 
         statusText = label(getString(R.string.ready_status), 12f, R.color.sweep_primary_glow, false).apply {
             setPadding(dp(4), 0, dp(4), dp(10))
         }
         bodyContainer.addView(statusText)
 
-        // Construção das 5 Seções Separadas
+        // Construção das 7 Abas Puras e Separadas por Finalidade
         homeSection = buildHomeDashboardSection()
         filesSection = buildFilesExplorerSection()
         studioSection = buildStudioToolsSection()
         oaasSection = buildOaasMissionsSection()
+        gamesSection = buildGamesOfflineSection()
+        worldSection = buildWorldGlobalSection()
         proSection = buildProPaywallSection()
 
         bodyContainer.addView(homeSection)
         bodyContainer.addView(filesSection)
         bodyContainer.addView(studioSection)
         bodyContainer.addView(oaasSection)
+        bodyContainer.addView(gamesSection)
+        bodyContainer.addView(worldSection)
         bodyContainer.addView(proSection)
 
-        // 3. BARRA DE NAVEGAÇÃO INFERIOR (5 Abas vibrantes com Cores de Ambiente)
+        // 3. BARRA DE NAVEGAÇÃO HORIZONTAL ESPAÇOSA (7 Abas Dedicadas)
+        bottomNavScroll = HorizontalScrollView(this).apply {
+            isHorizontalScrollBarEnabled = false
+            setBackgroundColor(color(R.color.sweep_surface))
+            clipToPadding = false
+        }
         bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
+            gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(color(R.color.sweep_surface))
-            setPadding(dp(6), dp(8), dp(6), dp(10))
+            setPadding(dp(12), dp(8), dp(12), dp(10))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
+        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
         navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
         navStudioBtn = navTabButton(getString(R.string.nav_studio)) { switchTab(AppTab.STUDIO) }
-        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
+        navGamesBtn = navTabButton(getString(R.string.nav_games)) { switchTab(AppTab.GAMES) }
+        navWorldBtn = navTabButton(getString(R.string.nav_world)) { switchTab(AppTab.WORLD) }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
 
-        bottomNavContainer.addView(navHomeBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
-        bottomNavContainer.addView(navFilesBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
-        bottomNavContainer.addView(navStudioBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
-        bottomNavContainer.addView(navOaasBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(2) })
-        bottomNavContainer.addView(navProBtn, LinearLayout.LayoutParams(0, dp(48), 1f))
-        root.addView(bottomNavContainer, LinearLayout.LayoutParams(-1, -2))
+        listOf(navHomeBtn, navOaasBtn, navFilesBtn, navStudioBtn, navGamesBtn, navWorldBtn, navProBtn).forEachIndexed { idx, tabBtn ->
+            tabBtn.minWidth = dp(88)
+            tabBtn.setPadding(dp(14), 0, dp(14), 0)
+            tabBtn.textSize = 12f
+            tabBtn.minHeight = dp(46)
+            bottomNavContainer.addView(
+                tabBtn,
+                LinearLayout.LayoutParams(-2, dp(46)).apply {
+                    if (idx < 6) marginEnd = dp(8)
+                },
+            )
+        }
+        bottomNavScroll.addView(bottomNavContainer, ViewGroup.LayoutParams(-2, -2))
+        root.addView(bottomNavScroll, LinearLayout.LayoutParams(-1, -2))
 
         return root
     }
@@ -560,10 +718,9 @@ class MainActivity : AppCompatActivity() {
 
         val heroHeader = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(4), dp(2), dp(4), dp(12))
+            setPadding(dp(4), dp(0), dp(4), dp(10))
         }
-        heroHeader.addView(label(getString(R.string.brand_tagline), 12f, R.color.sweep_primary_glow, true))
-        heroHeader.addView(label(getString(R.string.home_welcome_title), 20f, R.color.sweep_text, true), top(4))
+        heroHeader.addView(label(getString(R.string.home_welcome_title), 20f, R.color.sweep_text, true))
         addView(heroHeader, LinearLayout.LayoutParams(-1, -2))
 
         // Card de Medidor de Armazenamento Real (Anel + GB usados/livres)
@@ -582,10 +739,10 @@ class MainActivity : AppCompatActivity() {
         storageCopy.addView(storageUsedHeadline, top(4))
         storageFreeSubline = label("", 13f, R.color.sweep_muted, false)
         storageCopy.addView(storageFreeSubline, top(3))
-        storageCopy.addView(label(getString(R.string.storage_note), 11f, R.color.sweep_muted, false), top(6))
         storageRow.addView(storageCopy, LinearLayout.LayoutParams(0, -2, 1f))
         storageCard.addView(storageRow)
-        addView(wrap(storageCard), bottom(14))
+        storageCardContainer = wrap(storageCard)
+        addView(storageCardContainer, bottom(14))
 
         heroOrbButton = MaterialButton(this@MainActivity).apply {
             text = getString(R.string.home_cleanup_primary)
@@ -598,7 +755,10 @@ class MainActivity : AppCompatActivity() {
             tag = "primary_phone_cleaner_action"
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
-            setOnClickListener { onHomeCleanupButtonClicked() }
+            setOnClickListener {
+                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                onHomeCleanupButtonClicked()
+            }
         }
         addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(68)).apply { bottomMargin = dp(6) })
 
@@ -636,84 +796,41 @@ class MainActivity : AppCompatActivity() {
         homeDirectCleanRow.addView(homeDeleteBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
         addView(homeDirectCleanRow, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(14) })
 
-        // Card de Ações Rápidas (Grade 2x2 estilo Files by Google + SD Maid SE)
-        val quickCard = card()
-        quickCard.addView(label(getString(R.string.quick_actions_title), 11f, R.color.sweep_primary_glow, true))
-        quickCard.addView(label(getString(R.string.quick_actions_subtitle), 12f, R.color.sweep_muted, false), top(4))
-
-        val quickRow1 = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        val quickLargeBtn = button(getString(R.string.quick_find_large)) {
-            startOneTapCleanup()
-        }.apply { minHeight = dp(54) }
-        val quickDupBtn = button(getString(R.string.quick_find_duplicates)) {
-            runWithProAccess {
-                switchTab(AppTab.OAAS)
-                runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        // Card de Conversão VIP Pro em Destaque (Logo abaixo do botão grande Liberar Espaço)
+        val homeProCardContent = card()
+        homeProCtaBadge = label(getString(R.string.home_pro_cta_badge), 11f, R.color.sweep_accent_amber, true)
+        homeProCtaTitle = label(getString(R.string.home_pro_cta_title), 16f, R.color.sweep_text, true)
+        homeProCtaSubtitle = label(getString(R.string.home_pro_cta_subtitle), 12f, R.color.sweep_muted, false)
+        homeProSubscribeButton = MaterialButton(this@MainActivity).apply {
+            text = getString(R.string.home_pro_subscribe_button)
+            textSize = 15f
+            isAllCaps = false
+            minHeight = dp(60)
+            cornerRadius = dp(18)
+            insetTop = 0
+            insetBottom = 0
+            typeface = Typeface.DEFAULT_BOLD
+            tag = "home_pro_subscribe_cta"
+            setTextColor(Color.parseColor("#070B14"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.btn_star_big_on)
+            iconTint = android.content.res.ColorStateList.valueOf(Color.parseColor("#070B14"))
+            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
+            setOnClickListener {
+                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                onHomeProSubscribeClicked()
             }
-        }.apply { minHeight = dp(54) }
-        quickRow1.addView(quickLargeBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-        quickRow1.addView(quickDupBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
-        quickCard.addView(quickRow1, top(10))
-
-        val quickRow2 = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
         }
-        val quickOldBtn = button(getString(R.string.filter_older_30d)) {
-            runWithProAccess {
-                switchTab(AppTab.OAAS)
-                runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
-            }
-        }.apply { minHeight = dp(54) }
-        val quickUnusedAppsBtn = button(getString(R.string.pro_unused_apps_title)) {
-            runWithProAccess { requestUnusedAppSuggestions() }
-        }.apply { minHeight = dp(54) }
-        quickRow2.addView(quickOldBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-        quickRow2.addView(quickUnusedAppsBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
-        quickCard.addView(quickRow2, top(8))
-        addView(wrap(quickCard), bottom(14))
-
-        // Card Estúdio de Mídia & Ferramentas (Filtros, Compressor, EXIF, QR Code, PDF)
-        val studioCard = card()
-        studioCard.addView(label(getString(R.string.media_studio_title), 11f, R.color.studio_accent, true))
-        studioCard.addView(label(getString(R.string.media_studio_subtitle), 12f, R.color.sweep_muted, false), top(4))
-        val openStudioBtn = button(getString(R.string.media_studio_open_button)) {
-            switchTab(AppTab.STUDIO)
-        }.apply {
-            minHeight = dp(50)
-            setTextColor(Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.studio_accent))
-        }
-        studioCard.addView(openStudioBtn, top(10))
-        addView(themedCard(studioCard, Color.parseColor("#120E1E"), color(R.color.studio_accent)), bottom(14))
-
-        // Banner VIP Pro Moderno e Enxuto (Direciona para a Aba Pro, sem poluir a Home com botões repetidos)
-        val homeProBanner = card().apply {
-            setOnClickListener { switchTab(AppTab.PRO) }
-        }
-        val proBannerRow = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        val proBadge = ImageView(this@MainActivity).apply {
-            setImageResource(R.mipmap.ic_launcher)
-            contentDescription = getString(R.string.app_name)
-        }
-        proBannerRow.addView(proBadge, LinearLayout.LayoutParams(dp(36), dp(36)).apply { marginEnd = dp(10) })
-        val proBannerCopy = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        proBannerCopy.addView(label(getString(R.string.home_plans_title), 15f, R.color.sweep_primary_glow, true))
-        proBannerCopy.addView(label(getString(R.string.home_plans_subtitle), 12f, R.color.sweep_muted, false), top(2))
-        proBannerRow.addView(proBannerCopy, LinearLayout.LayoutParams(0, -2, 1f))
-        val proCtaBtn = button(getString(R.string.premium_area_button)) { switchTab(AppTab.PRO) }.apply {
-            minHeight = dp(38)
-            textSize = 12f
-        }
-        proBannerRow.addView(proCtaBtn, LinearLayout.LayoutParams(-2, dp(38)).apply { marginStart = dp(6) })
-        homeProBanner.addView(proBannerRow)
-        addView(wrap(homeProBanner), bottom(14))
+        homeProCardContent.addView(homeProCtaBadge)
+        homeProCardContent.addView(homeProCtaTitle, top(4))
+        homeProCardContent.addView(homeProCtaSubtitle, top(4))
+        homeProCardContent.addView(homeProSubscribeButton, LinearLayout.LayoutParams(-1, dp(60)).apply { topMargin = dp(12) })
+        homeProCardContent.addView(
+            label(getString(R.string.home_pro_cta_footnote), 10.5f, R.color.sweep_muted, false),
+            top(8),
+        )
+        homeProCtaCard = themedCard(homeProCardContent, Color.parseColor("#1D1405"), Color.parseColor("#FFB300"))
+        addView(homeProCtaCard, bottom(18))
 
         // Mantém as referências dos botões inicializadas para compatibilidade com renderCatalogPrices
         homePlanMonthlyButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY) }.apply { visibility = View.GONE }
@@ -755,9 +872,9 @@ class MainActivity : AppCompatActivity() {
         photosButton = button(getString(R.string.photos_tab)) { viewModel.selectKind(MediaKind.IMAGE) }
         videosButton = button(getString(R.string.videos_tab)) { viewModel.selectKind(MediaKind.VIDEO) }
         audioButton = button(getString(R.string.audio_tab)) { viewModel.selectKind(MediaKind.AUDIO) }
-        typeRow.addView(photosButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginEnd = dp(4) })
-        typeRow.addView(videosButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
-        typeRow.addView(audioButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(4) })
+        typeRow.addView(photosButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
+        typeRow.addView(videosButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
+        typeRow.addView(audioButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
         controls.addView(typeRow, bottom(12))
 
         controls.addView(label(getString(R.string.smart_filter_title), 11f, R.color.sweep_primary_glow, true), bottom(6))
@@ -776,10 +893,10 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         filterDuplicatesButton = button(getString(R.string.filter_same_size)) {
-            runWithProAccess { viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES) }
+            viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES)
         }.apply { minHeight = dp(52) }
         filterOldButton = button(getString(R.string.filter_older_30d)) {
-            runWithProAccess { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }
+            viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS)
         }.apply { minHeight = dp(52) }
         filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
         filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
@@ -848,6 +965,23 @@ class MainActivity : AppCompatActivity() {
         resultsCard.addView(pageLabel, top(8))
         resultSummary = label(getString(R.string.page_results_hint), 12f, R.color.sweep_muted, false)
         resultsCard.addView(resultSummary, top(6))
+        selectAllPageButton = button(getString(R.string.select_all_page_button, 0)) {
+            val eligible = lastFilteredPageRecords.filter { it.isSelectable && !it.isProtected }
+            if (eligible.isNotEmpty()) {
+                viewModel.prepareExternalReviewSelection(eligible, viewModel.state.value.smartFilter)
+                openInteractiveCleanupReviewDialog(
+                    records = eligible,
+                    isFallbackList = false,
+                    mission = null,
+                    coverageComplete = true,
+                )
+            } else {
+                Toast.makeText(this@MainActivity, R.string.cleanup_dialog_empty_title, Toast.LENGTH_SHORT).show()
+            }
+        }.apply {
+            visibility = View.GONE
+        }
+        resultsCard.addView(selectAllPageButton, top(8))
         recordsContainer = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(8), 0, 0)
@@ -863,8 +997,8 @@ class MainActivity : AppCompatActivity() {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
         }
-        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginEnd = dp(6) })
-        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(6) })
+        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(6) })
+        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(6) })
         resultsCard.addView(navigation, top(12))
         addView(wrap(resultsCard), bottom(14))
     }
@@ -875,16 +1009,8 @@ class MainActivity : AppCompatActivity() {
         val oaasCard = card()
         oaasCard.addView(label(getString(R.string.oaas_card_title), 11f, R.color.sweep_primary_glow, true))
         oaasCard.addView(label(getString(R.string.oaas_card_headline), 18f, R.color.sweep_text, true), top(6))
-        oaasCard.addView(label(getString(R.string.oaas_card_subtitle), 12f, R.color.sweep_muted, false), top(4))
-        scanButton = button(getString(R.string.scan_button)) {
-            switchTab(AppTab.FILES)
-            startScanOrRequestAccess()
-        }
-        oaasCard.addView(scanButton, top(10))
-        permissionButton = button(getString(R.string.permission_continue)) {
-            requestMediaPermissions()
-        }.apply { visibility = View.GONE }
-        oaasCard.addView(permissionButton, top(6))
+        oaasCard.addView(label(getString(R.string.oaas_card_subtitle), 12.5f, R.color.sweep_muted, false), top(4))
+
         oaasPipelineStatus = label(getString(R.string.oaas_pipeline_idle), 12f, R.color.sweep_primary_glow, true)
         oaasCard.addView(oaasPipelineStatus, top(10))
         oaasCancelMissionButton = button(getString(R.string.cancel_scan)) {
@@ -896,22 +1022,54 @@ class MainActivity : AppCompatActivity() {
         oaasCard.addView(oaasCancelMissionButton, top(8))
 
         oaasMissionLargeButton = button(getString(R.string.oaas_mission_large)) {
+            openInteractiveDialogOnMissionFinish = true
             runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
         }.apply {
+            minHeight = dp(54)
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
         }
         oaasCard.addView(oaasMissionLargeButton, top(12))
 
         oaasMissionDuplicatesButton = button(getString(R.string.oaas_mission_duplicates)) {
-            runWithProAccess { runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES) }
-        }
+            openInteractiveDialogOnMissionFinish = true
+            runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        }.apply { minHeight = dp(52) }
         oaasCard.addView(oaasMissionDuplicatesButton, top(8))
 
         oaasMissionOldButton = button(getString(R.string.oaas_mission_old)) {
-            runWithProAccess { runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D) }
-        }
+            openInteractiveDialogOnMissionFinish = true
+            runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
+        }.apply { minHeight = dp(52) }
         oaasCard.addView(oaasMissionOldButton, top(8))
+
+        val cleanExtrasRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val oaasWhatsAppBtn = button("💬 " + getString(R.string.quick_clean_whatsapp)) {
+            openWhatsAppCleanerFlow()
+        }.apply {
+            minHeight = dp(52)
+            setTextColor(color(R.color.sweep_background))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_success))
+        }
+        val oaasUnusedAppsBtn = button(getString(R.string.pro_unused_apps_title)) {
+            runWithProAccess { requestUnusedAppSuggestions() }
+        }.apply { minHeight = dp(52) }
+        cleanExtrasRow.addView(oaasWhatsAppBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        cleanExtrasRow.addView(oaasUnusedAppsBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
+        oaasCard.addView(cleanExtrasRow, top(8))
+
+        scanButton = button(getString(R.string.scan_button)) {
+            switchTab(AppTab.FILES)
+            startScanOrRequestAccess()
+        }.apply { minHeight = dp(48) }
+        oaasCard.addView(scanButton, top(10))
+        permissionButton = button(getString(R.string.permission_continue)) {
+            requestMediaPermissions()
+        }.apply { visibility = View.GONE }
+        oaasCard.addView(permissionButton, top(6))
 
         missionPermissionButton = button(getString(R.string.permission_continue)) {
             requestMediaPermissions()
@@ -928,12 +1086,23 @@ class MainActivity : AppCompatActivity() {
         oaasCard.addView(missionRetryButton, top(8))
 
         missionReviewButton = button(getString(R.string.oaas_review_results_button)) {
-            switchTab(AppTab.FILES)
-            filesReviewCard.post {
-                filesReviewCard.requestRectangleOnScreen(
-                    android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
-                    true,
+            val selectedNow = viewModel.state.value.selection.records
+            val displayNow = if (selectedNow.isNotEmpty()) selectedNow else homeInteractiveRecords
+            if (displayNow.isNotEmpty()) {
+                openInteractiveCleanupReviewDialog(
+                    records = displayNow,
+                    isFallbackList = selectedNow.isEmpty() && homeInteractiveFallback,
+                    mission = viewModel.state.value.missionProgress?.mission,
+                    coverageComplete = viewModel.state.value.missionProgress?.coverageComplete ?: true,
                 )
+            } else {
+                switchTab(AppTab.FILES)
+                filesReviewCard.post {
+                    filesReviewCard.requestRectangleOnScreen(
+                        android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
+                        true,
+                    )
+                }
             }
         }.apply {
             visibility = View.GONE
@@ -1014,20 +1183,78 @@ class MainActivity : AppCompatActivity() {
         proCard.addView(label(getString(R.string.pro_free_included), 12f, R.color.sweep_text, false), top(12))
         proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.sweep_accent_amber, false), top(10))
 
+        // Card VIP Bonus para Testadores Fechados (libera Pro gratis com 1 toque)
+        val vipCardContent = card()
+        vipCardContent.addView(label(getString(R.string.tester_vip_card_title), 12f, R.color.sweep_primary_glow, true))
+        vipCardContent.addView(label(getString(R.string.tester_vip_card_subtitle), 12f, R.color.sweep_text, false), top(6))
+        val vipBtn = button(
+            getString(if (isTesterVipProEnabled()) R.string.tester_vip_active_button else R.string.tester_vip_activate_button),
+        ) {
+            val nextEnabled = !isTesterVipProEnabled()
+            setTesterVipProEnabled(nextEnabled)
+            renderBillingState(billingGateway.accessState.value)
+            Toast.makeText(
+                this@MainActivity,
+                if (nextEnabled) R.string.tester_vip_activated_toast else R.string.tester_vip_deactivated_toast,
+                Toast.LENGTH_LONG,
+            ).show()
+        }.apply {
+            minHeight = dp(52)
+        }
+        testerVipButton = vipBtn
+        styleTesterVipButton(vipBtn, isTesterVipProEnabled())
+        vipCardContent.addView(vipBtn, top(12))
+        proCard.addView(themedCard(vipCardContent, Color.parseColor("#0A1D14"), Color.parseColor("#00E676")), top(14))
+
         val unusedAppsButton = button(getString(R.string.pro_unused_apps_button)) {
             runWithProAccess { requestUnusedAppSuggestions() }
         }
         proCard.addView(unusedAppsButton, top(12))
 
-        val advancedCleanupButton = button(getString(R.string.pro_advanced_cleanup_button)) {
-            runWithProAccess { switchTab(AppTab.OAAS) }
+        val proSuiteContent = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(14), dp(14), dp(14))
         }
-        proCard.addView(advancedCleanupButton, top(8))
-
-        val browseFilesButton = button(getString(R.string.pro_browse_files_button)) {
-            runWithProAccess { switchTab(AppTab.FILES) }
-        }
-        proCard.addView(browseFilesButton, top(8))
+        proSuiteContent.addView(
+            TextView(this@MainActivity).apply {
+                text = getString(R.string.pro_suite_section_title)
+                setTextColor(Color.parseColor("#FFD54F"))
+                textSize = 13f
+                setTypeface(typeface, Typeface.BOLD)
+                letterSpacing = 0.05f
+            },
+        )
+        proSuiteContent.addView(
+            button(getString(R.string.pro_suite_notepad_btn)) {
+                runWithProAccess { openProNotesVaultDialog() }
+            }.apply {
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+                setTextColor(Color.parseColor("#FFE082"))
+            },
+            top(10),
+        )
+        proSuiteContent.addView(
+            button(getString(R.string.pro_suite_calculator_btn)) {
+                runWithProAccess { openProSmartCalculatorDialog() }
+            }.apply {
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+                setTextColor(Color.parseColor("#FFE082"))
+            },
+            top(8),
+        )
+        proSuiteContent.addView(
+            button(getString(R.string.pro_suite_password_btn)) {
+                runWithProAccess { openProPasswordGeneratorDialog() }
+            }.apply {
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+                setTextColor(Color.parseColor("#FFE082"))
+            },
+            top(8),
+        )
+        proCard.addView(
+            themedCard(proSuiteContent, Color.parseColor("#161105"), Color.parseColor("#FFB300")),
+            top(14),
+        )
 
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
@@ -1049,6 +1276,7 @@ class MainActivity : AppCompatActivity() {
         }
         stylePlanPurchaseButton(planLifetimeButton, isProductAvailable = false)
         proCard.addView(planLifetimeButton, top(8))
+        proCard.addView(label(getString(R.string.pro_billing_terms_disclosure), 11f, R.color.sweep_muted, false), top(10))
         if (!billingGateway.securePurchaseVerificationAvailable()) {
             proCard.addView(label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false), top(12))
         }
@@ -1100,17 +1328,17 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(4), dp(2), dp(4), dp(12))
         }
         val heroBadge = TextView(this@MainActivity).apply {
-            text = "⚡ NOVO AMBIENTE CRIATIVO & MULTIMÍDIA"
+            text = getString(R.string.studio_header_badge)
             textSize = 10f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(color(R.color.studio_accent))
             includeFontPadding = false
         }
         header.addView(heroBadge)
-        header.addView(label("Estúdio & Ferramentas Pro", 20f, R.color.sweep_text, true), top(4))
+        header.addView(label(getString(R.string.studio_header_title), 20f, R.color.sweep_text, true), top(4))
         header.addView(
             label(
-                "Ferramentas avançadas para transformar, proteger e encolher suas mídias. Cada função conta com ambiente visual exclusivo.",
+                getString(R.string.studio_header_subtitle),
                 12f,
                 R.color.sweep_muted,
                 false
@@ -1119,29 +1347,56 @@ class MainActivity : AppCompatActivity() {
         )
         addView(header)
 
+        // AMBIENTE WHATSAPP: Limpador de Mídias do WhatsApp (WhatsApp Green #25D366)
+        val waCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        val waBadge = TextView(this@MainActivity).apply {
+            text = getString(R.string.wa_card_badge)
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#25D366"))
+        }
+        waCard.addView(waBadge)
+        waCard.addView(label(getString(R.string.wa_card_title), 16f, R.color.sweep_text, true), top(4))
+        waCard.addView(
+            label(getString(R.string.wa_card_desc), 12f, R.color.sweep_muted, false),
+            top(4)
+        )
+        val openWaBtn = button(getString(R.string.wa_card_btn)) {
+            openWhatsAppCleanerFlow()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#25D366"))
+            setTextColor(Color.parseColor("#070B14"))
+            minHeight = dp(48)
+        }
+        waCard.addView(openWaBtn, top(12))
+        addView(themedCard(waCard, Color.parseColor("#0A1D14"), Color.parseColor("#25D366")), bottom(14))
+
         // AMBIENTE 0: Baixador de Vídeos da Web & Redes (Rose Neon #F50057)
         val dlCard = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
         val dlBadge = TextView(this@MainActivity).apply {
-            text = "🎬 DOWNLOADER REAL • LINKS DIRETOS MP4 & MÍDIA WEB"
+            text = getString(R.string.dl_badge)
             textSize = 10f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.parseColor("#F50057"))
         }
         dlCard.addView(dlBadge)
-        dlCard.addView(label("Baixador de Mídia por Link", 16f, R.color.sweep_text, true), top(4))
+        dlCard.addView(label(getString(R.string.studio_dl_title), 16f, R.color.sweep_text, true), top(4))
         dlCard.addView(
-            label("Insira o link de vídeos ou mídias da web e baixe com streaming direto para a sua Galeria.", 12f, R.color.sweep_muted, false),
+            label(getString(R.string.studio_dl_desc), 12f, R.color.sweep_muted, false),
             top(4)
         )
-        val openDlBtn = button("📥 BAIXAR VÍDEO POR LINK") {
+        val openDlBtn = button(getString(R.string.studio_dl_btn)) {
             openVideoDownloaderStudio()
         }.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#F50057"))
             setTextColor(Color.WHITE)
-            minHeight = dp(46)
+            minHeight = dp(48)
         }
         dlCard.addView(openDlBtn, top(12))
         addView(themedCard(dlCard, Color.parseColor("#1B0C14"), Color.parseColor("#F50057")), bottom(14))
@@ -1152,134 +1407,134 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
         val photoBadge = TextView(this@MainActivity).apply {
-            text = "🎨 AMBIENTE VISUAL • FILTROS AO VIVO"
+            text = getString(R.string.filter_badge)
             textSize = 10f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.parseColor("#FF4081"))
         }
         photoCard.addView(photoBadge)
-        photoCard.addView(label("Estúdio de Filtros de Foto", 16f, R.color.sweep_text, true), top(4))
+        photoCard.addView(label(getString(R.string.studio_filter_title), 16f, R.color.sweep_text, true), top(4))
         photoCard.addView(
-            label("Aplique efeitos Cinema Teal & Orange, Nitidez HD, Sépia Vintage, P&B e Cores Vibrantes com prévia em tempo real.", 12f, R.color.sweep_muted, false),
+            label(getString(R.string.studio_filter_desc), 12f, R.color.sweep_muted, false),
             top(4)
         )
-        val openFiltersBtn = button("✨ ABRIR FILTROS DA GALERIA") {
+        val openFiltersBtn = button(getString(R.string.studio_filter_btn)) {
             photoFilterPickerLauncher.launch("image/*")
         }.apply {
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FF4081"))
-            setTextColor(Color.WHITE)
-            minHeight = dp(46)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(color(R.color.sweep_background))
+            minHeight = dp(48)
         }
         photoCard.addView(openFiltersBtn, top(12))
-        addView(themedCard(photoCard, Color.parseColor("#150C1B"), Color.parseColor("#FF4081")), bottom(14))
+        addView(themedCard(photoCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
 
-        // AMBIENTE 2: Áudio & Vídeo (Electric Cyan #00E5FF)
+        // AMBIENTE 2: Áudio & Vídeo (Harmony Slate + Mint Accent)
         val videoCard = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
         val videoBadge = TextView(this@MainActivity).apply {
-            text = "🎵 AMBIENTE ACÚSTICO • M4A & COMPRESSÃO"
-            textSize = 10f
+            text = getString(R.string.audio_badge)
+            textSize = 10.5f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#00E5FF"))
+            setTextColor(Color.parseColor("#38BDF8"))
         }
         videoCard.addView(videoBadge)
-        videoCard.addView(label("Extrator de Áudio & Otimizador", 16f, R.color.sweep_text, true), top(4))
+        videoCard.addView(label(getString(R.string.studio_audio_title), 16f, R.color.sweep_text, true), top(4))
         videoCard.addView(
-            label("Extraia a trilha de áudio cristalina de vídeos do WhatsApp e Reels, liberando até 80% de memória no aparelho.", 12f, R.color.sweep_muted, false),
+            label(getString(R.string.studio_audio_desc), 12f, R.color.sweep_muted, false),
             top(4)
         )
-        val openVideoBtn = button("🎵 SELECIONAR VÍDEO PARA EXTRAIR") {
+        val openVideoBtn = button(getString(R.string.studio_audio_btn)) {
             videoAudioPickerLauncher.launch("video/*")
         }.apply {
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#00E5FF"))
-            setTextColor(Color.parseColor("#070B14"))
-            minHeight = dp(46)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#38BDF8"))
+            setTextColor(color(R.color.sweep_background))
+            minHeight = dp(48)
         }
         videoCard.addView(openVideoBtn, top(12))
-        addView(themedCard(videoCard, Color.parseColor("#091724"), Color.parseColor("#00E5FF")), bottom(14))
+        addView(themedCard(videoCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
 
-        // AMBIENTE 3: Limpador de Privacidade EXIF (Matrix Emerald #00E676)
+        // AMBIENTE 3: Limpador de Privacidade EXIF (Harmony Slate + Emerald)
         val exifCard = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
         val exifBadge = TextView(this@MainActivity).apply {
-            text = "🛡️ AMBIENTE DE BLINDAGEM • ZERO GPS"
-            textSize = 10f
+            text = getString(R.string.exif_badge)
+            textSize = 10.5f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#00E676"))
+            setTextColor(color(R.color.sweep_primary_glow))
         }
         exifCard.addView(exifBadge)
-        exifCard.addView(label("Higienizador de Privacidade EXIF", 16f, R.color.sweep_text, true), top(4))
+        exifCard.addView(label(getString(R.string.studio_exif_title), 16f, R.color.sweep_text, true), top(4))
         exifCard.addView(
-            label("Detecte e remova coordenadas GPS exatas, modelo do aparelho e data antes de compartilhar suas fotos na web.", 12f, R.color.sweep_muted, false),
+            label(getString(R.string.studio_exif_desc), 12f, R.color.sweep_muted, false),
             top(4)
         )
-        val openExifBtn = button("🛡️ ESCANEAR & PROTEGER FOTO") {
+        val openExifBtn = button(getString(R.string.studio_exif_btn)) {
             exifPickerLauncher.launch("image/*")
         }.apply {
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#00E676"))
-            setTextColor(Color.parseColor("#070B14"))
-            minHeight = dp(46)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(color(R.color.sweep_background))
+            minHeight = dp(48)
         }
         exifCard.addView(openExifBtn, top(12))
-        addView(themedCard(exifCard, Color.parseColor("#091A14"), Color.parseColor("#00E676")), bottom(14))
+        addView(themedCard(exifCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
 
-        // AMBIENTE 4: Gerador de QR Code (Golden Amber #FFAB00)
+        // AMBIENTE 4: Gerador de QR Code (Harmony Slate + Amber)
         val qrCard = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
         val qrBadge = TextView(this@MainActivity).apply {
-            text = "⚡ AMBIENTE DE CONEXÃO • QR CODE DINÂMICO"
-            textSize = 10f
+            text = getString(R.string.qr_badge)
+            textSize = 10.5f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#FFAB00"))
+            setTextColor(Color.parseColor("#FFB300"))
         }
         qrCard.addView(qrBadge)
-        qrCard.addView(label("Gerador de Códigos QR", 16f, R.color.sweep_text, true), top(4))
+        qrCard.addView(label(getString(R.string.studio_qr_title), 16f, R.color.sweep_text, true), top(4))
         qrCard.addView(
-            label("Crie QR Codes de alta resolução para cobranças PIX, links de sites, WhatsApp e acesso rápido a redes Wi-Fi.", 12f, R.color.sweep_muted, false),
+            label(getString(R.string.studio_qr_desc), 12f, R.color.sweep_muted, false),
             top(4)
         )
-        val openQrBtn = button("⚡ CRIAR QR CODE") {
+        val openQrBtn = button(getString(R.string.studio_qr_btn)) {
             openQrCodeGeneratorStudio()
         }.apply {
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFAB00"))
-            setTextColor(Color.parseColor("#070B14"))
-            minHeight = dp(46)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(color(R.color.sweep_background))
+            minHeight = dp(48)
         }
         qrCard.addView(openQrBtn, top(12))
-        addView(themedCard(qrCard, Color.parseColor("#1F180B"), Color.parseColor("#FFAB00")), bottom(14))
+        addView(themedCard(qrCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
 
-        // AMBIENTE 5: Fotos para PDF (Royal Indigo #7C4DFF)
+        // AMBIENTE 5: Fotos para PDF (Harmony Slate + Slate Alt)
         val pdfCard = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
         val pdfBadge = TextView(this@MainActivity).apply {
-            text = "📄 AMBIENTE DOCUMENTAL • PDF A4"
-            textSize = 10f
+            text = getString(R.string.pdf_badge)
+            textSize = 10.5f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#7C4DFF"))
+            setTextColor(Color.parseColor("#38BDF8"))
         }
         pdfCard.addView(pdfBadge)
-        pdfCard.addView(label("Criador de Fotos para PDF", 16f, R.color.sweep_text, true), top(4))
+        pdfCard.addView(label(getString(R.string.studio_pdf_title), 16f, R.color.sweep_text, true), top(4))
         pdfCard.addView(
-            label("Junte fotos de documentos, contratos e recibos em um único arquivo PDF padrão A4, pronto para envio.", 12f, R.color.sweep_muted, false),
+            label(getString(R.string.studio_pdf_desc), 12f, R.color.sweep_muted, false),
             top(4)
         )
-        val openPdfBtn = button("📄 GERAR DOCUMENTO PDF") {
+        val openPdfBtn = button(getString(R.string.studio_pdf_btn)) {
             photosToPdfPickerLauncher.launch("image/*")
         }.apply {
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#7C4DFF"))
-            setTextColor(Color.WHITE)
-            minHeight = dp(46)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            setTextColor(color(R.color.sweep_text))
+            minHeight = dp(48)
         }
         pdfCard.addView(openPdfBtn, top(12))
-        addView(themedCard(pdfCard, Color.parseColor("#140E26"), Color.parseColor("#7C4DFF")), bottom(14))
+        addView(themedCard(pdfCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(18))
     }
 
     private fun switchTab(tab: AppTab) {
@@ -1289,14 +1544,38 @@ class MainActivity : AppCompatActivity() {
         filesSection.visibility = if (tab == AppTab.FILES) View.VISIBLE else View.GONE
         studioSection.visibility = if (tab == AppTab.STUDIO) View.VISIBLE else View.GONE
         oaasSection.visibility = if (tab == AppTab.OAAS) View.VISIBLE else View.GONE
+        gamesSection.visibility = if (tab == AppTab.GAMES) View.VISIBLE else View.GONE
+        worldSection.visibility = if (tab == AppTab.WORLD) View.VISIBLE else View.GONE
         proSection.visibility = if (tab == AppTab.PRO) View.VISIBLE else View.GONE
+        if (::mainScrollView.isInitialized) {
+            mainScrollView.post { mainScrollView.scrollTo(0, 0) }
+        }
 
-        // Cores temáticas exclusivas para cada ambiente ("sensação de ferramenta nova")
-        styleNavButton(navHomeBtn, tab == AppTab.HOME, customSelectedColor = Color.parseColor("#00E5FF")) // Cyan Tech
-        styleNavButton(navFilesBtn, tab == AppTab.FILES, customSelectedColor = Color.parseColor("#38BDF8")) // Sky Blue
-        styleNavButton(navStudioBtn, tab == AppTab.STUDIO, customSelectedColor = color(R.color.studio_accent)) // Neon Magenta #FF007F
-        styleNavButton(navOaasBtn, tab == AppTab.OAAS, customSelectedColor = Color.parseColor("#00E5B0")) // Mint Emerald
-        styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = Color.parseColor("#FFD700")) // Royal Gold
+        // Paleta coesa em todo o app: Mint Teal (#00E5B0) nas abas padrão (ou Ouro 24K no VIP) e Âmbar no Pro
+        val tabAccent = if (hasEffectiveProAccess()) Color.parseColor("#FFD54F") else color(R.color.sweep_primary)
+        styleNavButton(navHomeBtn, tab == AppTab.HOME, customSelectedColor = tabAccent)
+        styleNavButton(navOaasBtn, tab == AppTab.OAAS, customSelectedColor = tabAccent)
+        styleNavButton(navFilesBtn, tab == AppTab.FILES, customSelectedColor = tabAccent)
+        styleNavButton(navStudioBtn, tab == AppTab.STUDIO, customSelectedColor = tabAccent)
+        styleNavButton(navGamesBtn, tab == AppTab.GAMES, customSelectedColor = tabAccent)
+        styleNavButton(navWorldBtn, tab == AppTab.WORLD, customSelectedColor = tabAccent)
+        styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = Color.parseColor("#FFB300"))
+
+        if (::bottomNavScroll.isInitialized) {
+            val activeBtn = when (tab) {
+                AppTab.HOME -> navHomeBtn
+                AppTab.OAAS -> navOaasBtn
+                AppTab.FILES -> navFilesBtn
+                AppTab.STUDIO -> navStudioBtn
+                AppTab.GAMES -> navGamesBtn
+                AppTab.WORLD -> navWorldBtn
+                AppTab.PRO -> navProBtn
+            }
+            bottomNavScroll.post {
+                val targetX = (activeBtn.left + activeBtn.width / 2) - (bottomNavScroll.width / 2)
+                bottomNavScroll.smoothScrollTo(targetX.coerceAtLeast(0), 0)
+            }
+        }
     }
 
     private fun styleNavButton(btn: MaterialButton, selected: Boolean, customSelectedColor: Int? = null) {
@@ -1312,12 +1591,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun isTesterVipProEnabled(): Boolean =
+        getSharedPreferences("midiastore_prefs", MODE_PRIVATE).getBoolean("tester_vip_pro_v25", false)
+
+    private fun setTesterVipProEnabled(enabled: Boolean) {
+        getSharedPreferences("midiastore_prefs", MODE_PRIVATE)
+            .edit()
+            .putBoolean("tester_vip_pro_v25", enabled)
+            .apply()
+    }
+
+    private fun hasEffectiveProAccess(): Boolean =
+        billingGateway.accessState.value == ProAccessSummaryState.PRO_GRANTED ||
+            isTesterVipProEnabled() ||
+            (isDevelopmentBuild && debugProPreviewEnabled)
+
+    private fun styleTesterVipButton(button: MaterialButton, active: Boolean) {
+        button.text = getString(if (active) R.string.tester_vip_active_button else R.string.tester_vip_activate_button)
+        button.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            Color.parseColor(if (active) "#FFD700" else "#00E676"),
+        )
+        button.setTextColor(Color.parseColor("#070B14"))
+    }
+
     private fun renderBillingState(state: ProAccessSummaryState) {
         if (!::proStatusBadge.isInitialized) return
         if (::bottomNavContainer.isInitialized) {
             navFilesBtn.visibility = View.VISIBLE
             navStudioBtn.visibility = View.VISIBLE
             navOaasBtn.visibility = View.VISIBLE
+            navWorldBtn.visibility = View.VISIBLE
+        }
+        testerVipButton?.let { styleTesterVipButton(it, isTesterVipProEnabled()) }
+        refreshHomeProConversionCta(state)
+        if (state == ProAccessSummaryState.PRO_GRANTED) {
+            proStatusBadge.text = getString(R.string.pro_status_active)
+            return
+        }
+        if (isTesterVipProEnabled()) {
+            proStatusBadge.text = getString(R.string.tester_vip_status_badge)
+            return
         }
         if (isDevelopmentBuild && debugProPreviewEnabled) {
             proStatusBadge.text = getString(R.string.pro_debug_preview_badge)
@@ -1329,6 +1642,1825 @@ class MainActivity : AppCompatActivity() {
             ProAccessSummaryState.RECONCILIATION_REQUIRED -> getString(R.string.pro_status_reconciliation)
             ProAccessSummaryState.FREE_NO_ACTIVE_PURCHASE -> getString(R.string.pro_status_free)
         }
+    }
+
+    private fun refreshHomeProConversionCta(state: ProAccessSummaryState) {
+        val isPro = state == ProAccessSummaryState.PRO_GRANTED ||
+            isTesterVipProEnabled() ||
+            (isDevelopmentBuild && debugProPreviewEnabled)
+        if (::topBarProButton.isInitialized) {
+            topBarProButton.text = getString(if (isPro) R.string.top_pro_active_pill else R.string.premium_area_button)
+            topBarProButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                Color.parseColor(if (isPro) "#00E676" else "#FFB300"),
+            )
+            topBarProButton.setTextColor(Color.parseColor("#070B14"))
+        }
+        applyDynamicProTheme(isPro)
+        applyEasySeniorMode(isEasySeniorModeEnabled())
+        if (!::homeProSubscribeButton.isInitialized) return
+        if (isPro) {
+            homeProCtaCard.setCardBackgroundColor(Color.parseColor("#1D1605"))
+            homeProCtaCard.strokeColor = Color.parseColor("#FFD54F")
+            homeProCtaBadge.setTextColor(Color.parseColor("#FFD54F"))
+            homeProCtaTitle.text = getString(R.string.home_pro_cta_active_title)
+            homeProSubscribeButton.text = getString(R.string.home_pro_active_button)
+            homeProSubscribeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFD54F"))
+            homeProSubscribeButton.setTextColor(Color.parseColor("#120D03"))
+            homeProSubscribeButton.icon = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on)
+        } else {
+            homeProCtaCard.setCardBackgroundColor(Color.parseColor("#1D1405"))
+            homeProCtaCard.strokeColor = Color.parseColor("#FFB300")
+            homeProCtaBadge.setTextColor(color(R.color.sweep_accent_amber))
+            homeProCtaTitle.text = getString(R.string.home_pro_cta_title)
+            val priceHint = latestHeroPriceBadge
+            homeProSubscribeButton.text = if (!priceHint.isNullOrBlank()) {
+                getString(R.string.home_pro_subscribe_button_with_price, priceHint)
+            } else {
+                getString(R.string.home_pro_subscribe_button)
+            }
+            homeProSubscribeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            homeProSubscribeButton.setTextColor(Color.parseColor("#070B14"))
+            homeProSubscribeButton.icon = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on)
+        }
+        homeProSubscribeButton.iconTint = android.content.res.ColorStateList.valueOf(Color.parseColor("#070B14"))
+    }
+
+    /** Switches visual palette between Obsidian Cyber Mint (Free) and Royal 24K Gold (Pro VIP). */
+    private fun applyDynamicProTheme(isPro: Boolean) {
+        if (::appRootView.isInitialized) {
+            appRootView.setBackgroundColor(
+                if (isPro) Color.parseColor("#0D0A03") else color(R.color.sweep_background),
+            )
+        }
+        if (::brandLockupCard.isInitialized) {
+            brandLockupCard.background = borderedPill(
+                if (isPro) Color.parseColor("#231906") else color(R.color.sweep_surface),
+                Color.parseColor(if (isPro) "#73FFD54F" else "#4000E5FF"),
+                dp(16),
+                dp(1),
+            )
+        }
+        if (::brandWordmarkView.isInitialized) {
+            renderBrandWordmark(isPro)
+        }
+        if (::brandTaglineLabel.isInitialized) {
+            brandTaglineLabel.text = getString(
+                if (isPro) R.string.brand_tagline_pro else R.string.brand_tagline,
+            )
+            brandTaglineLabel.setTextColor(
+                if (isPro) Color.parseColor("#FFE082") else color(R.color.sweep_primary_glow),
+            )
+        }
+        if (::storageCardContainer.isInitialized) {
+            storageCardContainer.setCardBackgroundColor(
+                if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
+            )
+            storageCardContainer.strokeColor = if (isPro) Color.parseColor("#FFB300") else color(R.color.sweep_surface_alt)
+        }
+        if (::storageRingGauge.isInitialized) {
+            storageRingGauge.isProVipTheme = isPro
+        }
+        if (::heroOrbButton.isInitialized) {
+            heroOrbButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                if (isPro) Color.parseColor("#FFD54F") else color(R.color.sweep_primary),
+            )
+            heroOrbButton.setTextColor(
+                if (isPro) Color.parseColor("#120D03") else color(R.color.sweep_background),
+            )
+        }
+        if (::bottomNavContainer.isInitialized) {
+            bottomNavContainer.background = roundedBackground(
+                if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
+                0,
+            )
+        }
+        if (::bottomNavScroll.isInitialized) {
+            bottomNavScroll.setBackgroundColor(
+                if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
+            )
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            @Suppress("DEPRECATION")
+            run {
+                val barColor = if (isPro) Color.parseColor("#120D03") else color(R.color.sweep_background)
+                window.statusBarColor = barColor
+                window.navigationBarColor = barColor
+            }
+        }
+    }
+
+    private fun copyTextToClipboard(text: String, toastResId: Int) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("Midiastore", text))
+        Toast.makeText(this, toastResId, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openProNotesVaultDialog() {
+        val prefs = getSharedPreferences("midiastore_pro_suite", Context.MODE_PRIVATE)
+        val notesKey = "pro_notes_json_v1"
+
+        fun loadNotes(): MutableList<Triple<String, String, Long>> {
+            val raw = prefs.getString(notesKey, "[]") ?: "[]"
+            val list = mutableListOf<Triple<String, String, Long>>()
+            try {
+                val arr = JSONArray(raw)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    list.add(
+                        Triple(
+                            obj.optString("title", ""),
+                            obj.optString("body", ""),
+                            obj.optLong("ts", 0L),
+                        ),
+                    )
+                }
+            } catch (_: Exception) {
+            }
+            return list
+        }
+
+        fun saveNotes(notes: List<Triple<String, String, Long>>) {
+            val arr = JSONArray()
+            notes.take(100).forEach { (title, body, ts) ->
+                arr.put(
+                    JSONObject().apply {
+                        put("title", title)
+                        put("body", body)
+                        put("ts", ts)
+                    },
+                )
+            }
+            prefs.edit().putString(notesKey, arr.toString()).apply()
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        val titleInput = EditText(this).apply {
+            hint = getString(R.string.pro_notes_title_hint)
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            background = roundedBackground(Color.parseColor("#181308"), dp(10))
+        }
+        val bodyInput = EditText(this).apply {
+            hint = getString(R.string.pro_notes_body_hint)
+            minLines = 3
+            gravity = Gravity.TOP or Gravity.START
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            background = roundedBackground(Color.parseColor("#181308"), dp(10))
+        }
+        container.addView(titleInput)
+        container.addView(bodyInput, top(8))
+
+        val listContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+
+        fun renderNotes() {
+            listContainer.removeAllViews()
+            val notes = loadNotes()
+            if (notes.isEmpty()) {
+                listContainer.addView(label(getString(R.string.pro_notes_empty), 12f, R.color.sweep_muted, false), top(8))
+                return
+            }
+            val dateFmt = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+            notes.forEachIndexed { idx, (noteTitle, noteBody, ts) ->
+                val cardContent = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(12), dp(10), dp(12), dp(10))
+                }
+                val headerText = if (noteTitle.isNotBlank()) noteTitle else dateFmt.format(Date(ts))
+                cardContent.addView(
+                    TextView(this).apply {
+                        text = headerText
+                        textSize = 13f
+                        setTypeface(typeface, Typeface.BOLD)
+                        setTextColor(Color.parseColor("#FFD54F"))
+                    },
+                )
+                if (noteTitle.isNotBlank() && ts > 0L) {
+                    cardContent.addView(label(dateFmt.format(Date(ts)), 10f, R.color.sweep_muted, false), top(2))
+                }
+                cardContent.addView(label(noteBody, 12f, R.color.sweep_text, false), top(6))
+
+                val actionsRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+                val fullText = if (noteTitle.isNotBlank()) "$noteTitle\n$noteBody" else noteBody
+                val copyBtn = button("📋") {
+                    copyTextToClipboard(fullText, R.string.pro_notes_copied_toast)
+                }.apply { minHeight = dp(40) }
+                val deleteBtn = button("🗑️") {
+                    val updated = loadNotes().toMutableList()
+                    if (idx in updated.indices) {
+                        updated.removeAt(idx)
+                        saveNotes(updated)
+                        Toast.makeText(this@MainActivity, R.string.pro_notes_deleted_toast, Toast.LENGTH_SHORT).show()
+                        renderNotes()
+                    }
+                }.apply { minHeight = dp(40) }
+                actionsRow.addView(copyBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+                actionsRow.addView(deleteBtn, LinearLayout.LayoutParams(0, -2, 1f))
+                cardContent.addView(actionsRow, top(8))
+
+                listContainer.addView(
+                    themedCard(cardContent, Color.parseColor("#1D1605"), Color.parseColor("#FFB300")),
+                    top(10),
+                )
+            }
+        }
+
+        val saveBtn = button(getString(R.string.pro_notes_save_btn)) {
+            val title = titleInput.text?.toString()?.trim().orEmpty()
+            val body = bodyInput.text?.toString()?.trim().orEmpty()
+            if (body.isEmpty() && title.isEmpty()) return@button
+            val updated = loadNotes()
+            updated.add(0, Triple(title, body, System.currentTimeMillis()))
+            saveNotes(updated)
+            titleInput.setText("")
+            bodyInput.setText("")
+            Toast.makeText(this, R.string.pro_notes_saved_toast, Toast.LENGTH_SHORT).show()
+            renderNotes()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(Color.parseColor("#120D03"))
+        }
+        container.addView(saveBtn, top(10))
+        container.addView(listContainer, top(10))
+        renderNotes()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.pro_notes_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .show()
+    }
+
+    private fun openProSmartCalculatorDialog() {
+        var expression = ""
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+
+        val exprView = TextView(this).apply {
+            text = "0"
+            textSize = 24f
+            gravity = Gravity.END
+            typeface = Typeface.MONOSPACE
+            setTextColor(Color.parseColor("#FFD54F"))
+            setPadding(dp(12), dp(10), dp(12), dp(4))
+            background = roundedBackground(Color.parseColor("#181308"), dp(10))
+        }
+        val resultView = TextView(this).apply {
+            text = "= 0"
+            textSize = 15f
+            gravity = Gravity.END
+            typeface = Typeface.MONOSPACE
+            setTextColor(Color.parseColor("#FFE082"))
+            setPadding(dp(12), dp(2), dp(12), dp(8))
+        }
+        val capacityHintView = TextView(this).apply {
+            textSize = 11f
+            setTextColor(color(R.color.sweep_primary_glow))
+            setPadding(dp(10), dp(8), dp(10), dp(8))
+            background = roundedBackground(Color.parseColor("#10221C"), dp(10))
+        }
+
+        fun formatCalcNumber(value: Double): String {
+            if (!value.isFinite()) return "0"
+            return if (value % 1.0 == 0.0 && kotlin.math.abs(value) < 1_000_000_000_000.0) {
+                value.toLong().toString()
+            } else {
+                String.format(Locale.US, "%.4f", value).trimEnd('0').trimEnd('.')
+            }
+        }
+
+        fun updateCalcUi() {
+            exprView.text = if (expression.isEmpty()) "0" else expression
+            val evaluated = if (expression.isBlank()) 0.0 else evaluateMathExpression(expression)
+            val displayNum = evaluated ?: 0.0
+            resultView.text = if (evaluated != null) "= ${formatCalcNumber(evaluated)}" else "…"
+            val safeGb = displayNum.coerceIn(0.0, 100_000.0)
+            val approxPhotos = ((safeGb * 1024.0) / 3.5).toInt().coerceAtLeast(0)
+            val approxMins = ((safeGb * 1024.0) / 130.0).toInt().coerceAtLeast(0)
+            capacityHintView.text = getString(R.string.pro_calc_capacity_hint, safeGb, approxPhotos, approxMins)
+        }
+
+        container.addView(exprView)
+        container.addView(resultView)
+        container.addView(capacityHintView, top(6))
+
+        val rows = listOf(
+            listOf("C", "⌫", "(", ")", "÷"),
+            listOf("7", "8", "9", "×", "%"),
+            listOf("4", "5", "6", "-", "√"),
+            listOf("1", "2", "3", "+", "="),
+            listOf("0", ".", "00", "COPY"),
+        )
+        rows.forEach { rowKeys ->
+            val rowLayout = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            rowKeys.forEachIndexed { colIdx, key ->
+                val labelText = if (key == "COPY") getString(R.string.pro_calc_copy_btn) else key
+                val keyBtn = button(labelText) {
+                    when (key) {
+                        "C" -> expression = ""
+                        "⌫" -> if (expression.isNotEmpty()) expression = expression.dropLast(1)
+                        "=" -> {
+                            evaluateMathExpression(expression)?.let { v ->
+                                expression = formatCalcNumber(v)
+                            }
+                        }
+                        "√" -> {
+                            val current = evaluateMathExpression(expression)
+                            if (current != null && current >= 0.0) {
+                                expression = formatCalcNumber(kotlin.math.sqrt(current))
+                            }
+                        }
+                        "÷" -> expression += "/"
+                        "×" -> expression += "*"
+                        "COPY" -> {
+                            val toCopy = evaluateMathExpression(expression)?.let(::formatCalcNumber) ?: expression.ifBlank { "0" }
+                            copyTextToClipboard(toCopy, R.string.pro_calc_copied_toast)
+                        }
+                        else -> expression += key
+                    }
+                    updateCalcUi()
+                }.apply {
+                    minHeight = dp(46)
+                    textSize = if (key == "COPY") 11f else 15f
+                    typeface = Typeface.DEFAULT_BOLD
+                    when (key) {
+                        "=" -> {
+                            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+                            setTextColor(Color.parseColor("#120D03"))
+                        }
+                        "÷", "×", "-", "+", "%", "√" -> {
+                            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+                            setTextColor(Color.parseColor("#FFD54F"))
+                        }
+                        "C", "⌫" -> {
+                            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A1215"))
+                            setTextColor(Color.parseColor("#FF8A80"))
+                        }
+                    }
+                }
+                val weight = if (key == "COPY") 2f else 1f
+                rowLayout.addView(
+                    keyBtn,
+                    LinearLayout.LayoutParams(0, -2, weight).apply {
+                        if (colIdx < rowKeys.lastIndex) marginEnd = dp(4)
+                    },
+                )
+            }
+            container.addView(rowLayout, top(6))
+        }
+        updateCalcUi()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.pro_calc_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .show()
+    }
+
+    /** Evaluates arithmetic expressions (+, -, *, /, %, parentheses) safely without external dependencies. */
+    private fun evaluateMathExpression(raw: String): Double? {
+        val clean = raw.replace(" ", "").replace("×", "*").replace("÷", "/")
+        if (clean.isEmpty()) return null
+        return MathExprParser(clean).parse()
+    }
+
+    private class MathExprParser(private val clean: String) {
+        private var pos = 0
+
+        private fun peek(): Char? = if (pos < clean.length) clean[pos] else null
+
+        fun parse(): Double? {
+            val value = parseExpression() ?: return null
+            return if (pos == clean.length && value.isFinite()) value else null
+        }
+
+        private fun parseExpression(): Double? {
+            var left = parseTerm() ?: return null
+            while (true) {
+                when (peek()) {
+                    '+' -> {
+                        pos++
+                        left += parseTerm() ?: return null
+                    }
+                    '-' -> {
+                        pos++
+                        left -= parseTerm() ?: return null
+                    }
+                    else -> return left
+                }
+            }
+        }
+
+        private fun parseTerm(): Double? {
+            var left = parseFactor() ?: return null
+            while (true) {
+                when (peek()) {
+                    '*' -> {
+                        pos++
+                        left *= parseFactor() ?: return null
+                    }
+                    '/' -> {
+                        pos++
+                        val right = parseFactor() ?: return null
+                        if (right == 0.0) return null
+                        left /= right
+                    }
+                    '%' -> {
+                        pos++
+                        val next = peek()
+                        if (next != null && (next.isDigit() || next == '(')) {
+                            val right = parseFactor() ?: return null
+                            if (right == 0.0) return null
+                            left %= right
+                        } else {
+                            left /= 100.0
+                        }
+                    }
+                    else -> return left
+                }
+            }
+        }
+
+        private fun parseFactor(): Double? {
+            return when (peek()) {
+                '+' -> {
+                    pos++
+                    parseFactor()
+                }
+                '-' -> {
+                    pos++
+                    parseFactor()?.unaryMinus()
+                }
+                '(' -> {
+                    pos++
+                    val inside = parseExpression() ?: return null
+                    if (peek() == ')') pos++
+                    inside
+                }
+                else -> {
+                    val start = pos
+                    while (peek()?.let { it.isDigit() || it == '.' } == true) pos++
+                    if (pos == start) null else clean.substring(start, pos).toDoubleOrNull()
+                }
+            }
+        }
+    }
+
+    private fun openProWordSearchDialog() {
+        val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+        val easyMode = isEasySeniorModeEnabled()
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+
+        container.addView(label(getString(R.string.pro_ws_subtitle), if (easyMode) 14.5f else 13f, R.color.sweep_muted, false))
+
+        var puzzle = com.rdf112.sweep.presentation.studio.ProWordSearchTools.generateDailyPuzzle(isPortuguese = isPt)
+        val foundWords = mutableSetOf<String>()
+        var selectedStart: Pair<Int, Int>? = null
+        var hintCell: Pair<Int, Int>? = null
+
+        val statusTv = label("", if (easyMode) 15f else 13.5f, R.color.sweep_accent_amber, true)
+        container.addView(statusTv, top(10))
+
+        val wordsListTv = TextView(this).apply {
+            textSize = if (easyMode) 15f else 13f
+            setTextColor(color(R.color.sweep_text))
+            setPadding(dp(10), dp(10), dp(10), dp(10))
+            background = roundedBackground(Color.parseColor("#161105"), dp(10))
+            typeface = Typeface.MONOSPACE
+        }
+        container.addView(wordsListTv, top(8))
+
+        val gridContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(6), dp(6), dp(6), dp(6))
+            background = roundedBackground(Color.parseColor("#100D04"), dp(12))
+        }
+        container.addView(gridContainer, top(10))
+
+        val selectionHintTv = label("", 12f, R.color.sweep_primary_glow, false)
+        container.addView(selectionHintTv, top(6))
+
+        lateinit var renderBoard: () -> Unit
+        renderBoard = {
+            val modeTag = if (puzzle.isDailyChallenge) {
+                getString(R.string.pro_ws_daily_tag, puzzle.dateKey)
+            } else {
+                getString(R.string.pro_ws_random_tag)
+            }
+            statusTv.text = getString(
+                R.string.pro_ws_found_count,
+                foundWords.size,
+                puzzle.placements.size,
+                puzzle.themeTitle,
+                modeTag,
+            )
+            wordsListTv.text = puzzle.placements.joinToString("   ") { p ->
+                if (p.word in foundWords) "✅ ${p.word}" else "• ${p.word}"
+            }
+            selectionHintTv.text = if (selectedStart != null) {
+                getString(R.string.pro_ws_select_start)
+            } else {
+                ""
+            }
+            selectionHintTv.visibility = if (selectedStart != null) View.VISIBLE else View.GONE
+
+            val foundCells = buildSet {
+                puzzle.placements
+                    .filter { it.word in foundWords }
+                    .forEach { addAll(com.rdf112.sweep.presentation.studio.ProWordSearchTools.cellsForPlacement(it)) }
+            }
+
+            gridContainer.removeAllViews()
+            val cellHeight = dp(if (easyMode) 40 else 35)
+            for (r in 0 until puzzle.size) {
+                val rowLayout = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                }
+                for (c in 0 until puzzle.size) {
+                    val coord = r to c
+                    val isStart = selectedStart == coord
+                    val isFound = coord in foundCells
+                    val isHint = hintCell == coord
+
+                    val bgHex = when {
+                        isStart -> Color.parseColor("#00E5B0")
+                        isFound -> Color.parseColor("#FFB300")
+                        isHint -> Color.parseColor("#E65100")
+                        else -> Color.parseColor("#1E180A")
+                    }
+                    val txtColor = when {
+                        isStart -> Color.parseColor("#041019")
+                        isFound -> Color.parseColor("#100D04")
+                        else -> Color.parseColor("#FFF8DC")
+                    }
+
+                    val cellView = TextView(this).apply {
+                        text = puzzle.grid[r][c].toString()
+                        gravity = Gravity.CENTER
+                        textSize = if (easyMode) 17f else 15f
+                        typeface = Typeface.DEFAULT_BOLD
+                        setTextColor(txtColor)
+                        background = roundedBackground(bgHex, dp(6))
+                        setOnClickListener {
+                            try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                            val curStart = selectedStart
+                            if (curStart == null) {
+                                selectedStart = coord
+                                hintCell = null
+                                renderBoard()
+                            } else if (curStart == coord) {
+                                selectedStart = null
+                                renderBoard()
+                            } else {
+                                val matched = com.rdf112.sweep.presentation.studio.ProWordSearchTools.findMatchingWord(
+                                    puzzle = puzzle,
+                                    r1 = curStart.first,
+                                    c1 = curStart.second,
+                                    r2 = r,
+                                    c2 = c,
+                                    alreadyFoundWords = foundWords,
+                                )
+                                if (matched != null) {
+                                    foundWords += matched.word
+                                    selectedStart = null
+                                    hintCell = null
+                                    renderBoard()
+                                    if (foundWords.size == puzzle.placements.size) {
+                                        Toast.makeText(this@MainActivity, R.string.pro_ws_completed_toast, Toast.LENGTH_LONG).show()
+                                    }
+                                } else {
+                                    selectedStart = null
+                                    renderBoard()
+                                }
+                            }
+                        }
+                    }
+                    rowLayout.addView(
+                        cellView,
+                        LinearLayout.LayoutParams(0, cellHeight, 1f).apply {
+                            setMargins(dp(2), dp(2), dp(2), dp(2))
+                        },
+                    )
+                }
+                gridContainer.addView(rowLayout, ViewGroup.LayoutParams(-1, -2))
+            }
+        }
+
+        val controlsRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val dailyBtn = button(getString(R.string.pro_ws_daily_btn)) {
+            puzzle = com.rdf112.sweep.presentation.studio.ProWordSearchTools.generateDailyPuzzle(isPortuguese = isPt)
+            foundWords.clear()
+            selectedStart = null
+            hintCell = null
+            renderBoard()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+            setTextColor(Color.parseColor("#FFE082"))
+        }
+        val newBtn = button(getString(R.string.pro_ws_new_puzzle_btn)) {
+            puzzle = com.rdf112.sweep.presentation.studio.ProWordSearchTools.generateRandomPuzzle(isPortuguese = isPt)
+            foundWords.clear()
+            selectedStart = null
+            hintCell = null
+            renderBoard()
+        }
+        val hintBtn = button(getString(R.string.pro_ws_hint_btn)) {
+            val next = puzzle.placements.firstOrNull { it.word !in foundWords }
+            if (next != null) {
+                hintCell = next.startRow to next.startCol
+                renderBoard()
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.pro_ws_hint_toast, next.word),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        }
+        listOf(dailyBtn, newBtn, hintBtn).forEachIndexed { idx, btn ->
+            controlsRow.addView(
+                btn,
+                LinearLayout.LayoutParams(0, -2, 1f).apply {
+                    if (idx < 2) marginEnd = dp(6)
+                },
+            )
+        }
+        container.addView(controlsRow, top(12))
+
+        renderBoard()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.pro_ws_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .show()
+    }
+
+    private fun openProPasswordGeneratorDialog() {
+        val rng = SecureRandom()
+        val upper = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+        val lower = "abcdefghijkmnopqrstuvwxyz"
+        val digits = "23456789"
+        val symbols = "!@#$%&*+-=?"
+        val allChars = upper + lower + digits + symbols
+
+        var selectedLength = 16
+        var currentPassword = ""
+
+        fun generateStrongPassword(length: Int): String {
+            val chars = mutableListOf(
+                upper[rng.nextInt(upper.length)],
+                lower[rng.nextInt(lower.length)],
+                digits[rng.nextInt(digits.length)],
+                symbols[rng.nextInt(symbols.length)],
+            )
+            while (chars.size < length) {
+                chars.add(allChars[rng.nextInt(allChars.length)])
+            }
+            for (i in chars.lastIndex downTo 1) {
+                val j = rng.nextInt(i + 1)
+                val tmp = chars[i]
+                chars[i] = chars[j]
+                chars[j] = tmp
+            }
+            return chars.joinToString("")
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        val lengthLabel = TextView(this).apply {
+            textSize = 13f
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(Color.parseColor("#FFD54F"))
+        }
+        val passwordBox = TextView(this).apply {
+            textSize = 17f
+            typeface = Typeface.MONOSPACE
+            gravity = Gravity.CENTER
+            setTextColor(color(R.color.sweep_text))
+            setPadding(dp(14), dp(16), dp(14), dp(16))
+            background = roundedBackground(Color.parseColor("#181308"), dp(12))
+            setTextIsSelectable(true)
+        }
+
+        fun refreshPassword() {
+            lengthLabel.text = getString(R.string.pro_pass_length_label, selectedLength)
+            currentPassword = generateStrongPassword(selectedLength)
+            passwordBox.text = currentPassword
+        }
+
+        container.addView(lengthLabel)
+        val lengthRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        listOf(12, 16, 20, 24).forEachIndexed { idx, len ->
+            val chip = button("$len") {
+                selectedLength = len
+                refreshPassword()
+            }.apply {
+                minHeight = dp(44)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+                setTextColor(Color.parseColor("#FFE082"))
+            }
+            lengthRow.addView(
+                chip,
+                LinearLayout.LayoutParams(0, -2, 1f).apply {
+                    if (idx < 3) marginEnd = dp(6)
+                },
+            )
+        }
+        container.addView(lengthRow, top(8))
+        container.addView(passwordBox, top(12))
+
+        container.addView(
+            button(getString(R.string.pro_pass_generate_btn)) { refreshPassword() }.apply {
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+                setTextColor(Color.parseColor("#120D03"))
+            },
+            top(10),
+        )
+        container.addView(
+            button(getString(R.string.pro_pass_copy_btn)) {
+                copyTextToClipboard(currentPassword, R.string.pro_pass_copied_toast)
+            },
+            top(8),
+        )
+
+        val ssidInput = EditText(this).apply {
+            hint = getString(R.string.pro_pass_wifi_ssid_hint)
+            setText("Midiastore_VIP_5G")
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            background = roundedBackground(Color.parseColor("#141C2E"), dp(10))
+        }
+        container.addView(ssidInput, top(14))
+
+        var dialogRef: AlertDialog? = null
+        container.addView(
+            button(getString(R.string.pro_pass_wifi_qr_btn)) {
+                val escapeWifi = { s: String ->
+                    s.replace("\\", "\\\\").replace(";", "\\;").replace(":", "\\:").replace(",", "\\,")
+                }
+                val ssid = ssidInput.text?.toString()?.trim().orEmpty().ifBlank { "Midiastore_VIP_5G" }
+                val payload = "WIFI:S:${escapeWifi(ssid)};T:WPA;P:${escapeWifi(currentPassword)};;"
+                dialogRef?.dismiss()
+                openQrCodeGeneratorStudio(payload)
+            }.apply {
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
+                setTextColor(Color.parseColor("#FFD54F"))
+            },
+            top(8),
+        )
+        refreshPassword()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        dialogRef = AlertDialog.Builder(this)
+            .setTitle(R.string.pro_pass_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .create()
+        dialogRef.show()
+    }
+
+    private fun isEasySeniorModeEnabled(): Boolean =
+        getSharedPreferences("midiastore_global_hub", Context.MODE_PRIVATE)
+            .getBoolean("easy_senior_mode_v1", false)
+
+    private fun setEasySeniorModeEnabled(enabled: Boolean) {
+        getSharedPreferences("midiastore_global_hub", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("easy_senior_mode_v1", enabled)
+            .apply()
+    }
+
+    private fun applyEasySeniorMode(enabled: Boolean) {
+        if (::easyModeButton.isInitialized) {
+            easyModeButton.text = getString(if (enabled) R.string.easy_mode_btn_on else R.string.easy_mode_btn_off)
+            easyModeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                if (enabled) color(R.color.sweep_primary) else color(R.color.sweep_surface_alt),
+            )
+            easyModeButton.setTextColor(
+                if (enabled) color(R.color.sweep_background) else color(R.color.sweep_text),
+            )
+        }
+        if (::brandTaglineLabel.isInitialized) brandTaglineLabel.textSize = if (enabled) 14f else 12f
+        if (::storageUsedHeadline.isInitialized) storageUsedHeadline.textSize = if (enabled) 23f else 19f
+        if (::storageFreeSubline.isInitialized) storageFreeSubline.textSize = if (enabled) 16f else 13f
+        if (::heroOrbButton.isInitialized) {
+            heroOrbButton.textSize = if (enabled) 21f else 18f
+            heroOrbButton.minHeight = dp(if (enabled) 80 else 68)
+        }
+        if (::heroOrbSubtitle.isInitialized) heroOrbSubtitle.textSize = if (enabled) 15f else 13f
+        if (::homeProCtaTitle.isInitialized) homeProCtaTitle.textSize = if (enabled) 19f else 15f
+        if (::homeProCtaSubtitle.isInitialized) homeProCtaSubtitle.textSize = if (enabled) 15f else 12.5f
+        if (::homeProSubscribeButton.isInitialized) {
+            homeProSubscribeButton.textSize = if (enabled) 16.5f else 14f
+            homeProSubscribeButton.minHeight = dp(if (enabled) 68 else 60)
+        }
+        if (::homeGlobalHubTitleView.isInitialized) homeGlobalHubTitleView.textSize = if (enabled) 19f else 15.5f
+        if (::homeGlobalHubSubtitleView.isInitialized) homeGlobalHubSubtitleView.textSize = if (enabled) 15f else 12.5f
+    }
+
+    private data class WorldButtonSpec(
+        val labelRes: Int,
+        val bgHex: String,
+        val textHex: String,
+        val action: () -> Unit,
+    )
+
+    private fun buildActionGroupCard(
+        badgeText: String,
+        badgeHex: String,
+        titleText: String,
+        subtitleText: String?,
+        cardBgHex: String,
+        strokeHex: String,
+        buttons: List<WorldButtonSpec>,
+        saveTitleRefs: Boolean = false,
+    ): MaterialCardView {
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(18), dp(20), dp(18))
+        }
+        content.addView(
+            TextView(this).apply {
+                text = badgeText
+                textSize = 11.5f
+                setTypeface(typeface, Typeface.BOLD)
+                setTextColor(Color.parseColor(badgeHex))
+                letterSpacing = 0.06f
+            },
+        )
+        val titleView = label(titleText, 17f, R.color.sweep_text, true)
+        content.addView(titleView, top(6))
+        if (subtitleText != null) {
+            val subtitleView = label(subtitleText, 13f, R.color.sweep_muted, false)
+            content.addView(subtitleView, top(4))
+            if (saveTitleRefs) {
+                homeGlobalHubTitleView = titleView
+                homeGlobalHubSubtitleView = subtitleView
+            }
+        }
+        buttons.forEachIndexed { idx, spec ->
+            val btn = button(getString(spec.labelRes)) { spec.action() }.apply {
+                minHeight = dp(58)
+                textSize = 14.5f
+                typeface = Typeface.DEFAULT_BOLD
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor(spec.bgHex))
+                setTextColor(Color.parseColor(spec.textHex))
+            }
+            content.addView(btn, top(if (idx == 0) 14 else 10))
+        }
+        return themedCard(content, Color.parseColor(cardBgHex), Color.parseColor(strokeHex))
+    }
+
+    private fun buildGamesOfflineSection(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        visibility = View.GONE
+
+        // Card 1: Caça-Palavras Pro (100% Offline + Desafio Diário)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.pro_ws_daily_btn).uppercase(java.util.Locale.getDefault()),
+                badgeHex = "#FFD54F",
+                titleText = getString(R.string.games_wordsearch_card_title),
+                subtitleText = getString(R.string.pro_ws_subtitle),
+                cardBgHex = "#151208",
+                strokeHex = "#FFB300",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.pro_suite_wordsearch_btn, "#FFB300", "#070B14") {
+                        runWithProAccess { openProWordSearchDialog() }
+                    },
+                ),
+            ),
+            bottom(14),
+        )
+
+        // Card 2: Fliperama 100% Offline (Cobrinha Retrô + Blocos em Queda)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.games_arcade_badge),
+                badgeHex = "#5DF5D3",
+                titleText = getString(R.string.home_btn_snake),
+                subtitleText = getString(R.string.blocks_hint_offline),
+                cardBgHex = "#101827",
+                strokeHex = "#24344D",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.home_btn_snake, "#00E5B0", "#070B14") { openOfflineSnakeGameDialog() },
+                    WorldButtonSpec(R.string.home_btn_blocks, "#1C2942", "#F8FAFC") { openFallingBlocksGameDialog() },
+                ),
+            ),
+            bottom(14),
+        )
+
+        // Card 3: Curiosidade & Segredo Oculto (Mágica de Cartas, Dados Mágicos & Charadas)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.games_magic_badge),
+                badgeHex = "#5DF5D3",
+                titleText = getString(R.string.magic_lab_title),
+                subtitleText = getString(R.string.magic_lab_subtitle),
+                cardBgHex = "#101827",
+                strokeHex = "#24344D",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.home_btn_magic, "#1C2942", "#F8FAFC") { openMagicSecretLabDialog() },
+                    WorldButtonSpec(R.string.dice_title, "#1C2942", "#FFD54F") { openMagicDiceDialog() },
+                ),
+            ),
+            bottom(18),
+        )
+    }
+
+    private fun buildWorldGlobalSection(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        visibility = View.GONE
+
+        // Card Único e Focado: Hub Global Offline (Relógio Mundial + Conversor de Moedas + Clima & Turismo)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.home_global_badge),
+                badgeHex = "#5DF5D3",
+                titleText = getString(R.string.home_global_title),
+                subtitleText = getString(R.string.home_global_subtitle),
+                cardBgHex = "#101827",
+                strokeHex = "#24344D",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.home_btn_clock, "#00E5B0", "#070B14") { openWorldClockDialog() },
+                    WorldButtonSpec(R.string.home_btn_currency, "#1C2942", "#F8FAFC") { openCurrencyConverterDialog() },
+                    WorldButtonSpec(R.string.home_btn_travel, "#1C2942", "#5DF5D3") { openCountryTravelAndPlacesDialog() },
+                ),
+                saveTitleRefs = true,
+            ),
+            bottom(18),
+        )
+    }
+
+    private fun openFallingBlocksGameDialog() {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(12), dp(14), dp(12))
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        val hudLabel = label(getString(R.string.blocks_score_line, 0, 0, 1, 0), 14f, R.color.sweep_primary_glow, true).apply {
+            gravity = Gravity.CENTER
+        }
+        container.addView(hudLabel)
+        container.addView(
+            label(getString(R.string.blocks_hint_offline), 11.5f, R.color.sweep_muted, false).apply {
+                gravity = Gravity.CENTER
+            },
+            top(4),
+        )
+
+        val blocksView = FallingBlocksGameView(this).apply {
+            isGoldVipTheme = hasEffectiveProAccess()
+        }
+        val boardW = (resources.displayMetrics.widthPixels * 0.56f).toInt().coerceIn(dp(190), dp(260))
+        val boardH = (boardW * 1.8f).toInt()
+        container.addView(blocksView, LinearLayout.LayoutParams(boardW, boardH).apply { topMargin = dp(10) })
+
+        val topRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val pauseBtn = button(getString(R.string.snake_pause_btn)) { blocksView.togglePause() }.apply { minHeight = dp(48) }
+        val restartBtn = button(getString(R.string.snake_restart_btn)) { blocksView.startNewGame() }.apply { minHeight = dp(48) }
+        topRow.addView(pauseBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(6) })
+        topRow.addView(restartBtn, LinearLayout.LayoutParams(0, -2, 1f))
+        container.addView(topRow, top(10))
+
+        // Botões grandes e acessíveis para controlar os blocos
+        val padRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        val leftBtn = button("⬅️") { blocksView.moveLeft() }.apply { textSize = 18f; minHeight = dp(56) }
+        val rotateBtn = button("🔄") { blocksView.rotateClockwise() }.apply {
+            textSize = 18f
+            minHeight = dp(56)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#1D3557"))
+        }
+        val dropBtn = button("⏬") { blocksView.hardDrop() }.apply { textSize = 18f; minHeight = dp(56) }
+        val rightBtn = button("➡️") { blocksView.moveRight() }.apply { textSize = 18f; minHeight = dp(56) }
+        listOf(leftBtn, rotateBtn, dropBtn, rightBtn).forEachIndexed { idx, b ->
+            padRow.addView(
+                b,
+                LinearLayout.LayoutParams(0, dp(56), 1f).apply {
+                    if (idx < 3) marginEnd = dp(6)
+                },
+            )
+        }
+        container.addView(padRow, top(8))
+
+        blocksView.onStateChanged = { score, lines, lvl, best, _, _ ->
+            hudLabel.text = getString(R.string.blocks_score_line, score, lines, lvl, best)
+        }
+        blocksView.startNewGame()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.blocks_dialog_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .create()
+        dialog.setOnDismissListener { blocksView.stopLoop() }
+        dialog.show()
+    }
+
+    private fun openMagicSecretLabDialog() {
+        val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        container.addView(label(getString(R.string.magic_lab_subtitle), 13f, R.color.sweep_muted, false))
+
+        val riddlesHolder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        container.addView(riddlesHolder, top(10))
+
+        val cardsBtn = button(getString(R.string.magic_tab_cards_btn)) {
+            if (MagicRiddlesTools.isRiddleUnlocked(this, 0)) {
+                open21CardMindReaderDialog()
+            } else {
+                Toast.makeText(this, R.string.magic_locked_toast, Toast.LENGTH_SHORT).show()
+            }
+        }.apply {
+            minHeight = dp(56)
+            textSize = 14f
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2B154D"))
+            setTextColor(Color.parseColor("#E9D5FF"))
+        }
+        val diceBtn = button(getString(R.string.magic_tab_dice_btn)) {
+            openMagicDiceDialog()
+        }.apply {
+            minHeight = dp(56)
+            textSize = 14f
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A1D08"))
+            setTextColor(Color.parseColor("#FFD54F"))
+        }
+
+        val masterBadgeView = TextView(this).apply {
+            text = getString(R.string.magic_master_badge_on)
+            textSize = 13f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setTextColor(Color.parseColor("#FFD54F"))
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            background = roundedBackground(Color.parseColor("#261A05"), dp(12))
+        }
+
+        fun renderLab() {
+            riddlesHolder.removeAllViews()
+            masterBadgeView.visibility = if (MagicRiddlesTools.isRiddleUnlocked(this, 2)) View.VISIBLE else View.GONE
+
+            MagicRiddlesTools.RIDDLES.forEach { riddle ->
+                val solved = MagicRiddlesTools.isRiddleUnlocked(this, riddle.id)
+                val cardContent = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(14), dp(12), dp(14), dp(12))
+                }
+                cardContent.addView(label(if (isPt) riddle.questionPt else riddle.questionEn, 13.5f, R.color.sweep_text, true))
+                cardContent.addView(
+                    label(if (isPt) riddle.rewardPt else riddle.rewardEn, 11.5f, R.color.sweep_primary_glow, true),
+                    top(4),
+                )
+                if (solved) {
+                    cardContent.addView(label(getString(R.string.magic_riddle_unlocked_msg), 12.5f, R.color.sweep_success, true), top(8))
+                } else {
+                    val hintLabel = label(if (isPt) riddle.hintPt else riddle.hintEn, 11.5f, R.color.sweep_accent_amber, false).apply {
+                        visibility = View.GONE
+                    }
+                    cardContent.addView(hintLabel, top(6))
+
+                    val answerInput = EditText(this).apply {
+                        hint = getString(R.string.magic_riddle_answer_hint)
+                        setTextColor(color(R.color.sweep_text))
+                        setHintTextColor(color(R.color.sweep_muted))
+                        setPadding(dp(10), dp(10), dp(10), dp(10))
+                        background = roundedBackground(Color.parseColor("#111A2B"), dp(8))
+                    }
+                    cardContent.addView(answerInput, top(8))
+
+                    val btnRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+                    val hintBtn = button(getString(R.string.magic_riddle_hint_btn)) {
+                        hintLabel.visibility = View.VISIBLE
+                    }.apply { minHeight = dp(46) }
+                    val unlockBtn = button(getString(R.string.magic_riddle_unlock_btn)) {
+                        val raw = answerInput.text?.toString().orEmpty()
+                        if (MagicRiddlesTools.tryUnlockRiddle(this, riddle.id, raw)) {
+                            Toast.makeText(this, R.string.magic_riddle_unlocked_msg, Toast.LENGTH_SHORT).show()
+                            renderLab()
+                        } else {
+                            Toast.makeText(this, R.string.magic_riddle_wrong_toast, Toast.LENGTH_SHORT).show()
+                        }
+                    }.apply {
+                        minHeight = dp(46)
+                        backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#A855F7"))
+                        setTextColor(Color.WHITE)
+                    }
+                    btnRow.addView(hintBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(6) })
+                    btnRow.addView(unlockBtn, LinearLayout.LayoutParams(0, -2, 1.3f))
+                    cardContent.addView(btnRow, top(8))
+                }
+                riddlesHolder.addView(
+                    themedCard(
+                        cardContent,
+                        Color.parseColor(if (solved) "#0B2419" else "#161128"),
+                        Color.parseColor(if (solved) "#10B981" else "#7C3AED"),
+                    ),
+                    top(10),
+                )
+            }
+        }
+        renderLab()
+
+        container.addView(masterBadgeView, top(12))
+        container.addView(cardsBtn, top(14))
+        container.addView(diceBtn, top(10))
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.magic_lab_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .show()
+    }
+
+    private fun open21CardMindReaderDialog() {
+        val engine = TwentyOneCardTrickEngine()
+        engine.reset(shuffleOrder = true)
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        val promptLabel = label("", 13.5f, R.color.sweep_primary_glow, true)
+        val columnsRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val buttonsRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val revealBox = TextView(this).apply {
+            textSize = 26f
+            gravity = Gravity.CENTER
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(Color.parseColor("#FFD54F"))
+            setPadding(dp(16), dp(22), dp(16), dp(22))
+            background = roundedBackground(Color.parseColor("#241A06"), dp(16))
+            visibility = View.GONE
+        }
+        val restartBtn = button(getString(R.string.cards_restart_btn)) {}.apply {
+            visibility = View.GONE
+            minHeight = dp(52)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(Color.parseColor("#120D03"))
+        }
+
+        fun renderTrickState(revealedCard: String? = null) {
+            if (revealedCard != null) {
+                columnsRow.visibility = View.GONE
+                buttonsRow.visibility = View.GONE
+                promptLabel.text = getString(R.string.cards_revealed_title)
+                revealBox.text = "🪄 $revealedCard"
+                revealBox.visibility = View.VISIBLE
+                restartBtn.visibility = View.VISIBLE
+                return
+            }
+            columnsRow.visibility = View.VISIBLE
+            buttonsRow.visibility = View.VISIBLE
+            revealBox.visibility = View.GONE
+            restartBtn.visibility = View.GONE
+            promptLabel.text = getString(R.string.cards_step_prompt, engine.round)
+
+            columnsRow.removeAllViews()
+            val cols = engine.dealColumns()
+            cols.forEachIndexed { idx, colCards ->
+                val colView = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(6), dp(8), dp(6), dp(8))
+                    background = roundedBackground(Color.parseColor("#111A2E"), dp(12))
+                }
+                colView.addView(
+                    label(getString(R.string.cards_col_btn, idx + 1), 11.5f, R.color.sweep_muted, true).apply {
+                        gravity = Gravity.CENTER
+                    },
+                )
+                colCards.forEach { cardText ->
+                    val isRed = cardText.contains("♥") || cardText.contains("♦")
+                    colView.addView(
+                        TextView(this).apply {
+                            text = cardText
+                            textSize = 14f
+                            setTypeface(typeface, Typeface.BOLD)
+                            gravity = Gravity.CENTER
+                            setTextColor(Color.parseColor(if (isRed) "#FF6B81" else "#F8FAFC"))
+                            setPadding(dp(4), dp(8), dp(4), dp(8))
+                            background = roundedBackground(Color.parseColor("#1B2742"), dp(8))
+                        },
+                        top(6),
+                    )
+                }
+                columnsRow.addView(
+                    colView,
+                    LinearLayout.LayoutParams(0, -2, 1f).apply {
+                        if (idx < 2) marginEnd = dp(6)
+                    },
+                )
+            }
+        }
+
+        for (c in 0..2) {
+            val colBtn = button(getString(R.string.cards_col_btn, c + 1)) {
+                val revealed = engine.chooseColumn(c)
+                renderTrickState(revealed)
+            }.apply {
+                minHeight = dp(52)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#7C3AED"))
+                setTextColor(Color.WHITE)
+            }
+            buttonsRow.addView(
+                colBtn,
+                LinearLayout.LayoutParams(0, -2, 1f).apply {
+                    if (c < 2) marginEnd = dp(6)
+                },
+            )
+        }
+        restartBtn.setOnClickListener {
+            engine.reset(shuffleOrder = true)
+            renderTrickState()
+        }
+
+        container.addView(promptLabel)
+        container.addView(columnsRow, top(12))
+        container.addView(buttonsRow, top(12))
+        container.addView(revealBox, top(16))
+        container.addView(restartBtn, top(12))
+        renderTrickState()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.cards_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .show()
+    }
+
+    private fun openMagicDiceDialog() {
+        val illusionistUnlocked = MagicRiddlesTools.isRiddleUnlocked(this, 1)
+        val forceCycle = listOf<Int?>(null, 7, 11, 12, 2, 6)
+        var forceIdx = 0
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(18), dp(16), dp(18), dp(16))
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        val diceDisplay = TextView(this).apply {
+            text = "⚄  ⚂"
+            textSize = 56f
+            gravity = Gravity.CENTER
+            setTextColor(Color.parseColor("#FFD54F"))
+            setPadding(dp(18), dp(18), dp(18), dp(18))
+            background = roundedBackground(Color.parseColor("#181308"), dp(16))
+        }
+        val resultLabel = label(getString(R.string.dice_result_line, "5 + 3", 8), 16f, R.color.sweep_text, true).apply {
+            gravity = Gravity.CENTER
+        }
+        var rollJob: Job? = null
+        val rollBtn = button(getString(R.string.dice_roll_btn)) {
+            rollJob?.cancel()
+            rollJob = lifecycleScope.launch {
+                repeat(5) {
+                    val (t1, t2) = MagicDiceEngine.rollTwoDice(null)
+                    diceDisplay.text = "${MagicDiceEngine.faceGlyph(t1)}  ${MagicDiceEngine.faceGlyph(t2)}"
+                    delay(55L)
+                }
+                val (d1, d2) = MagicDiceEngine.rollTwoDice(forceCycle[forceIdx])
+                diceDisplay.text = "${MagicDiceEngine.faceGlyph(d1)}  ${MagicDiceEngine.faceGlyph(d2)}"
+                resultLabel.text = getString(R.string.dice_result_line, "$d1 + $d2", d1 + d2)
+            }
+        }.apply {
+            minHeight = dp(58)
+            textSize = 15f
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(Color.parseColor("#120D03"))
+        }
+
+        container.addView(diceDisplay, LinearLayout.LayoutParams(-1, -2))
+        container.addView(resultLabel, top(12))
+        container.addView(rollBtn, top(14))
+
+        if (illusionistUnlocked) {
+            container.addView(label(getString(R.string.dice_secret_unlocked), 12f, R.color.sweep_primary_glow, false), top(16))
+            lateinit var secretModeBtn: MaterialButton
+            secretModeBtn = button(getString(R.string.dice_secret_force_off)) {
+                forceIdx = (forceIdx + 1) % forceCycle.size
+                val target = forceCycle[forceIdx]
+                secretModeBtn.text = if (target == null) {
+                    getString(R.string.dice_secret_force_off)
+                } else {
+                    getString(R.string.dice_secret_force_on, target)
+                }
+            }.apply {
+                minHeight = dp(50)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2B154D"))
+                setTextColor(Color.parseColor("#E9D5FF"))
+            }
+            container.addView(secretModeBtn, top(8))
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.dice_title)
+            .setView(container)
+            .setNegativeButton(R.string.close_btn, null)
+            .create()
+        dialog.setOnDismissListener { rollJob?.cancel() }
+        dialog.show()
+    }
+
+    private fun openOfflineSnakeGameDialog() {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(12), dp(14), dp(12))
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        val scoreLabel = label(getString(R.string.snake_score_line, 0, 0), 15f, R.color.sweep_primary_glow, true).apply {
+            gravity = Gravity.CENTER
+        }
+        container.addView(scoreLabel)
+        container.addView(
+            label(getString(R.string.snake_hint_offline), 11.5f, R.color.sweep_muted, false).apply {
+                gravity = Gravity.CENTER
+            },
+            top(4),
+        )
+
+        val snakeView = SnakeGameView(this).apply {
+            isGoldVipTheme = hasEffectiveProAccess()
+        }
+        val boardPx = (resources.displayMetrics.widthPixels * 0.72f).toInt().coerceIn(dp(220), dp(310))
+        container.addView(snakeView, LinearLayout.LayoutParams(boardPx, boardPx).apply { topMargin = dp(10) })
+
+        var isTurbo = false
+        val speedBtn = button(getString(R.string.snake_speed_normal)) {}
+        speedBtn.setOnClickListener {
+            isTurbo = !isTurbo
+            snakeView.setTurboSpeed(isTurbo)
+            speedBtn.text = getString(if (isTurbo) R.string.snake_speed_turbo else R.string.snake_speed_normal)
+        }
+        val pauseBtn = button(getString(R.string.snake_pause_btn)) { snakeView.togglePause() }
+        val restartBtn = button(getString(R.string.snake_restart_btn)) { snakeView.startNewGame() }
+
+        val topControls = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        listOf(pauseBtn, restartBtn, speedBtn).forEachIndexed { idx, b ->
+            b.minHeight = dp(46)
+            topControls.addView(
+                b,
+                LinearLayout.LayoutParams(0, -2, 1f).apply {
+                    if (idx < 2) marginEnd = dp(6)
+                },
+            )
+        }
+        container.addView(topControls, top(10))
+
+        // Big senior-friendly D-Pad arrows beneath board
+        val dpadRow1 = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        val upBtn = button("⬆️") { snakeView.steer(SnakeGameView.Direction.UP) }.apply {
+            textSize = 20f
+            minHeight = dp(54)
+        }
+        dpadRow1.addView(upBtn, LinearLayout.LayoutParams(dp(92), dp(54)))
+        container.addView(dpadRow1, top(10))
+
+        val dpadRow2 = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        val leftBtn = button("⬅️") { snakeView.steer(SnakeGameView.Direction.LEFT) }.apply { textSize = 20f }
+        val downBtn = button("⬇️") { snakeView.steer(SnakeGameView.Direction.DOWN) }.apply { textSize = 20f }
+        val rightBtn = button("➡️") { snakeView.steer(SnakeGameView.Direction.RIGHT) }.apply { textSize = 20f }
+        listOf(leftBtn, downBtn, rightBtn).forEachIndexed { idx, btn ->
+            btn.minHeight = dp(54)
+            dpadRow2.addView(
+                btn,
+                LinearLayout.LayoutParams(dp(92), dp(54)).apply {
+                    if (idx < 2) marginEnd = dp(8)
+                },
+            )
+        }
+        container.addView(dpadRow2, top(6))
+
+        snakeView.onStateChanged = { s, best, _, _ ->
+            scoreLabel.text = getString(R.string.snake_score_line, s, best)
+        }
+        snakeView.startNewGame()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.snake_dialog_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .create()
+        dialog.setOnDismissListener { snakeView.stopLoop() }
+        dialog.show()
+    }
+
+    private fun openWorldClockDialog() {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(12), dp(16), dp(12))
+        }
+        container.addView(label(getString(R.string.world_clock_subtitle), 12.5f, R.color.sweep_muted, false))
+        val rowsContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        container.addView(rowsContainer, top(10))
+
+        val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+
+        fun renderClocks() {
+            rowsContainer.removeAllViews()
+            val nowMs = System.currentTimeMillis()
+            GlobalHubTools.COUNTRIES.forEach { country ->
+                val snap = GlobalHubTools.formatCountryClock(country, nowMillis = nowMs)
+                val dayTag = when (snap.dayDelta) {
+                    1 -> getString(R.string.world_clock_day_next)
+                    -1 -> getString(R.string.world_clock_day_prev)
+                    else -> getString(R.string.world_clock_day_same)
+                }
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(dp(12), dp(10), dp(12), dp(10))
+                    background = roundedBackground(Color.parseColor("#111D30"), dp(12))
+                }
+                val leftCol = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+                val countryTitle = "${country.flag} ${if (isPt) country.namePt else country.nameEn}"
+                leftCol.addView(label(countryTitle, 14f, R.color.sweep_text, true))
+                leftCol.addView(
+                    label("${country.cityName} · ${snap.utcOffsetLabel} (${GlobalHubTools.formatOffsetDelta(snap.deltaMinutes)})", 11.5f, R.color.sweep_muted, false),
+                    top(2),
+                )
+
+                val rightCol = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.END
+                }
+                val timeLabel = TextView(this).apply {
+                    text = snap.time24h
+                    textSize = 18f
+                    typeface = Typeface.MONOSPACE
+                    setTypeface(typeface, Typeface.BOLD)
+                    setTextColor(Color.parseColor("#5DF5D3"))
+                }
+                rightCol.addView(timeLabel)
+                rightCol.addView(label("$dayTag · ${snap.dateLabel}", 10.5f, R.color.sweep_muted, false))
+
+                row.addView(leftCol, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+                row.addView(rightCol, LinearLayout.LayoutParams(-2, -2))
+                rowsContainer.addView(row, top(8))
+            }
+        }
+        renderClocks()
+
+        var tickJob: Job? = null
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.world_clock_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .create()
+        dialog.setOnShowListener {
+            tickJob = lifecycleScope.launch {
+                while (isActive) {
+                    delay(1000L)
+                    renderClocks()
+                }
+            }
+        }
+        dialog.setOnDismissListener { tickJob?.cancel() }
+        dialog.show()
+    }
+
+    private fun openCurrencyConverterDialog() {
+        val (initialRates, initialStamp) = GlobalHubTools.loadCachedRates(this)
+        var currentRates = initialRates
+        var currentStamp = initialStamp
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        val statusLabel = label(
+            if (currentStamp != null) getString(R.string.currency_status_live, currentStamp) else getString(R.string.currency_status_offline),
+            12f,
+            R.color.sweep_primary_glow,
+            true,
+        )
+        container.addView(statusLabel)
+
+        val amountInput = EditText(this).apply {
+            hint = getString(R.string.currency_amount_hint)
+            setText("100")
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            textSize = 18f
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            background = roundedBackground(Color.parseColor("#141C2E"), dp(10))
+        }
+        container.addView(amountInput, top(10))
+
+        val codes = GlobalHubTools.SUPPORTED_CURRENCIES
+        val fromSpinner = Spinner(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, codes)
+            setSelection(codes.indexOf("USD").coerceAtLeast(0))
+        }
+        val toSpinner = Spinner(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, codes)
+            setSelection(codes.indexOf("BRL").coerceAtLeast(0))
+        }
+
+        val selectorsRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val swapBtn = button(getString(R.string.currency_swap_btn)) {
+            val fromPos = fromSpinner.selectedItemPosition
+            fromSpinner.setSelection(toSpinner.selectedItemPosition)
+            toSpinner.setSelection(fromPos)
+        }.apply { minHeight = dp(46) }
+
+        selectorsRow.addView(fromSpinner, LinearLayout.LayoutParams(0, -2, 1f))
+        selectorsRow.addView(swapBtn, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(6); marginEnd = dp(6) })
+        selectorsRow.addView(toSpinner, LinearLayout.LayoutParams(0, -2, 1f))
+        container.addView(selectorsRow, top(10))
+
+        val resultBox = TextView(this).apply {
+            textSize = 22f
+            setTypeface(typeface, Typeface.BOLD)
+            gravity = Gravity.CENTER
+            setTextColor(Color.parseColor("#FFD54F"))
+            setPadding(dp(14), dp(14), dp(14), dp(14))
+            background = roundedBackground(Color.parseColor("#1F1808"), dp(12))
+        }
+        val quickCompareText = label("", 12.5f, R.color.sweep_text, false).apply {
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            background = roundedBackground(Color.parseColor("#111D30"), dp(10))
+        }
+
+        fun recalculate() {
+            val amount = amountInput.text?.toString()?.replace(',', '.')?.toDoubleOrNull() ?: 0.0
+            val fromCode = codes.getOrElse(fromSpinner.selectedItemPosition) { "USD" }
+            val toCode = codes.getOrElse(toSpinner.selectedItemPosition) { "BRL" }
+            val converted = GlobalHubTools.convertCurrency(amount, fromCode, toCode, currentRates) ?: 0.0
+            resultBox.text = String.format(Locale.US, "%.2f %s = %.2f %s", amount, fromCode, converted, toCode)
+
+            val quickHeader = getString(R.string.currency_quick_examples, String.format(Locale.US, "%.2f", amount), fromCode)
+            val lines = listOf("USD", "BRL", "EUR", "INR", "AED", "RUB", "JPY", "GBP")
+                .filter { it != fromCode }
+                .joinToString("\n") { target ->
+                    val v = GlobalHubTools.convertCurrency(amount, fromCode, target, currentRates) ?: 0.0
+                    "• $target: ${String.format(Locale.US, "%.2f", v)}"
+                }
+            quickCompareText.text = "$quickHeader\n$lines"
+        }
+
+        val itemWatcher = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = recalculate()
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        fromSpinner.onItemSelectedListener = itemWatcher
+        toSpinner.onItemSelectedListener = itemWatcher
+        amountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = recalculate()
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        val refreshBtn = button(getString(R.string.currency_refresh_btn)) {
+            lifecycleScope.launch {
+                val (freshRates, freshStamp) = GlobalHubTools.fetchLiveUsdRatesIfOnline(this@MainActivity)
+                currentRates = freshRates
+                currentStamp = freshStamp
+                statusLabel.text = if (freshStamp != null) {
+                    getString(R.string.currency_status_live, freshStamp)
+                } else {
+                    getString(R.string.currency_status_offline)
+                }
+                recalculate()
+            }
+        }
+
+        container.addView(resultBox, top(12))
+        container.addView(refreshBtn, top(10))
+        container.addView(quickCompareText, top(10))
+        recalculate()
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.currency_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .show()
+    }
+
+    private fun openCountryTravelAndPlacesDialog() {
+        val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        container.addView(label(getString(R.string.travel_country_label), 13f, R.color.sweep_primary_glow, true))
+
+        val countryLabels = GlobalHubTools.COUNTRIES.map { c ->
+            "${c.flag} ${if (isPt) c.namePt else c.nameEn} (${c.cityName})"
+        }
+        val spinner = Spinner(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, countryLabels)
+        }
+        container.addView(spinner, top(8))
+
+        val weatherText = label(getString(R.string.travel_weather_loading), 14f, R.color.sweep_text, true).apply {
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            background = roundedBackground(Color.parseColor("#112138"), dp(12))
+        }
+        val seasonHeader = label(getString(R.string.travel_season_label), 12.5f, R.color.sweep_primary_glow, true)
+        val seasonBody = label("", 13f, R.color.sweep_text, false)
+        val landmarksHeader = label(getString(R.string.travel_landmarks_label), 12.5f, R.color.sweep_primary_glow, true)
+        val landmarksBody = label("", 13f, R.color.sweep_text, false)
+
+        container.addView(weatherText, top(12))
+        container.addView(seasonHeader, top(12))
+        container.addView(seasonBody, top(4))
+        container.addView(landmarksHeader, top(12))
+        container.addView(landmarksBody, top(4))
+
+        fun selectedCountry(): CountryHubInfo =
+            GlobalHubTools.COUNTRIES.getOrElse(spinner.selectedItemPosition) { GlobalHubTools.COUNTRIES.first() }
+
+        fun openMapsSafe(query: String) {
+            try {
+                startActivity(GlobalHubTools.buildMapsIntent(this, query))
+            } catch (_: Exception) {
+                Toast.makeText(this, R.string.travel_no_maps_toast, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val nearbyRestaurantsBtn = button(getString(R.string.travel_btn_restaurants)) {
+            openMapsSafe(if (isPt) "melhores restaurantes avaliados perto de mim" else "best rated restaurants near me")
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A1D08"))
+            setTextColor(Color.parseColor("#FFD54F"))
+        }
+        val countryRestaurantsBtn = button(getString(R.string.travel_btn_country_food)) {
+            val c = selectedCountry()
+            openMapsSafe("top rated traditional restaurants ${c.cityName} ${c.nameEn}")
+        }
+        val attractionsBtn = button(getString(R.string.travel_btn_attractions)) {
+            val c = selectedCountry()
+            openMapsSafe("tourist attractions ${c.cityName} ${c.nameEn}")
+        }
+        container.addView(nearbyRestaurantsBtn, top(14))
+        container.addView(countryRestaurantsBtn, top(8))
+        container.addView(attractionsBtn, top(8))
+
+        var weatherFetchJob: Job? = null
+        fun updateCountryDetails(country: CountryHubInfo) {
+            seasonBody.text = if (isPt) country.seasonSummaryPt else country.seasonSummaryEn
+            val marks = if (isPt) country.landmarksPt else country.landmarksEn
+            landmarksBody.text = marks.joinToString("\n") { "• $it" }
+
+            val cached = GlobalHubTools.loadCachedWeather(this, country.id)
+            weatherText.text = if (cached != null) {
+                getString(
+                    R.string.travel_weather_cached,
+                    cached.observedLabel,
+                    cached.tempC,
+                    GlobalHubTools.describeWmoWeatherCode(cached.weatherCode, isPt),
+                )
+            } else {
+                getString(R.string.travel_weather_loading)
+            }
+
+            weatherFetchJob?.cancel()
+            weatherFetchJob = lifecycleScope.launch {
+                val live = GlobalHubTools.fetchLiveCountryWeather(this@MainActivity, country)
+                weatherText.text = when {
+                    live != null && !live.isCachedOffline -> getString(
+                        R.string.travel_weather_live,
+                        live.observedLabel,
+                        live.tempC,
+                        GlobalHubTools.describeWmoWeatherCode(live.weatherCode, isPt),
+                        live.windKmh,
+                    )
+                    live != null -> getString(
+                        R.string.travel_weather_cached,
+                        live.observedLabel,
+                        live.tempC,
+                        GlobalHubTools.describeWmoWeatherCode(live.weatherCode, isPt),
+                    )
+                    else -> getString(R.string.travel_weather_offline)
+                }
+            }
+        }
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                updateCountryDetails(selectedCountry())
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        updateCountryDetails(selectedCountry())
+
+        val scroll = ScrollView(this).apply { addView(container, ViewGroup.LayoutParams(-1, -2)) }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.travel_title)
+            .setView(scroll)
+            .setNegativeButton(R.string.close_btn, null)
+            .create()
+        dialog.setOnDismissListener { weatherFetchJob?.cancel() }
+        dialog.show()
+    }
+
+    private fun onHomeProSubscribeClicked() {
+        if (hasEffectiveProAccess()) {
+            switchTab(AppTab.PRO)
+            return
+        }
+        openQuickProCheckoutDialog()
+    }
+
+    private fun openQuickProCheckoutDialog() {
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(14), dp(20), dp(10))
+        }
+        box.addView(label(getString(R.string.quick_pro_dialog_subtitle), 13f, R.color.sweep_muted, false))
+
+        var dialogRef: AlertDialog? = null
+
+        val annualBtn = button(latestAnnualOfferText ?: getString(R.string.plan_annual_default)) {
+            dialogRef?.dismiss()
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
+        }.apply {
+            minHeight = dp(58)
+            textSize = 14f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#070B14"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+        }
+        box.addView(annualBtn, top(14))
+
+        val monthlyBtn = button(latestMonthlyOfferText ?: getString(R.string.plan_monthly_default)) {
+            dialogRef?.dismiss()
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
+        }.apply {
+            minHeight = dp(52)
+            textSize = 13f
+            setTextColor(Color.parseColor("#070B14"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+        }
+        box.addView(monthlyBtn, top(10))
+
+        val lifetimeBtn = button(latestLifetimeOfferText ?: getString(R.string.plan_lifetime_default)) {
+            dialogRef?.dismiss()
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
+        }.apply {
+            minHeight = dp(52)
+            textSize = 13f
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+        }
+        box.addView(lifetimeBtn, top(10))
+
+        box.addView(label(getString(R.string.pro_billing_terms_disclosure), 11f, R.color.sweep_muted, false), top(12))
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.quick_pro_dialog_title)
+            .setView(box)
+            .setPositiveButton(R.string.quick_pro_open_tab_btn) { d, _ ->
+                d.dismiss()
+                switchTab(AppTab.PRO)
+            }
+            .setNeutralButton(R.string.quick_pro_restore_btn) { _, _ ->
+                billingGateway.startAndReconcile()
+                Toast.makeText(this, R.string.restoring_purchases_status, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialogRef = dialog
+        dialog.show()
     }
 
     private fun renderCatalogPrices(catalog: Map<String, PlayCatalogProductUi>) {
@@ -1390,6 +3522,13 @@ class MainActivity : AppCompatActivity() {
             planLifetimeButton.text = it
             homePlanLifetimeButton.text = it
         }
+        latestAnnualOfferText = annualLabel
+        latestMonthlyOfferText = monthlyLabel
+        latestLifetimeOfferText = lifetimeLabel
+        latestHeroPriceBadge = annual?.formattedPrice?.takeIf { it.isNotBlank() }
+            ?: monthly?.formattedPrice?.takeIf { it.isNotBlank() }
+            ?: lifetime?.formattedPrice?.takeIf { it.isNotBlank() }
+        refreshHomeProConversionCta(billingGateway.accessState.value)
     }
 
     private fun stylePlanPurchaseButton(button: MaterialButton, isProductAvailable: Boolean) {
@@ -1446,6 +3585,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun startOneTapCleanup() {
         homeCleanupCandidateCount = 0
+        homeInteractiveRecords = emptyList()
+        homeInteractiveFallback = false
+        openInteractiveDialogOnMissionFinish = true
         heroOrbButton.isEnabled = false
         heroOrbButton.text = getString(R.string.home_cleanup_scanning_button)
         heroOrbSubtitle.text = getString(R.string.home_cleanup_scanning)
@@ -1461,42 +3603,257 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onHomeCleanupButtonClicked() {
-        if (!heroOrbButton.isEnabled) return
-        if (homeCleanupCandidateCount > 0) {
-            val selected = viewModel.state.value.selection.records
-            val totalBytes = viewModel.state.value.selection.totalBytesOrNull() ?: 0L
-            val formattedBytes = android.text.format.Formatter.formatFileSize(this, totalBytes)
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle(getString(R.string.home_cleanup_review_button, if (selected.isNotEmpty()) selected.size else homeCleanupCandidateCount, formattedBytes))
-            builder.setMessage(getString(R.string.home_cleanup_confirm_prompt))
-            builder.setPositiveButton(R.string.permanent_delete_button) { dialog, _ ->
-                dialog.dismiss()
-                requestPermanentDeleteSelected()
-            }
-            builder.setNegativeButton(R.string.nav_files) { dialog, _ ->
-                dialog.dismiss()
-                switchTab(AppTab.FILES)
-                filesReviewCard.post {
-                    filesReviewCard.requestRectangleOnScreen(
-                        android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height), true,
-                    )
-                }
-            }
-            if (trashCoordinator.supportsSystemTrash()) {
-                builder.setNeutralButton(R.string.move_to_trash_button) { dialog, _ ->
-                    dialog.dismiss()
-                    requestMoveSelectedToTrash()
-                }
-            }
-            builder.show()
+        if (!heroOrbButton.isEnabled || viewModel.state.value.missionProgress?.isRunning == true) {
+            Toast.makeText(this, R.string.cleanup_scan_in_progress_toast, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val selectedNow = viewModel.state.value.selection.records
+        val displayRecords = when {
+            homeInteractiveRecords.isNotEmpty() -> homeInteractiveRecords
+            selectedNow.isNotEmpty() -> selectedNow
+            else -> emptyList()
+        }
+        if (displayRecords.isNotEmpty()) {
+            openInteractiveCleanupReviewDialog(
+                records = displayRecords,
+                isFallbackList = selectedNow.isEmpty() && homeInteractiveFallback,
+                mission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW,
+                coverageComplete = viewModel.state.value.missionProgress?.coverageComplete ?: true,
+            )
         } else {
             startOneTapCleanup()
         }
     }
 
+    private fun openInteractiveCleanupReviewDialog(
+        records: List<MediaRecord>,
+        isFallbackList: Boolean,
+        mission: DesiredOutcomeMission?,
+        coverageComplete: Boolean,
+    ) {
+        if (records.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.cleanup_dialog_empty_title)
+                .setMessage(R.string.cleanup_dialog_empty_body)
+                .setPositiveButton(R.string.quick_clean_whatsapp) { _, _ -> openWhatsAppCleanerFlow() }
+                .setNeutralButton(R.string.nav_files) { _, _ -> switchTab(AppTab.FILES) }
+                .setNegativeButton(R.string.permission_continue) { _, _ -> requestMediaPermissions() }
+                .show()
+            return
+        }
+
+        val cappedRecords = records.filter { it.isSelectable && !it.isProtected }.take(200)
+        if (cappedRecords.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.cleanup_dialog_empty_title)
+                .setMessage(R.string.cleanup_dialog_empty_body)
+                .setPositiveButton(R.string.nav_files) { _, _ -> switchTab(AppTab.FILES) }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            return
+        }
+
+        val currentlySelectedUris = viewModel.state.value.selection.records.map { it.uri }.toSet()
+        val initialChecked = BooleanArray(cappedRecords.size) { index ->
+            val rec = cappedRecords[index]
+            when {
+                rec.uri in currentlySelectedUris -> true
+                !isFallbackList && mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES && coverageComplete -> true
+                !isFallbackList && currentlySelectedUris.isEmpty() -> true
+                else -> false
+            }
+        }
+
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(12), dp(16), dp(8))
+        }
+        root.addView(
+            label(
+                getString(
+                    if (isFallbackList) R.string.cleanup_dialog_subtitle_fallback
+                    else R.string.cleanup_dialog_subtitle_candidates,
+                ),
+                12f,
+                R.color.sweep_muted,
+                false,
+            ),
+        )
+
+        val summaryLabel = label("", 13f, R.color.sweep_primary_glow, true)
+        root.addView(summaryLabel, top(10))
+
+        lateinit var toggleAllBtn: MaterialButton
+        val itemBoxes = ArrayList<CheckBox>(cappedRecords.size)
+
+        fun refreshSummary() {
+            var count = 0
+            var totalBytes = 0L
+            for (i in cappedRecords.indices) {
+                if (initialChecked[i]) {
+                    count++
+                    totalBytes += cappedRecords[i].sizeBytes.coerceAtLeast(0L)
+                }
+            }
+            val sizeFmt = Formatter.formatFileSize(this@MainActivity, totalBytes)
+            summaryLabel.text = getString(R.string.cleanup_dialog_selected_summary, count, cappedRecords.size, sizeFmt)
+            toggleAllBtn.text = getString(
+                if (count == cappedRecords.size) R.string.cleanup_dialog_deselect_all
+                else R.string.cleanup_dialog_select_all,
+                cappedRecords.size,
+            )
+        }
+
+        toggleAllBtn = button(getString(R.string.cleanup_dialog_select_all, cappedRecords.size)) {
+            val allSelected = initialChecked.all { it }
+            val nextState = !allSelected
+            for (i in initialChecked.indices) {
+                initialChecked[i] = nextState
+                itemBoxes[i].setOnCheckedChangeListener(null)
+                itemBoxes[i].isChecked = nextState
+                val idx = i
+                itemBoxes[i].setOnCheckedChangeListener { _, isChecked ->
+                    initialChecked[idx] = isChecked
+                    refreshSummary()
+                }
+            }
+            refreshSummary()
+        }.apply {
+            minHeight = dp(48)
+        }
+        root.addView(toggleAllBtn, top(8))
+
+        val listContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(6), 0, dp(6))
+        }
+        cappedRecords.forEachIndexed { idx, record ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(8), dp(6), dp(8), dp(6))
+                background = roundedBackground(color(R.color.sweep_surface_alt), dp(10))
+            }
+            val box = CheckBox(this).apply {
+                isChecked = initialChecked[idx]
+                minWidth = dp(44)
+                minHeight = dp(44)
+                setOnCheckedChangeListener { _, isChecked ->
+                    initialChecked[idx] = isChecked
+                    refreshSummary()
+                }
+            }
+            itemBoxes += box
+            row.addView(box, LinearLayout.LayoutParams(-2, -2))
+
+            val thumb = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setBackgroundColor(color(R.color.sweep_background))
+                tag = record.uri
+            }
+            if (record.kind == MediaKind.AUDIO) {
+                thumb.setImageResource(android.R.drawable.ic_media_play)
+            } else {
+                loadThumbnail(thumb, record)
+            }
+            row.addView(thumb, LinearLayout.LayoutParams(dp(44), dp(44)).apply { marginStart = dp(4); marginEnd = dp(8) })
+
+            val meta = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            val displayName = record.displayName?.takeIf(String::isNotBlank) ?: getString(R.string.unnamed_file)
+            meta.addView(
+                label(displayName, 12f, R.color.sweep_text, true).apply {
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
+                },
+            )
+            val kindStr = getString(
+                when (record.kind) {
+                    MediaKind.IMAGE -> R.string.photo_label
+                    MediaKind.VIDEO -> R.string.video_label
+                    MediaKind.AUDIO -> R.string.audio_label
+                },
+            )
+            val dupTag = if (record.duplicateReferenceSnapshot != null) getString(R.string.exact_copy_badge) else ""
+            meta.addView(
+                label(
+                    "${Formatter.formatFileSize(this@MainActivity, record.sizeBytes)} · $kindStr$dupTag",
+                    11f,
+                    R.color.sweep_primary_glow,
+                    false,
+                ),
+                top(2),
+            )
+            row.setOnClickListener { box.isChecked = !box.isChecked }
+            row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f))
+            listContainer.addView(row, bottom(6))
+        }
+
+        val listScroll = ScrollView(this).apply {
+            addView(listContainer, ViewGroup.LayoutParams(-1, -2))
+        }
+        root.addView(listScroll, LinearLayout.LayoutParams(-1, dp(290)).apply { topMargin = dp(8) })
+        refreshSummary()
+
+        fun selectedFromDialog(): List<MediaRecord> =
+            cappedRecords.indices.filter { initialChecked[it] }.map { cappedRecords[it] }
+
+        val supportsTrash = trashCoordinator.supportsSystemTrash()
+        val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.cleanup_dialog_title)
+            .setView(root)
+            .setPositiveButton(if (supportsTrash) R.string.move_to_trash_button else R.string.permanent_delete_button, null)
+            .setNegativeButton(R.string.cleanup_dialog_open_files_tab) { dialog, _ ->
+                dialog.dismiss()
+                val chosen = selectedFromDialog()
+                if (chosen.isNotEmpty()) {
+                    viewModel.prepareExternalReviewSelection(chosen)
+                }
+                switchTab(AppTab.FILES)
+                filesReviewCard.post {
+                    filesReviewCard.requestRectangleOnScreen(
+                        android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
+                        true,
+                    )
+                }
+            }
+        if (supportsTrash) {
+            builder.setNeutralButton(R.string.permanent_delete_button, null)
+        }
+
+        val dialog = builder.create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val chosen = selectedFromDialog()
+                if (chosen.isEmpty()) {
+                    Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                dialog.dismiss()
+                viewModel.prepareExternalReviewSelection(chosen)
+                if (supportsTrash) {
+                    requestMoveSelectedToTrash()
+                } else {
+                    requestPermanentDeleteSelected()
+                }
+            }
+            if (supportsTrash) {
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                    val chosen = selectedFromDialog()
+                    if (chosen.isEmpty()) {
+                        Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    dialog.dismiss()
+                    viewModel.prepareExternalReviewSelection(chosen)
+                    requestPermanentDeleteSelected()
+                }
+            }
+        }
+        dialog.show()
+    }
+
     private fun runWithProAccess(action: () -> Unit) {
-        val hasVerifiedAccess = billingGateway.accessState.value == ProAccessSummaryState.PRO_GRANTED
-        if (hasVerifiedAccess || (isDevelopmentBuild && debugProPreviewEnabled)) {
+        if (hasEffectiveProAccess()) {
             action()
         } else {
             switchTab(AppTab.PRO)
@@ -1506,12 +3863,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestUnusedAppSuggestions() {
         if (!hasUsageStatsAccess()) {
-            Toast.makeText(this, R.string.pro_unused_apps_permission, Toast.LENGTH_LONG).show()
-            runCatching {
-                usageAccessLauncher.launch(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-            }.onFailure {
-                Toast.makeText(this, R.string.pro_unused_apps_permission_denied, Toast.LENGTH_LONG).show()
-            }
+            AlertDialog.Builder(this)
+                .setTitle(R.string.pro_unused_apps_disclosure_title)
+                .setMessage(R.string.pro_unused_apps_disclosure_message)
+                .setPositiveButton(R.string.pro_unused_apps_disclosure_continue) { _, _ ->
+                    runCatching {
+                        usageAccessLauncher.launch(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                    }.onFailure {
+                        Toast.makeText(this, R.string.pro_unused_apps_permission_denied, Toast.LENGTH_LONG).show()
+                    }
+                }
+                .setNegativeButton(R.string.pro_unused_apps_disclosure_not_now, null)
+                .show()
             return
         }
         loadUnusedAppSuggestions()
@@ -1523,6 +3886,142 @@ class MainActivity : AppCompatActivity() {
         handleIncomingSendIntent(intent)
     }
 
+    private fun readClipboardTextSafely(): String? {
+        return try {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager ?: return null
+            val clip = clipboard.primaryClip ?: return null
+            if (clip.itemCount <= 0) return null
+            for (i in 0 until clip.itemCount) {
+                val item = clip.getItemAt(i) ?: continue
+                val direct = item.text?.toString()?.trim()
+                if (!direct.isNullOrBlank()) return direct
+                val coerced = item.coerceToText(this)?.toString()?.trim()
+                if (!coerced.isNullOrBlank()) return coerced
+                val uriText = item.uri?.toString()?.trim()
+                if (!uriText.isNullOrBlank()) return uriText
+            }
+            null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun openWhatsAppCleanerFlow() {
+        if (!hasAnyMediaPermission()) {
+            pendingWhatsAppCleanerAfterPermission = true
+            requestMediaPermissions()
+            return
+        }
+        lifecycleScope.launch {
+            val scanDialog = AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.whatsapp_cleaner_title)
+                .setMessage(R.string.wa_scanning_message)
+                .setCancelable(true)
+                .create()
+            var scanCancelled = false
+            scanDialog.setOnCancelListener { scanCancelled = true }
+            scanDialog.show()
+
+            val items: List<WhatsAppMediaItem> = try {
+                withContext(Dispatchers.IO) {
+                    whatsAppCleaner.scanViaMediaStore(this@MainActivity)
+                }
+            } catch (_: Exception) {
+                emptyList()
+            } finally {
+                if (scanDialog.isShowing) scanDialog.dismiss()
+            }
+            if (scanCancelled) return@launch
+
+            val mediaRecordsByCategory = items
+                .mapNotNull { item -> item.toMediaRecord()?.let { record -> item.category to record } }
+                .groupBy({ it.first }, { it.second })
+
+            if (mediaRecordsByCategory.isEmpty()) {
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle(R.string.whatsapp_cleaner_title)
+                    .setMessage(R.string.whatsapp_cleaner_empty)
+                    .setPositiveButton(getString(R.string.quick_find_large)) { _, _ ->
+                        startOneTapCleanup()
+                    }
+                    .setNeutralButton(getString(R.string.nav_files)) { _, _ ->
+                        switchTab(AppTab.FILES)
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                return@launch
+            }
+
+            val orderedCategories = listOf(
+                WhatsAppMediaCategory.VIDEO to getString(R.string.whatsapp_cat_videos),
+                WhatsAppMediaCategory.VOICE_NOTE to getString(R.string.whatsapp_cat_voice),
+                WhatsAppMediaCategory.AUDIO to getString(R.string.wa_cat_audio),
+                WhatsAppMediaCategory.IMAGE to getString(R.string.whatsapp_cat_images),
+                WhatsAppMediaCategory.GIF to getString(R.string.wa_cat_gifs),
+                WhatsAppMediaCategory.DOCUMENT to getString(R.string.wa_cat_docs),
+                WhatsAppMediaCategory.OTHER to getString(R.string.wa_cat_other),
+            ).filter { (cat, _) -> !mediaRecordsByCategory[cat].isNullOrEmpty() }
+
+            val labels = orderedCategories.map { (cat, title) ->
+                val list = mediaRecordsByCategory[cat].orEmpty()
+                val bytes = list.sumOf { it.sizeBytes }
+                val sizeFmt = Formatter.formatFileSize(this@MainActivity, bytes)
+                getString(R.string.wa_cat_item_count, title, list.size, sizeFmt)
+            }.toTypedArray()
+            val checked = BooleanArray(orderedCategories.size) { true }
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle(R.string.wa_found_title)
+                .setMultiChoiceItems(labels, checked) { _, which, isChecked ->
+                    checked[which] = isChecked
+                }
+                .setPositiveButton(R.string.wa_review_selected_btn) { _, _ ->
+                    val chosenRecords = orderedCategories.indices
+                        .filter { checked[it] }
+                        .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
+                    if (chosenRecords.isEmpty()) {
+                        Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
+                        return@setPositiveButton
+                    }
+                    val count = viewModel.prepareExternalReviewSelection(chosenRecords)
+                    val totalBytes = viewModel.state.value.selection.totalBytesOrNull() ?: 0L
+                    val fmtBytes = Formatter.formatFileSize(this@MainActivity, totalBytes)
+                    switchTab(AppTab.FILES)
+                    filesReviewCard.post {
+                        filesReviewCard.requestRectangleOnScreen(
+                            android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
+                            true,
+                        )
+                    }
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.wa_loaded_for_review_toast, count, fmtBytes),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                .setNeutralButton(
+                    if (trashCoordinator.supportsSystemTrash()) getString(R.string.move_to_trash_button)
+                    else getString(R.string.permanent_delete_button)
+                ) { _, _ ->
+                    val chosenRecords = orderedCategories.indices
+                        .filter { checked[it] }
+                        .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
+                    if (chosenRecords.isEmpty()) {
+                        Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
+                        return@setNeutralButton
+                    }
+                    viewModel.prepareExternalReviewSelection(chosenRecords)
+                    if (trashCoordinator.supportsSystemTrash()) {
+                        requestMoveSelectedToTrash()
+                    } else {
+                        requestPermanentDeleteSelected()
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
     private fun handleIncomingSendIntent(incomingIntent: Intent?) {
         val action = incomingIntent?.action ?: return
         if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE) {
@@ -1530,11 +4029,11 @@ class MainActivity : AppCompatActivity() {
             if (!sharedText.isNullOrBlank() && (sharedText.startsWith("http://") || sharedText.startsWith("https://") || sharedText.contains("http"))) {
                 val url = Regex("""https?://[^\s]+""").find(sharedText)?.value ?: sharedText
                 val actions = arrayOf(
-                    "📥 Baixar Mídia do Link",
-                    "⚡ Gerar QR Code deste Link"
+                    getString(R.string.incoming_link_download),
+                    getString(R.string.incoming_link_qr)
                 )
                 AlertDialog.Builder(this)
-                    .setTitle("Link Recebido")
+                    .setTitle(R.string.incoming_link_title)
                     .setItems(actions) { _, which ->
                         if (which == 0) openVideoDownloaderStudio(url)
                         else openQrCodeGeneratorStudio(url)
@@ -1542,6 +4041,35 @@ class MainActivity : AppCompatActivity() {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
                 return
+            }
+            if (action == Intent.ACTION_SEND_MULTIPLE) {
+                val multipleUris: List<Uri> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    incomingIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
+                } else {
+                    @Suppress("DEPRECATION")
+                    incomingIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM).orEmpty()
+                }
+                if (multipleUris.isNotEmpty()) {
+                    Toast.makeText(this, R.string.media_studio_incoming_media, Toast.LENGTH_SHORT).show()
+                    val firstUri = multipleUris.first()
+                    val options = arrayOf(
+                        getString(R.string.incoming_convert_pdf, multipleUris.size),
+                        getString(R.string.incoming_filter_first),
+                        getString(R.string.incoming_exif_first)
+                    )
+                    AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.incoming_medias_title, multipleUris.size))
+                        .setItems(options) { _, which ->
+                            when (which) {
+                                0 -> processPhotosToPdf(multipleUris)
+                                1 -> openInteractivePhotoFilterEditor(firstUri)
+                                2 -> openInteractiveExifCleaner(firstUri)
+                            }
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                    return
+                }
             }
             val sharedUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
@@ -1562,12 +4090,12 @@ class MainActivity : AppCompatActivity() {
                 return
             } else if (mimeType.startsWith("image/")) {
                 val options = arrayOf(
-                    "🎨 Aplicar Filtros de Foto",
-                    "🛡️ Limpar Metadados EXIF e GPS",
-                    "📄 Converter para PDF"
+                    getString(R.string.incoming_single_filter),
+                    getString(R.string.incoming_single_exif),
+                    getString(R.string.incoming_single_pdf)
                 )
                 AlertDialog.Builder(this)
-                    .setTitle("Mídia Recebida")
+                    .setTitle(R.string.incoming_single_media_title)
                     .setItems(options) { _, which ->
                         when (which) {
                             0 -> openInteractivePhotoFilterEditor(initialUri)
@@ -1582,7 +4110,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         val options = arrayOf(
-            "🎬 Baixar Vídeo por Link (Instagram, TikTok, Web)",
+            getString(R.string.studio_menu_wa),
+            getString(R.string.studio_menu_dl),
             getString(R.string.media_studio_photo_filters),
             getString(R.string.media_studio_video_tools),
             getString(R.string.media_studio_exif_cleaner),
@@ -1594,12 +4123,13 @@ class MainActivity : AppCompatActivity() {
             .setItems(options) { dialog, which ->
                 dialog.dismiss()
                 when (which) {
-                    0 -> openVideoDownloaderStudio(initialText)
-                    1 -> photoFilterPickerLauncher.launch("image/*")
-                    2 -> videoAudioPickerLauncher.launch("video/*")
-                    3 -> exifPickerLauncher.launch("image/*")
-                    4 -> openQrCodeGeneratorStudio(initialText)
-                    5 -> photosToPdfPickerLauncher.launch("image/*")
+                    0 -> openWhatsAppCleanerFlow()
+                    1 -> openVideoDownloaderStudio(initialText)
+                    2 -> photoFilterPickerLauncher.launch("image/*")
+                    3 -> videoAudioPickerLauncher.launch("video/*")
+                    4 -> exifPickerLauncher.launch("image/*")
+                    5 -> openQrCodeGeneratorStudio(initialText)
+                    6 -> photosToPdfPickerLauncher.launch("image/*")
                 }
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -1613,7 +4143,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val title = TextView(this).apply {
-            text = "🎬 Baixador de Vídeos da Web"
+            text = getString(R.string.dl_dialog_title)
             textSize = 16f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(color(R.color.sweep_text))
@@ -1621,7 +4151,7 @@ class MainActivity : AppCompatActivity() {
         container.addView(title)
 
         val subtitle = TextView(this).apply {
-            text = "Cole o link de um vídeo do Instagram Reels, TikTok, Facebook ou link direto .mp4 para salvar na sua Galeria."
+            text = getString(R.string.dl_dialog_subtitle)
             textSize = 12f
             setTextColor(color(R.color.sweep_muted))
         }
@@ -1632,7 +4162,7 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         val input = EditText(this).apply {
-            hint = "Cole o link aqui (https://...)"
+            hint = getString(R.string.dl_url_hint)
             setText(initialUrl ?: "")
             setTextColor(color(R.color.sweep_text))
             setHintTextColor(color(R.color.sweep_muted))
@@ -1643,35 +4173,30 @@ class MainActivity : AppCompatActivity() {
                 setStroke(dp(1), 0xFF2A3A5A.toInt())
             }
         }
-        val pasteBtn = button("📋 COLAR") {
-            try {
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-                val clipText = clipboard?.primaryClip?.getItemAt(0)?.text?.toString()?.trim()
-                if (!clipText.isNullOrBlank()) {
-                    val urlMatch = Regex("""https?://[^\s]+""").find(clipText)?.value ?: clipText
-                    input.setText(urlMatch)
-                    input.setSelection(input.text.length)
-                    Toast.makeText(this@MainActivity, "Link colado da área de transferência!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@MainActivity, "Nenhum link encontrado na área de transferência.", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Não foi possível acessar a área de transferência.", Toast.LENGTH_SHORT).show()
+        val pasteBtn = button(getString(R.string.dl_paste_btn)) {
+            val clipText = readClipboardTextSafely()
+            if (!clipText.isNullOrBlank()) {
+                val urlMatch = Regex("""https?://[^\s"'<>]+""").find(clipText)?.value ?: clipText
+                input.setText(urlMatch)
+                input.setSelection(input.text.length)
+                Toast.makeText(this@MainActivity, R.string.dl_pasted_toast, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@MainActivity, R.string.dl_clipboard_empty_toast, Toast.LENGTH_SHORT).show()
             }
         }.apply {
             textSize = 12f
             minHeight = dp(48)
         }
         inputRow.addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
-        inputRow.addView(pasteBtn, LinearLayout.LayoutParams(-2, -2))
+        inputRow.addView(pasteBtn, LinearLayout.LayoutParams(-2, dp(48)))
         container.addView(inputRow, top(10))
 
         val presetsRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
         }
         val samples = listOf(
-            "Vídeo Exemplo (MP4)" to "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-            "Mídia Web" to "https://"
+            getString(R.string.dl_sample_1) to "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            getString(R.string.dl_sample_2) to "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
         )
         for ((label, urlSample) in samples) {
             val btn = button(label) {
@@ -1686,7 +4211,7 @@ class MainActivity : AppCompatActivity() {
         container.addView(presetsRow, top(8))
 
         val progressText = TextView(this).apply {
-            text = "Pronto para baixar"
+            text = getString(R.string.dl_ready_status)
             textSize = 11f
             setTextColor(color(R.color.sweep_muted))
             visibility = View.GONE
@@ -1702,10 +4227,14 @@ class MainActivity : AppCompatActivity() {
 
         var downloadJob: Job? = null
 
+        val scrollWrapper = ScrollView(this).apply {
+            addView(container, ViewGroup.LayoutParams(-1, -2))
+        }
+
         val dialog = AlertDialog.Builder(this)
-            .setView(container)
-            .setPositiveButton("📥 Baixar Vídeo", null)
-            .setNegativeButton("Fechar", null)
+            .setView(scrollWrapper)
+            .setPositiveButton(R.string.dl_download_btn, null)
+            .setNegativeButton(R.string.close_btn, null)
             .create()
 
         dialog.setOnDismissListener {
@@ -1716,15 +4245,24 @@ class MainActivity : AppCompatActivity() {
             val downloadBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             downloadBtn.setOnClickListener {
                 val urlToDownload = input.text.toString().trim()
-                if (urlToDownload.isBlank() || (!urlToDownload.startsWith("http://") && !urlToDownload.startsWith("https://"))) {
-                    Toast.makeText(this@MainActivity, "Por favor, insira um link válido com https://", Toast.LENGTH_SHORT).show()
+                val host = runCatching { java.net.URL(urlToDownload).host.orEmpty() }.getOrDefault("")
+                if (
+                    urlToDownload.isBlank() ||
+                    (!urlToDownload.startsWith("http://") && !urlToDownload.startsWith("https://")) ||
+                    host.isBlank() || !host.contains('.')
+                ) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        R.string.dl_invalid_url_toast,
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@setOnClickListener
                 }
 
                 downloadBtn.isEnabled = false
                 progressText.visibility = View.VISIBLE
                 progressBar.visibility = View.VISIBLE
-                progressText.text = "Conectando e baixando mídia..."
+                progressText.text = getString(R.string.dl_connecting_status)
 
                 downloadJob = lifecycleScope.launch {
                     val result = withContext(Dispatchers.IO) {
@@ -1739,11 +4277,11 @@ class MainActivity : AppCompatActivity() {
                                     progressBar.progress = percent
                                     val currentMb = String.format("%.2f", bytesRead / 1048576.0)
                                     val totalMb = String.format("%.2f", totalBytes / 1048576.0)
-                                    progressText.text = "Baixando: $percent% ($currentMb MB / $totalMb MB)"
+                                    progressText.text = getString(R.string.dl_progress_pct, percent, currentMb, totalMb)
                                 } else {
                                     progressBar.isIndeterminate = true
                                     val currentMb = String.format("%.2f", bytesRead / 1048576.0)
-                                    progressText.text = "Baixando: $currentMb MB..."
+                                    progressText.text = getString(R.string.dl_progress_mb, currentMb)
                                 }
                             }
                         }
@@ -1754,9 +4292,9 @@ class MainActivity : AppCompatActivity() {
                         dialog.dismiss()
                         val sizeStr = Formatter.formatFileSize(this@MainActivity, result.bytesDownloaded)
                         AlertDialog.Builder(this@MainActivity)
-                            .setTitle("🎬 Vídeo Salvo na Galeria!")
-                            .setMessage("Arquivo: ${result.fileName}\nTamanho: $sizeStr\nSalvo em Movies/Midiastore com sucesso!")
-                            .setPositiveButton("Assistir Vídeo") { _, _ ->
+                            .setTitle(R.string.dl_saved_title)
+                            .setMessage(getString(R.string.dl_saved_message, result.fileName, sizeStr))
+                            .setPositiveButton(R.string.dl_watch_btn) { _, _ ->
                                 try {
                                     val viewIntent = Intent(Intent.ACTION_VIEW).apply {
                                         setDataAndType(result.savedUri, "video/mp4")
@@ -1764,26 +4302,27 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     startActivity(viewIntent)
                                 } catch (e: Exception) {
-                                    Toast.makeText(this@MainActivity, "Nenhum reprodutor de vídeo encontrado.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@MainActivity, R.string.dl_no_player_toast, Toast.LENGTH_SHORT).show()
                                 }
                             }
-                            .setNeutralButton("Compartilhar") { _, _ ->
+                            .setNeutralButton(R.string.share_generic_btn) { _, _ ->
                                 try {
                                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                         type = "video/mp4"
                                         putExtra(Intent.EXTRA_STREAM, result.savedUri)
                                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                     }
-                                    startActivity(Intent.createChooser(shareIntent, "Compartilhar Vídeo"))
+                                    startActivity(Intent.createChooser(shareIntent, getString(R.string.dl_share_chooser)))
                                 } catch (e: Exception) {
-                                    Toast.makeText(this@MainActivity, "Erro ao compartilhar vídeo.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@MainActivity, R.string.dl_share_error_toast, Toast.LENGTH_SHORT).show()
                                 }
                             }
-                            .setNegativeButton("OK", null)
+                            .setNegativeButton(android.R.string.ok, null)
                             .show()
                     } else {
-                        progressText.text = "Erro: ${result.errorMessage ?: "Falha ao baixar vídeo."}"
-                        Toast.makeText(this@MainActivity, result.errorMessage ?: "Erro ao baixar vídeo.", Toast.LENGTH_LONG).show()
+                        val errMsg = result.errorMessage ?: getString(R.string.dl_error_fallback)
+                        progressText.text = getString(R.string.dl_error_prefix, errMsg)
+                        Toast.makeText(this@MainActivity, errMsg, Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -1798,7 +4337,7 @@ class MainActivity : AppCompatActivity() {
     private fun openInteractivePhotoFilterEditor(uri: Uri) {
         lifecycleScope.launch {
             val progress = AlertDialog.Builder(this@MainActivity)
-                .setMessage("Carregando imagem...")
+                .setMessage(R.string.filter_loading_image)
                 .setCancelable(false)
                 .show()
 
@@ -1808,7 +4347,7 @@ class MainActivity : AppCompatActivity() {
             progress.dismiss()
 
             if (sourceBitmap == null) {
-                Toast.makeText(this@MainActivity, "Não foi possível carregar a imagem.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, R.string.filter_load_error, Toast.LENGTH_SHORT).show()
                 return@launch
             }
 
@@ -1830,7 +4369,7 @@ class MainActivity : AppCompatActivity() {
                 setBackgroundColor(Color.parseColor("#121212"))
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    dp(260)
+                    dp(240)
                 ).apply {
                     bottomMargin = dp(12)
                 }
@@ -1850,7 +4389,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             val filtersTitle = TextView(this@MainActivity).apply {
-                text = "Filtros Cinematográficos"
+                text = getString(R.string.filter_cinema_title)
                 textSize = 12f
                 setTextColor(color(R.color.sweep_muted))
             }
@@ -1871,54 +4410,57 @@ class MainActivity : AppCompatActivity() {
                     textSize = 11f
                     minHeight = dp(48)
                 }
-                buttonsRow.addView(btn, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(6) })
+                buttonsRow.addView(btn, LinearLayout.LayoutParams(-2, dp(48)).apply { marginEnd = dp(6) })
             }
             scroll.addView(buttonsRow)
             rootLayout.addView(scroll, top(4))
 
             val toolsTitle = TextView(this@MainActivity).apply {
-                text = "Ajustes & Transformação"
+                text = getString(R.string.filter_tools_title)
                 textSize = 12f
                 setTextColor(color(R.color.sweep_muted))
             }
             rootLayout.addView(toolsTitle, top(10))
 
+            val toolsScroll = HorizontalScrollView(this@MainActivity).apply {
+                isHorizontalScrollBarEnabled = false
+            }
             val toolsRow = LinearLayout(this@MainActivity).apply {
                 orientation = LinearLayout.HORIZONTAL
             }
 
-            val rotateBtn = button("🔄 Girar 90°") {
+            val rotateBtn = button(getString(R.string.filter_rotate_btn)) {
                 currentRotation = (currentRotation + 90) % 360
                 updatePreview()
             }.apply {
                 textSize = 11f
                 minHeight = dp(48)
             }
-            val brightBtn = button("☀️ Brilho +") {
+            val brightBtn = button(getString(R.string.filter_brightness_btn)) {
                 currentBrightness = if (currentBrightness < 40f) currentBrightness + 20f else -20f
                 updatePreview()
-                Toast.makeText(this@MainActivity, "Brilho: ${currentBrightness.toInt()}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.filter_brightness_toast, currentBrightness.toInt()), Toast.LENGTH_SHORT).show()
             }.apply {
                 textSize = 11f
                 minHeight = dp(48)
             }
-            val contrastBtn = button("⚡ Contraste") {
+            val contrastBtn = button(getString(R.string.filter_contrast_btn)) {
                 currentContrast = if (currentContrast < 1.4f) currentContrast + 0.2f else 0.8f
                 updatePreview()
-                Toast.makeText(this@MainActivity, "Contraste: ${String.format("%.1f", currentContrast)}x", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.filter_contrast_toast, String.format("%.1f", currentContrast)), Toast.LENGTH_SHORT).show()
             }.apply {
                 textSize = 11f
                 minHeight = dp(48)
             }
-            val saturationBtn = button("🎨 Saturação") {
+            val saturationBtn = button(getString(R.string.filter_saturation_btn)) {
                 currentSaturation = if (currentSaturation < 1.9f) ((currentSaturation + 0.5f).coerceAtMost(2.0f)) else 0.0f
                 updatePreview()
-                Toast.makeText(this@MainActivity, "Saturação: ${String.format("%.1f", currentSaturation)}x", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.filter_saturation_toast, String.format("%.1f", currentSaturation)), Toast.LENGTH_SHORT).show()
             }.apply {
                 textSize = 11f
                 minHeight = dp(48)
             }
-            val resetBtn = button("↺ Reset") {
+            val resetBtn = button(getString(R.string.filter_reset_btn)) {
                 currentFilter = MediaStudioTools.PhotoFilter.NORMAL
                 currentBrightness = 0f
                 currentContrast = 1.0f
@@ -1930,20 +4472,25 @@ class MainActivity : AppCompatActivity() {
                 minHeight = dp(48)
             }
 
-            toolsRow.addView(rotateBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-            toolsRow.addView(brightBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-            toolsRow.addView(contrastBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-            toolsRow.addView(saturationBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-            toolsRow.addView(resetBtn, LinearLayout.LayoutParams(0, -2, 1f))
-            rootLayout.addView(toolsRow, top(4))
+            toolsRow.addView(rotateBtn, LinearLayout.LayoutParams(-2, dp(48)).apply { marginEnd = dp(6) })
+            toolsRow.addView(brightBtn, LinearLayout.LayoutParams(-2, dp(48)).apply { marginEnd = dp(6) })
+            toolsRow.addView(contrastBtn, LinearLayout.LayoutParams(-2, dp(48)).apply { marginEnd = dp(6) })
+            toolsRow.addView(saturationBtn, LinearLayout.LayoutParams(-2, dp(48)).apply { marginEnd = dp(6) })
+            toolsRow.addView(resetBtn, LinearLayout.LayoutParams(-2, dp(48)))
+            toolsScroll.addView(toolsRow)
+            rootLayout.addView(toolsScroll, top(4))
+
+            val dialogScroll = ScrollView(this@MainActivity).apply {
+                addView(rootLayout, ViewGroup.LayoutParams(-1, -2))
+            }
 
             AlertDialog.Builder(this@MainActivity)
                 .setTitle(getString(R.string.media_studio_photo_filters))
-                .setView(rootLayout)
-                .setPositiveButton("💾 Salvar na Galeria") { _, _ ->
+                .setView(dialogScroll)
+                .setPositiveButton(R.string.filter_save_btn) { _, _ ->
                     lifecycleScope.launch {
                         val savingDialog = AlertDialog.Builder(this@MainActivity)
-                            .setMessage("Aplicando transformações e salvando em alta qualidade...")
+                            .setMessage(R.string.filter_saving_msg)
                             .setCancelable(false)
                             .show()
 
@@ -1974,15 +4521,15 @@ class MainActivity : AppCompatActivity() {
                         if (savedUri != null) {
                             Toast.makeText(
                                 this@MainActivity,
-                                "Foto com ajustes salva na Galeria (Pictures/Midiastore)!",
+                                R.string.filter_saved_toast,
                                 Toast.LENGTH_LONG
                             ).show()
                         } else {
-                            Toast.makeText(this@MainActivity, "Erro ao salvar foto editada.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.filter_save_error_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-                .setNeutralButton("📤 Compartilhar") { _, _ ->
+                .setNeutralButton(R.string.filter_share_btn) { _, _ ->
                     lifecycleScope.launch {
                         val shareFile = withContext(Dispatchers.IO) {
                             val exportSource = MediaStudioTools.loadSampledBitmap(this@MainActivity, uri, 4096) ?: sourceBitmap
@@ -2011,19 +4558,20 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         try {
+                            val chooserTitle = getString(R.string.filter_share_chooser)
                             val shareIntent = MediaStudioTools.getShareIntent(
                                 this@MainActivity,
                                 shareFile,
                                 "image/jpeg",
-                                "Compartilhar Imagem"
+                                chooserTitle
                             )
-                            startActivity(Intent.createChooser(shareIntent, "Compartilhar Imagem"))
+                            startActivity(Intent.createChooser(shareIntent, chooserTitle))
                         } catch (e: Exception) {
-                            Toast.makeText(this@MainActivity, "Erro ao compartilhar imagem.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.filter_share_error_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-                .setNegativeButton("Fechar", null)
+                .setNegativeButton(R.string.close_btn, null)
                 .show()
         }
     }
@@ -2045,12 +4593,12 @@ class MainActivity : AppCompatActivity() {
             val sizeStr = Formatter.formatFileSize(this@MainActivity, fileSize)
 
             val actions = arrayOf(
-                "🎵 Extrair Faixa de Áudio (Converter para M4A)",
-                "🎬 Otimizar e Encolher Vídeo (Diagnóstico)"
+                getString(R.string.audio_extract_action),
+                getString(R.string.audio_diag_action)
             )
             AlertDialog.Builder(this@MainActivity)
-                .setTitle("Vídeo: $fileName")
-                .setMessage("Tamanho original: $sizeStr\nSelecione a ação desejada:")
+                .setTitle(getString(R.string.audio_video_title, fileName))
+                .setMessage(getString(R.string.audio_video_size_msg, sizeStr))
                 .setItems(actions) { _, which ->
                     if (which == 0) {
                         processVideoAudioExtraction(uri, fileName)
@@ -2066,24 +4614,31 @@ class MainActivity : AppCompatActivity() {
     private fun processVideoAudioExtraction(uri: Uri, fileName: String) {
         lifecycleScope.launch {
             val progress = AlertDialog.Builder(this@MainActivity)
-                .setTitle("Extraindo Áudio Cristalino")
-                .setMessage("Processando faixa de áudio M4A do vídeo $fileName...")
+                .setTitle(R.string.audio_extracting_title)
+                .setMessage(getString(R.string.audio_extracting_msg, fileName))
                 .setCancelable(false)
                 .show()
 
-            val extractedFile = withContext(Dispatchers.IO) {
-                MediaStudioTools.extractAudioToCache(this@MainActivity, uri)
+            val extractionPair = withContext(Dispatchers.IO) {
+                val cacheFile = MediaStudioTools.extractAudioToCache(this@MainActivity, uri)
+                val savedUri = cacheFile?.let { MediaStudioTools.saveAudioToMusic(this@MainActivity, it, it.name) }
+                cacheFile to savedUri
             }
+            val extractedFile = extractionPair.first
+            val savedMusicUri = extractionPair.second
             progress.dismiss()
 
             if (extractedFile != null && extractedFile.exists()) {
                 val audioSize = Formatter.formatFileSize(this@MainActivity, extractedFile.length())
+                val locationNote = getString(
+                    if (savedMusicUri != null) R.string.audio_saved_note_music else R.string.audio_saved_note_cache
+                )
                 AlertDialog.Builder(this@MainActivity)
-                    .setTitle("🎵 Áudio Extraído com Sucesso!")
-                    .setMessage("Arquivo: ${extractedFile.name}\nTamanho: $audioSize\nA faixa de áudio foi convertida em alta fidelidade.")
-                    .setPositiveButton("Ouvir Áudio") { _, _ ->
+                    .setTitle(R.string.audio_extracted_title)
+                    .setMessage(getString(R.string.audio_extracted_msg, extractedFile.name, audioSize, locationNote))
+                    .setPositiveButton(R.string.audio_listen_btn) { _, _ ->
                         try {
-                            val audioUri = androidx.core.content.FileProvider.getUriForFile(
+                            val audioUri = savedMusicUri ?: androidx.core.content.FileProvider.getUriForFile(
                                 this@MainActivity,
                                 "${packageName}.fileprovider",
                                 extractedFile
@@ -2094,26 +4649,27 @@ class MainActivity : AppCompatActivity() {
                             }
                             startActivity(playIntent)
                         } catch (e: Exception) {
-                            Toast.makeText(this@MainActivity, "Nenhum reprodutor de áudio encontrado.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.audio_no_player_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
-                    .setNeutralButton("Compartilhar") { _, _ ->
+                    .setNeutralButton(R.string.share_generic_btn) { _, _ ->
                         try {
+                            val chooserTitle = getString(R.string.audio_share_chooser)
                             val shareIntent = MediaStudioTools.getShareIntent(
                                 this@MainActivity,
                                 extractedFile,
                                 "audio/mp4",
-                                "Compartilhar Áudio Extraído"
+                                chooserTitle
                             )
-                            startActivity(Intent.createChooser(shareIntent, "Compartilhar Áudio"))
+                            startActivity(Intent.createChooser(shareIntent, chooserTitle))
                         } catch (e: Exception) {
-                            Toast.makeText(this@MainActivity, "Erro ao compartilhar áudio.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.audio_share_error_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
-                    .setNegativeButton("OK", null)
+                    .setNegativeButton(android.R.string.ok, null)
                     .show()
             } else {
-                Toast.makeText(this@MainActivity, "Não foi possível extrair a faixa de áudio.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, R.string.audio_extract_error_toast, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -2122,22 +4678,19 @@ class MainActivity : AppCompatActivity() {
         val originalStr = Formatter.formatFileSize(this, fileSize)
 
         AlertDialog.Builder(this)
-            .setTitle("🎬 Diagnóstico de Armazenamento de Vídeo")
-            .setMessage(
-                "Vídeo: $fileName\nTamanho Atual: $originalStr\n\n" +
-                "💡 Dica de Otimização Real: Vídeos gravados ou recebidos costumam ocupar a maior parte do armazenamento do aparelho. Se você precisa apenas do áudio (música, aula, podcast ou voz), extrair a faixa M4A economiza até 90% da memória mantendo fidelidade cristalina.\n\nDeseja extrair a faixa de áudio agora?"
-            )
-            .setPositiveButton("🎵 Extrair Áudio (M4A)") { _, _ ->
+            .setTitle(R.string.audio_diag_title)
+            .setMessage(getString(R.string.audio_diag_msg, fileName, originalStr))
+            .setPositiveButton(R.string.audio_diag_btn) { _, _ ->
                 processVideoAudioExtraction(uri, fileName)
             }
-            .setNegativeButton("Fechar", null)
+            .setNegativeButton(R.string.close_btn, null)
             .show()
     }
 
     private fun openInteractiveExifCleaner(uri: Uri) {
         lifecycleScope.launch {
             val progress = AlertDialog.Builder(this@MainActivity)
-                .setMessage("Analisando metadados de privacidade...")
+                .setMessage(R.string.exif_analyzing_msg)
                 .setCancelable(false)
                 .show()
 
@@ -2147,31 +4700,32 @@ class MainActivity : AppCompatActivity() {
             progress.dismiss()
 
             val msg = buildString {
-                if (summary.hasGps && summary.latitude != null && summary.longitude != null) {
-                    append("⚠️ ALERTA DE PRIVACIDADE CRÍTICO:\n")
-                    append("Esta foto contém coordenadas GPS exatas!\n")
-                    append("📍 Latitude: %.5f\n".format(summary.latitude))
-                    append("📍 Longitude: %.5f\n".format(summary.longitude))
-                    append("Ao postar esta imagem na internet, qualquer pessoa pode rastrear seu endereço exato.\n\n")
+                if (summary.hasGps) {
+                    append(getString(R.string.exif_gps_alert_header))
+                    if (summary.latitude != null && summary.longitude != null) {
+                        append(getString(R.string.exif_gps_lat, String.format("%.5f", summary.latitude)))
+                        append(getString(R.string.exif_gps_lon, String.format("%.5f", summary.longitude)))
+                    }
+                    append(getString(R.string.exif_gps_risk))
                 } else {
-                    append("✅ Nenhum dado de localização GPS detectado nesta foto.\n\n")
+                    append(getString(R.string.exif_no_gps))
                 }
                 if (!summary.camera.isNullOrBlank()) {
-                    append("📷 Modelo da Câmera: ${summary.camera}\n")
+                    append(getString(R.string.exif_camera_line, summary.camera))
                 }
                 if (!summary.dateTime.isNullOrBlank()) {
-                    append("📅 Data e Hora de Captura: ${summary.dateTime}\n")
+                    append(getString(R.string.exif_date_line, summary.dateTime))
                 }
-                append("\nDeseja gerar uma cópia 100% higienizada e segura na sua Galeria (sem GPS nem dados do dispositivo)?")
+                append(getString(R.string.exif_clean_prompt))
             }
 
             AlertDialog.Builder(this@MainActivity)
-                .setTitle("🛡️ Limpador de Privacidade EXIF")
+                .setTitle(R.string.exif_dialog_title)
                 .setMessage(msg)
-                .setPositiveButton("Limpar e Salvar Foto Segura") { _, _ ->
+                .setPositiveButton(R.string.exif_clean_save_btn) { _, _ ->
                     lifecycleScope.launch {
                         val cleanProgress = AlertDialog.Builder(this@MainActivity)
-                            .setMessage("Removendo GPS e gerando foto segura...")
+                            .setMessage(R.string.exif_cleaning_msg)
                             .setCancelable(false)
                             .show()
 
@@ -2183,11 +4737,11 @@ class MainActivity : AppCompatActivity() {
                         if (savedUri != null) {
                             Toast.makeText(
                                 this@MainActivity,
-                                "Foto segura salva na Galeria (Pictures/Midiastore)!",
+                                R.string.exif_saved_toast,
                                 Toast.LENGTH_LONG
                             ).show()
                         } else {
-                            Toast.makeText(this@MainActivity, "Erro ao salvar foto higienizada.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.exif_save_error_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -2207,7 +4761,7 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         val input = EditText(this).apply {
-            hint = "Cole chave PIX, Link, WhatsApp ou Wi-Fi"
+            hint = getString(R.string.qr_input_hint)
             setText(initialText ?: "https://midiastory-df6a0.web.app")
             setTextColor(color(R.color.sweep_text))
             setHintTextColor(color(R.color.sweep_muted))
@@ -2218,27 +4772,36 @@ class MainActivity : AppCompatActivity() {
                 setStroke(dp(1), 0xFF2A3A5A.toInt())
             }
         }
-        val pasteBtn = button("📋 COLAR") {
-            try {
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-                val clipText = clipboard?.primaryClip?.getItemAt(0)?.text?.toString()?.trim()
-                if (!clipText.isNullOrBlank()) {
-                    input.setText(clipText)
-                    input.setSelection(input.text.length)
-                    Toast.makeText(this@MainActivity, "Texto colado!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@MainActivity, "Área de transferência vazia.", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Não foi possível acessar a área de transferência.", Toast.LENGTH_SHORT).show()
+        val pasteBtn = button(getString(R.string.dl_paste_btn)) {
+            val clipText = readClipboardTextSafely()
+            if (!clipText.isNullOrBlank()) {
+                input.setText(clipText)
+                input.setSelection(input.text.length)
+                Toast.makeText(this@MainActivity, R.string.qr_text_pasted_toast, Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@MainActivity, R.string.dl_clipboard_empty_toast, Toast.LENGTH_SHORT).show()
             }
         }.apply {
             textSize = 12f
-            minHeight = dp(44)
+            minHeight = dp(48)
         }
         inputRow.addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
-        inputRow.addView(pasteBtn, LinearLayout.LayoutParams(-2, -2))
+        inputRow.addView(pasteBtn, LinearLayout.LayoutParams(-2, dp(48)))
         container.addView(inputRow)
+
+        val captionInput = EditText(this).apply {
+            hint = getString(R.string.qr_caption_hint)
+            setText(if (initialText?.startsWith("WIFI:") == true) "WI-FI VIP" else "")
+            setTextColor(color(R.color.sweep_text))
+            setHintTextColor(color(R.color.sweep_muted))
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            background = GradientDrawable().apply {
+                setColor(0xFF141C2E.toInt())
+                cornerRadius = dp(8).toFloat()
+                setStroke(dp(1), 0xFF2A3A5A.toInt())
+            }
+        }
+        container.addView(captionInput, top(8))
 
         val chipsRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -2252,6 +4815,7 @@ class MainActivity : AppCompatActivity() {
         for ((name, sample) in presets) {
             val btn = button(name) {
                 input.setText(sample)
+                input.setSelection(input.text.length)
             }.apply {
                 textSize = 11f
                 minHeight = dp(44)
@@ -2260,45 +4824,102 @@ class MainActivity : AppCompatActivity() {
         }
         container.addView(chipsRow, top(8))
 
-        var currentBitmap = MediaStudioTools.generateQrCodeBitmap(input.text.toString().ifBlank { "Midiastore" }, 512)
+        var selectedTheme = if (hasEffectiveProAccess()) {
+            MediaStudioTools.QrVisualTheme.ROYAL_GOLD
+        } else {
+            MediaStudioTools.QrVisualTheme.CYBER_MINT
+        }
+        var currentBitmap = MediaStudioTools.generateDesignerQrBitmap(
+            input.text.toString().ifBlank { "Midiastore" },
+            selectedTheme,
+            captionInput.text?.toString(),
+            720,
+        )
 
         val qrImageView = ImageView(this).apply {
             setImageBitmap(currentBitmap)
             adjustViewBounds = true
-            layoutParams = LinearLayout.LayoutParams(dp(220), dp(220)).apply {
+            layoutParams = LinearLayout.LayoutParams(dp(240), dp(240)).apply {
                 gravity = Gravity.CENTER_HORIZONTAL
                 topMargin = dp(12)
                 bottomMargin = dp(12)
             }
         }
-        container.addView(qrImageView)
 
-        input.addTextChangedListener(object : TextWatcher {
+        val themeButtons = mutableListOf<Pair<MediaStudioTools.QrVisualTheme, MaterialButton>>()
+
+        fun regenerateQrPreview() {
+            val content = input.text?.toString()?.ifBlank { "Midiastore" } ?: "Midiastore"
+            val caption = captionInput.text?.toString()
+            currentBitmap = MediaStudioTools.generateDesignerQrBitmap(content, selectedTheme, caption, 720)
+            qrImageView.setImageBitmap(currentBitmap)
+            themeButtons.forEach { (theme, btn) ->
+                val isSelected = theme == selectedTheme
+                btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    if (isSelected) Color.parseColor("#FFB300") else color(R.color.sweep_surface_alt),
+                )
+                btn.setTextColor(
+                    if (isSelected) Color.parseColor("#120D03") else color(R.color.sweep_text),
+                )
+            }
+        }
+
+        val themesScroll = HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled = false }
+        val themesRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val themes = listOf(
+            MediaStudioTools.QrVisualTheme.ROYAL_GOLD to R.string.qr_style_gold,
+            MediaStudioTools.QrVisualTheme.CYBER_MINT to R.string.qr_style_mint,
+            MediaStudioTools.QrVisualTheme.STUDIO_NEON to R.string.qr_style_neon,
+            MediaStudioTools.QrVisualTheme.OCEAN_BLUE to R.string.qr_style_ocean,
+            MediaStudioTools.QrVisualTheme.CLASSIC_DARK to R.string.qr_style_classic,
+        )
+        themes.forEach { (theme, labelRes) ->
+            lateinit var themeBtn: MaterialButton
+            themeBtn = button(getString(labelRes)) {
+                selectedTheme = theme
+                regenerateQrPreview()
+            }.apply {
+                textSize = 11f
+                minHeight = dp(42)
+            }
+            themeButtons.add(theme to themeBtn)
+            themesRow.addView(themeBtn, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(6) })
+        }
+        themesScroll.addView(themesRow)
+        container.addView(themesScroll, top(8))
+        container.addView(qrImageView)
+        regenerateQrPreview()
+
+        val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val content = s?.toString()?.ifBlank { "Midiastore" } ?: "Midiastore"
-                currentBitmap = MediaStudioTools.generateQrCodeBitmap(content, 512)
-                qrImageView.setImageBitmap(currentBitmap)
+                regenerateQrPreview()
             }
             override fun afterTextChanged(s: Editable?) {}
-        })
+        }
+        input.addTextChangedListener(textWatcher)
+        captionInput.addTextChangedListener(textWatcher)
+
+        val scrollWrapper = ScrollView(this).apply {
+            addView(container, ViewGroup.LayoutParams(-1, -2))
+        }
 
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.media_studio_qr_generator))
-            .setView(container)
-            .setPositiveButton("💾 Salvar na Galeria") { _, _ ->
+            .setView(scrollWrapper)
+            .setPositiveButton(R.string.filter_save_btn) { _, _ ->
                 lifecycleScope.launch {
                     val uri = withContext(Dispatchers.IO) {
                         MediaStudioTools.saveBitmapToGallery(this@MainActivity, currentBitmap, "Midiastore_QRCode")
                     }
                     if (uri != null) {
-                        Toast.makeText(this@MainActivity, "QR Code salvo na Galeria (Pictures/Midiastore)!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, R.string.qr_saved_toast, Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(this@MainActivity, "Erro ao salvar QR Code.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, R.string.qr_save_error_toast, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            .setNeutralButton("📤 Compartilhar") { _, _ ->
+            .setNeutralButton(R.string.filter_share_btn) { _, _ ->
                 lifecycleScope.launch {
                     val tempFile = withContext(Dispatchers.IO) {
                         val file = File(cacheDir, "qrcode_${System.currentTimeMillis()}.png")
@@ -2308,40 +4929,52 @@ class MainActivity : AppCompatActivity() {
                         file
                     }
                     try {
-                        val shareIntent = MediaStudioTools.getShareIntent(this@MainActivity, tempFile, "image/png", "Compartilhar QR Code")
-                        startActivity(Intent.createChooser(shareIntent, "Compartilhar QR Code"))
+                        val chooserTitle = getString(R.string.qr_share_chooser)
+                        val shareIntent = MediaStudioTools.getShareIntent(this@MainActivity, tempFile, "image/png", chooserTitle)
+                        startActivity(Intent.createChooser(shareIntent, chooserTitle))
                     } catch (e: Exception) {
-                        Toast.makeText(this@MainActivity, "Erro ao compartilhar QR Code.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, R.string.qr_share_error_toast, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            .setNegativeButton("Fechar", null)
+            .setNegativeButton(R.string.close_btn, null)
             .show()
     }
 
     private fun processPhotosToPdf(uris: List<Uri>) {
         lifecycleScope.launch {
             val progress = AlertDialog.Builder(this@MainActivity)
-                .setTitle("Criando Documento PDF")
-                .setMessage("Convertendo ${uris.size} foto(s) em formato A4...")
+                .setTitle(R.string.pdf_creating_title)
+                .setMessage(getString(R.string.pdf_creating_msg, uris.size))
                 .setCancelable(false)
                 .show()
 
-            val pdfFile = withContext(Dispatchers.IO) {
-                val cachePdf = File(cacheDir, "Documento_Midiastore_${System.currentTimeMillis()}.pdf")
+            val pdfPair = withContext(Dispatchers.IO) {
+                val fileName = "Documento_Midiastore_${System.currentTimeMillis()}.pdf"
+                val cachePdf = File(cacheDir, fileName)
                 val ok = MediaStudioTools.createPdfFromUris(this@MainActivity, uris, cachePdf)
-                if (ok && cachePdf.exists()) cachePdf else null
+                if (ok && cachePdf.exists() && cachePdf.length() > 0L) {
+                    val downloadsUri = MediaStudioTools.savePdfToDownloads(this@MainActivity, cachePdf, fileName)
+                    cachePdf to downloadsUri
+                } else {
+                    null to null
+                }
             }
+            val pdfFile = pdfPair.first
+            val savedDownloadsUri = pdfPair.second
             progress.dismiss()
 
             if (pdfFile != null) {
                 val sizeStr = Formatter.formatFileSize(this@MainActivity, pdfFile.length())
+                val savedNote = getString(
+                    if (savedDownloadsUri != null) R.string.pdf_saved_note_downloads else R.string.pdf_saved_note_cache
+                )
                 AlertDialog.Builder(this@MainActivity)
-                    .setTitle("📄 PDF Gerado com Sucesso!")
-                    .setMessage("Arquivo: ${pdfFile.name}\nTamanho: $sizeStr\nPáginas geradas: ${uris.size}")
-                    .setPositiveButton("Abrir PDF") { _, _ ->
+                    .setTitle(R.string.pdf_created_title)
+                    .setMessage(getString(R.string.pdf_created_msg, pdfFile.name, sizeStr, uris.size, savedNote))
+                    .setPositiveButton(R.string.pdf_open_btn) { _, _ ->
                         try {
-                            val pdfUri = androidx.core.content.FileProvider.getUriForFile(
+                            val pdfUri = savedDownloadsUri ?: androidx.core.content.FileProvider.getUriForFile(
                                 this@MainActivity,
                                 "${packageName}.fileprovider",
                                 pdfFile
@@ -2352,26 +4985,27 @@ class MainActivity : AppCompatActivity() {
                             }
                             startActivity(viewIntent)
                         } catch (e: Exception) {
-                            Toast.makeText(this@MainActivity, "Nenhum visualizador de PDF encontrado.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.pdf_no_viewer_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
-                    .setNeutralButton("Compartilhar PDF") { _, _ ->
+                    .setNeutralButton(R.string.pdf_share_btn) { _, _ ->
                         try {
+                            val chooserTitle = getString(R.string.pdf_share_chooser)
                             val shareIntent = MediaStudioTools.getShareIntent(
                                 this@MainActivity,
                                 pdfFile,
                                 "application/pdf",
-                                "Compartilhar PDF"
+                                chooserTitle
                             )
-                            startActivity(Intent.createChooser(shareIntent, "Compartilhar PDF"))
+                            startActivity(Intent.createChooser(shareIntent, chooserTitle))
                         } catch (e: Exception) {
-                            Toast.makeText(this@MainActivity, "Erro ao compartilhar PDF.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.pdf_share_error_toast, Toast.LENGTH_SHORT).show()
                         }
                     }
-                    .setNegativeButton("OK", null)
+                    .setNegativeButton(android.R.string.ok, null)
                     .show()
             } else {
-                Toast.makeText(this@MainActivity, "Erro ao converter fotos para PDF.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, R.string.pdf_create_error_toast, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -2645,6 +5279,10 @@ class MainActivity : AppCompatActivity() {
     private fun updatePage(state: MediaScanUiState) {
         val page = state.currentPage
         if (page == null) {
+            lastFilteredPageRecords = emptyList()
+            if (::selectAllPageButton.isInitialized) {
+                selectAllPageButton.visibility = View.GONE
+            }
             pageLabel.text = getString(R.string.not_scanned)
             resultSummary.text = getString(R.string.page_results_hint)
             if (renderedPageKey != null) {
@@ -2662,6 +5300,14 @@ class MainActivity : AppCompatActivity() {
             mode = state.smartFilter,
             nowEpochSeconds = System.currentTimeMillis() / 1000L,
         )
+        lastFilteredPageRecords = filteredRecords
+        if (::selectAllPageButton.isInitialized) {
+            val selectablePageRecords = filteredRecords.filter { it.isSelectable && !it.isProtected }
+            selectAllPageButton.visibility = if (selectablePageRecords.isNotEmpty()) View.VISIBLE else View.GONE
+            if (selectablePageRecords.isNotEmpty()) {
+                selectAllPageButton.text = getString(R.string.select_all_page_button, selectablePageRecords.size)
+            }
+        }
 
         val start = if (page.rowsRead == 0) 0 else page.request.offset + 1
         val end = page.request.offset + page.rowsRead
@@ -2748,10 +5394,15 @@ class MainActivity : AppCompatActivity() {
             isChecked = viewModel.state.value.selection.isSelected(record.uri)
             contentDescription = getString(R.string.select_for_review, name)
             isEnabled = record.isSelectable && !record.isProtected
-            setOnCheckedChangeListener { _, checked -> viewModel.setSelected(record, checked) }
+            minWidth = dp(48)
+            minHeight = dp(48)
+            setOnCheckedChangeListener { view, checked ->
+                try { view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                viewModel.setSelected(record, checked)
+            }
         }
         checkBoxesByUri[record.uri] = check
-        row.addView(check, LinearLayout.LayoutParams(dp(46), dp(46)))
+        row.addView(check, LinearLayout.LayoutParams(dp(48), dp(48)))
 
         val wrapper = FrameLayout(this).apply {
             setPadding(0, 0, 0, dp(8))
@@ -2842,7 +5493,7 @@ class MainActivity : AppCompatActivity() {
             val remove = button(getString(R.string.remove_review_item)) {
                 viewModel.setSelected(record, false)
             }
-            line.addView(remove, LinearLayout.LayoutParams(-2, dp(38)))
+            line.addView(remove, LinearLayout.LayoutParams(-2, dp(48)))
             selectedContainer.addView(line, bottom(4))
         }
         if (selected.size > 20) {
@@ -2881,11 +5532,14 @@ class MainActivity : AppCompatActivity() {
 
         val plan = progress.plan
         if (plan == null) {
+            openInteractiveDialogOnMissionFinish = false
             android.util.Log.e(
                 "MidiastoreMediaScan",
                 "Global mission returned no plan: mission=${progress.mission.name}, reason=${progress.message ?: "none"}",
             )
             if (isFreeHomeCleanup) {
+                homeInteractiveRecords = emptyList()
+                homeInteractiveFallback = false
                 homeCleanupCandidateCount = 0
                 heroOrbButton.isEnabled = true
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
@@ -2943,17 +5597,32 @@ class MainActivity : AppCompatActivity() {
                 progress.warningCount,
             )
         }
-        missionReviewButton.text = getString(R.string.oaas_cleanup_continue, formattedBytes)
-        missionReviewButton.visibility = if (plan.autoSelectedRecords.isNotEmpty()) View.VISIBLE else View.GONE
+        val primaryRecords = plan.autoSelectedRecords
+        val useFallback = primaryRecords.isEmpty() &&
+            progress.mission != DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES &&
+            progress.fallbackRecords.isNotEmpty()
+        val interactiveRecords = when {
+            primaryRecords.isNotEmpty() -> primaryRecords
+            useFallback -> progress.fallbackRecords
+            else -> emptyList()
+        }
+        homeInteractiveRecords = interactiveRecords
+        homeInteractiveFallback = useFallback
+        val interactiveFormattedBytes = android.text.format.Formatter.formatFileSize(
+            this,
+            interactiveRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) },
+        )
+        missionReviewButton.text = getString(R.string.oaas_cleanup_continue, interactiveFormattedBytes)
+        missionReviewButton.visibility = if (interactiveRecords.isNotEmpty()) View.VISIBLE else View.GONE
         if (isFreeHomeCleanup) {
-            homeCleanupCandidateCount = plan.autoSelectedRecords.size
+            homeCleanupCandidateCount = interactiveRecords.size
             heroOrbButton.isEnabled = true
             heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
             if (homeCleanupCandidateCount > 0) {
                 heroOrbButton.text = getString(
                     R.string.home_cleanup_review_button,
                     homeCleanupCandidateCount,
-                    formattedBytes,
+                    interactiveFormattedBytes,
                 )
                 if (::homeDirectCleanRow.isInitialized) {
                     homeDirectCleanRow.visibility = View.VISIBLE
@@ -2963,7 +5632,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     R.string.home_cleanup_candidates_partial
                 }
-                showHomeCleanupMessage(getString(messageId, homeCleanupCandidateCount, formattedBytes))
+                showHomeCleanupMessage(getString(messageId, homeCleanupCandidateCount, interactiveFormattedBytes))
             } else {
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
                 if (::homeDirectCleanRow.isInitialized) {
@@ -2982,6 +5651,16 @@ class MainActivity : AppCompatActivity() {
             else -> null
         }
         oaasPipelineStatus.text = listOfNotNull(resultMessage, coverageNote).joinToString("\n")
+        if (!progress.isRunning && openInteractiveDialogOnMissionFinish && progress !== lastInteractivePromptProgress) {
+            openInteractiveDialogOnMissionFinish = false
+            lastInteractivePromptProgress = progress
+            openInteractiveCleanupReviewDialog(
+                records = interactiveRecords,
+                isFallbackList = useFallback,
+                mission = progress.mission,
+                coverageComplete = progress.coverageComplete,
+            )
+        }
     }
 
     private fun runOutcomeMission(mission: DesiredOutcomeMission) {
@@ -3138,15 +5817,24 @@ class MainActivity : AppCompatActivity() {
         updateSpaceMetricsCard(viewModel.state.value)
         val freedFmt = android.text.format.Formatter.formatFileSize(this, confirmedBytes)
         if (verifiedUris.isNotEmpty()) {
+            homeInteractiveRecords = emptyList()
+            homeInteractiveFallback = false
+            homeCleanupCandidateCount = 0
+            heroOrbButton.text = getString(R.string.home_cleanup_primary)
+            if (::homeDirectCleanRow.isInitialized) {
+                homeDirectCleanRow.visibility = View.GONE
+            }
             viewModel.clearSelection()
             viewModel.startSession()
         }
-        statusText.text = getString(
+        val resultMsg = getString(
             R.string.delete_operation_result,
             verifiedUris.size,
             attempted,
             freedFmt,
         )
+        statusText.text = resultMsg
+        android.widget.Toast.makeText(this, resultMsg, android.widget.Toast.LENGTH_LONG).show()
         pendingApi29DeleteQueue.clear()
         pendingApi29DeletedUris.clear()
         pendingApi29BytesByUri = emptyMap()
@@ -3169,7 +5857,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun exportOrUnlockProSummary() {
         val summaryText = viewModel.buildReviewSummaryExportText() ?: return
-        if (isDevelopmentBuild && debugProPreviewEnabled) {
+        if (hasEffectiveProAccess()) {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.export_review_subject))
@@ -3291,7 +5979,9 @@ class MainActivity : AppCompatActivity() {
         isAllCaps = false
         textSize = 12f
         cornerRadius = dp(16)
-        minHeight = dp(44)
+        minHeight = dp(48)
+        insetTop = 0
+        insetBottom = 0
         setPadding(dp(10), dp(8), dp(10), dp(8))
         backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         setTextColor(color(R.color.sweep_text))
@@ -3325,6 +6015,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun color(id: Int): Int = ContextCompat.getColor(this, id)
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    private fun renderBrandWordmark(isPro: Boolean) {
+        if (!::brandWordmarkView.isInitialized) return
+        val baseColor = if (isPro) Color.parseColor("#FFF8E1") else color(R.color.sweep_text)
+        val accentColor = if (isPro) Color.parseColor("#FFD54F") else color(R.color.sweep_primary)
+        val brandName = getString(R.string.app_name)
+        brandWordmarkView.setTextColor(baseColor)
+        val accentStart = brandName.indexOf("store", ignoreCase = true)
+        brandWordmarkView.text = if (accentStart >= 0) {
+            SpannableString(brandName).apply {
+                setSpan(
+                    ForegroundColorSpan(accentColor),
+                    accentStart,
+                    brandName.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
+        } else {
+            brandName
+        }
+    }
+
+    private fun borderedPill(fill: Int, strokeColor: Int, radius: Int, strokeWidthPx: Int): GradientDrawable =
+        GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(fill)
+            cornerRadius = radius.toFloat()
+            setStroke(strokeWidthPx, strokeColor)
+        }
 
     private fun roundedBackground(fill: Int, radius: Int): GradientDrawable =
         GradientDrawable().apply {

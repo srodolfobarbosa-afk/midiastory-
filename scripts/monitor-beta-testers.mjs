@@ -11,16 +11,52 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { getSupabaseToken } from "./lib/supabase-auth.mjs";
+import { getSupabaseToken as getLocalSupabaseToken } from "./lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 const projectRef = "usmqtnlsaavxqguwrtix";
 const GOAL = 20;
 
+function resolveSupabaseToken() {
+  try {
+    return getLocalSupabaseToken();
+  } catch (err) {
+    try {
+      const gitCommonDir = execFileSync("git", ["rev-parse", "--git-common-dir"], {
+        cwd: projectRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+      if (gitCommonDir) {
+        const mainRepoRoot = path.resolve(projectRoot, gitCommonDir, "..");
+        const mcpConfigPath = path.join(mainRepoRoot, ".agents", "plugins", "supabase", "mcp_config.json");
+        if (fs.existsSync(mcpConfigPath)) {
+          const config = JSON.parse(fs.readFileSync(mcpConfigPath, "utf8"));
+          const envToken = config?.mcpServers?.supabase?.env?.SUPABASE_ACCESS_TOKEN?.trim();
+          if (envToken) return envToken;
+          const authHeader = config?.mcpServers?.supabase?.headers?.Authorization || "";
+          const bearerToken = authHeader.replace(/^Bearer\s+/i, "").trim();
+          if (bearerToken) return bearerToken;
+        }
+      }
+    } catch {
+      // ignore fallback error
+    }
+    throw err;
+  }
+}
+
+function isSyntheticTestRow(row) {
+  const email = (row.email || "").toLowerCase();
+  const source = (row.source || "").toLowerCase();
+  return email.startsWith("teste_") || source === "automated_verification";
+}
+
 async function runSql(query) {
-  const token = getSupabaseToken();
+  const token = resolveSupabaseToken();
   const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
     method: "POST",
     headers: {
@@ -43,24 +79,26 @@ async function checkBetaTesters() {
       ORDER BY id ASC;
     `);
 
-    const count = testers.length;
+    const realTesters = testers.filter(t => !isSyntheticTestRow(t));
+    const count = realTesters.length;
     const remaining = Math.max(GOAL - count, 0);
 
     const now = new Date().toLocaleTimeString("pt-BR");
     console.log(`[${now}] === STATUS DE RECRUTAMENTO MIDIASTORE ===`);
-    console.log(`Testadores Registrados: ${count}/${GOAL} (${((count / GOAL) * 100).toFixed(0)}%)`);
-    console.log(`Faltam para liberação de Produção: ${remaining} testador(es)`);
+    console.log(`Testadores Reais no Funil: ${count}/${GOAL} (${((count / GOAL) * 100).toFixed(0)}%) | Total linhas: ${testers.length}`);
+    console.log(`Faltam no Funil para Meta de 20: ${remaining} testador(es)`);
 
     if (testers.length > 0) {
       console.log("Últimos inscritos:");
       testers.slice(-5).forEach(t => {
-        console.log(` - [#${t.id}] ${t.email} (${t.source || "site"}) [${t.status || "PENDING"}]`);
+        const tag = isSyntheticTestRow(t) ? " [SINTÉTICO]" : "";
+        console.log(` - [#${t.id}] ${t.email} (${t.source || "site"}) [${t.status || "PENDING"}]${tag}`);
       });
     }
 
-    // Exportar lista atualizada para arquivo
     const exportPath = path.join(projectRoot, "docs", "campaigns", "lista-20-testadores-google-play.txt");
-    const emailsText = testers.map(t => t.email).join("\n");
+    const emailsText = realTesters.map(t => t.email).join("\n");
+    fs.mkdirSync(path.dirname(exportPath), { recursive: true });
     fs.writeFileSync(exportPath, emailsText, "utf8");
   } catch (err) {
     console.error("[ERRO ao monitorar beta_testers]:", err.message);

@@ -54,45 +54,81 @@ class StorageRingGaugeView(context: Context) : View(context) {
     var usedFraction: Float = 0f
         set(value) {
             field = value.coerceIn(0f, 1f)
+            updateAccessibilityLabel()
             invalidate()
         }
 
     var centerLabel: String = "—"
         set(value) {
             field = value
+            updateAccessibilityLabel()
             invalidate()
         }
 
     var bottomLabel: String = "USED"
         set(value) {
             field = value
+            updateAccessibilityLabel()
             invalidate()
         }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        val pad = strokePx + 4f * density
-        val size = minOf(w, h).toFloat()
-        val left = (w - size) / 2f + pad
-        val top = (h - size) / 2f + pad
-        arcRect.set(left, top, w - left, h - top)
+    var isProVipTheme: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                trackPaint.color = Color.parseColor(if (value) "#2C2208" else "#1C2942")
+                subTextPaint.color = Color.parseColor(if (value) "#FFD700" else "#5DF5D3")
+                updateProgressShader()
+                invalidate()
+            }
+        }
+
+    private fun updateAccessibilityLabel() {
+        contentDescription = "$centerLabel $bottomLabel"
+    }
+
+    private fun updateProgressShader() {
+        if (arcRect.width() <= 0f || arcRect.height() <= 0f) return
+        val colors = if (isProVipTheme) {
+            intArrayOf(
+                Color.parseColor("#FFD700"),
+                Color.parseColor("#FFAB00"),
+                Color.parseColor("#FEF08A"),
+            )
+        } else {
+            intArrayOf(
+                Color.parseColor("#00E5B0"),
+                Color.parseColor("#38BDF8"),
+                Color.parseColor("#FBBF24"),
+            )
+        }
         progressPaint.shader = LinearGradient(
             arcRect.left,
             arcRect.top,
             arcRect.right,
             arcRect.bottom,
-            intArrayOf(
-                Color.parseColor("#00E5B0"),
-                Color.parseColor("#38BDF8"),
-                Color.parseColor("#FBBF24"),
-            ),
+            colors,
             floatArrayOf(0f, 0.7f, 1f),
             Shader.TileMode.CLAMP,
         )
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w <= 0 || h <= 0) return
+        val pad = strokePx + 4f * density
+        val size = minOf(w, h).toFloat()
+        val left = (w - size) / 2f + pad
+        val top = (h - size) / 2f + pad
+        val right = (w - left).coerceAtLeast(left + 1f)
+        val bottom = (h - top).coerceAtLeast(top + 1f)
+        arcRect.set(left, top, right, bottom)
+        updateProgressShader()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (width <= 0 || height <= 0) return
         canvas.drawArc(arcRect, 135f, 270f, false, trackPaint)
         val sweep = 270f * usedFraction
         canvas.drawArc(arcRect, 135f, sweep, false, progressPaint)

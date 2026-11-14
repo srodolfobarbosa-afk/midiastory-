@@ -97,8 +97,8 @@ flowchart TD
      4. Registro do novo marco via `node scripts/sync-agent-memory.mjs write "..."`.
      5. Commit assinado e push para o repositório GitHub.
 
-2. **Acompanhamento do Requisito dos 20 Testadores (14 Dias):**
-   - Trilha fechada `alpha` com 20 testadores vinculados.
+2. **Acompanhamento do Requisito Oficial de Teste Fechado (14 Dias):**
+   - Trilha fechada `alpha` com mínimo oficial de 12+ testadores opt-in contínuos (meta operacional de segurança de 15–20 testadores vinculados).
    - Monitoramento contínuo para evitar desconexões até a solicitação de Produção.
 
 3. **Projeção de Escala de Receita R$ 1M:**

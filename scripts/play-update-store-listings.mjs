@@ -184,7 +184,7 @@ const listingsByLanguage = {
       "Midiastore é o limpador inteligente de armazenamento e estúdio de mídia para Android, projetado com transparência e processamento 100% no seu aparelho.\n\n" +
       "NOVIDADE — ESTÚDIO DE MÍDIA & FERRAMENTAS:\n" +
       "• Filtros de Fotos ao Vivo: Aplique efeitos Cinema, Vintage, P&B e Nitidez instantaneamente.\n" +
-      "• Extrator de Áudio (MP3/M4A): Extraia faixas de áudio cristalinas de vídeos salvos.\n" +
+      "• Extrator de Áudio (M4A): Extraia faixas de áudio cristalinas de vídeos salvos.\n" +
       "• Limpador de Privacidade EXIF: Remova localização GPS oculta e metadados de suas fotos antes de compartilhar.\n" +
       "• Gerador de QR Code: Crie códigos QR para PIX, links, WhatsApp e redes Wi-Fi em segundos.\n" +
       "• Fotos para PDF: Converta e agrupe fotos em documentos PDF prontos para impressão.\n" +
@@ -205,7 +205,7 @@ const listingsByLanguage = {
       "Midiastore is a transparent, privacy-first storage cleaner and media studio suite for Android with 100% on-device processing.\n\n" +
       "NEW — MEDIA STUDIO & PRODUCTIVITY TOOLS:\n" +
       "• Live Photo Filters: Apply Cinematic, Vintage, B&W, and Sharpness effects instantly.\n" +
-      "• Video-to-Audio Extractor (MP3/M4A): Extract crystal-clear audio tracks from your videos.\n" +
+      "• Video-to-Audio Extractor (M4A): Extract crystal-clear audio tracks from your videos.\n" +
       "• EXIF Privacy Cleaner: Strip hidden GPS coordinates and sensitive metadata before sharing photos.\n" +
       "• QR Code Generator: Generate fast QR codes for URLs, Wi-Fi, WhatsApp, and text.\n" +
       "• Photos to PDF: Convert and bundle multiple photos into clean, printable PDF documents.\n" +
@@ -226,7 +226,7 @@ const listingsByLanguage = {
       "Midiastore es un limpiador de almacenamiento y suite de herramientas multimedia para Android con análisis 100% local.\n\n" +
       "NOVEDAD — ESTUDIO DE MEDIOS Y HERRAMIENTAS:\n" +
       "• Filtros de Fotos en Vivo: Aplica efectos Cine, Vintage, Blanco y Negro y Nitidez al instante.\n" +
-      "• Extractor de Audio (MP3/M4A): Extrae pistas de audio nítidas de cualquier vídeo.\n" +
+      "• Extractor de Audio (M4A): Extrae pistas de audio nítidas de cualquier vídeo.\n" +
       "• Limpiador de Privacidad EXIF: Elimina coordenadas GPS y metadatos ocultos de tus imágenes.\n" +
       "• Generador de Códigos QR: Crea códigos QR rápidos para enlaces, Wi-Fi y texto.\n" +
       "• Fotos a PDF: Convierte y agrupa fotos en documentos PDF de alta calidad.\n\n" +
@@ -243,7 +243,7 @@ const listingsByLanguage = {
       "Midiastore est un nettoyeur de stockage et studio multimédia pour Android avec traitement 100 % local sur votre appareil.\n\n" +
       "NOUVEAU — STUDIO MÉDIA & OUTILS :\n" +
       "• Filtres Photo en Direct : Effets Cinéma, Vintage, Noir & Blanc et Netteté instantanés.\n" +
-      "• Extracteur Audio (MP3/M4A) : Isolez le son de vos vidéos en haute qualité.\n" +
+      "• Extracteur Audio (M4A) : Isolez le son de vos vidéos en haute qualité.\n" +
       "• Nettoyeur de Confidentialité EXIF : Supprimez les coordonnées GPS de vos photos.\n" +
       "• Générateur de QR Code : Créez des QR codes pour liens, Wi-Fi et messages.\n" +
       "• Photos vers PDF : Assemblez des photos en documents PDF nets et imprimables.\n\n" +
@@ -260,7 +260,7 @@ const listingsByLanguage = {
       "Midiastore ist ein transparenter Speicher-Reiniger und Medien-Studio für Android mit 100 % lokaler Analyse.\n\n" +
       "NEU — MEDIEN-STUDIO & WERKZEUGE:\n" +
       "• Live-Fotofilter: Wenden Sie Kino-, Vintage-, S/W- und Schärfe-Effekte an.\n" +
-      "• Audio-Extraktor (MP3/M4A): Kristallklare Audiospuren aus Videos extrahieren.\n" +
+      "• Audio-Extraktor (M4A): Kristallklare Audiospuren aus Videos extrahieren.\n" +
       "• EXIF-Datenschutzbereinigung: Entfernt GPS-Daten und Metadaten vor dem Teilen.\n" +
       "• QR-Code-Generator: Erstellen Sie QR-Codes für Links, WLAN und Text.\n" +
       "• Fotos zu PDF: Fotos schnell in saubere PDF-Dokumente umwandeln.\n\n" +
@@ -277,7 +277,7 @@ const listingsByLanguage = {
       "Midiastore Android के लिए एक सुरक्षित स्टोरेज क्लीनर और मीडिया स्टूडियो टूलकिट है जो 100% फ़ोन पर काम करता है।\n\n" +
       "नया — मीडिया स्टूडियो टूल्स:\n" +
       "• लाइव फ़ोटो फ़िल्टर: सिनेमा, विंटेज, B&W और शार्पनेस इफ़ेक्ट।\n" +
-      "• ऑडियो एक्सट्रैक्टर (MP3/M4A): वीडियो से साफ़ ऑडियो निकालें।\n" +
+      "• ऑडियो एक्सट्रैक्टर (M4A): वीडियो से साफ़ ऑडियो निकालें।\n" +
       "• EXIF प्राइवेसी क्लीनर: शेयर करने से पहले फ़ोटो से GPS लोकेशन हटाएं।\n" +
       "• QR कोड जनरेटर: लिंक, वाई-फ़ाई और टेक्स्ट के लिए तुरंत QR कोड बनाएं।\n" +
       "• फ़ोटो से PDF: फ़ोटो को तुरंत PDF दस्तावेज़ में बदलें।\n\n" +
@@ -293,7 +293,7 @@ const listingsByLanguage = {
       "Midiastoreは、端末内100%ローカルで動作するAndroid向けストレージ整理＆メディアスタジオです。\n\n" +
       "新機能 — メディアスタジオ＆便利機能：\n" +
       "• ライブ写真フィルター：シネマ、ヴィンテージ、モノクロ、鮮明化。\n" +
-      "• 音声抽出（MP3/M4A）：動画から高音質な音声を簡単抽出。\n" +
+      "• 音声抽出（M4A）：動画から高音質な音声を簡単抽出。\n" +
       "• EXIFプライバシークリーナー：共有前に位置情報（GPS）とメタデータを消去。\n" +
       "• QRコード生成：リンク、Wi-Fi、テキストのQRコードを作成。\n" +
       "• 写真PDF変換：写真をまとめて綺麗なPDF文書へ変換。\n\n" +
@@ -309,7 +309,7 @@ const listingsByLanguage = {
       "Midiastore 是一款透明安全的 Android 存储清理与媒体处理工坊，100% 在本地运行。\n\n" +
       "全新功能 — 媒体工坊与实用工具：\n" +
       "• 实时照片滤镜：电影色调、复古、黑白与清晰度提升。\n" +
-      "• 音频提取（MP3/M4A）：一键将视频原声提取为高品质音频。\n" +
+      "• 音频提取（M4A）：一键将视频原声提取为高品质音频。\n" +
       "• EXIF 隐私清理：分享前一键抹除照片中隐藏的 GPS 位置与元数据。\n" +
       "• 二维码生成：快速制作链接、Wi-Fi与文本二维码。\n" +
       "• 照片转 PDF：将多张照片合并为标准清晰 PDF 文档。\n\n" +

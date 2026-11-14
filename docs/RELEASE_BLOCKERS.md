@@ -1,5 +1,15 @@
 # Bloqueadores de release — Midiastore
 
+## Atualização verificada — 2026-11-14
+
+- **Build e Play Console atuais:** `versionCode 21` / `versionName 2.4.0` publicados em `internal` e `alpha` (`com.rdf112.midiastore`). Os 3 produtos Billing (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`) estão **ACTIVE** na Google Play Developer API v3 (`BR R$ 14,99/mês`, `R$ 79,99/ano`, `R$ 149,99` vitalício).
+- **Validação server-side Billing ativa:** `AndroidPlayBillingGateway` envia `{ packageName, productId, purchaseToken }` para a Supabase Edge Function `verify-play-purchase` (`v6`, `verify_jwt: false`), que consulta a Google Play Developer API (`subscriptionsv2` / `products`), valida o SKU esperado e audita em `public.play_purchases` usando SHA-256 do token.
+- **Funil web e Política de Privacidade no ar:** `https://midiastory-df6a0.web.app/` implantado com `ANON_KEY` válida (zero HTTP 401), sem link quebrado do Google Group e sem promessa não comprovada de 3 meses grátis; `https://midiastory-df6a0.web.app/privacidade.html` atualizada com MediaStore local, ferramentas do Estúdio, `PACKAGE_USAGE_STATS` e validação Billing via Supabase.
+- **Ainda bloqueados antes da promoção pública para Produção:**
+  1. Fechar o ciclo P0 no app Android (Prominent Disclosure de `PACKAGE_USAGE_STATS`, aviso explícito de renovação/cancelamento de assinatura no paywall e revalidação pós-edites).
+  2. Executar e comprovar testes instrumentados em API 29 (`RecoverableSecurityException` em emulador/dispositivo real com Linux/KVM ou aparelho físico) e dispositivo API 35/36 sem auto-clicker, além de completar CI verde no commit candidato.
+  3. Cumprir na Play Console: 12+ testadores opt-in contínuos por 14 dias, declarações de `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO` / `PACKAGE_USAGE_STATS` + Data Safety compatíveis com o AAB final e upload de `phoneScreenshots` para os 6 idiomas hoje zerados (`es-ES`, `fr-FR`, `de-DE`, `hi-IN`, `ja-JP`, `zh-CN`).
+
 ## Reavaliação local mais recente — 2026-11-07
 
 - Home: a ação grátis executa a varredura MediaStore de arquivos grandes no próprio app. Manualmente no Moto G84 5G/API35, encontrou 5 candidatos para revisão (84,30 MB) e abriu a lista interna; nenhum arquivo pessoal foi apagado. O teste não aprovou/cancelou a caixa de consentimento de exclusão permanente e não fecha o gate de deleção.

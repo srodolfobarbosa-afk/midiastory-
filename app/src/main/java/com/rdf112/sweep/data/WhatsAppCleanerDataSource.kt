@@ -1,6 +1,7 @@
 package com.rdf112.sweep.data
 
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.Context
 import android.content.IntentSender
 import android.net.Uri
@@ -8,6 +9,8 @@ import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
+import com.rdf112.sweep.domain.model.MediaKind
+import com.rdf112.sweep.domain.model.MediaRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -19,7 +22,50 @@ data class WhatsAppMediaItem(
     val sizeBytes: Long,
     val category: WhatsAppMediaCategory,
     val isSafUri: Boolean,
-)
+    val id: Long = 0L,
+    val displayName: String = "",
+    val mimeType: String? = null,
+    val relativePath: String? = null,
+    val dateModifiedEpochSeconds: Long = 0L,
+    val volumeName: String = MediaStore.VOLUME_EXTERNAL_PRIMARY,
+    val mediaType: Int = MediaStore.Files.FileColumns.MEDIA_TYPE_NONE,
+) {
+    fun toMediaRecord(): MediaRecord? {
+        if (isSafUri) return null
+        val uriString = uri.toString()
+        if (!uriString.startsWith("content://")) return null
+        val kind = when (mediaType) {
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> MediaKind.IMAGE
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> MediaKind.VIDEO
+            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> MediaKind.AUDIO
+            else -> when (category) {
+                WhatsAppMediaCategory.IMAGE, WhatsAppMediaCategory.GIF -> MediaKind.IMAGE
+                WhatsAppMediaCategory.VIDEO -> MediaKind.VIDEO
+                WhatsAppMediaCategory.AUDIO, WhatsAppMediaCategory.VOICE_NOTE -> MediaKind.AUDIO
+                else -> return null
+            }
+        }
+        val resolvedName = displayName.ifBlank {
+            uri.lastPathSegment?.let { "WhatsApp_$it" } ?: "WhatsApp_Media"
+        }
+        val resolvedMime = mimeType?.takeIf { it.isNotBlank() } ?: when (kind) {
+            MediaKind.IMAGE -> "image/jpeg"
+            MediaKind.VIDEO -> "video/mp4"
+            MediaKind.AUDIO -> "audio/ogg"
+        }
+        return MediaRecord(
+            uri = uriString,
+            volumeName = volumeName.ifBlank { MediaStore.VOLUME_EXTERNAL_PRIMARY },
+            kind = kind,
+            displayName = resolvedName,
+            mimeType = resolvedMime,
+            sizeBytes = sizeBytes.coerceAtLeast(0L),
+            dateModifiedEpochSeconds = dateModifiedEpochSeconds.takeIf { it > 0L },
+            isProtected = false,
+            isSelectable = true,
+        )
+    }
+}
 
 enum class WhatsAppMediaCategory {
     IMAGE,
@@ -47,12 +93,18 @@ class WhatsAppCleanerDataSource(
                 MediaStore.Files.FileColumns.SIZE,
                 MediaStore.Files.FileColumns.RELATIVE_PATH,
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.DISPLAY_NAME,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.DATE_MODIFIED,
+                MediaStore.Files.FileColumns.VOLUME_NAME,
             )
             val pathColumn = MediaStore.Files.FileColumns.RELATIVE_PATH
-            val selection = "$pathColumn LIKE ? OR $pathColumn LIKE ?"
+            val selection = "$pathColumn LIKE ? OR $pathColumn LIKE ? OR $pathColumn LIKE ? OR $pathColumn LIKE ?"
             val args = arrayOf(
                 "%Android/media/com.whatsapp/WhatsApp/Media/%",
                 "%Android/media/com.whatsapp.w4b/WhatsApp Business/Media/%",
+                "%WhatsApp/Media/%",
+                "%WhatsApp Business/Media/%",
             )
             val sortOrder = "${MediaStore.Files.FileColumns.SIZE} DESC"
             val items = mutableListOf<WhatsAppMediaItem>()
@@ -64,22 +116,54 @@ class WhatsAppCleanerDataSource(
                 val sizeColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)
                 val pathIndex = it.getColumnIndexOrThrow(pathColumn)
                 val typeColumn = it.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)
+                val nameColumn = it.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+                val mimeColumn = it.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)
+                val modifiedColumn = it.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)
+                val volumeColumn = it.getColumnIndex(MediaStore.Files.FileColumns.VOLUME_NAME)
                 while (it.moveToNext()) {
                     currentCoroutineContext().ensureActive()
+                    val rowId = it.getLong(idColumn)
                     val path = it.getString(pathIndex).orEmpty()
-                    val category = categoryForPath(path)
+                    val name = if (nameColumn >= 0) it.getString(nameColumn).orEmpty() else ""
+                    val mime = if (mimeColumn >= 0) it.getString(mimeColumn) else null
+                    val modified = if (modifiedColumn >= 0) it.getLong(modifiedColumn).coerceAtLeast(0L) else 0L
+                    val volume = if (volumeColumn >= 0) {
+                        it.getString(volumeColumn).orEmpty().ifBlank { MediaStore.VOLUME_EXTERNAL_PRIMARY }
+                    } else {
+                        MediaStore.VOLUME_EXTERNAL_PRIMARY
+                    }
+                    val category = categoryForPath(path, name, mime)
                     val mediaType = it.getInt(typeColumn)
                     // Files with no indexed media type (such as documents) belong to the SAF scan.
                     if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE) continue
+                    val mediaUri = mediaUriForType(mediaType, rowId, collection)
                     items += WhatsAppMediaItem(
-                        uri = Uri.withAppendedPath(collection, it.getLong(idColumn).toString()),
+                        uri = mediaUri,
                         sizeBytes = it.getLong(sizeColumn).coerceAtLeast(0L),
                         category = category,
                         isSafUri = false,
+                        id = rowId,
+                        displayName = name,
+                        mimeType = mime,
+                        relativePath = path,
+                        dateModifiedEpochSeconds = modified,
+                        volumeName = volume,
+                        mediaType = mediaType,
                     )
                 }
             }
             items
+        }
+
+    private fun mediaUriForType(mediaType: Int, id: Long, fallbackCollection: Uri): Uri =
+        when (mediaType) {
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ->
+                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO ->
+                ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO ->
+                ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+            else -> Uri.withAppendedPath(fallbackCollection, id.toString())
         }
 
     suspend fun scanViaSaf(treeUri: Uri): List<WhatsAppMediaItem> = withContext(Dispatchers.IO) {
@@ -139,8 +223,16 @@ class WhatsAppCleanerDataSource(
         val depth: Int,
     )
 
-    private fun categoryForPath(path: String): WhatsAppMediaCategory =
-        categoryForName(path.substringBeforeLast('/').substringAfterLast('/'), WhatsAppMediaCategory.OTHER)
+    private fun categoryForPath(
+        path: String,
+        displayName: String = "",
+        mimeType: String? = null,
+    ): WhatsAppMediaCategory =
+        categoryForName(
+            name = "$path/$displayName",
+            inherited = WhatsAppMediaCategory.OTHER,
+            mimeType = mimeType,
+        )
 
     private fun categoryForName(
         name: String,

@@ -68,6 +68,7 @@ data class GlobalMissionProgress(
     val coverageComplete: Boolean = false,
     val warningCount: Int = 0,
     val message: String? = null,
+    val fallbackRecords: List<MediaRecord> = emptyList(),
 )
 
 data class MediaScanUiState(
@@ -292,6 +293,8 @@ class MediaScanViewModel(
 
                 // For large/old missions, retain only the highest-impact 500 candidates.
                 val rankedCandidates = ArrayList<MediaRecord>(500)
+                // Manual-review fallback list (top 100 largest accessible media) when threshold filters find 0 items.
+                val largestAccessibleCandidates = ArrayList<MediaRecord>(150)
 
                 // For exact duplicates, retain one record per observed size and expand only repeated sizes.
                 // A hard cap prevents an extremely large library from exhausting application memory.
@@ -387,6 +390,15 @@ class MediaScanViewModel(
                         }
 
                         for (record in page.records) {
+                            if (mission != DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES &&
+                                record.isSelectable && !record.isProtected && record.sizeBytes > 0L
+                            ) {
+                                largestAccessibleCandidates += record
+                                if (largestAccessibleCandidates.size > 150) {
+                                    largestAccessibleCandidates.sortByDescending { it.sizeBytes }
+                                    largestAccessibleCandidates.subList(100, largestAccessibleCandidates.size).clear()
+                                }
+                            }
                             when (mission) {
                                 DesiredOutcomeMission.FREE_MAX_SPACE_NOW -> {
                                     if (record.sizeBytes >= SmartMediaGroupingPolicy.LARGE_FILE_THRESHOLD_BYTES) {
@@ -620,6 +632,11 @@ class MediaScanViewModel(
                             pagingEvidenceUnverified -> "paging_args_unverified"
                             else -> null
                         },
+                        fallbackRecords = if (mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES) {
+                            emptyList()
+                        } else {
+                            largestAccessibleCandidates.sortedByDescending { it.sizeBytes }.take(100)
+                        },
                     ),
                 )
             } catch (cancelled: CancellationException) {
@@ -694,6 +711,42 @@ class MediaScanViewModel(
 
     fun clearSelection() {
         mutableState.value = mutableState.value.copy(selection = MediaSelectionLedger.empty())
+    }
+
+    /**
+     * Loads user-selected candidate records (e.g. from WhatsApp media category review)
+     * into the review ledger so the user can inspect, uncheck individual items, and
+     * execute deletion/trash through the official Android consent flow.
+     */
+    fun prepareExternalReviewSelection(
+        records: Collection<MediaRecord>,
+        filter: SmartFilterMode = SmartFilterMode.ALL_ITEMS,
+    ): Int {
+        val current = mutableState.value
+        if (current.isLoading) return 0
+        var nextLedger = MediaSelectionLedger.empty()
+        var addedCount = 0
+        var limitReached = false
+        for (record in records) {
+            if (!record.isSelectable || record.isProtected) continue
+            when (val update = nextLedger.setSelected(record, true)) {
+                is SelectionUpdate.Applied -> {
+                    nextLedger = update.ledger
+                    addedCount++
+                }
+                is SelectionUpdate.LimitReached -> {
+                    limitReached = true
+                    break
+                }
+                is SelectionUpdate.NotSelectable -> Unit
+            }
+        }
+        mutableState.value = current.copy(
+            smartFilter = filter,
+            selection = nextLedger,
+            message = if (limitReached) "selection_limit_reached" else null,
+        )
+        return addedCount
     }
 
     /** Generates a plain-text summary of the current review selection for verified Pro export. */

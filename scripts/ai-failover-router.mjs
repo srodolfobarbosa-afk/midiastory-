@@ -53,17 +53,15 @@ async function callGoogleAIStudio(modelName, prompt, options = {}) {
   const isGemini4Thinking = modelName.includes("gemini-4-hydrogen") || modelName.includes("gemini-4-carbon") || modelName.includes("gemini-4-argon");
   const thinkingLevel = options.thinkingLevel || (options.isCode ? "HIGH" : "MEDIUM");
 
+  const generationConfig = {
+    ...(options.maxTokens ? { maxOutputTokens: options.maxTokens } : {}),
+    ...(options.responseFormatJson ? { responseMimeType: "application/json" } : {}),
+    ...(isGemini4Thinking ? { thinkingConfig: { thinkingLevel } } : {}),
+  };
+
   const bodyPayload = {
     contents: [{ parts: [{ text: prompt }] }],
-    ...(isGemini4Thinking
-      ? {
-          generationConfig: {
-            thinkingConfig: {
-              thinkingLevel,
-            },
-          },
-        }
-      : {}),
+    ...(Object.keys(generationConfig).length > 0 ? { generationConfig } : {}),
   };
 
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${googleStudioKey}`, {
@@ -98,10 +96,11 @@ const MODEL_CASCADE = [
   { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 31B (Free)" },
 ];
 
-async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort = "medium") {
+async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort = "medium", responseFormatJson = false) {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
   const isReasoningModel = modelId.includes("carbon") || modelId.includes("argon") || modelId.includes("nano-omni");
+  const isFreeModel = modelId.endsWith(":free") || modelId === "openrouter/free";
 
   let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -114,6 +113,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
     body: JSON.stringify({
       model: modelId,
       max_tokens: maxTokens,
+      ...(responseFormatJson && !isFreeModel ? { response_format: { type: "json_object" } } : {}),
       ...(isReasoningModel ? { reasoning: { effort: reasoningEffort } } : {}),
       messages: [{ role: "user", content: prompt }],
     }),
@@ -123,7 +123,13 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
   if (res.status === 402) {
     const errText = await res.text();
     const match = errText.match(/can only afford (\d+)/i);
-    const affordableTokens = match ? Math.max(60, parseInt(match[1], 10) - 15) : Math.floor(maxTokens * 0.4);
+    const maxAffordable = match ? parseInt(match[1], 10) : Math.floor(maxTokens * 0.4);
+    if (maxAffordable < 60) {
+      const error = new Error(`HTTP 402: Saldo insuficiente (${maxAffordable} tokens disponíveis) para ${modelId}`);
+      error.status = 402;
+      throw error;
+    }
+    const affordableTokens = Math.max(60, maxAffordable - 15);
     console.warn(`[Auto-Adaptação 402] Ajustando tokens dinamicamente para ${affordableTokens} para ${modelId}...`);
     res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -136,6 +142,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
       body: JSON.stringify({
         model: modelId,
         max_tokens: affordableTokens,
+        ...(responseFormatJson && !isFreeModel ? { response_format: { type: "json_object" } } : {}),
         ...(isReasoningModel ? { reasoning: { effort: reasoningEffort === "high" ? "medium" : reasoningEffort } } : {}),
         messages: [{ role: "user", content: prompt }],
       }),
@@ -175,22 +182,27 @@ function callCodexLocal(prompt) {
 
 export async function executeWithFailover(prompt, options = {}) {
   const isCode = options.isCode || false;
+  const maxTokens = options.maxTokens || (isCode ? 2500 : 1200);
+  const responseFormatJson = Boolean(options.responseFormatJson);
 
-  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"})...`);
+  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens})...`);
 
   // 1. Prioridade Nativa: Google AI Studio Direto (Custo Zero, 1M Context no Gemini 4 Hydrogen com Thinking)
   if (googleStudioKey) {
     const studioModels = [
-      "gemini-4-hydrogen",
-      "gemini-2.5-flash",
       "gemini-4-carbon",
+      "gemini-3-flash-preview",
+      "gemini-2.5-flash",
       "gemini-4-argon",
+      "gemini-4-hydrogen",
     ];
     for (const sm of studioModels) {
       console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm} (Thinking: ${isCode ? "HIGH" : "MEDIUM"})...`);
       try {
         const response = await callGoogleAIStudio(sm, prompt, {
           isCode,
+          maxTokens,
+          responseFormatJson,
           thinkingLevel: options.thinkingLevel || (isCode ? "HIGH" : "MEDIUM"),
         });
         if (response) {
@@ -205,18 +217,22 @@ export async function executeWithFailover(prompt, options = {}) {
 
   let lastError = null;
 
-  for (let i = 0; i < MODEL_CASCADE.length; i++) {
-    const model = MODEL_CASCADE[i];
-    console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
-    try {
-      const reasoningEffort = options.reasoningEffort || (isCode ? "high" : "medium");
-      const response = await callOpenRouter(model.id, prompt, isCode ? 2500 : 1200, reasoningEffort);
-      console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
-      return { source: model.id, content: response };
-    } catch (err) {
-      console.warn(`⚠️ Rota ${i + 1} (${model.name}) falhou: ${err.message.slice(0, 140)}`);
-      lastError = err;
-      continue;
+  if (openRouterKey) {
+    for (let i = 0; i < MODEL_CASCADE.length; i++) {
+      const model = MODEL_CASCADE[i];
+      console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
+      try {
+        const reasoningEffort = options.reasoningEffort || (isCode ? "high" : "medium");
+        const response = await callOpenRouter(model.id, prompt, maxTokens, reasoningEffort, responseFormatJson);
+        if (response) {
+          console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
+          return { source: model.id, content: response };
+        }
+      } catch (err) {
+        console.warn(`⚠️ Rota ${i + 1} (${model.name}) falhou: ${err.message.slice(0, 140)}`);
+        lastError = err;
+        continue;
+      }
     }
   }
 

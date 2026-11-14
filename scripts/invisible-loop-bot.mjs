@@ -2,22 +2,34 @@ import fs from "node:fs";
 import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { executeWithFailover } from "./ai-failover-router.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const aiKeys = JSON.parse(fs.readFileSync(path.join(projectRoot, ".secrets", "ai-media-keys.json"), "utf8"));
-const playKey = JSON.parse(fs.readFileSync(path.join(projectRoot, ".secrets", "play-service-account.json"), "utf8"));
 const packageName = "com.rdf112.midiastore";
 const playStoreUrl = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore";
 
+function loadPlayServiceAccount() {
+  if (process.env.PLAY_SERVICE_ACCOUNT_JSON) {
+    return JSON.parse(process.env.PLAY_SERVICE_ACCOUNT_JSON);
+  }
+  const playKeyPath = path.join(projectRoot, ".secrets", "play-service-account.json");
+  if (fs.existsSync(playKeyPath)) {
+    return JSON.parse(fs.readFileSync(playKeyPath, "utf8"));
+  }
+  throw new Error("Credenciais da Google Play Service Account não encontradas.");
+}
+
 async function getPlayAccessToken() {
+  const playKey = loadPlayServiceAccount();
   const now = Math.floor(Date.now() / 1000);
+  const tokenUri = playKey.token_uri || "https://oauth2.googleapis.com/token";
   const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
   const payload = Buffer.from(
     JSON.stringify({
       iss: playKey.client_email,
       scope: "https://www.googleapis.com/auth/androidpublisher",
-      aud: playKey.token_uri,
+      aud: tokenUri,
       iat: now,
       exp: now + 3600,
     })
@@ -26,29 +38,21 @@ async function getPlayAccessToken() {
   sign.update(`${header}.${payload}`);
   const jwt = `${header}.${payload}.${sign.sign(playKey.private_key, "base64url")}`;
 
-  const res = await fetch(playKey.token_uri, {
+  const res = await fetch(tokenUri, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
   });
   const data = await res.json();
+  if (!res.ok || !data.access_token) {
+    throw new Error(`Falha ao obter token OAuth da Google Play (HTTP ${res.status})`);
+  }
   return data.access_token;
 }
 
-async function generateAiReply(contextPrompt) {
-  const res = await fetch(aiKeys.OPENROUTER_BASE_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${aiKeys.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-4o-mini",
-      messages: [{ role: "user", content: contextPrompt }],
-    }),
-  });
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content?.trim() || "";
+export async function generateAiReply(contextPrompt) {
+  const result = await executeWithFailover(contextPrompt, { maxTokens: 400 });
+  return (result.content || "").trim();
 }
 
 async function checkAndReplyPlayStoreReviews() {
@@ -95,7 +99,9 @@ async function main() {
   console.log(reelHook);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

@@ -1,17 +1,16 @@
 # Checklist da Google Play Console — Midiastore
 
-**Estado: NÃO PRONTO PARA RELEASE.** Este documento substitui as instruções antigas de Sweep VC13 que mencionavam dois cadastros e dois AABs.
+**Estado (`2026-11-14`): EM VALIDAÇÃO P0 ANTES DE PRODUÇÃO.** Este documento reflete os fatos verificados na Play Developer API v3 e na branch atual (`codex/midiastore-release-audit`).
 
-## 1. Identidade confirmada pelo proprietário
+## 1. Identidade confirmada pelo proprietário e Play Console API
 
 - [x] Nome comercial da ficha: **Midiastore**.
-- [x] Package da ficha de teste interno mostrado pelo proprietário: `com.rdf112.midiastore`.
+- [x] Package da ficha de teste interno e alpha: `com.rdf112.midiastore`.
 - [x] `applicationId` do código atual: `com.rdf112.midiastore`.
 - [x] Namespace Kotlin legado: `com.rdf112.sweep` (não é o package publicado).
-- [x] `versionCode=17` e `versionName=2.2.1` no código atual.
-- [ ] Confirmar qual é o maior versionCode efetivamente enviado/publicado para este listing.
-- [ ] Confirmar certificado de upload que a Play Console aceita e confrontar com a chave legítima.
-- [ ] Confirmar que o app de teste instalado pertence a este listing/package.
+- [x] `versionCode=21` e `versionName=2.4.0` no código atual e publicados em `internal` / `alpha` (`status: completed`, 7 bundles no Histórico API v3).
+- [ ] Confirmar certificado de upload (`sweep-upload.jks`) no próximo upload de AAB (`> 21`) apenas quando aprovado pelo proprietário.
+- [ ] Confirmar na UI da Play Console que os 12+ testadores opt-in atingiram os 14 dias contínuos exigidos.
 
 **Não use instruções antigas para criar dois AABs.** O script Windows de Release foi desativado porque alterava applicationId e podia restaurar `com.rdf112.sweep` como padrão. A aplicação em continuidade é somente `com.rdf112.midiastore`.
 
@@ -26,24 +25,18 @@
 
 ## 3. Monetização dentro do aplicativo
 
-O proprietário informou que o perfil financeiro/recebimento foi habilitado em 03/11/2026. Isso não confirma que produtos in-app estejam cadastrados ou ativos.
+Produtos conferidos ao vivo na Google Play Developer API v3 (`2026-11-14`) em `com.rdf112.midiastore`:
 
-O source atualmente espera:
+| Product ID | Tipo no Billing | Status API v3 & Preço BR/US |
+|---|---|---|
+| `sweep_pro_monthly` | SUBS (`monthly-base`, `P1M`) | **ACTIVE** — `R$ 14,99` / `US $2.69` (`offers: []`) |
+| `sweep_pro_annual` | SUBS (`annual-base`, `P1Y`) | **ACTIVE** — `R$ 79,99` / `US $13.99` (`offers: []`) |
+| `sweep_pro_lifetime` | INAPP (`lifetime-buy`) | **ACTIVE** — `R$ 149,99` / `US $26.99` |
 
-| Product ID | Tipo no Billing |
-|---|---|
-| `sweep_pro_monthly` | SUBS |
-| `sweep_pro_annual` | SUBS |
-| `sweep_pro_lifetime` | INAPP |
-
-- [ ] Conferir os IDs exatos no Play Console.
-- [ ] Conferir base plans, offers, períodos, status ativo, países/regions e preços.
-- [ ] Adicionar contas de license tester.
-- [ ] Testar preços dinâmicos recebidos de ProductDetails.
-- [ ] Testar compra aprovada, pendente, cancelada, já possuída, restauração e reconexão.
-- [ ] Testar renovação, cancelamento, expiração, reembolso e mudança de plano.
-- [ ] Implementar validação de purchaseToken por backend confiável usando Google Play Developer API.
-- [ ] Preservar entitlement de qualquer comprador existente.
+- [x] Conferir os IDs exatos, base plans, períodos e status `ACTIVE` na Play Console API.
+- [x] Implementar validação de `purchaseToken` via backend confiável (`verify-play-purchase` v6 no Supabase consultando `subscriptionsv2` / `products` na Google Play Developer API).
+- [ ] Adicionar contas de license tester e executar testes ponta a ponta de compra aprovada, pendente, cancelada, renovação, reembolso e expiração.
+- [ ] Avaliar criação opcional de ofertas de período de avaliação gratuito (`Free Trial` / oferta introdutória) nos base plans de assinatura.
 
 Não cadastrar preços de benchmark como se fossem preços ativos. Não prometer Pix/cartão ou outros meios: a própria Google Play determina os meios disponíveis para o país e tipo de compra.
 

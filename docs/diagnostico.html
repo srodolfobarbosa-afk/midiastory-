@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diagnóstico Gratuito de Memória • Midiastore Android</title>
+  <meta name="description" content="Descubra quantos gigabytes de mídias grandes, antigas e duplicadas ocupam o armazenamento do seu Android com o simulador gratuito Midiastore.">
+  <meta property="og:title" content="Diagnóstico Gratuito de Memória • Midiastore Android">
+  <meta property="og:description" content="Estime quantos GB de fotos duplicadas e vídeos grandes ocupam seu Android.">
+  <meta property="og:image" content="https://midiastory-df6a0.web.app/icon-512.png">
+  <link rel="canonical" href="https://midiastory-df6a0.web.app/diagnostico.html">
   <link rel="icon" type="image/png" href="/icon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,8 +211,13 @@
     <header>
       <div class="badge-live">⚡ Inovação Midiastore • Diagnóstico Rápido</div>
       <img src="/icon-512.png" alt="Midiastore" class="logo-img" onerror="this.style.display='none'">
-      <h1>Descubra Quanto Espaço Invisível o WhatsApp Está Comendo</h1>
-      <p class="subtitle">Áudios esquecidos de grupos, fotos repetidas e lixo oculto que a Galeria do Android não mostra.</p>
+      <h1>Descubra Quanto Espaço de Mídia Você Pode Revisar no Android</h1>
+      <p class="subtitle">Áudios antigos de grupos, fotos duplicadas exatas (SHA-256) e vídeos grandes (>10 MB) acumulados no armazenamento.</p>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-top:0.25rem;">
+        <a href="/" style="color:var(--accent);font-size:0.84rem;font-weight:700;text-decoration:none;">← Início &amp; Cadastro VIP</a>
+        <span style="color:var(--muted);">•</span>
+        <a href="/ferramentas.html" style="color:var(--accent-cyan);font-size:0.84rem;font-weight:700;text-decoration:none;">🎨 Central de Ferramentas</a>
+      </div>
     </header>
 
     <div class="card">
@@ -280,18 +290,29 @@
               <span style="font-size: 0.7rem; color: #FDE68A;">Acesso Permanente</span>
             </div>
           </div>
-          <div style="margin-top: 1rem;">
-            <a href="/terminal.html" class="btn" style="width: 100%; font-size: 0.88rem;">
-              👥 Garantir Vaga Gratuita no Teste Fechado Google Play (20 Vagas)
+          <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem;">
+            <a href="/#vip-testers" class="btn" style="width: 100%; font-size: 0.9rem;">
+              👥 Passo 1: Cadastrar Gmail no Teste Fechado (Acesso Antecipado Gratuito)
             </a>
+            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+              <a href="https://play.google.com/apps/testing/com.rdf112.midiastore" target="_blank" rel="noopener" class="btn" style="flex: 1; min-width: 200px; font-size: 0.82rem; background: #1E293B; color: #F8FAFC; border: 1px solid var(--accent);">
+                ✅ Passo 2: Aceitar Convite Web (Opt-in)
+              </a>
+              <a href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" rel="noopener" class="btn" style="flex: 1; min-width: 200px; font-size: 0.82rem; background: #1E293B; color: #F8FAFC; border: 1px solid #334155;">
+                📲 Passo 3: Instalar na Google Play
+              </a>
+            </div>
+            <p style="font-size: 0.76rem; color: var(--muted); line-height: 1.4;">
+              💡 O Midiastore está em Teste Fechado Oficial (14 dias • meta: 12+ testadores ativos, 15+ ideal). Cadastre seu Gmail no Passo 1 e aceite o convite no Passo 2 antes de abrir a Google Play.
+            </p>
           </div>
         </div>
       </div>
     </div>
 
     <footer>
-      Midiastore (com.rdf112.midiastore) • Desenvolvido com Inteligência Real.<br>
-      Total respeito à sua privacidade: zero envio de fotos para servidores externos.
+      Midiastore (com.rdf112.midiastore) • Processamento 100% no seu dispositivo Android.<br>
+      Total respeito à sua privacidade: zero envio de fotos para servidores externos • <a href="/privacidade.html" style="color: var(--accent); text-decoration: none;">Política de Privacidade</a>
     </footer>
   </div>
 
@@ -315,14 +336,18 @@
 
       // Monta link viral de WhatsApp
       const shareText = encodeURIComponent(
-        `🚨 Acabei de fazer o teste de memória do Midiastore e descobri que meu WhatsApp tem cerca de ${estimatedGB} GB de mídias invisíveis e arquivos duplicados travando meu celular!\n\n` +
+        `🚨 Acabei de fazer a estimativa de armazenamento do Midiastore e descobri que meu celular pode ter cerca de ${estimatedGB} GB de mídias repetidas e vídeos grandes ocupando espaço!\n\n` +
         `Faça o teste grátis no seu também aqui: https://midiastory-df6a0.web.app/diagnostico.html`
       );
       document.getElementById('btn-share-wa').href = `https://api.whatsapp.com/send?text=${shareText}`;
 
       document.getElementById('result-box').style.display = 'block';
       document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+      if (window.MidiastoreTelemetry) {
+        window.MidiastoreTelemetry.trackEvent('cta_click', 'diagnostico_calculado');
+      }
     }
   </script>
+  <script src="/telemetry.js" defer></script>
 </body>
 </html>

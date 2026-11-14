@@ -1,27 +1,53 @@
-# Midiastore — Pro phone cleaner & storage analyzer
+<div align="center">
+
+# 🧹🌍 Midiastore (`com.rdf112.midiastore`)
+### Pro Phone Cleaner · Local Media Studio · Worldwide Offline Hub & Mystery Vault
+
+[![Android API](https://img.shields.io/badge/Android-29%20to%2036-00E5B0?style=for-the-badge&logo=android&logoColor=070B14)](https://developer.android.com)
+[![Languages](https://img.shields.io/badge/Global%20Locales-14%20Languages%20(incl.%20AR--RTL)-38BDF8?style=for-the-badge)](app/src/main/res/xml/locales_config.xml)
+[![Scoped Storage](https://img.shields.io/badge/Scoped%20Storage-100%25%20Compliant-10B981?style=for-the-badge)](app/src/main/AndroidManifest.xml)
+[![Play Billing](https://img.shields.io/badge/Google%20Play%20Billing-8.3.0-FFD54F?style=for-the-badge&logo=googleplay&logoColor=070B14)](app/build.gradle.kts)
+
+**Clean up gigabytes safely with official Android confirmation — and carry useful offline global tools, accessible Senior Easy Mode, retro arcade classics, and a hidden riddle & card-magic lab everywhere you go.**
+
+</div>
+
+---
+
+## ✨ What makes Midiastore different from ordinary cleaners
+
+| Pillar | Highlights (Implemented on-device) |
+|---|---|
+| 🧹 **Real Free Phone Cleaner** | 1-tap cleanup scan with **thumbnails & review checkboxes**, exact duplicates (**streaming SHA-256**), large files (`>10 MB`), older media (`+30d`), **WhatsApp Cleaner**, official Android Trash & permanent delete consent. |
+| 🎨 **Free Local Media Studio** | Live photo filters, **Video ➔ M4A audio extractor**, **EXIF/GPS privacy scrubber**, **Designer QR Studio (5 luxury card styles)**, Photos-to-A4 PDF, and direct public web video saver. |
+| 🌍 **Worldwide & Inclusive Hub** | **14 native locales** (`PT-BR, EN, ES, DE, FR, HI, JA, ZH-CN, AR-RTL, RU, ID, BN, KO`), **1-tap Senior Easy Mode (`👓 Aa+`)** for large text/buttons, offline **World Clock (16 hubs)**, **Global Currency Converter (offline + live rates)**, **Live Weather & Travel/Restaurant Maps guide**. |
+| 🎮🔮 **Offline Arcade & Mystery Lab** | Play **Retro Snake** & **Falling Blocks Puzzle** 100% offline on the bus or flight — plus a **5-Tap Secret Logo Easter Egg**, **3 unlockable riddles**, mathematical **21-Card Mind Reader Magic**, and **Illusionist Magic Dice**! |
+| 👑 **Pro VIP Edition (174 Countries)** | Transforms the interface into **Royal Black & 24K Gold VIP Theme**, unlocking **Pro Word Search (100% Offline + Daily Date Puzzle)**, **Pro Private Notes Vault**, **Pro Smart Calculator + Storage Estimator**, **Strong Password & Wi-Fi QR Vault**, **90-day Unused Apps finder**, and **Audited Reports**. |
+
+---
 
 ## Posicionamento e modelo comercial confirmados: Pro + Freemium
 
-O Midiastore será um **limpador inteligente de celular (phone cleaner)** com apresentação premium. O plano gratuito inclui análise das mídias acessíveis, localização de arquivos grandes e cópias exatas, revisão manual e limpeza com confirmação do Android. O benefício Pro já implementado no cliente é exportar o resumo da seleção revisada. Histórico avançado, previsão de armazenamento e análise visual continuam no roadmap; não devem ser anunciados como recursos disponíveis.
+O Midiastore é um **limpador inteligente de celular (phone cleaner) + suíte global de utilidades diárias** com apresentação premium em 6 abas espaçosas (`Início`, `Limpeza`, `Arquivos`, `Estúdio`, `Mundo` e `Pro VIP`). O plano gratuito inclui análise das mídias acessíveis no aparelho via MediaStore, localização de arquivos grandes, itens antigos e cópias exatas por SHA-256, revisão manual, limpeza com confirmação oficial do Android, Estúdio de Mídia local e o Hub Mundial Offline. Recursos não implementados — como detecção de desfoque e análise de similaridade visual — continuam no roadmap e não devem ser anunciados.
 
-Novas compras Pro permanecem desativadas até que a validação segura de purchaseToken por backend/Google Play Developer API esteja implementada e testada. Segurança, proteção do original e consentimento do Android permanecem gratuitos.
+A verificação de assinatura/compras usa Google Play Billing (`billing:8.3.0`) com validação de `purchaseToken` via Edge Function (`verify-play-purchase` + Google Play Developer API v3) e requer testes completos de compra, restauração e reembolso com License Testers antes da liberação comercial. Segurança, proteção do original e consentimento do Android permanecem gratuitos.
 
-
-**Status:** development / recovery. This repository is not a release candidate and must not be submitted to Google Play until all P0 gates in `docs/RELEASE_BLOCKERS.md` are closed.
+**Status:** pre-production hardening (closed testing & P0 verification in progress). Consulte [`docs/RELEASE_BLOCKERS.md`](docs/RELEASE_BLOCKERS.md) e [`docs/ROADMAP_GLOBAL_V3.md`](docs/ROADMAP_GLOBAL_V3.md) antes de promover qualquer build para produção na Google Play Console.
 
 ## Confirmed application identity
 
 | Field | Current source configuration | Evidence / qualification |
 |---|---|---|
 | Commercial name | Midiastore | Owner confirmed the Play Console listing name |
-| Google Play package | `com.rdf112.midiastore` | Owner supplied the listing with this package on 04/11/2026 |
+| Google Play package | `com.rdf112.midiastore` | Confirmed in Play Console (`app/build.gradle.kts`) |
 | Android namespace | `com.rdf112.sweep` | Internal Kotlin/R namespace; do not confuse it with applicationId |
-| versionCode | `17` | Current source value only; the highest version already published must still be checked in Play Console |
-| versionName | `2.2.1` | Current source value only |
+| versionCode | `22` | Current `app/build.gradle.kts` value (`targetSdk 36`, `compileSdk 36`) |
+| versionName | `2.5.0` | Current `app/build.gradle.kts` value |
 | minSdk / targetSdk | `29` / `36` | Current source configuration |
 | compileSdk | `36` | Current source configuration |
 | Java / Kotlin JVM | `17` | Current source configuration |
-| Billing Library | `8.0.0` | Current dependency; product activation and live purchase have not been verified |
+| Billing Library | `8.3.0` | `com.android.billingclient:billing:8.3.0` + Edge Function token validation |
+| Supported Locales | 14 directories (`values` + 13 locales) | Includes `ar` (RTL), `bn`, `de`, `en`, `es`, `fr`, `hi`, `in`, `ja`, `ko`, `pt-rBR`, `ru`, `zh-rCN` |
 
 The source project retains the legacy `com.rdf112.sweep` namespace and resource names for compatibility with the reconstructed code. The installable application identity is `com.rdf112.midiastore`. Do not change `applicationId`, signing certificate, versionCode or Play listing without the owner's explicit approval.
 
@@ -60,7 +86,7 @@ The source integrates Google Play Billing Client and currently queries these pro
 - `sweep_pro_annual` — subscription
 - `sweep_pro_lifetime` — one-time product
 
-These IDs and purchase types are source configuration, not proof of activation in the Play Console. The current client checks the presence of the Play purchase signature/JSON fields but does not perform cryptographic token validation through a trusted backend. Do not represent local entitlement as production-grade purchase verification. Real catalog queries, test purchases, pending/cancelled/restored purchases, acknowledgement and subscription lifecycle must be tested before selling Pro.
+These IDs match the active Google Play Developer API catalog (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`). The Android client delegates `purchaseToken` verification and Play Store acknowledgement to the Supabase Edge Function (`verify-play-purchase`) backed by the Google Play Developer API v3 service account. Real license-tester purchases, pending/cancelled/restored purchases, subscription renewals, refunds and expiry lifecycles must still be tested end-to-end before marketing production availability.
 
 ## Build and verification
 

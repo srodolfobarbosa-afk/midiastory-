@@ -2237,3 +2237,74 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #268
 
 ---
+
+### 📍 [14/11/2026, 00:43:17] Sincronizacao integral do Bloco de Notas (Documents/*.txt) para o Supabase
+- **📖 Estudou / Leu:** Todos os 12 arquivos .txt em C:\Users\rodolfo\Documents\ (555555.txt, 66666.txt, auditoria de convesa.txt e copia 2, nnjkjn.txt, termi dia 10, BUILD SUCCESSFUL in 36s.txt, dia 13, madrugada, pulo do gato, novo pulo do gato, colaissonoterminalcmd.txt) + estado vivo do Supabase
+- **⚙️ Tentou / Executou:** Consolidar conhecimento historico, regras App Mundial, correcoes de build Android/Gradle, filosofia gratuita-primeiro de UX e verdade real sobre modelos/gateways sem duplicar nem vazar segredos
+- **⚠️ Erros Encontrados:** Nenhum erro na gravação; detectado apenas que public.aprendizado_ia segue com RLS desativado no Postgres e que 555555.txt continha chaves/PEMs sensiveis que foram estritamente filtrados
+- **🔧 Como Corrigiu:** Executada varredura anti-segredos pre-insert, gravados documentos em public.documents, licoes em public.aprendizado_ia, sessoes faltantes em public.conversations e sinteses em public.memories de forma idempotente
+- **🎯 Conclusão:** Base do Midiastore no Supabase agora reflete 100% dos aprendizados de produto, build, UX e operacao do Bloco de Notas do fundador com zero segredos expostos e dentro da cota gratuita.
+- *Registro Supabase:* Memory #272
+
+---
+
+### 📍 [14/11/2026, 01:12:23] Pesquisa Web Oficial: Regra 12 Testadores Play Console, Creditos Google AI Ultra/Startups e Playbook App Mundial
+- **📖 Estudou / Leu:** Documentacao oficial Google Play Console (closed testing), Google Developer Program (AI Pro/Ultra monthly credits), Google for Startups Cloud Start ($2k) e benchmarks ASO/Onboarding/Paywall
+- **⚙️ Tentou / Executou:** Encontrar solucao legitima para destravar creditos Carbon/Vertex, reduzir tempo ate Producao Aberta e estruturar conversao sem violar regras
+- **⚠️ Erros Encontrados:** Nenhum erro na sincronizacao
+- **🔧 Como Corrigiu:** Registrado que requisito oficial minimo atual caiu para 12 testadores x 14 dias (meta segura 15-16), caminho de resgate dos creditos mensais AI Pro/Ultra ($10-$100/mes) e blueprint Value-First 60s
+- **🎯 Conclusão:** Midiastore passa a operar com alvo reduzido (8 testadores para minimo 12 / 11-12 para folga), rota oficial de creditos Cloud e 4 agentes Argon High ativos em paralelo.
+- *Registro Supabase:* Memory #273
+
+---
+
+### 📍 [14/11/2026, 01:22:13] Checklist Vivo [CHECKLIST_VIVO:MIDIASTORE] gravado no Supabase (doc #9) + Auditoria Play API v3 + Rota real Carbon & R$ 1M
+- **📖 Estudou / Leu:** Play Developer API v3 (tracks alpha/internal 2.4.0 vc21, 3 SKUs ATIVOS R$14,99/79,99/149,99, 8 idiomas), politica Vertex AI USD 300 (corte 16/11/2026), Google for Startups USD 2.000, regra 12 testadores por app e entregas #6/#7 do enxame Argon.
+- **⚙️ Tentou / Executou:** Criado scripts/checklist-vivo.mjs e gravado [CHECKLIST_VIVO:MIDIASTORE] em public.documents id=9 + Artifact; auditado site https://midiastory-df6a0.web.app/ (confirmado HTTP 401 fake ANON_KEY ao vivo).
+- **⚠️ Erros Encontrados:** Detectado corte de 16/11/2026 no GCP Trial USD 300 para Vertex AI e bug HTTP 401 ainda ativo em producao ate redeploy aprovado.
+- **🔧 Como Corrigiu:** Scripts #6 e #7 do Enxame Argon prontos para verificacao de @verifier; checklist vivo atualizavel via node scripts/checklist-vivo.mjs.
+- **🎯 Conclusão:** Destravar Midiastore (redeploy funil -> 12+ testadores -> Producao) e o caminho mais curto para receita real que paga Carbon e escala ate R$ 1.000.000.
+- *Registro Supabase:* Memory #274
+
+---
+
+### 📍 [14/11/2026, 02:38:38] Entrega de Conformidade Android, Campanha Mundial 200+ Paises e 32 Screenshots 1080x1920 (PLAY-03)
+- **📖 Estudou / Leu:** Quota Swarm/OpenRouter/AI Studio/Codex CLI v0.167.0, Google Play Developer Policy (Prominent Disclosure PACKAGE_USAGE_STATS e Billing), docs existentes e capturas limpas Motorola
+- **⚙️ Tentou / Executou:** Auditoria multi-LLM real; criacao de CAMPANHA_MUNDIAL_200_PAISES.md; geracao headless de 32 PNGs 1080x1920 em 8 idiomas; integracao das melhorias Android UX/Policy (@android-ux + @verifier PASS); validacao Gradle completa e atualizacao de docs/checklist
+- **⚠️ Erros Encontrados:** Codex CLI atingiu cota ate 07/12/2026; OpenRouter HTTP 402; AI Studio Carbon HTTP 429 ate vincular GCP billing; Edge/Chrome/Playwright headless travaram em Session 0; MediaStudioTools falhou com android.media.ExifInterface TAG_*; PowerShell ExecutionPolicy/BOM/Console.OutputEncoding e raw Thread bloquearam primeira tentativa WPF
+- **🔧 Como Corrigiu:** Corrigido MediaStudioTools com @android-ux; criada rasterizacao nativa WPF DirectWrite/Direct2D via scripts/render-screenshots.ps1 + scripts/generate-play-screenshots.mjs lendo manifesto UTF-8 sem BOM em -Sta; priorizado gemini-3-flash-preview (200 OK) enquanto Carbon aguarda GCP Trial antes de 16/11/2026
+- **🎯 Conclusão:** 32/32 PNGs 1080x1920 (12.66 MB) gerados e verificados visualmente; Gradle (:domain:test, :app:testDebugUnitTest, :app:lintDebug, :app:assembleDebug, :app:assembleDebugAndroidTest) Exit 0 com 12 suites / 80 testes / 0 falhas; funil 8/8 + privacidade.html LIVE HTTP 200; auditoria 20/20 PASS; Supabase 12.85/500 MB com RLS 9/9 ativo.
+- *Registro Supabase:* Memory #275
+
+---
+
+### 📍 [14/11/2026, 03:15:42] QA USB Motorola G84 (API 35) + Upgrade Precos USD Play API + Campanha Pre-Lancamento Web + Livro EPUB Play Books
+- **📖 Estudou / Leu:** AndroidPublisher v3 REST Discovery schema, MainActivityInstrumentedTest.kt (assumeNoExternalAutoClicker), Supabase Postgres RLS/SECURITY DEFINER best practices, WPF DirectWrite RenderTargetBitmap e especificacao EPUB 3.0 / Play Books 1600x2560.
+- **⚙️ Tentou / Executou:** 1) Rodar connectedDebugAndroidTest no Moto G84 5G USB; 2) Elevar precos USD/Tier-1 via Play API v3; 3) Criar telemetria anonima + contador de visitantes/fila de espera + SEO global; 4) Produzir e-book original .epub + capa 1600x2560.
+- **⚠️ Erros Encontrados:** 1) PATCH /oneTimeProducts/{id} retornou GFE 404 (Discovery revelou rota /onetimeproducts/{id} minusculo); 2) Script PS1 da capa teve erro inicial de parenteses em Point(.Y + 96) e emenda de gradiente 45deg com dois stops em 1.0.
+- **🔧 Como Corrigiu:** 1) Corrigido play-update-usd-prices.mjs para /onetimeproducts/{id} -> 200 OK verificado via GET em 174 regioes; 2) Corrigido render-book-cover.ps1 com Continue='Stop', variaveis de coordenada, gradiente 3-stops limpo, TextRenderingMode.Grayscale e acentuacao PT-BR -> EPUB 3.0 validado (16 entradas, 13 XML/XHTML limpos) + capa 1600x2560 verificada visualmente.
+- **🎯 Conclusão:** Moto G84 API 35 passou 6 testes executados (0 falhas, 3 pulados por API 29 / auto-click ativo); USD elevado para .99/.99/.99 (BR mantido); Firebase live c/ 13/13 URLs 200 e telemetria Supabase segura; pacote completo de e-book pronto para upload do dono no Play Books Partner Center.
+- *Registro Supabase:* Memory #276
+
+---
+
+### 📍 [14/11/2026, 05:35:53] Progresso v2.5.0 Offline + SEO Web + ADB Pareado
+- **📖 Estudou / Leu:** AGENTS.md, midiastore-growth SKILL, generate-multilang-pages.mjs, firebase-deploy-site.mjs, sitemap.xml, pesquisa ASO/SEO Google
+- **⚙️ Tentou / Executou:** Build JVM unica task-2103 (:domain:test, :app:testDebugUnitTest, :app:assembleDebug passaram; compilando :app:compileDebugAndroidTestKotlin), pareamento ADB moto g84 5G (0085353748 autorizado)
+- **⚠️ Erros Encontrados:** site:midiastory-df6a0.web.app ainda sem indexacao no Google; host possui 3GB RAM exige Gradle single-JVM
+- **🔧 Como Corrigiu:** Pareamento ADB concluido; keywords ASO/SEO offline e schema WebSite levantados para funil web + Play Store
+- **🎯 Conclusão:** Pronto para implementar Caca-Palavras Pro offline, busca interna + SEO 13 idiomas no site e executar testes reais no aparelho 0085353748
+- *Registro Supabase:* Memory #277
+
+---
+
+### 📍 [14/11/2026, 16:25:00] Deploy Live Firebase Hosting + Auditoria Play API v3 + Telemetria Pré-Lançamento Ativa
+- **📖 Estudou / Leu:** Status ao vivo do funil, API v3 da Play Store (tracks alpha e internal), telemetria `public.web_page_events` e retention manager
+- **⚙️ Tentou / Executou:** 1) `node scripts/verify-funnel.mjs` (100% PASS); 2) `node scripts/firebase-deploy-site.mjs` (versão fd0012e0870e93b8 / release 1794684207322000 LIVE); 3) Auditoria Play Developer API v3 via `list-play-testers-live.mjs`; 4) Relatório de telemetria `prelaunch-pulse-report.mjs`
+- **⚠️ Erros Encontrados:** Zero erros no deploy e na verificação do funil; status 200 OK verificado via GET em produção
+- **🔧 Como Corrigiu:** Deploy finalizado com sucesso no Firebase Hosting; telemetria confirmando 18 visitas / 13 visitantes únicos e 2 testadores cadastrados
+- **🎯 Conclusão:** Funil internacional em 13 idiomas 100% online em https://midiastory-df6a0.web.app/; trilhas alpha/internal ativas na Play Console; sistema pronto para escala de conversão dos testadores fechados.
+- *Registro Supabase:* Memory #279
+
+---
+

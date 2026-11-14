@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111f">
-  <title>Midiastore Ferramentas — Central de Mídia, Download por Link, Filtros e QR Code</title>
-  <meta name="description" content="Ferramentas gratuitas online de mídia: Otimizador de vídeos por link, filtros de fotos ao vivo, gerador de QR Code e conversor para PDF. Baixe o app Midiastore na Google Play!">
+  <title>Midiastore Ferramentas — Filtros de Fotos, Privacidade EXIF, QR Code e PDF</title>
+  <meta name="description" content="Estúdio online gratuito do Midiastore: filtros de fotos ao vivo, remoção de metadados EXIF/GPS para privacidade, gerador de QR Code PIX e conversor de fotos para PDF A4.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://midiastory-df6a0.web.app/ferramentas.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Midiastore Ferramentas — Central Online de Mídia Gratuita">
-  <meta property="og:description" content="Baixe e otimize mídias por link, aplique filtros ao vivo, gere QR Codes PIX e converta fotos para PDF.">
+  <meta property="og:title" content="Midiastore Ferramentas — Estúdio Online de Mídia Gratuito">
+  <meta property="og:description" content="Aplique filtros ao vivo, remova metadados EXIF/GPS das suas fotos, gere QR Codes PIX e converta imagens para PDF A4.">
   <meta property="og:url" content="https://midiastory-df6a0.web.app/ferramentas.html">
   <style>
     :root{--bg:#07111f;--card:#0f1d31;--line:#223652;--text:#edf3fc;--muted:#9ab0ce;--mint:#5de3bf;--white:#fff;--danger:#ff5252;--max:1040px}
@@ -21,7 +21,7 @@
     .nav{display:flex;align-items:center;justify-content:space-between;min-height:64px;gap:12px;flex-wrap:wrap}
     .brand{font-size:1.25rem;font-weight:900;letter-spacing:-.02em;text-decoration:none;color:var(--white)}
     .brand span{color:var(--mint)}
-    .nav-links{display:flex;gap:10px;align-items:center}
+    .nav-links{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .nav-links a{color:var(--muted);text-decoration:none;font-size:0.9rem;font-weight:700;padding:6px 12px;border-radius:8px;transition:all .15s}
     .nav-links a:hover,.nav-links a.active{color:var(--white);background:#1a2b42}
     
@@ -41,11 +41,9 @@
     .tool-header h2{margin:0 0 8px;font-size:1.5rem}
     .tool-header p{margin:0;color:var(--muted);font-size:0.92rem}
 
-    /* Downloader Tool */
-    .dl-box{max-width:600px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap}
     .dl-input{flex:1;min-width:260px;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:0.95rem;outline:none}
     .dl-input:focus{border-color:var(--mint)}
-    .dl-btn{background:var(--mint);color:#041019;border:none;padding:14px 24px;border-radius:12px;font-weight:800;font-size:0.95rem;cursor:pointer;transition:transform .15s}
+    .dl-btn{background:var(--mint);color:#041019;border:none;padding:14px 24px;border-radius:12px;font-weight:800;font-size:0.95rem;cursor:pointer;transition:transform .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
     .dl-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(93,227,191,0.3)}
     .dl-result{margin-top:24px;padding:20px;border-radius:16px;background:#07111f;border:1px dashed rgba(93,227,191,0.3);text-align:center;display:none}
 
@@ -66,9 +64,12 @@
     /* Play Store Conversion Banner */
     .app-banner{background:linear-gradient(135deg,#0e273a,#091729);border:1px solid var(--mint);border-radius:20px;padding:28px 24px;margin:40px 0;text-align:center;box-shadow:0 12px 40px rgba(93,227,191,0.15)}
     .app-banner h3{margin:0 0 8px;font-size:1.4rem}
-    .app-banner p{color:var(--muted);max-width:560px;margin:0 auto 20px;font-size:0.95rem}
-    .play-btn{display:inline-flex;align-items:center;gap:10px;background:var(--mint);color:#041019;font-weight:900;text-decoration:none;padding:14px 28px;border-radius:14px;font-size:1rem;transition:all .15s}
+    .app-banner p{color:var(--muted);max-width:600px;margin:0 auto 20px;font-size:0.95rem}
+    .banner-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .play-btn{display:inline-flex;align-items:center;gap:10px;background:var(--mint);color:#041019;font-weight:900;text-decoration:none;padding:14px 24px;border-radius:14px;font-size:0.95rem;transition:all .15s}
     .play-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(93,227,191,0.4)}
+    .play-btn.secondary{background:#12243b;color:var(--white);border:1px solid var(--line)}
+    .play-btn.secondary:hover{border-color:var(--mint)}
 
     footer{border-top:1px solid var(--line);padding:24px 0;margin-top:48px;font-size:0.85rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
     footer a{color:var(--muted);text-decoration:none}
@@ -83,6 +84,8 @@
     <div class="nav-links">
       <a href="/">Início</a>
       <a href="/ferramentas.html" class="active">Central de Ferramentas</a>
+      <a href="/diagnostico.html">Diagnóstico</a>
+      <a href="/#vip-testers" style="color:var(--mint);">Teste Fechado VIP</a>
       <a href="/privacidade.html">Privacidade</a>
     </div>
   </div>
@@ -90,42 +93,23 @@
 
 <main class="wrap">
   <div class="hero">
-    <div class="eyebrow">Estúdio Online Gratuito</div>
+    <div class="eyebrow">Estúdio Online Gratuito (100% Local no Navegador)</div>
     <h1>Central de <em>Ferramentas de Mídia</em></h1>
-    <p class="lead">Baixe por link, aplique filtros profissionais, gere QR Codes instantâneos e converta fotos para PDF sem instalar nada no navegador.</p>
+    <p class="lead">Experimente no navegador as mesmas ferramentas do Estúdio de Mídia do aplicativo Midiastore para Android: filtros ao vivo, remoção de metadados EXIF/GPS, QR Code e PDF.</p>
 
     <div class="tabs-nav">
-      <button class="tab-btn active" onclick="switchTab('downloader')">📥 Baixar Vídeo por Link</button>
-      <button class="tab-btn" onclick="switchTab('filters')">🎨 Filtros de Fotos ao Vivo</button>
-      <button class="tab-btn" onclick="switchTab('qrcode')">📱 Gerador de QR Code</button>
-      <button class="tab-btn" onclick="switchTab('pdf')">📄 Fotos para PDF</button>
+      <button class="tab-btn active" onclick="switchTab('filters', this)">🎨 Filtros de Fotos ao Vivo</button>
+      <button class="tab-btn" onclick="switchTab('exif', this)">🛡️ Limpador de EXIF / GPS</button>
+      <button class="tab-btn" onclick="switchTab('qrcode', this)">📱 Gerador de QR Code</button>
+      <button class="tab-btn" onclick="switchTab('pdf', this)">📄 Fotos para PDF</button>
     </div>
   </div>
 
-  <!-- TOOL 1: Downloader por Link -->
-  <section id="tool-downloader" class="tool-section active">
-    <div class="tool-header">
-      <h2>Otimizador e Download de Mídia por Link</h2>
-      <p>Cole o link do Reels, TikTok, Shorts ou vídeo da web para processar e salvar em alta qualidade.</p>
-    </div>
-    <div class="dl-box">
-      <input type="text" id="videoUrlInput" class="dl-input" placeholder="Cole o link do vídeo aqui (ex: https://instagram.com/reel/...)">
-      <button class="dl-btn" onclick="processVideoLink()">Baixar Vídeo</button>
-    </div>
-    <div id="dlResult" class="dl-result">
-      <h3 style="color:var(--mint);margin:0 0 8px;">✅ Vídeo Analisado com Sucesso!</h3>
-      <p style="color:var(--muted);margin:0 0 16px;">Para baixar com compressão inteligente que reduz até 80% do espaço no seu Android, use o app oficial:</p>
-      <a href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" class="play-btn">
-        <span>📲 Baixar no Midiastore para Android</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- TOOL 2: Filtros de Fotos -->
-  <section id="tool-filters" class="tool-section">
+  <!-- TOOL 1: Filtros de Fotos -->
+  <section id="tool-filters" class="tool-section active">
     <div class="tool-header">
       <h2>Estúdio de Filtros de Fotos ao Vivo</h2>
-      <p>Selecione uma foto e aplique efeitos Cinema, Nitidez, Vintage e P&B diretamente no seu navegador.</p>
+      <p>Selecione uma foto e aplique efeitos Cinema, Nitidez, Vintage e P&amp;B diretamente no seu navegador, sem enviar suas fotos para servidores.</p>
     </div>
     <div class="filter-box">
       <input type="file" id="photoInput" accept="image/*" onchange="loadPhotoPreview(event)" style="margin-bottom:12px;">
@@ -133,7 +117,7 @@
       <canvas id="filterCanvas" class="canvas-preview"></canvas>
       <div class="filter-buttons" id="filterBtnGroup" style="display:none;">
         <button class="filter-btn" onclick="applyWebFilter('normal')">Normal</button>
-        <button class="filter-btn" onclick="applyWebFilter('cinema')">Cinema (Teal & Orange)</button>
+        <button class="filter-btn" onclick="applyWebFilter('cinema')">Cinema (Teal &amp; Orange)</button>
         <button class="filter-btn" onclick="applyWebFilter('sharp')">Nitidez Alta</button>
         <button class="filter-btn" onclick="applyWebFilter('vintage')">Vintage / Sépia</button>
         <button class="filter-btn" onclick="applyWebFilter('bw')">Preto e Branco</button>
@@ -144,42 +128,70 @@
     </div>
   </section>
 
+  <!-- TOOL 2: Remoção de EXIF / GPS -->
+  <section id="tool-exif" class="tool-section">
+    <div class="tool-header">
+      <h2>Remoção de Metadados EXIF e Localização GPS</h2>
+      <p>Gere uma cópia limpa da sua imagem (JPEG) sem coordenadas de GPS ou dados ocultos da câmera antes de compartilhar nas redes sociais.</p>
+    </div>
+    <div class="filter-box">
+      <input type="file" id="exifInput" accept="image/*" onchange="processExifClean(event)" style="margin-bottom:12px;">
+      <canvas id="exifCanvas" style="display:none;"></canvas>
+      <div id="exifResult" class="dl-result">
+        <h3 style="color:var(--mint);margin:0 0 8px;">✅ Cópia Limpa sem Metadados EXIF Pronta!</h3>
+        <p id="exifDetails" style="color:var(--muted);margin:0 0 16px;"></p>
+        <button class="dl-btn" onclick="downloadCleanExifPhoto()">📥 Baixar Foto sem EXIF/GPS</button>
+      </div>
+    </div>
+  </section>
+
   <!-- TOOL 3: Gerador de QR Code -->
   <section id="tool-qrcode" class="tool-section">
     <div class="tool-header">
-      <h2>Gerador de QR Code Gratuito (PIX / Links / Wi-Fi)</h2>
-      <p>Gere QR Codes de alta nitidez para pagamentos PIX, links de redes sociais ou WhatsApp.</p>
+      <h2>Gerador Visual de Código Rápido (PIX / Links / Wi-Fi)</h2>
+      <p>Crie códigos visuais no navegador ou use o gerador oficial ZXing QR Code no app Midiastore para Android.</p>
     </div>
     <div class="qr-box">
-      <input type="text" id="qrTextInput" class="dl-input" placeholder="Digite o texto, link ou chave PIX copia e cola..." value="https://midiastory-df6a0.web.app" style="width:100%;margin-bottom:12px;">
-      <button class="dl-btn" onclick="generateWebQr()">Gerar QR Code</button>
+      <input type="text" id="qrTextInput" class="dl-input" placeholder="Digite o texto, link ou chave PIX..." value="https://midiastory-df6a0.web.app" style="width:100%;margin-bottom:12px;">
+      <button class="dl-btn" onclick="generateWebQr()">Gerar Prévia no Canvas</button>
       <br>
       <canvas id="qrCanvas" width="260" height="260"></canvas>
       <br>
-      <button class="dl-btn" style="background:#1a2b42;color:#fff;" onclick="downloadQrCode()">Baixar Imagem do QR Code (PNG)</button>
+      <button class="dl-btn" style="background:#1a2b42;color:#fff;" onclick="downloadQrCode()">Baixar Imagem (PNG)</button>
     </div>
   </section>
 
   <!-- TOOL 4: Conversor PDF -->
   <section id="tool-pdf" class="tool-section">
     <div class="tool-header">
-      <h2>Conversor de Fotos para PDF</h2>
+      <h2>Conversor de Fotos para PDF A4</h2>
       <p>Selecione imagens do seu computador ou celular e compile em um documento PDF padrão.</p>
     </div>
     <div class="pdf-box">
       <input type="file" id="pdfInput" accept="image/*" multiple style="margin-bottom:14px;">
       <p id="pdfStatus" style="color:var(--mint);font-weight:700;"></p>
-      <button class="dl-btn" onclick="processPdfConversion()">Criar e Baixar PDF</button>
+      <button class="dl-btn" onclick="processPdfConversion()">Criar e Imprimir / Salvar PDF</button>
     </div>
   </section>
 
-  <!-- CONVERSION BANNER TO GOOGLE PLAY -->
+  <!-- CONVERSION BANNER TO GOOGLE PLAY CLOSED TESTING -->
   <div class="app-banner">
-    <h3>Quer tudo isso com 1 toque direto no seu celular?</h3>
-    <p>O <strong>Midiastore</strong> traz o Estúdio Completo de Mídia + Limpeza Inteligente de WhatsApp e Duplicatas SHA-256 no seu Android.</p>
-    <a href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" class="play-btn">
-      <span>🚀 Instalar Midiastore na Google Play</span>
-    </a>
+    <h3>Quer o Estúdio Completo + Detector de Duplicatas SHA-256 no Android?</h3>
+    <p>O <strong>Midiastore</strong> reúne o Estúdio de Mídia (QR Code ZXing, Filtros, Remoção de EXIF e PDF A4) + revisão de vídeos grandes (&gt;10 MB) e cópias exatas SHA-256 com confirmação oficial do Android. Garanta seu <strong>Acesso Antecipado Gratuito ao Teste Fechado</strong>!</p>
+    <div class="banner-actions">
+      <a href="/#vip-testers" class="play-btn">
+        <span>⭐ Passo 1: Cadastrar Gmail no Teste Fechado (Acesso Gratuito)</span>
+      </a>
+      <a href="https://play.google.com/apps/testing/com.rdf112.midiastore" target="_blank" rel="noopener" class="play-btn secondary">
+        <span>✅ Passo 2: Aceitar Convite Web (Opt-in)</span>
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" rel="noopener" class="play-btn secondary">
+        <span>📲 Passo 3: Abrir na Google Play</span>
+      </a>
+    </div>
+    <p style="font-size:0.8rem;color:var(--muted);margin:14px auto 0;">
+      💡 Como o app está em Teste Fechado na Google Play (14 dias • meta: 12+ testadores ativos, 15+ ideal), autorize seu Gmail no Passo 1 e aceite o convite no Passo 2 antes de abrir a loja.
+    </p>
   </div>
 </main>
 
@@ -188,24 +200,19 @@
     <span>© 2026 Midiastore (com.rdf112.midiastore) · Todos os direitos reservados.</span>
     <div>
       <a href="/privacidade.html">Política de Privacidade</a> ·
-      <a href="/ferramentas.html">Ferramentas Online</a> ·
-      <a href="/">Programa de Testadores VIP</a>
+      <a href="/diagnostico.html">Diagnóstico</a> ·
+      <a href="/#vip-testers">Programa de Testadores VIP</a>
     </div>
   </div>
 </footer>
 
 <script>
-  function switchTab(tabId) {
+  function switchTab(tabId, btnEl) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tool-section').forEach(s => s.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById('tool-' + tabId).classList.add('active');
-  }
-
-  function processVideoLink() {
-    const val = document.getElementById('videoUrlInput').value.trim();
-    if (!val) { alert('Por favor, cole um link de vídeo válido.'); return; }
-    document.getElementById('dlResult').style.display = 'block';
+    if (btnEl) btnEl.classList.add('active');
+    const sec = document.getElementById('tool-' + tabId);
+    if (sec) sec.classList.add('active');
   }
 
   let originalImg = null;
@@ -251,6 +258,35 @@
     a.click();
   }
 
+  function processExifClean(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.getElementById('exifCanvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        document.getElementById('exifDetails').innerText =
+          'Imagem reprocessada localmente (' + img.width + 'x' + img.height + ' px). Todos os cabeçalhos EXIF/GPS originais foram descartados.';
+        document.getElementById('exifResult').style.display = 'block';
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function downloadCleanExifPhoto() {
+    const canvas = document.getElementById('exifCanvas');
+    const a = document.createElement('a');
+    a.download = 'midiastore-sem-exif.jpg';
+    a.href = canvas.toDataURL('image/jpeg', 0.94);
+    a.click();
+  }
+
   function generateWebQr() {
     const text = document.getElementById('qrTextInput').value || 'https://midiastory-df6a0.web.app';
     const canvas = document.getElementById('qrCanvas');
@@ -261,7 +297,6 @@
 
     const grid = 25;
     const cell = 260 / grid;
-    // Finder patterns
     function finder(x, y) {
       ctx.fillRect(x*cell, y*cell, 7*cell, 7*cell);
       ctx.fillStyle = '#fff';
@@ -273,7 +308,6 @@
     finder(grid-8, 1);
     finder(1, grid-8);
 
-    // Data dots
     let hash = 0;
     for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i);
     for (let r = 1; r < grid-1; r++) {
@@ -301,9 +335,9 @@
     window.print();
   }
 
-  // Gera o primeiro QR Code ao carregar
   window.addEventListener('DOMContentLoaded', generateWebQr);
 </script>
+<script src="/telemetry.js" defer></script>
 
 </body>
 </html>
