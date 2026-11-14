@@ -37,6 +37,7 @@ function getSupabaseClient() {
 
 async function callBrainLlm(prompt: string, state: OrchestratorState, recentLogs: unknown[], recentTasks: unknown[]): Promise<LlmDecision> {
   const openRouterKey = Deno.env.get("OPENROUTER_API_KEY");
+  const googleStudioKey = Deno.env.get("GOOGLE_AI_STUDIO_API_KEY") || Deno.env.get("GOOGLE_AQ_API_KEY");
   const openRouterUrl = Deno.env.get("OPENROUTER_BASE_URL") || "https://openrouter.ai/api/v1/chat/completions";
 
   const systemPrompt = `Você é a IA Nativa Orquestradora do projeto Midiastore (Android App com.rdf112.midiastore).
@@ -76,10 +77,47 @@ Instruções Cruciais:
     prompt_instruction: prompt || "Execute o próximo ciclo de raciocínio e ação para o objetivo ativo.",
   });
 
+  // 1. Rota Primária Oficial Gratuita: Google AI Studio (Gemini 4 Hydrogen - 1M Context + Thinking / Gemini 2.5 Flash)
+  if (googleStudioKey) {
+    for (const studioModel of ["gemini-4-hydrogen", "gemini-2.5-flash"]) {
+      try {
+        const gRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${studioModel}:generateContent?key=${googleStudioKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${systemPrompt}\n\nCONTEXTO ATUAL:\n${userContext}` }] }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.2,
+                ...(studioModel.includes("gemini-4") ? { thinkingConfig: { thinkingLevel: "MEDIUM" } } : {}),
+              },
+            }),
+          },
+        );
+        if (gRes.ok) {
+          const gData = await gRes.json();
+          const text = (gData.candidates?.[0]?.content?.parts || [])
+            .map((p: { text?: string }) => p.text || "")
+            .join("")
+            .trim();
+          if (text) {
+            return JSON.parse(text) as LlmDecision;
+          }
+        }
+      } catch (err) {
+        console.warn(`Google AI Studio (${studioModel}) error:`, err);
+      }
+    }
+  }
+
+  // 2. Fallback OpenRouter (Modelos Gratuitos Ativos + Calibragem de max_tokens)
   const modelsToTry = [
-    "google/gemini-2.0-flash-exp:free",
-    "google/gemini-2.0-flash-lite:free",
-    "openai/gpt-4o-mini",
+    "nvidia/nemotron-3.5-lightning:free",
+    "google/gemma-4-31b-it:free",
+    "baidu/ernie-5.5-flash-preview:free",
+    "openrouter/free",
   ];
 
   for (const model of modelsToTry) {
@@ -94,6 +132,7 @@ Instruções Cruciais:
         },
         body: JSON.stringify({
           model,
+          max_tokens: 1200,
           response_format: { type: "json_object" },
           messages: [
             { role: "system", content: systemPrompt },

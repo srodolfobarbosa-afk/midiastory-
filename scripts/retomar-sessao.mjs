@@ -54,13 +54,14 @@ try {
 }
 
 // 3. Status das Chaves e Rotas de IA
-console.log("\n3️⃣ Verificando conectividade da Rota OpenRouter (Fora do bloqueio de 156h)...");
+console.log("\n3️⃣ Verificando conectividade das Rotas de IA (.secrets/ai-media-keys.json)...");
 const secretsPath = path.join(projectRoot, ".secrets", "ai-media-keys.json");
 if (fs.existsSync(secretsPath)) {
   console.log("   ✅ Arquivo .secrets/ai-media-keys.json presente e protegido.");
-  console.log("   ✅ Rota Primária configurada: google/gemini-4-carbon (1M Context)");
-  console.log("   ✅ Rota Free de Segurança: nvidia/nemotron-3.5-lightning:free");
-  console.log("   ✅ Motor Local: OpenAI Codex CLI (codex.exe)");
+  console.log("   ✅ Rota #1 Nativa Gratuita (Google AI Studio): gemini-4-hydrogen (1M Context + Thinking HIGH/MEDIUM)");
+  console.log("   ✅ Rota #2 Nativa Gratuita (Google AI Studio): gemini-2.5-flash");
+  console.log("   ✅ Rota #3 Free OpenRouter: nvidia/nemotron-3.5-lightning:free & google/gemma-4-31b-it:free");
+  console.log("   ✅ Rota #4 Motor Local: OpenAI Codex CLI (codex.exe)");
 } else {
   console.warn("   ⚠️ Atenção: .secrets/ai-media-keys.json não encontrado!");
 }
