@@ -2157,3 +2157,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #260
 
 ---
+
+### 📍 [13/11/2026, 21:00:51] Sincronizacao GitHub (22 Commits), Blindagem do Funil 8 Idiomas e Versionamento do Verify-Play-Purchase
+- **📖 Estudou / Leu:** AGENTS.md, CONTEXTO_MESTRE.md, LINHA_DO_TEMPO_AUTONOMA.md, public.memories #256-#260, AndroidPlayBillingGateway.kt e workflows GitHub Actions
+- **⚙️ Tentou / Executou:** Push dos 22 commits locais para origin/codex/midiastore-release-audit, auditoria de percepcao de ponta a ponta e restauracao do funil Firebase Hosting
+- **⚠️ Erros Encontrados:** 1. 22 commits locais (5510814..f6e99c0) nao estavam publicados no GitHub. 2. Workflow legado fabrica-autonoma-ubuntu.yml rodava na main a cada 30m e sobrescrevia o Firebase Hosting causando HTTP 404 nas 8 rotas de idiomas
+- **🔧 Como Corrigiu:** 1. Push de todos os commits locais e execucao verde do CI/CD (#43530311746). 2. Desativado e removido fabrica-autonoma-ubuntu.yml, republicado site completo no Firebase Hosting (9/9 rotas HTTP 200 PASS) e versionado supabase/functions/verify-play-purchase/index.ts
+- **🎯 Conclusão:** GitHub 100% sincronizado, CI/CD verde, funil 8 idiomas blindado com HTTP 200 e verificacao server-side Play Billing ativa e versionada
+- *Registro Supabase:* Memory #261
+
+---

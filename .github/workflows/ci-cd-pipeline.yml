@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -68,7 +68,7 @@ jobs:
   firebase-cd:
     name: 🚀 Deploy do Funil Web (8 Idiomas)
     needs: android-ci
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/codex/') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código

@@ -1,8 +1,16 @@
 # Midiastore publication checklist
 
-Updated 2026-11-07. This checklist records the current local build and release gates; it is not a declaration that the app is release-ready.
+Updated 2026-11-13. This checklist records the current build, Play Console tracks (`versionCode 21` / `v2.4.0`), Billing verification, and remaining public production release gates.
 
-## Implemented and checked in this session
+## Implemented and verified through 2026-11-13
+
+- [x] `v2.4.0` (`versionCode = 21`) signed with the official upload key and uploaded to Google Play Console `internal` and `alpha` (Closed Testing) tracks.
+- [x] All 8 store listing locales and all 8 in-app Android string resource locales (`values`, `pt-rBR`, `en`, `es`, `de`, `fr`, `hi`, `ja`, `zh-rCN`) pass `scripts/ci-cd-governance-audit.mjs` (20/20 checks).
+- [x] All 9 web funnel routes on `https://midiastory-df6a0.web.app` (`/`, `/en/`, `/es/`, `/de/`, `/fr/`, `/hi/`, `/ja/`, `/zh/`, `/artigos/como-liberar-espaco-whatsapp.html`) return HTTP 200; stale scheduled workflow `fabrica-autonoma-ubuntu.yml` disabled and removed.
+- [x] Google Play Console products `sweep_pro_monthly` (R$ 14.99), `sweep_pro_annual` (R$ 79.99), and `sweep_pro_lifetime` (R$ 149.99) configured and `ACTIVE` via Google Play Developer API v3.
+- [x] Server-side purchase-token verification Edge Function (`verify-play-purchase`) active on Supabase and versioned in `supabase/functions/verify-play-purchase/index.ts`.
+
+## Previous session checks (2026-11-07)
 
 - [x] Home uses the navy and pink identity, original vector artwork, one prominent free-cleanup action, and a visible Pro entry point.
 - [x] The free-cleanup action runs the app's MediaStore large-file mission instead of opening Files by Google. On the connected Moto G84 5G (Android 15/API 35), it found 5 review candidates totaling 84.30 MB and opened Midiastore's review screen.
