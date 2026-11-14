@@ -358,15 +358,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var worldSection: LinearLayout
     private lateinit var proSection: LinearLayout
 
-    // Botões da Barra de Navegação Inferior
+    // Botões da Barra de Navegação Inferior (4 Abas Padrão Mundial)
     private lateinit var navHomeBtn: MaterialButton
     private lateinit var navFilesBtn: MaterialButton
     private lateinit var navStudioBtn: MaterialButton
-    private lateinit var navOaasBtn: MaterialButton
-    private lateinit var navGamesBtn: MaterialButton
-    private lateinit var navWorldBtn: MaterialButton
     private lateinit var navProBtn: MaterialButton
-    private lateinit var bottomNavScroll: HorizontalScrollView
     private lateinit var bottomNavContainer: LinearLayout
     private var logoEasterEggTapCount = 0
     private var logoLastTapMs = 0L
@@ -674,40 +670,31 @@ class MainActivity : AppCompatActivity() {
         bodyContainer.addView(worldSection)
         bodyContainer.addView(proSection)
 
-        // 3. BARRA DE NAVEGAÇÃO HORIZONTAL ESPAÇOSA (7 Abas Dedicadas)
-        bottomNavScroll = HorizontalScrollView(this).apply {
-            isHorizontalScrollBarEnabled = false
-            setBackgroundColor(color(R.color.sweep_surface))
-            clipToPadding = false
-        }
+        // 3. BARRA DE NAVEGAÇÃO FIXA & ESPAÇOSA (4 Abas Principais Padrão Mundial com largura balanceada)
         bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(color(R.color.sweep_surface))
-            setPadding(dp(12), dp(8), dp(12), dp(10))
+            setPadding(dp(6), dp(8), dp(6), dp(8))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
-        navOaasBtn = navTabButton(getString(R.string.nav_missions)) { switchTab(AppTab.OAAS) }
         navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
         navStudioBtn = navTabButton(getString(R.string.nav_studio)) { switchTab(AppTab.STUDIO) }
-        navGamesBtn = navTabButton(getString(R.string.nav_games)) { switchTab(AppTab.GAMES) }
-        navWorldBtn = navTabButton(getString(R.string.nav_world)) { switchTab(AppTab.WORLD) }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
 
-        listOf(navHomeBtn, navOaasBtn, navFilesBtn, navStudioBtn, navGamesBtn, navWorldBtn, navProBtn).forEachIndexed { idx, tabBtn ->
-            tabBtn.minWidth = dp(88)
-            tabBtn.setPadding(dp(14), 0, dp(14), 0)
-            tabBtn.textSize = 12f
+        listOf(navHomeBtn, navFilesBtn, navStudioBtn, navProBtn).forEach { tabBtn ->
+            tabBtn.textSize = 12.5f
             tabBtn.minHeight = dp(46)
+            tabBtn.typeface = Typeface.DEFAULT_BOLD
             bottomNavContainer.addView(
                 tabBtn,
-                LinearLayout.LayoutParams(-2, dp(46)).apply {
-                    if (idx < 6) marginEnd = dp(8)
+                LinearLayout.LayoutParams(0, dp(46), 1f).apply {
+                    marginStart = dp(3)
+                    marginEnd = dp(3)
                 },
             )
         }
-        bottomNavScroll.addView(bottomNavContainer, ViewGroup.LayoutParams(-2, -2))
-        root.addView(bottomNavScroll, LinearLayout.LayoutParams(-1, -2))
+        root.addView(bottomNavContainer, LinearLayout.LayoutParams(-1, -2))
 
         return root
     }
@@ -780,14 +767,24 @@ class MainActivity : AppCompatActivity() {
             visibility = View.GONE
         }
         val homeTrashBtn = button(getString(R.string.move_to_trash_button)) {
-            requestMoveSelectedToTrash()
+            val targets = if (viewModel.state.value.selection.records.isNotEmpty()) {
+                viewModel.state.value.selection.records
+            } else {
+                homeInteractiveRecords
+            }
+            requestMoveSelectedToTrash(targets)
         }.apply {
             setTextColor(color(R.color.sweep_background))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
             visibility = if (trashCoordinator.supportsSystemTrash()) View.VISIBLE else View.GONE
         }
         val homeDeleteBtn = button(getString(R.string.permanent_delete_button)) {
-            requestPermanentDeleteSelected()
+            val targets = if (viewModel.state.value.selection.records.isNotEmpty()) {
+                viewModel.state.value.selection.records
+            } else {
+                homeInteractiveRecords
+            }
+            requestPermanentDeleteSelected(targets)
         }.apply {
             setTextColor(color(R.color.sweep_text))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
@@ -795,6 +792,33 @@ class MainActivity : AppCompatActivity() {
         homeDirectCleanRow.addView(homeTrashBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
         homeDirectCleanRow.addView(homeDeleteBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
         addView(homeDirectCleanRow, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(14) })
+
+        // Card de Destaque WhatsApp Express Cleaner (100% Grátis)
+        val homeWaCard = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+        }
+        val homeWaBadge = TextView(this@MainActivity).apply {
+            text = getString(R.string.wa_card_badge)
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#25D366"))
+        }
+        homeWaCard.addView(homeWaBadge)
+        homeWaCard.addView(label(getString(R.string.wa_card_title), 16f, R.color.sweep_text, true), top(3))
+        homeWaCard.addView(label(getString(R.string.wa_card_desc), 11.5f, R.color.sweep_muted, false), top(2))
+        val homeWaBtn = button(getString(R.string.quick_clean_whatsapp)) {
+            openWhatsAppCleanerFlow()
+        }.apply {
+            minHeight = dp(46)
+            cornerRadius = dp(14)
+            textSize = 13f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#070B14"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#25D366"))
+        }
+        homeWaCard.addView(homeWaBtn, top(10))
+        addView(themedCard(homeWaCard, Color.parseColor("#0A1D14"), Color.parseColor("#25D366")), bottom(14))
 
         // Card de Conversão VIP Pro em Destaque (Logo abaixo do botão grande Liberar Espaço)
         val homeProCardContent = card()
@@ -1534,18 +1558,104 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(48)
         }
         pdfCard.addView(openPdfBtn, top(12))
-        addView(themedCard(pdfCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(18))
+        addView(themedCard(pdfCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
+
+        // SEÇÃO: FLIPERAMA & PASSATEMPOS 100% OFFLINE
+        val arcadeHeader = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(4), dp(16), dp(4), dp(10))
+        }
+        val arcadeBadge = TextView(this@MainActivity).apply {
+            text = getString(R.string.games_arcade_badge)
+            textSize = 10.5f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#5DF5D3"))
+        }
+        arcadeHeader.addView(arcadeBadge)
+        arcadeHeader.addView(label(getString(R.string.snake_dialog_title), 18f, R.color.sweep_text, true), top(4))
+        arcadeHeader.addView(label(getString(R.string.home_global_subtitle), 12f, R.color.sweep_muted, false), top(4))
+        addView(arcadeHeader)
+
+        // Card 1: Fliperama Offline (Cobrinha Retrô + Blocos em Queda)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.games_arcade_badge),
+                badgeHex = "#5DF5D3",
+                titleText = getString(R.string.snake_dialog_title),
+                subtitleText = getString(R.string.snake_hint_offline),
+                cardBgHex = "#101827",
+                strokeHex = "#24344D",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.home_btn_snake, "#00E5B0", "#070B14") { openOfflineSnakeGameDialog() },
+                    WorldButtonSpec(R.string.home_btn_blocks, "#1C2942", "#F8FAFC") { openFallingBlocksGameDialog() },
+                ),
+            ),
+            bottom(14),
+        )
+
+        // Card 2: Salão Secreto de Mágicas & Charadas
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.games_magic_badge),
+                badgeHex = "#5DF5D3",
+                titleText = getString(R.string.magic_lab_title),
+                subtitleText = getString(R.string.magic_lab_subtitle),
+                cardBgHex = "#101827",
+                strokeHex = "#24344D",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.home_btn_magic, "#1C2942", "#F8FAFC") { openMagicSecretLabDialog() },
+                    WorldButtonSpec(R.string.dice_title, "#1C2942", "#FFD54F") { openMagicDiceDialog() },
+                ),
+            ),
+            bottom(14),
+        )
+
+        // Card 3: Caça-Palavras Pro (Desafio Diário Offline)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.pro_ws_daily_btn).uppercase(java.util.Locale.getDefault()),
+                badgeHex = "#FFD54F",
+                titleText = getString(R.string.games_wordsearch_card_title),
+                subtitleText = getString(R.string.pro_ws_subtitle),
+                cardBgHex = "#151208",
+                strokeHex = "#FFB300",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.pro_suite_wordsearch_btn, "#FFB300", "#070B14") {
+                        openProWordSearchDialog()
+                    },
+                ),
+            ),
+            bottom(14),
+        )
+
+        // Card 4: Hub Global Offline (Relógio Mundial + Moedas + Clima/Turismo)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.home_global_badge),
+                badgeHex = "#5DF5D3",
+                titleText = getString(R.string.home_global_title),
+                subtitleText = getString(R.string.home_global_subtitle),
+                cardBgHex = "#101827",
+                strokeHex = "#24344D",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.home_btn_clock, "#1C2942", "#F8FAFC") { openWorldClockDialog() },
+                    WorldButtonSpec(R.string.home_btn_currency, "#1C2942", "#F8FAFC") { openCurrencyConverterDialog() },
+                    WorldButtonSpec(R.string.home_btn_travel, "#1C2942", "#F8FAFC") { openCountryTravelAndPlacesDialog() },
+                ),
+            ),
+            bottom(18),
+        )
     }
 
     private fun switchTab(tab: AppTab) {
         activeTab = tab
         statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS || tab == AppTab.HOME)) View.VISIBLE else View.GONE
         homeSection.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
-        filesSection.visibility = if (tab == AppTab.FILES) View.VISIBLE else View.GONE
-        studioSection.visibility = if (tab == AppTab.STUDIO) View.VISIBLE else View.GONE
-        oaasSection.visibility = if (tab == AppTab.OAAS) View.VISIBLE else View.GONE
-        gamesSection.visibility = if (tab == AppTab.GAMES) View.VISIBLE else View.GONE
-        worldSection.visibility = if (tab == AppTab.WORLD) View.VISIBLE else View.GONE
+        filesSection.visibility = if (tab == AppTab.FILES || tab == AppTab.OAAS) View.VISIBLE else View.GONE
+        studioSection.visibility = if (tab == AppTab.STUDIO || tab == AppTab.GAMES || tab == AppTab.WORLD) View.VISIBLE else View.GONE
+        oaasSection.visibility = View.GONE
+        gamesSection.visibility = View.GONE
+        worldSection.visibility = View.GONE
         proSection.visibility = if (tab == AppTab.PRO) View.VISIBLE else View.GONE
         if (::mainScrollView.isInitialized) {
             mainScrollView.post { mainScrollView.scrollTo(0, 0) }
@@ -1554,28 +1664,9 @@ class MainActivity : AppCompatActivity() {
         // Paleta coesa em todo o app: Mint Teal (#00E5B0) nas abas padrão (ou Ouro 24K no VIP) e Âmbar no Pro
         val tabAccent = if (hasEffectiveProAccess()) Color.parseColor("#FFD54F") else color(R.color.sweep_primary)
         styleNavButton(navHomeBtn, tab == AppTab.HOME, customSelectedColor = tabAccent)
-        styleNavButton(navOaasBtn, tab == AppTab.OAAS, customSelectedColor = tabAccent)
-        styleNavButton(navFilesBtn, tab == AppTab.FILES, customSelectedColor = tabAccent)
-        styleNavButton(navStudioBtn, tab == AppTab.STUDIO, customSelectedColor = tabAccent)
-        styleNavButton(navGamesBtn, tab == AppTab.GAMES, customSelectedColor = tabAccent)
-        styleNavButton(navWorldBtn, tab == AppTab.WORLD, customSelectedColor = tabAccent)
+        styleNavButton(navFilesBtn, tab == AppTab.FILES || tab == AppTab.OAAS, customSelectedColor = tabAccent)
+        styleNavButton(navStudioBtn, tab == AppTab.STUDIO || tab == AppTab.GAMES || tab == AppTab.WORLD, customSelectedColor = tabAccent)
         styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = Color.parseColor("#FFB300"))
-
-        if (::bottomNavScroll.isInitialized) {
-            val activeBtn = when (tab) {
-                AppTab.HOME -> navHomeBtn
-                AppTab.OAAS -> navOaasBtn
-                AppTab.FILES -> navFilesBtn
-                AppTab.STUDIO -> navStudioBtn
-                AppTab.GAMES -> navGamesBtn
-                AppTab.WORLD -> navWorldBtn
-                AppTab.PRO -> navProBtn
-            }
-            bottomNavScroll.post {
-                val targetX = (activeBtn.left + activeBtn.width / 2) - (bottomNavScroll.width / 2)
-                bottomNavScroll.smoothScrollTo(targetX.coerceAtLeast(0), 0)
-            }
-        }
     }
 
     private fun styleNavButton(btn: MaterialButton, selected: Boolean, customSelectedColor: Int? = null) {
@@ -1619,8 +1710,7 @@ class MainActivity : AppCompatActivity() {
         if (::bottomNavContainer.isInitialized) {
             navFilesBtn.visibility = View.VISIBLE
             navStudioBtn.visibility = View.VISIBLE
-            navOaasBtn.visibility = View.VISIBLE
-            navWorldBtn.visibility = View.VISIBLE
+            navProBtn.visibility = View.VISIBLE
         }
         testerVipButton?.let { styleTesterVipButton(it, isTesterVipProEnabled()) }
         refreshHomeProConversionCta(state)
@@ -1734,8 +1824,8 @@ class MainActivity : AppCompatActivity() {
                 0,
             )
         }
-        if (::bottomNavScroll.isInitialized) {
-            bottomNavScroll.setBackgroundColor(
+        if (::bottomNavContainer.isInitialized) {
+            bottomNavContainer.setBackgroundColor(
                 if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
             )
         }
@@ -2556,8 +2646,8 @@ class MainActivity : AppCompatActivity() {
             buildActionGroupCard(
                 badgeText = getString(R.string.games_arcade_badge),
                 badgeHex = "#5DF5D3",
-                titleText = getString(R.string.home_btn_snake),
-                subtitleText = getString(R.string.blocks_hint_offline),
+                titleText = getString(R.string.snake_dialog_title),
+                subtitleText = getString(R.string.snake_hint_offline),
                 cardBgHex = "#101827",
                 strokeHex = "#24344D",
                 buttons = listOf(
@@ -3785,6 +3875,16 @@ class MainActivity : AppCompatActivity() {
             )
             row.setOnClickListener { box.isChecked = !box.isChecked }
             row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f))
+            val quickDeleteBtn = button("🗑") {
+                requestPermanentDeleteSelected(listOf(record))
+            }.apply {
+                minWidth = dp(44)
+                minHeight = dp(44)
+                setTextColor(color(R.color.sweep_danger))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#22FF4444"))
+                setPadding(dp(4), dp(4), dp(4), dp(4))
+            }
+            row.addView(quickDeleteBtn, LinearLayout.LayoutParams(dp(44), dp(44)).apply { marginStart = dp(4) })
             listContainer.addView(row, bottom(6))
         }
 
@@ -3801,24 +3901,9 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
             .setTitle(R.string.cleanup_dialog_title)
             .setView(root)
-            .setPositiveButton(if (supportsTrash) R.string.move_to_trash_button else R.string.permanent_delete_button, null)
-            .setNegativeButton(R.string.cleanup_dialog_open_files_tab) { dialog, _ ->
-                dialog.dismiss()
-                val chosen = selectedFromDialog()
-                if (chosen.isNotEmpty()) {
-                    viewModel.prepareExternalReviewSelection(chosen)
-                }
-                switchTab(AppTab.FILES)
-                filesReviewCard.post {
-                    filesReviewCard.requestRectangleOnScreen(
-                        android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
-                        true,
-                    )
-                }
-            }
-        if (supportsTrash) {
-            builder.setNeutralButton(R.string.permanent_delete_button, null)
-        }
+            .setPositiveButton(R.string.permanent_delete_button, null)
+            .setNeutralButton(if (supportsTrash) R.string.move_to_trash_button else R.string.cleanup_dialog_open_files_tab, null)
+            .setNegativeButton(android.R.string.cancel, null)
 
         val dialog = builder.create()
         dialog.setOnShowListener {
@@ -3830,22 +3915,20 @@ class MainActivity : AppCompatActivity() {
                 }
                 dialog.dismiss()
                 viewModel.prepareExternalReviewSelection(chosen)
-                if (supportsTrash) {
-                    requestMoveSelectedToTrash()
-                } else {
-                    requestPermanentDeleteSelected()
-                }
+                requestPermanentDeleteSelected(chosen)
             }
-            if (supportsTrash) {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                    val chosen = selectedFromDialog()
-                    if (chosen.isEmpty()) {
-                        Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-                    dialog.dismiss()
-                    viewModel.prepareExternalReviewSelection(chosen)
-                    requestPermanentDeleteSelected()
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                val chosen = selectedFromDialog()
+                if (chosen.isEmpty()) {
+                    Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                dialog.dismiss()
+                viewModel.prepareExternalReviewSelection(chosen)
+                if (supportsTrash) {
+                    requestMoveSelectedToTrash(chosen)
+                } else {
+                    switchTab(AppTab.FILES)
                 }
             }
         }
@@ -3975,7 +4058,7 @@ class MainActivity : AppCompatActivity() {
                 .setMultiChoiceItems(labels, checked) { _, which, isChecked ->
                     checked[which] = isChecked
                 }
-                .setPositiveButton(R.string.wa_review_selected_btn) { _, _ ->
+                .setPositiveButton(R.string.permanent_delete_button) { _, _ ->
                     val chosenRecords = orderedCategories.indices
                         .filter { checked[it] }
                         .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
@@ -3983,25 +4066,12 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
                         return@setPositiveButton
                     }
-                    val count = viewModel.prepareExternalReviewSelection(chosenRecords)
-                    val totalBytes = viewModel.state.value.selection.totalBytesOrNull() ?: 0L
-                    val fmtBytes = Formatter.formatFileSize(this@MainActivity, totalBytes)
-                    switchTab(AppTab.FILES)
-                    filesReviewCard.post {
-                        filesReviewCard.requestRectangleOnScreen(
-                            android.graphics.Rect(0, 0, filesReviewCard.width, filesReviewCard.height),
-                            true,
-                        )
-                    }
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.wa_loaded_for_review_toast, count, fmtBytes),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    viewModel.prepareExternalReviewSelection(chosenRecords)
+                    requestPermanentDeleteSelected(chosenRecords)
                 }
                 .setNeutralButton(
                     if (trashCoordinator.supportsSystemTrash()) getString(R.string.move_to_trash_button)
-                    else getString(R.string.permanent_delete_button)
+                    else getString(R.string.cleanup_dialog_open_files_tab)
                 ) { _, _ ->
                     val chosenRecords = orderedCategories.indices
                         .filter { checked[it] }
@@ -4012,9 +4082,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     viewModel.prepareExternalReviewSelection(chosenRecords)
                     if (trashCoordinator.supportsSystemTrash()) {
-                        requestMoveSelectedToTrash()
+                        requestMoveSelectedToTrash(chosenRecords)
                     } else {
-                        requestPermanentDeleteSelected()
+                        switchTab(AppTab.FILES)
                     }
                 }
                 .setNegativeButton(android.R.string.cancel, null)
@@ -5715,14 +5785,24 @@ class MainActivity : AppCompatActivity() {
         restoreTrashButton.isEnabled = !ledger.isEmpty && trashCoordinator.supportsSystemTrash()
     }
 
-    private fun requestMoveSelectedToTrash() {
-        val selected = viewModel.state.value.selection.records
-        if (selected.isEmpty() || !trashCoordinator.supportsSystemTrash()) return
+    private fun requestMoveSelectedToTrash(targetRecords: Collection<MediaRecord>? = null) {
+        val selected = targetRecords ?: viewModel.state.value.selection.records
+        if (selected.isEmpty()) {
+            Toast.makeText(this, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!trashCoordinator.supportsSystemTrash()) {
+            Toast.makeText(this, R.string.trash_unsupported_on_device, Toast.LENGTH_SHORT).show()
+            return
+        }
         lifecycleScope.launch {
             val plan = trashCoordinator.prepareAndRevalidatePlan(selected, MediaOperationMode.MOVE_TO_TRASH)
             val firstBatch = plan.uriBatches.firstOrNull()
             if (firstBatch.isNullOrEmpty()) {
-                statusText.text = getString(R.string.revalidation_none_eligible, plan.rejectedItems.size)
+                val count = plan.rejectedItems.size
+                val msg = getString(R.string.revalidation_none_eligible, count)
+                statusText.text = msg
+                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
                 return@launch
             }
             val sender = trashCoordinator.createTrashIntentSender(firstBatch, moveToTrash = true)
@@ -5733,19 +5813,28 @@ class MainActivity : AppCompatActivity() {
                 updateSpaceMetricsCard(viewModel.state.value)
                 trashIntentLauncher.launch(IntentSenderRequest.Builder(sender).build())
             } else {
-                statusText.text = getString(R.string.page_failed)
+                val err = getString(R.string.page_failed)
+                statusText.text = err
+                Toast.makeText(this@MainActivity, err, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun requestPermanentDeleteSelected() {
-        val selected = viewModel.state.value.selection.records
-        if (selected.isEmpty() || !trashCoordinator.supportsPermanentDelete()) return
+    private fun requestPermanentDeleteSelected(targetRecords: Collection<MediaRecord>? = null) {
+        val selected = targetRecords ?: viewModel.state.value.selection.records
+        if (selected.isEmpty()) {
+            Toast.makeText(this, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!trashCoordinator.supportsPermanentDelete()) return
         lifecycleScope.launch {
             val plan = trashCoordinator.prepareAndRevalidatePlan(selected, MediaOperationMode.PERMANENT_DELETE)
             val firstBatch = plan.uriBatches.firstOrNull()
             if (firstBatch.isNullOrEmpty()) {
-                statusText.text = getString(R.string.revalidation_none_eligible, plan.rejectedItems.size)
+                val count = plan.rejectedItems.size
+                val msg = getString(R.string.revalidation_none_eligible, count)
+                statusText.text = msg
+                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
                 return@launch
             }
             if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
@@ -5768,7 +5857,9 @@ class MainActivity : AppCompatActivity() {
                 updateSpaceMetricsCard(viewModel.state.value)
                 deleteIntentLauncher.launch(IntentSenderRequest.Builder(sender).build())
             } else {
-                statusText.text = getString(R.string.page_failed)
+                val err = getString(R.string.page_failed)
+                statusText.text = err
+                Toast.makeText(this@MainActivity, err, Toast.LENGTH_SHORT).show()
             }
         }
     }

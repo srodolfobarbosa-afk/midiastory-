@@ -99,7 +99,16 @@ class AndroidMediaPageRepository(
         when (initialFreshness) {
             SessionFreshness.ACCESS_CHANGED -> return@withContext stalePage(request, PageIssueCode.ACCESS_CHANGED)
             SessionFreshness.VOLUMES_CHANGED -> return@withContext stalePage(request, PageIssueCode.VOLUME_CHANGED)
-            SessionFreshness.SOURCE_CHANGED -> return@withContext stalePage(request, PageIssueCode.SESSION_STALE)
+            SessionFreshness.SOURCE_CHANGED -> {
+                val versionChanged = session.volumeNames.any { vol ->
+                    val orig = session.revisionsByVolume[vol]
+                    val curr = runCatching { MediaStore.getVersion(appContext, vol) }.getOrNull()
+                    orig != null && curr != null && orig.version != curr
+                }
+                if (versionChanged) {
+                    return@withContext stalePage(request, PageIssueCode.SESSION_STALE)
+                }
+            }
             SessionFreshness.REVISION_UNCHANGED, SessionFreshness.UNVERIFIABLE -> Unit
         }
 
@@ -136,7 +145,18 @@ class AndroidMediaPageRepository(
         when (assessSession(session)) {
             SessionFreshness.ACCESS_CHANGED -> stalePage(request, PageIssueCode.ACCESS_CHANGED)
             SessionFreshness.VOLUMES_CHANGED -> stalePage(request, PageIssueCode.VOLUME_CHANGED)
-            SessionFreshness.SOURCE_CHANGED -> stalePage(request, PageIssueCode.SESSION_STALE)
+            SessionFreshness.SOURCE_CHANGED -> {
+                val versionChanged = session.volumeNames.any { vol ->
+                    val orig = session.revisionsByVolume[vol]
+                    val curr = runCatching { MediaStore.getVersion(appContext, vol) }.getOrNull()
+                    orig != null && curr != null && orig.version != curr
+                }
+                if (versionChanged) {
+                    stalePage(request, PageIssueCode.SESSION_STALE)
+                } else {
+                    page
+                }
+            }
             SessionFreshness.REVISION_UNCHANGED -> page
             SessionFreshness.UNVERIFIABLE -> {
                 if (page.issues.any { it.code == PageIssueCode.REVISION_UNVERIFIABLE }) page

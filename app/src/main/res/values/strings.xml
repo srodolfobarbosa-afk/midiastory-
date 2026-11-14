@@ -65,6 +65,7 @@ Total: %3$s</string>
     <string name="revalidation_none_eligible">No selected items passed pre-execution revalidation (%1$d modified or protected).</string>
     <string name="trash_operation_result">Moved to trash: %1$d of %2$d item(s). These files may continue using storage until permanently deleted.</string>
     <string name="trash_operation_cancelled_or_unconfirmed">Operation cancelled or partial: %1$d of %2$d confirmed in Trash.</string>
+    <string name="trash_unsupported_on_device">System trash requires Android 11+ (API 30). Use permanent deletion.</string>
     <string name="delete_operation_result">Deleted and verified: %1$d of %2$d item(s) (%3$s freed).</string>
     <string name="restore_operation_result">Restored and verified: %1$d item(s) · %2$d still pending.</string>
     <string name="export_review_summary">Export report (Pro)</string>

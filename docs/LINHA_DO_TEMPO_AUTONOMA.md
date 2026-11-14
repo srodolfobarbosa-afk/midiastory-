@@ -2308,3 +2308,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 
 ---
 
+
+### 📍 [14/11/2026, 19:11:32] Exclusao Permanente em 1 Toque, Navegacao em 4 Abas e Auditoria Tripla de Subagentes
+- **📖 Estudou / Leu:** MainActivity.kt, AndroidMediaPageRepository.kt, AndroidTrashOperationCoordinator.kt, MediaOperationContracts.kt, docs/campaigns/lista-20-testadores-google-play.txt
+- **⚙️ Tentou / Executou:** Blindagem contra session_stale em Android 15, revalidacao tolerante a timestamps FAT32/exFAT (+-3s), botao rapido de exclusao por item e ativacao de 3 subagentes em paralelo
+- **⚠️ Erros Encontrados:** Session abortava por desvio de generation no MediaStore; 5 referencias pendentes de strings e navegacao identificadas e corrigidas na compilacao
+- **🔧 Como Corrigiu:** Adicionado fallback para resolver.query com/sem args; sincronizadas strings trash_unsupported_on_device e nav_pro; implementado targets direto em homeDirectCleanRow
+- **🎯 Conclusão:** Motorola Moto G84 conectado via ADB; codigo Kotlin compilado; ecossistema preparado para teste real de 1-toque e expansao do funil de 20 testadores
+- *Registro Supabase:* Memory #281
+
+---

@@ -84,12 +84,17 @@ class RevalidatedOperationPlan(
             if (actualSizeBytes == null || actualSizeBytes != expectedSizeBytes) {
                 return ItemRevalidationReason.MODIFIED_SINCE_SCAN
             }
-            if (!expectedMimeType.isNullOrBlank() &&
-                !expectedMimeType.equals(actualMimeType, ignoreCase = true)
-            ) {
-                return ItemRevalidationReason.MODIFIED_SINCE_SCAN
+            if (!expectedMimeType.isNullOrBlank() && !actualMimeType.isNullOrBlank()) {
+                val exp = expectedMimeType.lowercase().trim()
+                val act = actualMimeType.lowercase().trim()
+                val isJpegJpg = (exp == "image/jpeg" || exp == "image/jpg") && (act == "image/jpeg" || act == "image/jpg")
+                if (!isJpegJpg && exp != act) {
+                    return ItemRevalidationReason.MODIFIED_SINCE_SCAN
+                }
             }
-            if (expectedDateModifiedSec != null && actualDateModifiedSec != expectedDateModifiedSec) {
+            if (expectedDateModifiedSec != null && actualDateModifiedSec != null &&
+                Math.abs(expectedDateModifiedSec - actualDateModifiedSec) > 3L
+            ) {
                 return ItemRevalidationReason.MODIFIED_SINCE_SCAN
             }
             return ItemRevalidationReason.VALID_UNCHANGED

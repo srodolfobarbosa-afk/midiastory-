@@ -171,9 +171,13 @@ class AndroidTrashOperationCoordinator(
                     putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
                 }
             }
-            val cursor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                resolver.query(uri, projection, args, null)
-            } else {
+            val cursor = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    resolver.query(uri, projection, args, null)
+                } else {
+                    resolver.query(uri, projection, null, null, null)
+                }
+            } catch (_: Exception) {
                 resolver.query(uri, projection, null, null, null)
             } ?: return ItemRevalidationReason.MISSING_OR_DELETED
 

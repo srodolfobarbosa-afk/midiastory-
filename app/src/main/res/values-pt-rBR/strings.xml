@@ -65,6 +65,7 @@ Total: %3$s</string>
     <string name="revalidation_none_eligible">Nenhum item selecionado passou na revalidação pré-execução (%1$d modificado(s) ou protegido(s)).</string>
     <string name="trash_operation_result">Movidos para a lixeira: %1$d de %2$d item(ns). Esses arquivos podem continuar ocupando espaço até a exclusão definitiva.</string>
     <string name="trash_operation_cancelled_or_unconfirmed">Operação cancelada ou parcial: %1$d de %2$d confirmado(s) na Lixeira.</string>
+    <string name="trash_unsupported_on_device">A lixeira do sistema requer Android 11+ (API 30). Use exclusão definitiva.</string>
     <string name="delete_operation_result">Excluídos e verificados: %1$d de %2$d item(ns) (%3$s liberados).</string>
     <string name="restore_operation_result">Restaurados e verificados: %1$d item(ns) · %2$d ainda pendente(s).</string>
     <string name="export_review_summary">Exportar relatório (Pro)</string>
