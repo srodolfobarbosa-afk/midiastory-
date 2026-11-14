@@ -2187,3 +2187,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #263
 
 ---
+
+### 📍 [13/11/2026, 22:28:48] Auditoria Estrategica R$ 1M & Plano 1a Venda Organica
+- **📖 Estudou / Leu:** Scripts play-console-api, list-inapp-products, verify-funnel, e diretriz do usuario de ciclo de teste de 1h
+- **⚙️ Tentou / Executou:** Checagem de produtos Play Store e status do funil web
+- **⚠️ Erros Encontrados:** Funil web possui apenas formulario de email beta e nao possui botao de pagamento PIX para venda imediata
+- **🔧 Como Corrigiu:** Planejada adicao de checkout PIX no funil web e matriz de testes organicos de 1h
+- **🎯 Conclusão:** sweep_pro_lifetime ativo na Play API; funil pronto para integracao de checkout e disparos organicos
+- *Registro Supabase:* Memory #264
+
+---
+
+### 📍 [13/11/2026, 22:32:09] Integracao REA MCP e Engenharia Reversa dos Melhores Apps do Mundo
+- **📖 Estudou / Leu:** Repositorios morluto/rea, d4rken-org/sdmaid-se, e JunkFood02/Seal
+- **⚙️ Tentou / Executou:** Auditoria e ativacao de 5 servidores MCP (.agents/mcp_config.json) e estudo comparativo de arquitetura Android
+- **⚠️ Erros Encontrados:** npx no PowerShell bloqueado por ExecutionPolicy corrigido para npx.cmd no mcp_config
+- **🔧 Como Corrigiu:** Adicionados rea, playwright e chrome-devtools ao mcp_config.json oficial
+- **🎯 Conclusão:** Padroes globais de SD Maid SE e Seal incorporados ao roadmap tecnico do Midiastore
+- *Registro Supabase:* Memory #265
+
+---
