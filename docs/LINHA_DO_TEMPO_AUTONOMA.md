@@ -2167,3 +2167,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #261
 
 ---
+
+### 📍 [13/11/2026, 21:10:00] Desbloqueio Oficial Gemini 4 Hydrogen (1M Context + Thinking HIGH/MEDIUM) a Custo Zero no Google AI Studio
+- **📖 Estudou / Leu:** Catalogo oficial generativelanguage.googleapis.com/v1beta/models, model card de models/gemini-4-hydrogen e saldo residual da chave OpenRouter
+- **⚙️ Tentou / Executou:** Mapeamento de todos os 50 modelos da chave GOOGLE_AI_STUDIO_API_KEY e integracao do gemini-4-hydrogen com thinkingConfig (MEDIUM/HIGH) em ai-failover-router.mjs e equipe-ia.mjs
+- **⚠️ Erros Encontrados:** 1. Saldo promocional de .20 na chave OpenRouter atingiu .1999 (402). 2. gemini-4-carbon e gemini-4-argon possuem limit: 0 no Free Tier do Google AI Studio. 3. Limite artificial de 200 tokens sem thinkingConfig cortava a saida do Hydrogen
+- **🔧 Como Corrigiu:** Descoberto e ativado o endpoint oficial models/gemini-4-hydrogen no Free Tier do Google AI Studio (1.048.576 tokens de entrada, 65.536 de saida, thinking: true) com thinkingLevel MEDIUM/HIGH como Rota #1 gratuita
+- **🎯 Conclusão:** Gemini 4 Hydrogen operando em 200 OK a R$ 0,00 com 1M de contexto e raciocinio calibrado (MEDIUM/HIGH) em ai-failover-router.mjs e equipe-ia.mjs
+- *Registro Supabase:* Memory #262
+
+---

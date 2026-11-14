@@ -143,9 +143,38 @@ async function processNextCodex() {
   await runCodexTask(pending[0]);
 }
 
-async function callOpenRouterLlm(prompt, model = "google/gemini-4-argon") {
+async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
   const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
+  const studioKey = aiKeys.GOOGLE_AI_STUDIO_API_KEY || aiKeys.GOOGLE_AQ_API_KEY;
+  if (studioKey) {
+    for (const sm of ["gemini-4-hydrogen", "gemini-2.5-flash"]) {
+      try {
+        console.log(`\n🧠 [EQUIPE IA] Consultando ${sm} direto no Google AI Studio (Custo R$ 0,00 / 1M Context)...`);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${sm}:generateContent?key=${studioKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            ...(sm.includes("gemini-4") ? { generationConfig: { thinkingConfig: { thinkingLevel: "HIGH" } } } : {}),
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const reply = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
+          if (reply) {
+            console.log(`\n--- RESPOSTA (google_ai_studio/${sm}) ---\n${reply}\n`);
+            return reply;
+          }
+        }
+      } catch (e) {
+        console.warn(`Aviso Google AI Studio (${sm}):`, e.message);
+      }
+    }
+  }
+
   const modelAliases = {
+    hydrogen: "google/gemini-4-hydrogen",
+    carbon: "google/gemini-4-carbon",
     argon: "google/gemini-4-argon",
     o3: "openai/o3",
     "o3-pro": "openai/o3-pro",
@@ -156,7 +185,7 @@ async function callOpenRouterLlm(prompt, model = "google/gemini-4-argon") {
   if (modelAliases[model]) model = modelAliases[model];
   console.log(`\n🧠 [EQUIPE IA] Consultando Modelo Remoto (${model}) via OpenRouter...`);
   
-  const modelsToTry = [model, "google/gemini-4-argon", "openai/gpt-4o-mini", "openrouter/free"];
+  const modelsToTry = [model, "nvidia/nemotron-3.5-lightning:free", "google/gemma-4-31b-it:free", "openrouter/free"];
   for (const m of modelsToTry) {
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {

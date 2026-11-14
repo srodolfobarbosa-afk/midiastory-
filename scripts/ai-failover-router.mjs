@@ -48,14 +48,29 @@ if (fs.existsSync(secretsPath)) {
   }
 }
 
-async function callGoogleAIStudio(modelName, prompt) {
+async function callGoogleAIStudio(modelName, prompt, options = {}) {
   if (!googleStudioKey) throw new Error("Chave GOOGLE_AI_STUDIO_API_KEY não encontrada.");
+  const isGemini4Thinking = modelName.includes("gemini-4-hydrogen") || modelName.includes("gemini-4-carbon") || modelName.includes("gemini-4-argon");
+  const thinkingLevel = options.thinkingLevel || (options.isCode ? "HIGH" : "MEDIUM");
+
+  const bodyPayload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    ...(isGemini4Thinking
+      ? {
+          generationConfig: {
+            thinkingConfig: {
+              thinkingLevel,
+            },
+          },
+        }
+      : {}),
+  };
+
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${googleStudioKey}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-    }),
+    signal: AbortSignal.timeout(options.timeoutMs || 25000),
+    body: JSON.stringify(bodyPayload),
   });
   if (!res.ok) {
     const errText = await res.text();
@@ -64,7 +79,8 @@ async function callGoogleAIStudio(modelName, prompt) {
     throw error;
   }
   const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  return parts.map((p) => p.text || "").join("").trim();
 }
 
 const MODEL_CASCADE = [
@@ -159,15 +175,25 @@ export async function executeWithFailover(prompt, options = {}) {
 
   console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"})...`);
 
-  // 1. Prioridade Nativa: Google AI Studio Direto (Custo Zero, sem intermediários)
+  // 1. Prioridade Nativa: Google AI Studio Direto (Custo Zero, 1M Context no Gemini 4 Hydrogen com Thinking)
   if (googleStudioKey) {
-    const studioModels = ["gemini-2.5-flash", "gemini-3.8-flash"];
+    const studioModels = [
+      "gemini-4-hydrogen",
+      "gemini-2.5-flash",
+      "gemini-4-carbon",
+      "gemini-4-argon",
+    ];
     for (const sm of studioModels) {
-      console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm}...`);
+      console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm} (Thinking: ${isCode ? "HIGH" : "MEDIUM"})...`);
       try {
-        const response = await callGoogleAIStudio(sm, prompt);
-        console.log(`✅ Sucesso no Google AI Studio Direto (${sm})!`);
-        return { source: `google_ai_studio/${sm}`, content: response };
+        const response = await callGoogleAIStudio(sm, prompt, {
+          isCode,
+          thinkingLevel: options.thinkingLevel || (isCode ? "HIGH" : "MEDIUM"),
+        });
+        if (response) {
+          console.log(`✅ Sucesso no Google AI Studio Direto (${sm})!`);
+          return { source: `google_ai_studio/${sm}`, content: response };
+        }
       } catch (err) {
         console.warn(`⚠️ Google AI Studio (${sm}) falhou: ${err.message.slice(0, 140)}`);
       }
