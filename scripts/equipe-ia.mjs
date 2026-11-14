@@ -188,7 +188,8 @@ async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
   const modelsToTry = [model, "nvidia/nemotron-3.5-lightning:free", "google/gemma-4-31b-it:free", "openrouter/free"];
   for (const m of modelsToTry) {
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const isReasoning = m.includes("carbon") || m.includes("argon") || m.includes("hydrogen");
+      let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${aiKeys.OPENROUTER_API_KEY}`,
@@ -198,10 +199,34 @@ async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
         },
         body: JSON.stringify({
           model: m,
-          max_tokens: 3000,
+          max_tokens: 1500,
+          ...(isReasoning ? { reasoning: { effort: "medium" } } : {}),
           messages: [{ role: "user", content: prompt }],
         }),
       });
+
+      // Auto-adaptação para HTTP 402 (crédito insuficiente para reserva alta de tokens)
+      if (res.status === 402) {
+        const errText = await res.text();
+        const match = errText.match(/can only afford (\d+)/i);
+        const affordableTokens = match ? Math.max(60, parseInt(match[1], 10) - 15) : 600;
+        console.warn(`[Auto-Adaptação 402] Ajustando tokens dinamicamente para ${affordableTokens} para ${m}...`);
+        res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${aiKeys.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://midiastory-df6a0.web.app/",
+            "X-Title": "Midiastore Equipe IA",
+          },
+          body: JSON.stringify({
+            model: m,
+            max_tokens: affordableTokens,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        });
+      }
+
       if (!res.ok) {
         const errText = await res.text();
         console.warn(`Modelo ${m} retornou ${res.status}: ${errText.slice(0, 150)}. Tentando próximo...`);

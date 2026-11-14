@@ -98,9 +98,11 @@ const MODEL_CASCADE = [
   { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 31B (Free)" },
 ];
 
-async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
+async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort = "medium") {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
+  const isReasoningModel = modelId.includes("carbon") || modelId.includes("argon") || modelId.includes("nano-omni");
+
   let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -112,7 +114,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
     body: JSON.stringify({
       model: modelId,
       max_tokens: maxTokens,
-      ...(modelId.includes("carbon") || modelId.includes("argon") ? { reasoning: { effort: "medium" } } : {}),
+      ...(isReasoningModel ? { reasoning: { effort: reasoningEffort } } : {}),
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -134,6 +136,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200) {
       body: JSON.stringify({
         model: modelId,
         max_tokens: affordableTokens,
+        ...(isReasoningModel ? { reasoning: { effort: reasoningEffort === "high" ? "medium" : reasoningEffort } } : {}),
         messages: [{ role: "user", content: prompt }],
       }),
     });
@@ -206,7 +209,8 @@ export async function executeWithFailover(prompt, options = {}) {
     const model = MODEL_CASCADE[i];
     console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
     try {
-      const response = await callOpenRouter(model.id, prompt, isCode ? 2500 : 1200);
+      const reasoningEffort = options.reasoningEffort || (isCode ? "high" : "medium");
+      const response = await callOpenRouter(model.id, prompt, isCode ? 2500 : 1200, reasoningEffort);
       console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
       return { source: model.id, content: response };
     } catch (err) {

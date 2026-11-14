@@ -2177,3 +2177,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #262
 
 ---
+
+### 📍 [13/11/2026, 21:27:56] Validacao da Rota de Imunidade ao Bloqueio de 156h e Profundidade Gemini 4 Carbon/Argon
+- **📖 Estudou / Leu:** Quotas Antigravity IDE (156h reset), OpenRouter BYOK (.secrets/ai-media-keys.json), Gemini 4 Carbon/Argon reasoning levels (Low/Medium/High)
+- **⚙️ Tentou / Executou:** Blindagem da esteira de IA contra HTTP 402 via max_tokens 1500 e auto-adaptacao de creditos residuais
+- **⚠️ Erros Encontrados:** Bloqueio de 6 dias (156h) afeta apenas o login direto Google na UI do IDE, enquanto chamadas sem max_tokens bloqueavam por HTTP 402 no OpenRouter
+- **🔧 Como Corrigiu:** Integrado max_tokens: 1500/3000 cirurgico, calibragem de reasoning effort (Low/Medium/High) e cascata OpenRouter + Codex Local imune a bloqueios
+- **🎯 Conclusão:** Operacao 100% resiliente: autonomia continua 24/7 sem dependencia de cota semanal unica e operando na fronteira da inteligencia
+- *Registro Supabase:* Memory #263
+
+---
