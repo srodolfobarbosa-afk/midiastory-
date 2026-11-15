@@ -85,3 +85,19 @@
 - **Play Developer API v3**: Título em espanhol não pode passar de 30 caracteres (`Midiastore: Limpiador Estudio`); rota de produto único é `/onetimeproducts/{id}` (minúsculo).
 - **Firebase Hosting**: O workflow antigo `fabrica-autonoma-ubuntu.yml` sobrescrevia o site e causava HTTP 404 nas rotas de idioma — foi removido; sempre validar com `node scripts/verify-funnel.mjs` após deploy.
 - **Segurança**: Nunca expor `sbp_`, tokens ou `.secrets/` em scripts ou commits; usar `scripts/lib/supabase-auth.mjs` e verificar `git status` antes de qualquer commit.
+
+
+---
+
+## 7. Post-Mortem Operacional: Fim do Ciclo Estéril (Feedback do Fundador — 2026-11-15)
+
+- **Contexto observado:** Histórico de sessão em `Antigravity CLI 1.5.6` (`srodolfobarbosa@gmail.com`, `Google AI Pro`, `Gemini 3.8 Flash (High)`, `~/midiastory-`). *(Nota de Verdade Absoluta: o trecho colado encerrou no cabeçalho da sessão, sem os comandos subsequentes).*
+- **Diagnóstico da falha recorrente apontada pelo fundador:**
+  1. **Atividade sem resultado financeiro:** Múltiplas sessões rodando em círculos (gerando novos documentos, scripts paralelos e micro-refatorações) sem fechar os 3 gargalos que realmente colocam dinheiro na conta: **P0 do app -> 12+ testadores por 14 dias -> Produção & Billing validado**.
+  2. **Limitação de modelo / Cota:** Sessões rodando em modelos mais fracos (`Gemini 3.8 Flash`) ou sem `Gemini 4 Carbon` ativo (que exige GCP billing/créditos AI Pro/Ultra além do Free Tier).
+- **Regras Anti-Repetição Obrigatórias:**
+  - **Filtro Caixa-Primeiro (Peso 1.00):** Antes de criar qualquer novo doc ou script, validar se a ação destrava diretamente: *(a)* fechamento de blocker P0, *(b)* teste real/CI, *(c)* aquisição/retenção dos 12+ testadores por 14 dias, ou *(d)* conversão paga no Google Play Billing. Se não destrava nenhum dos 4, **não priorizar**.
+  - **Transparência de Modelo & Cota:** Nunca fingir que `Gemini 4 Carbon` está rodando se a API retornar `limit: 0` / `429`; usar o melhor modelo ativo (`Gemini 4 Hydrogen` / roteador) e orientar o caminho exato para habilitar `Carbon` quando necessário.
+  - **Zero Invenção em Logs:** Se um log colado vier incompleto/truncado, analisar apenas o que está presente e pedir explicitamente o restante se precisar de stack trace.
+  - **Chave presente != Cota ativa:** Nunca afirmar que `Gemini 4 Carbon` / `Argon` / OpenRouter está "pronto para uso" apenas porque `.secrets/ai-media-keys.json` existe; validar saldo/cota real (`limit > 0` / sem HTTP 402) antes de prometer acesso.
+  - **Não confundir modelos homônimos:** `models/gemini-4-hydrogen` é o modelo oficial do Google AI Studio (acessível grátis via `GOOGLE_AI_STUDIO_API_KEY`), diferente de `deep-principle/Hydrogen-1.0` (open-weight no Hugging Face baseado em GLM-5.3, que exige hospedagem GPU própria/provedor externo).

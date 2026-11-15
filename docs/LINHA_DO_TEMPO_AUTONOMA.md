@@ -2349,3 +2349,14 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #284
 
 ---
+
+
+### 📍 [15/11/2026, 16:41:00] Post-Mortem Histórico Terminal Anterior (174 -> 182 pares ChatML)
+- **📖 Estudou / Leu:** Feedback direto do fundador em `Antigravity CLI 1.5.6` (`Gemini 3.8 Flash High`), verificação de `.secrets/ai-media-keys.json` (`OPENROUTER_API_KEY`, Google AI Studio, FFmpeg Micro) e descrição de `deep-principle/Hydrogen-1.0` (GLM-5.3).
+- **⚙️ Tentou / Executou:** Mapeamento de acertos e falhas do histórico colado, gravação das regras anti-repetição (Regra Anti-Ciclo Estéril, Chave != Cota ativa, distinção `gemini-4-hydrogen` vs `Hydrogen-1.0`, zero invenção em logs truncados) em `docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md` e `C:\Users\rodolfo\.gemini\GEMINI.md`, e adição de +8 pares ChatML reais em `docs/datasets/rodolfo-brain-finetuning.jsonl`.
+- **⚠️ Erros Encontrados:** (1) Ciclo estéril repetindo docs/scripts sem destravar caixa; (2) Sessão anterior declarou cascata `Carbon`/`Argon` pronta apenas pela existência do `.secrets/ai-media-keys.json` sem checar saldo/cota (`402` / `limit: 0`); (3) Risco de confundir `models/gemini-4-hydrogen` (Google AI Studio) com `deep-principle/Hydrogen-1.0` (Hugging Face).
+- **🔧 Como Corrigiu:** Regra Anti-Ciclo Estéril ativada com Filtro Caixa-Primeiro (4 portões reais: P0 app, CI API 29/35, 12+ testadores x 14 dias, Billing em produção) e 182/182 pares JSONL validados com `JSON.parse`.
+- **🎯 Conclusão:** Post-mortem absorvido no repositório, no `~/.gemini/GEMINI.md` e no Supabase.
+- *Registro Supabase:* Memory #285
+
+---
