@@ -53,7 +53,7 @@ for attempt in $(seq 1 90); do
         "$boot" == "1" &&
         "$package_service" == *": found"* &&
         "$activity_service" == *": found"* &&
-        "$external_volumes" =~ (^|$'\n')emulated\;[0-9]+[[:space:]]+mounted ]]; then
+        "$external_volumes" =~ (^|$'\n')emulated(\;[0-9]+)?[[:space:]]+mounted ]]; then
     ready=true
     break
   fi
@@ -61,7 +61,7 @@ for attempt in $(seq 1 90); do
 done
 
 if [[ "$ready" != true ]]; then
-  capture_diagnostics "Emulator not Android-ready: expected_api=$expected_api actual_api=$api boot=$boot package_service=$package_service activity_service=$activity_service"
+  capture_diagnostics "Emulator not Android-ready: expected_api=$expected_api actual_api=$api boot=$boot package_service=$package_service activity_service=$activity_service external_volumes=$external_volumes"
   exit 1
 fi
 
