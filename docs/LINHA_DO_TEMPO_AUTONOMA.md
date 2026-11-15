@@ -2360,3 +2360,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #285
 
 ---
+
+### 📍 [15/11/2026, 17:25:25] Extracao integral de rodolfo madrgada!.txt e expansao do dataset (182 -> 192 pares ChatML)
+- **📖 Estudou / Leu:** Leitura integral de C:\Users\rodolfo\Documents\rodolfo madrgada!.txt (5.936 linhas) em blocos, docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md e docs/datasets/rodolfo-brain-finetuning.jsonl
+- **⚙️ Tentou / Executou:** Extracao de erros, descartes e decisoes reais nao presentes no consolidado, adicao de 10 pares ChatML unicos e validacao de 100% do JSONL via JSON.parse
+- **⚠️ Erros Encontrados:** Zero erros de schema JSONL; 4 alteracoes locais em app/ preservadas fora do commit conforme instrucao
+- **🔧 Como Corrigiu:** Atualizada Secao 8 em docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md (descartes XOR/HTML/Lixeira API 29, R8 4,2 MB, ADB signatures, OpenRouter 402 max_tokens, plato 0 vs opt-in Play Console, REA dentro da lei) e validados 192/192 pares JSONL
+- **🎯 Conclusão:** Dataset Rodolfo Brain expandido para 192 pares validos e sincronizado no Supabase, Linha do Tempo e GitHub
+- *Registro Supabase:* Memory #286
+
+---

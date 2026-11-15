@@ -101,3 +101,26 @@
   - **Zero Invenção em Logs:** Se um log colado vier incompleto/truncado, analisar apenas o que está presente e pedir explicitamente o restante se precisar de stack trace.
   - **Chave presente != Cota ativa:** Nunca afirmar que `Gemini 4 Carbon` / `Argon` / OpenRouter está "pronto para uso" apenas porque `.secrets/ai-media-keys.json` existe; validar saldo/cota real (`limit > 0` / sem HTTP 402) antes de prometer acesso.
   - **Não confundir modelos homônimos:** `models/gemini-4-hydrogen` é o modelo oficial do Google AI Studio (acessível grátis via `GOOGLE_AI_STUDIO_API_KEY`), diferente de `deep-principle/Hydrogen-1.0` (open-weight no Hugging Face baseado em GLM-5.3, que exige hospedagem GPU própria/provedor externo).
+
+---
+
+## 8. Extrações Reais da Sessão `rodolfo madrgada!.txt` (Erros, Descartes e Decisões)
+
+- **Descartes Definitivos no App (Não Repetir):**
+  - **QR Code XOR/Hash customizado ->** substituído por `com.google.zxing:core:3.5.3` (ISO/IEC 18004, contraste >= 4:1) após falha de leitura em câmeras/apps bancários.
+  - **Downloader salvando HTML como `.mp4` ->** substituído por validação `Content-Type: video/*` (rejeição explícita de HTML), streaming em blocos de 8 KB e cancelamento cooperativo.
+  - **Botão de Lixeira na API 29 ->** Android 10 não possui Lixeira de sistema; ocultado na API 29, usando exclusão permanente com consentimento (`RecoverableSecurityException`).
+  - **Alertas pequenos ->** substituídos por `BottomSheetDialog` com alvos de **48dp**, `WindowInsets`, botão `📋 COLAR` (`ClipboardManager` + regex `https?://[^\s]+`) e `HapticFeedbackConstants` (`KEYBOARD_TAP` / `CONFIRM`).
+- **Build, R8 e ADB:**
+  - `isMinifyEnabled = false` impedia redução do APK e geração de `mapping.txt`; ativar R8 estrito (`app/proguard-rules.pro` protegendo ZXing, Billing e ViewModels) reduziu o APK de release para **4,2 MB** (AAB `vc 21` = 5.861.444 bytes).
+  - `adb install -r` falha com `signatures do not match` se houver build com outra assinatura no aparelho (ex.: debug vs `sweep-upload.jks`).
+- **OpenRouter 402 & APIs Google:**
+  - Omitir `max_tokens` no OpenRouter faz o servidor pré-reservar **65.536 tokens** e disparar HTTP 402; travar `max_tokens: 30` em healthcheck retornou `200 OK` a `$0.00000795` (e `1500`/`3000` em produção).
+  - `check-google-apis.mjs` validou `200 OK` em Search Console API e Play Developer Reporting API (Anomalias + Crash Rate) com `midiastore-agent@cultivated-pen-469823-p3.iam.gserviceaccount.com`.
+  - Recusa estrita de usar engenharia reversa/REA para burlar cotas ou controles de acesso de serviços Google (uso do REA `morluto/rea` restrito a auditoria forense legítima).
+- **Tração Real na Play Console & Decisão Freemium:**
+  - Instalações locais via `adb install` **não contam** nos gráficos da Play Console (platô `0` de 15/10 a 08/11/2026); apenas downloads pelo link oficial de opt-in (`https://play.google.com/apps/testing/com.rdf112.midiastore`) iniciam o relógio de 14 dias.
+  - As primeiras **4 instalações reais** (1 em 09/11 + 3 em 10/11) vieram **100% do Brasil** (foco inicial no mercado brasileiro + ferramentas essenciais gratuitas para retenção dos 14 dias).
+- **Infraestrutura Cognitiva Criada:**
+  - `CONTEXTO_MESTRE.md` e `CONTEXTO_ESTRATEGICO.md` (linha de montagem Fábrica GitHub -> Cérebro/Cofre Supabase -> Vitrine/Caixa Google Play, com matriz de pesos `1.00 / 0.95 / 0.90 / 0.85`).
+  - Tabela `public.aprendizado_ia` no Supabase + `scripts/registrar-aprendizado-ia.mjs` e Lei Cognitiva dos Verbos (`forma_base` no infinitivo + tolerância fonética a erros de digitação).
