@@ -2400,3 +2400,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #289
 
 ---
+
+### 📍 [15/11/2026, 18:24:59] Sincronizacao Contador Testadores Site + Telemetria Ao Vivo + Build Testes Local
+- **📖 Estudou / Leu:** docs/index.html, docs/telemetry.js, supabase/migrations/20261114060000_web_prelaunch_analytics.sql e resultado Gradle :domain:test :app:testDebugUnitTest
+- **⚙️ Tentou / Executou:** Atualizacao da RPC get_prelaunch_stats + play_console_sync_state (12 oficiais, Dia 2/14), rastreamento optin_click em telemetry.js, script monitor-site-telemetry.mjs e deploy Firebase Hosting
+- **⚠️ Erros Encontrados:** Nenhum; antes o site mostrava 2 por ler apenas public.beta_testers sem base oficial Play Console nem cliques optin_click
+- **🔧 Como Corrigiu:** Migration 20261115180000 aplicada (HTTP 201), Firebase Hosting publicado (Release 1794777879571000), monitor-site-telemetry.mjs validado ao vivo (22 visitas, 17 unicos, 4 em 24h, 12 exibidos) e Gradle :domain:test :app:testDebugUnitTest BUILD SUCCESSFUL
+- **🎯 Conclusão:** Site ao vivo sincronizado com os 12 testadores oficiais da Play Console e monitoramento em tempo real ativo sem depender de memoria velha
+- *Registro Supabase:* Memory #290
+
+---

@@ -51,7 +51,9 @@
     };
 
     try {
-      fetch(`${SUPABASE_URL}/rest/v1/web_page_events`, {
+      const endpoint = `${SUPABASE_URL}/rest/v1/web_page_events`;
+      const bodyStr = JSON.stringify(payload);
+      fetch(endpoint, {
         method: "POST",
         keepalive: true,
         headers: {
@@ -60,7 +62,7 @@
           "Content-Type": "application/json",
           Prefer: "return=minimal",
         },
-        body: JSON.stringify(payload),
+        body: bodyStr,
       }).catch(() => {});
     } catch (_) {}
   }
@@ -83,10 +85,16 @@
           el.textContent = Number(val || 0).toLocaleString(document.documentElement.lang || "pt-BR");
         });
       };
+      const syncedTesters =
+        stats.active_testers_display !== undefined && stats.active_testers_display !== null
+          ? stats.active_testers_display
+          : stats.waitlist_count;
       apply('[data-stat="total_visits"]', stats.total_visits);
       apply('[data-stat="unique_visitors"]', stats.unique_visitors);
       apply('[data-stat="visits_24h"]', stats.visits_24h);
-      apply('[data-stat="waitlist_count"]', stats.waitlist_count);
+      apply('[data-stat="waitlist_count"]', syncedTesters);
+      apply('[data-stat="active_testers_display"]', syncedTesters);
+      apply('[data-stat="optin_clicks"]', stats.optin_clicks);
       apply('[data-stat="share_clicks"]', stats.share_clicks);
       return stats;
     } catch (_) {
@@ -121,9 +129,14 @@
     sendEvent("page_view");
     refreshPrelaunchStats();
 
-    document.querySelectorAll("[data-track-cta]").forEach((el) => {
+    document.querySelectorAll("[data-track-cta], a[href*='play.google.com/apps/testing']").forEach((el) => {
       el.addEventListener("click", () => {
-        sendEvent("cta_click", el.getAttribute("data-track-cta"));
+        const ctaName = el.getAttribute("data-track-cta") || "play_optin_link";
+        const href = el.getAttribute("href") || "";
+        const isPlayOptin =
+          ctaName.includes("optin") || href.indexOf("play.google.com/apps/testing") !== -1;
+        sendEvent(isPlayOptin ? "optin_click" : "cta_click", ctaName);
+        setTimeout(refreshPrelaunchStats, 450);
       });
     });
   });
