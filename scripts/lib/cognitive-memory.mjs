@@ -251,11 +251,24 @@ export async function retrieveRelevantContext({ query = "", sessionId = null, li
       LIMIT 3;
     `);
 
+    const docs = await runSupabaseSql(`
+      SELECT id, left(content, 240) AS snippet, created_at
+      FROM public.documents
+      ORDER BY id DESC
+      LIMIT 4;
+    `);
+
     const lines = [];
     if (memories.length > 0) {
       lines.push("### MEMÓRIAS RELEVANTES & REGRAS ATIVAS");
       for (const m of memories) {
         lines.push(`- [#${m.id} | ${m.categoria} v${m.versao} | conf:${m.confianca} | ${String(m.created_at).slice(0, 10)}] ${String(m.content).replace(/\s+/g, " ").slice(0, 320)}`);
+      }
+    }
+    if (docs.length > 0) {
+      lines.push("\n### DOCUMENTOS HISTÓRICOS (Bloco de Notas / Pesquisas)");
+      for (const d of docs) {
+        lines.push(`- [Doc #${d.id}] ${String(d.snippet).replace(/\s+/g, " ")}`);
       }
     }
     if (learnings.length > 0) {
