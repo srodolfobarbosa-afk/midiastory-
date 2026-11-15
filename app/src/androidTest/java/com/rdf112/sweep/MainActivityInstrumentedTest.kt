@@ -417,12 +417,14 @@ class MainActivityInstrumentedTest {
             val verifiedMissing = runBlocking { coordinator.verifyPostDeleteUris(listOf(uri.toString())) }
             assertTrue("The post-authorization provider query must confirm the URI is gone", uri.toString() in verifiedMissing)
         } finally {
-            helperContext.contentResolver.call(
-                helperUri,
-                HELPER_METHOD_DELETE_MEDIA,
-                uri.toString(),
-                null,
-            )
+            runCatching {
+                helperContext.contentResolver.call(
+                    helperUri,
+                    HELPER_METHOD_DELETE_MEDIA,
+                    uri.toString(),
+                    null,
+                )
+            }
         }
     }
 
