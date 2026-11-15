@@ -42,6 +42,7 @@ export async function fetchLiveSiteTelemetry() {
   const stats = await rpcRes.json();
 
   let recentSignups24h = null;
+  let recentEmails = [];
   try {
     const token = getSupabaseToken();
     const qRes = await fetch(
@@ -63,6 +64,25 @@ export async function fetchLiveSiteTelemetry() {
       const rows = await qRes.json();
       recentSignups24h = rows?.[0]?.count_24h ?? null;
     }
+
+    const listRes = await fetch(
+      `https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query:
+            "SELECT id, email, created_at FROM public.beta_testers ORDER BY created_at DESC LIMIT 20;",
+        }),
+        signal: AbortSignal.timeout(15000),
+      }
+    );
+    if (listRes.ok) {
+      recentEmails = await listRes.json();
+    }
   } catch {
     // Fallback silencioso quando rodando sem token de gerenciamento (ex.: apenas anon key)
   }
@@ -70,6 +90,7 @@ export async function fetchLiveSiteTelemetry() {
   return {
     ...stats,
     recent_signups_24h: recentSignups24h,
+    recent_emails: recentEmails,
     checked_at: new Date().toISOString(),
   };
 }
@@ -96,6 +117,12 @@ async function main() {
   console.log(`👥 Exibido no site (sincron.):  ${data.active_testers_display ?? data.waitlist_count ?? 0}`);
   if (data.closed_test_day != null && data.closed_test_target_days != null) {
     console.log(`⏳ Relógio 14 dias:             Dia ${data.closed_test_day} de ${data.closed_test_target_days}`);
+  }
+  if (Array.isArray(data.recent_emails) && data.recent_emails.length > 0) {
+    console.log("📧 E-mails em public.beta_testers:");
+    for (const row of data.recent_emails) {
+      console.log(`   - ${row.email} (${row.created_at})`);
+    }
   }
   console.log(`🕒 Atualizado em:               ${data.updated_at || data.checked_at}`);
 }
