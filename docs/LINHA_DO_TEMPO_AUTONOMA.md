@@ -2420,3 +2420,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #291
 
 ---
+
+### 📍 [15/11/2026, 19:17:45] Modo Leve Ativado (PC 3,93 GB) + Backup do Treinamento
+- **📖 Estudou / Leu:** C:\Users\rodolfo\.gemini\GEMINI.md, docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md, .github/workflows/android.yml
+- **⚙️ Tentou / Executou:** Limpeza de processos Java/Gradle/Edge/Codex, app/build, .gradle e envio de alteracoes pendentes para GitHub Actions
+- **⚠️ Erros Encontrados:** Sem erros; Gradle local evitado para preservar RAM (3,93 GB)
+- **🔧 Como Corrigiu:** Commit 2a2741d enviado para origin/codex/midiastore-release-audit; build delegado ao GitHub Actions na nuvem
+- **🎯 Conclusão:** Treinamento consolidado salvo no Supabase (public.memories), no GitHub (docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md e docs/LINHA_DO_TEMPO_AUTONOMA.md) e localmente em GEMINI.md
+- *Registro Supabase:* Memory #292
+
+---
