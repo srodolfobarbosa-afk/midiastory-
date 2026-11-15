@@ -124,3 +124,29 @@
 - **Infraestrutura Cognitiva Criada:**
   - `CONTEXTO_MESTRE.md` e `CONTEXTO_ESTRATEGICO.md` (linha de montagem Fábrica GitHub -> Cérebro/Cofre Supabase -> Vitrine/Caixa Google Play, com matriz de pesos `1.00 / 0.95 / 0.90 / 0.85`).
   - Tabela `public.aprendizado_ia` no Supabase + `scripts/registrar-aprendizado-ia.mjs` e Lei Cognitiva dos Verbos (`forma_base` no infinitivo + tolerância fonética a erros de digitação).
+
+---
+
+## 9. Mineração Total do Histórico (`C:\Users\rodolfo\Documents` — 13 Arquivos `.txt`, ~2,07 MB)
+
+Extrações consolidadas dos logs completos de Codespaces, Play Console, Moto G84, terminal, Cloud 24/7 e roteamento multi-LLM:
+
+- **Gradle, AGP, Kotlin DSL e Codespaces (`usar esse como exemplo...`):**
+  - `java.io.IOException: java.io.tmpdir (/tmp/gtmp)` inexistente no container -> criar `/tmp/gtmp` antes do Gradle (`mkdir -p /tmp/gtmp`).
+  - `Incorrect package="..." found in source AndroidManifest.xml` -> no AGP 8+, remover atributo `package` do `AndroidManifest.xml` e declarar `namespace` apenas em `app/build.gradle.kts`.
+  - `Unresolved reference 'isCheckReleaseBuilds' / 'isAbortOnError'` no bloco `lint {}` em Kotlin DSL -> usar `checkReleaseBuilds = false` / `abortOnError = false` (sem prefixo `is`).
+  - `Inconsistent JVM-target compatibility` (`compileReleaseJavaWithJavac` 1.8 vs `compileReleaseKotlin` 21) e crash do Kotlin Daemon no JDK 25 (`NotSerializableException: SmartList`) -> travar `JavaVersion.VERSION_17` + `jvmTarget = "17"` (e usar **JDK 17 + Gradle 8.13**).
+  - `gh models run --system` falha com `unknown flag: --system` -> a flag correta no GitHub Models CLI é `--system-prompt`.
+- **UI Android, Moto G84 & Play Console (`66666.txt` & `termi rodolfo dia 10`):**
+  - Altura fixa `dp(52)` cortou botões de 2 linhas em ~2px no Moto G84 e `cardElevation = 2dp` aplicou surface tint esverdeado do Material 3 (`v19 -> v20`) -> usar `WRAP_CONTENT` com `minHeight` e controlar `cardBackgroundColor`/`elevation` explicitamente.
+  - Aviso de política **Advertising ID** na Play Console bloqueou release até ser declarado/corrigido no painel; após ajuste, a faixa `20 (2.3.1)` atingiu `"status": "completed"`.
+  - Editor de Fotos local corrigido para exportar em alta resolução até **4096px** com controle de saturação `0.0x–2.0x`.
+- **Scripts Node.js, Supabase & Cota Zero (`termi rodolfo dia 10`, `pulo do gato`):**
+  - Caminhos relativos em `scripts/*.mjs` quebram com `ENOENT` se executados fora da raiz (ex.: `system32` ou CI) -> resolver `projectRoot` via `path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")` e ler `.secrets/ai-media-keys.json` (ou env vars `OPENROUTER_API_KEY` / `AI_MEDIA_KEYS_JSON` na nuvem).
+  - Submissão duplicada de testador em `public.beta_testers` retorna HTTP `409 Conflict` -> tratar `409` graciosamente no frontend (`testerForm`) como já cadastrado.
+  - Manutenção do Supabase (`scripts/supabase-maintenance.mjs`): teto preventivo de **400 MB** (plano free 500 MB) com purga de `orchestrator_logs > 7d` e `orchestrator_tasks > 14d`.
+- **Failover Multi-LLM Real Testado (`rodolfosalavandomidiadia13`, `novo pulo do gato`, `ligarocarbomdeverdade`):**
+  - Crédito promocional `$0.20` do OpenRouter consumido até `$0.199917639` -> modelos pagos (`google/gemini-4-carbon`, `google/gemini-4-argon`) devolvem HTTP `402` ("can only afford 1") até recarga, e `deepseek/deepseek-r1:free` foi descontinuado (`404`).
+  - `Gemini 4 Carbon` direto via Google AI Studio API devolve `429` sem vínculo de faturamento GCP.
+  - **Rotas de custo zero validadas (`200 OK`):** Google AI Studio direto (`gemini-4-hydrogen` / `gemini-2.5-flash` / `gemini-3-flash-preview`), OpenRouter `:free` ativos (`openrouter/free`, `nvidia/nemotron-3.5-lightning:free`, `google/gemma-4-31b-it:free` — 50 req/dia) e `codex.exe` local (logado via ChatGPT).
+  - **Dívida técnica identificada:** `scripts/invisible-loop-bot.mjs` e `scripts/organic-growth-agent.mjs` ainda chamam `openai/gpt-4o-mini` direto no OpenRouter sem `max_tokens` nem failover.

@@ -2370,3 +2370,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #286
 
 ---
+
+### 📍 [15/11/2026, 17:29:59] Mineracao Total do Historico em C:\\Users\\rodolfo\\Documents (13 arquivos .txt, ~2.07 MB)
+- **📖 Estudou / Leu:** Todos os 13 arquivos .txt completos (2.070.654 bytes, 28.138 linhas), incluindo logs de Codespaces/Gradle, Play Console, Moto G84, Cloud 24/7 e failover multi-LLM
+- **⚙️ Tentou / Executou:** Extracao cronologica de erros, causas, solucoes, decisoes e pulos do gato sem duplicar conhecimento previo
+- **⚠️ Erros Encontrados:** Gradle /tmp/gtmp inexistente, AGP 8+ package no AndroidManifest, lint isCheckReleaseBuilds, JVM target mismatch + JDK 25 DaemonCrashedException, gh models --system, Moto G84 dp(52)+tint M3, script ENOENT fora da raiz, Advertising ID Play Console, OpenRouter 402 (.1999 usado) e deepseek-r1:free 404
+- **🔧 Como Corrigiu:** Atualizado docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md (Secao 9), C:\\Users\\rodolfo\\.gemini\\GEMINI.md e docs/datasets/rodolfo-brain-finetuning.jsonl (+13 pares ChatML, total 205 validos via JSON.parse)
+- **🎯 Conclusão:** Conhecimento historico 100% consolidado para zero repeticao de erros; foco imediato retorna aos 4 portoes reais de producao (P0 app, CI/API 29-35, 12+ testadores/14d e Billing)
+- *Registro Supabase:* Memory #287
+
+---
