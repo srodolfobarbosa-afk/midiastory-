@@ -17,6 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { RODOLFO_BRAIN_SYSTEM_PROMPT, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -60,6 +61,7 @@ async function callGoogleAIStudio(modelName, prompt, options = {}) {
   };
 
   const bodyPayload = {
+    systemInstruction: { parts: [{ text: RODOLFO_BRAIN_SYSTEM_PROMPT }] },
     contents: [{ parts: [{ text: prompt }] }],
     ...(Object.keys(generationConfig).length > 0 ? { generationConfig } : {}),
   };
@@ -115,7 +117,10 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
       max_tokens: maxTokens,
       ...(responseFormatJson && !isFreeModel ? { response_format: { type: "json_object" } } : {}),
       ...(isReasoningModel ? { reasoning: { effort: reasoningEffort } } : {}),
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
     }),
   });
 
@@ -144,7 +149,10 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
         max_tokens: affordableTokens,
         ...(responseFormatJson && !isFreeModel ? { response_format: { type: "json_object" } } : {}),
         ...(isReasoningModel ? { reasoning: { effort: reasoningEffort === "high" ? "medium" : reasoningEffort } } : {}),
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+        { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
       }),
     });
   }
@@ -173,7 +181,7 @@ function callCodexLocal(prompt) {
     throw new Error(`Codex CLI não encontrado no ambiente (${process.platform})`);
   }
   console.log("⚡ Executando via OpenAI Codex CLI Local (Zero dependência de quota externa)...");
-  const cleanPrompt = prompt.replace(/"/g, '\\"');
+  const cleanPrompt = buildCodexPromptWithPersona(prompt).replace(/"/g, '\\"');
   return execSync(
     `"${bin}" exec --cd "${projectRoot}" --dangerously-bypass-approvals-and-sandbox "${cleanPrompt}"`,
     { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 }

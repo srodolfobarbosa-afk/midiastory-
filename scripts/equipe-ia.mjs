@@ -24,6 +24,7 @@
 import fs from "node:fs";
 import { execSync, spawn } from "node:child_process";
 import { getSupabaseToken } from "./lib/supabase-auth.mjs";
+import { RODOLFO_BRAIN_SYSTEM_PROMPT, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
 
 const projectDir = "C:/Users/rodolfo/midiastory-";
 const token = getSupabaseToken();
@@ -93,7 +94,7 @@ async function runCodexTask(task) {
     return;
   }
 
-  const prompt = task.payload?.prompt || task.payload?.script_or_command || task.title;
+  const prompt = buildCodexPromptWithPersona(task.payload?.prompt || task.payload?.script_or_command || task.title);
   console.log(`Prompt para o Codex:\n${prompt}\n`);
 
   try {
@@ -154,6 +155,7 @@ async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            systemInstruction: { parts: [{ text: RODOLFO_BRAIN_SYSTEM_PROMPT }] },
             contents: [{ parts: [{ text: prompt }] }],
             ...(sm.includes("gemini-4") ? { generationConfig: { thinkingConfig: { thinkingLevel: "HIGH" } } } : {}),
           }),
@@ -201,7 +203,10 @@ async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
           model: m,
           max_tokens: 1500,
           ...(isReasoning ? { reasoning: { effort: "medium" } } : {}),
-          messages: [{ role: "user", content: prompt }],
+          messages: [
+            { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+            { role: "user", content: prompt },
+          ],
         }),
       });
 
@@ -222,7 +227,10 @@ async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
           body: JSON.stringify({
             model: m,
             max_tokens: affordableTokens,
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+            { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+            { role: "user", content: prompt },
+          ],
           }),
         });
       }
@@ -248,9 +256,10 @@ async function callCodexDirect(prompt) {
   console.log(`Prompt: "${prompt}"`);
 
   try {
+    const fullPrompt = buildCodexPromptWithPersona(prompt);
     const child = spawn(
       codexPath,
-      ["exec", "--cd", projectDir, "--dangerously-bypass-approvals-and-sandbox", prompt],
+      ["exec", "--cd", projectDir, "--dangerously-bypass-approvals-and-sandbox", fullPrompt],
       { stdio: "inherit" }
     );
 

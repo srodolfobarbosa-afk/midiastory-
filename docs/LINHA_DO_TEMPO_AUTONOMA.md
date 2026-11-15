@@ -2318,3 +2318,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #281
 
 ---
+
+### 📍 [15/11/2026, 15:59:16] Incorporacao do Perfil Cognitivo do Fundador (Rodolfo Brain) e Dataset de Fine-Tuning (35 exemplos)
+- **📖 Estudou / Leu:** AGENTS.md, SKILL.md, scripts/equipe-ia.mjs, scripts/ai-failover-router.mjs, public.memories, docs/LINHA_DO_TEMPO_AUTONOMA.md
+- **⚙️ Tentou / Executou:** Geracao do dataset docs/datasets/rodolfo-brain-finetuning.jsonl (35 pares ChatML), atualizacao de AGENTS.md, .agents/skills/midiastore-growth/SKILL.md, scripts/lib/rodolfo-brain-persona.mjs, scripts/equipe-ia.mjs e scripts/ai-failover-router.mjs
+- **⚠️ Erros Encontrados:** scripts/conselho-trindade.mjs nao existe no repositorio; corrigida linha duplicada incompleta durante geracao do JSONL
+- **🔧 Como Corrigiu:** Validado JSONL (35/35 linhas validas) e sintaxe JS (node --check); injetado RODOLFO_BRAIN_SYSTEM_PROMPT em todos os roteadores e Codex CLI
+- **🎯 Conclusão:** Personalidade oficial do fundador Rodolfo (10 diretrizes: qualidade antes de vender, pulo do gato legal, verdade absoluta, regra 50/50, foco em resultado, zero passividade, pesquisa/invencao, liberdade legal, caixa R$ 1M no Midiastore e lei suprema) ativa no projeto e no Supabase
+- *Registro Supabase:* Memory #282
+
+---
