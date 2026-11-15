@@ -17,7 +17,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { RODOLFO_BRAIN_SYSTEM_PROMPT, RODOLFO_BRAIN_MODEL_PRIORITY, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
+import {
+  RODOLFO_BRAIN_SYSTEM_PROMPT,
+  RODOLFO_BRAIN_MODEL_PRIORITY,
+  buildCodexPromptWithPersona,
+  buildRodolfoBrainSystemPrompt,
+} from "./lib/rodolfo-brain-persona.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -61,7 +66,7 @@ async function callGoogleAIStudio(modelName, prompt, options = {}) {
   };
 
   const bodyPayload = {
-    systemInstruction: { parts: [{ text: RODOLFO_BRAIN_SYSTEM_PROMPT }] },
+    systemInstruction: { parts: [{ text: options.systemPrompt || RODOLFO_BRAIN_SYSTEM_PROMPT }] },
     contents: [{ parts: [{ text: prompt }] }],
     ...(Object.keys(generationConfig).length > 0 ? { generationConfig } : {}),
   };
@@ -98,7 +103,52 @@ const MODEL_CASCADE = [
   { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 31B (Free)" },
 ];
 
-async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort = "medium", responseFormatJson = false) {
+const GITHUB_MODELS_CASCADE = [
+  "openai/gpt-4o",
+  "openai/gpt-4o-mini",
+  "deepseek/DeepSeek-R1",
+];
+
+function getGitHubToken() {
+  if (process.env.GITHUB_TOKEN?.trim()) return process.env.GITHUB_TOKEN.trim();
+  try {
+    return execSync("gh auth token", { encoding: "utf8", timeout: 3000 }).trim();
+  } catch {
+    return "";
+  }
+}
+
+async function callGitHubModels(modelId, prompt, maxTokens = 1200, responseFormatJson = false, systemPrompt = RODOLFO_BRAIN_SYSTEM_PROMPT) {
+  const token = getGitHubToken();
+  if (!token) throw new Error("Token GitHub Models indisponível.");
+  const res = await fetch("https://models.github.ai/inference/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    signal: AbortSignal.timeout(25000),
+    body: JSON.stringify({
+      model: modelId,
+      max_tokens: maxTokens,
+      ...(responseFormatJson && modelId.startsWith("openai/") ? { response_format: { type: "json_object" } } : {}),
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    const error = new Error(`HTTP ${res.status}: ${errText}`);
+    error.status = res.status;
+    throw error;
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort = "medium", responseFormatJson = false, systemPrompt = RODOLFO_BRAIN_SYSTEM_PROMPT) {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
   const isReasoningModel = modelId.includes("carbon") || modelId.includes("argon") || modelId.includes("nano-omni");
@@ -118,7 +168,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
       ...(responseFormatJson && !isFreeModel ? { response_format: { type: "json_object" } } : {}),
       ...(isReasoningModel ? { reasoning: { effort: reasoningEffort } } : {}),
       messages: [
-        { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
     }),
@@ -150,7 +200,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
         ...(responseFormatJson && !isFreeModel ? { response_format: { type: "json_object" } } : {}),
         ...(isReasoningModel ? { reasoning: { effort: reasoningEffort === "high" ? "medium" : reasoningEffort } } : {}),
         messages: [
-        { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
       }),
@@ -192,10 +242,11 @@ export async function executeWithFailover(prompt, options = {}) {
   const isCode = options.isCode || false;
   const maxTokens = options.maxTokens || (isCode ? 2500 : 1200);
   const responseFormatJson = Boolean(options.responseFormatJson);
+  const systemPrompt = await buildRodolfoBrainSystemPrompt(6);
 
-  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens})...`);
+  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens}, Memória Viva: ativa)...`);
 
-  // 1. Prioridade Nativa (Camada Central Agnóstica): Google AI Studio Direto priorizando Gemini 4 Carbon
+  // 1. Prioridade Nativa (Camada Central Agnóstica): Google AI Studio Direto priorizando Gemini 4 Carbon -> Hydrogen
   if (googleStudioKey) {
     const studioModels = RODOLFO_BRAIN_MODEL_PRIORITY;
     for (const sm of studioModels) {
@@ -206,6 +257,7 @@ export async function executeWithFailover(prompt, options = {}) {
           maxTokens,
           responseFormatJson,
           thinkingLevel: options.thinkingLevel || (isCode ? "HIGH" : "MEDIUM"),
+          systemPrompt,
         });
         if (response) {
           console.log(`✅ Sucesso no Google AI Studio Direto (${sm})!`);
@@ -217,6 +269,20 @@ export async function executeWithFailover(prompt, options = {}) {
     }
   }
 
+  // 2. Segunda Rota Gratuita Legal: GitHub Models (GPT-4o / GPT-4o-mini / DeepSeek-R1 via conta GitHub)
+  for (const gm of GITHUB_MODELS_CASCADE) {
+    console.log(`[GitHub Models] Testando modelo gratuito: ${gm}...`);
+    try {
+      const response = await callGitHubModels(gm, prompt, maxTokens, responseFormatJson, systemPrompt);
+      if (response) {
+        console.log(`✅ Sucesso via GitHub Models (${gm})!`);
+        return { source: `github_models/${gm}`, content: response };
+      }
+    } catch (err) {
+      console.warn(`⚠️ GitHub Models (${gm}) falhou: ${err.message.slice(0, 140)}`);
+    }
+  }
+
   let lastError = null;
 
   if (openRouterKey) {
@@ -225,7 +291,7 @@ export async function executeWithFailover(prompt, options = {}) {
       console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
       try {
         const reasoningEffort = options.reasoningEffort || (isCode ? "high" : "medium");
-        const response = await callOpenRouter(model.id, prompt, maxTokens, reasoningEffort, responseFormatJson);
+        const response = await callOpenRouter(model.id, prompt, maxTokens, reasoningEffort, responseFormatJson, systemPrompt);
         if (response) {
           console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
           return { source: model.id, content: response };

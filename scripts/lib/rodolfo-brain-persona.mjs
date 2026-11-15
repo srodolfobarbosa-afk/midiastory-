@@ -33,6 +33,75 @@ DIRETRIZES INVIOLÁVEIS DE PERSONALIDADE, DECISÃO E EXECUÇÃO:
 14. ARQUITETURA AGNÓSTICA DE MODELO: Nunca limitar a inteligência a modelos pequenos locais; manter esta personalidade, regras e memórias como camada central agnóstica plugável nos LLMs frontier mais inteligentes do mercado (priorizando Gemini 4 Carbon quando disponível) e pronta para trocar dinamicamente para modelos superiores futuros.
 15. PÓS-R$ 1M: Manter foco total em atingir R$ 1.000.000,00 no Midiastore primeiro e mapear oportunidades de maior ROI em IA e automação na sequência.`;
 
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { getSupabaseToken, SUPABASE_PROJECT_REF } from "./supabase-auth.mjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, "..", "..");
+
+let cachedMemoryBlock = null;
+let cachedAtMs = 0;
+
+/**
+ * Carrega as memórias recentes reais (Supabase public.memories com fallback para
+ * docs/LINHA_DO_TEMPO_AUTONOMA.md) para manter continuidade histórica entre LLMs.
+ */
+export async function loadRecentMemories(limit = 6) {
+  if (cachedMemoryBlock && Date.now() - cachedAtMs < 60_000) {
+    return cachedMemoryBlock;
+  }
+
+  let block = "";
+  try {
+    const token = getSupabaseToken();
+    const res = await fetch(`https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      signal: AbortSignal.timeout(3500),
+      body: JSON.stringify({
+        query: `SELECT id, content, created_at FROM public.memories ORDER BY id DESC LIMIT ${Math.max(1, Math.min(12, limit))};`,
+      }),
+    });
+    if (res.ok) {
+      const rows = await res.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        block = rows
+          .map((r) => `[#${r.id} @ ${String(r.created_at).slice(0, 10)}] ${String(r.content || "").replace(/\s+/g, " ").slice(0, 260)}`)
+          .join("\n");
+      }
+    }
+  } catch {
+    // Fallback local abaixo caso Supabase esteja indisponível
+  }
+
+  if (!block) {
+    const timelinePath = path.join(projectRoot, "docs", "LINHA_DO_TEMPO_AUTONOMA.md");
+    if (fs.existsSync(timelinePath)) {
+      const raw = fs.readFileSync(timelinePath, "utf8");
+      block = raw.slice(-1400).trim();
+    }
+  }
+
+  cachedMemoryBlock = block;
+  cachedAtMs = Date.now();
+  return block;
+}
+
+/**
+ * Constrói o prompt central completo (Regras do Fundador + Memória Histórica Viva),
+ * plugável em qualquer LLM frontier presente ou futura.
+ */
+export async function buildRodolfoBrainSystemPrompt(limit = 6) {
+  const memories = await loadRecentMemories(limit);
+  if (!memories) return RODOLFO_BRAIN_SYSTEM_PROMPT;
+  return `${RODOLFO_BRAIN_SYSTEM_PROMPT}\n\n[MEMÓRIA HISTÓRICA RECENTE DO PROJETO (NUNCA ESQUECER O PASSADO)]\n${memories}`;
+}
+
 export function buildCodexPromptWithPersona(taskPrompt) {
   return `[PERFIL COGNITIVO DO FUNDADOR - RODOLFO BRAIN]\n${RODOLFO_BRAIN_SYSTEM_PROMPT}\n\n[ORDEM EXECUTÁVEL]\n${taskPrompt}`;
 }
