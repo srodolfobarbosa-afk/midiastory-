@@ -171,19 +171,35 @@ export async function retrieveRelevantContext({ query = "", sessionId = null, li
       LIMIT 4;
     `);
 
-    // 2. Query-relevant memories via FTS + pgvector cosine similarity fallback
+    // 2. Query-relevant memories via OR-keyword FTS + exact identifier boost + pgvector cosine similarity
     let relevantMemories = [];
     if (cleanQuery) {
-      const qEsc = escapeSqlString(cleanQuery);
+      const stopWords = new Set(["qual", "quais", "como", "para", "com", "que", "uma", "uns", "das", "dos", "nos", "nas", "responda", "frase", "curta", "atual", "sobre", "voce", "você"]);
+      const keywords = cleanQuery
+        .replace(/[^a-zA-Z0-9áéíóúâêôãõç_\- ]/g, " ")
+        .split(/\s+/)
+        .map((w) => w.trim())
+        .filter((w) => w.length >= 3 && !stopWords.has(w.toLowerCase()))
+        .slice(0, 10);
+
+      const tsQueryExpr = keywords.length > 0
+        ? `websearch_to_tsquery('portuguese', '${escapeSqlString(keywords.join(" OR "))}')`
+        : `plainto_tsquery('portuguese', '${escapeSqlString(cleanQuery)}')`;
+      const exactTokens = keywords.filter((k) => /[A-Z0-9_]{4,}/.test(k)).slice(0, 3);
+      const exactBoostSql = exactTokens.length > 0
+        ? exactTokens.map((t) => `CASE WHEN content ILIKE '%${escapeSqlString(t)}%' THEN 5.0 ELSE 0.0 END`).join(" + ")
+        : "0.0";
+
       const qEmb = computeDeterministicEmbedding(cleanQuery);
       relevantMemories = await runSupabaseSql(`
         SELECT id, content, origem, categoria, confianca, versao, created_at,
-               ts_rank(search_tsv, plainto_tsquery('portuguese', '${qEsc}')) AS fts_rank,
+               ts_rank(search_tsv, ${tsQueryExpr}) AS fts_rank,
                CASE WHEN embedding IS NOT NULL THEN 1 - (embedding <=> '${qEmb}'::vector) ELSE 0 END AS vec_sim
         FROM public.memories
         WHERE is_active = true
         ORDER BY
-          (ts_rank(search_tsv, plainto_tsquery('portuguese', '${qEsc}')) * 2.0 +
+          ((${exactBoostSql}) +
+           ts_rank(search_tsv, ${tsQueryExpr}) * 2.0 +
            CASE WHEN embedding IS NOT NULL THEN (1 - (embedding <=> '${qEmb}'::vector)) ELSE 0 END +
            (confianca::float * 0.2)) DESC,
           id DESC
@@ -221,7 +237,7 @@ export async function retrieveRelevantContext({ query = "", sessionId = null, li
 
     // 4. Pending tasks & recent learnings
     const pendingTasks = await runSupabaseSql(`
-      SELECT id, title, status, target_runner, created_at
+      SELECT id, title, status, target, created_at
       FROM public.orchestrator_tasks
       WHERE status IN ('PENDING', 'RUNNING')
       ORDER BY id DESC

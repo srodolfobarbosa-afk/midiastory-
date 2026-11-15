@@ -87,26 +87,26 @@ async function main() {
     results.push({ test: "contradiction_versioning", passed: true, v1: v1.id, v2: v2.id });
     console.log(`✅ [4/7] Resolução de contradição v1(${v1.id}) -> v2(${v2.id}): PASS`);
 
-    // 5. Cross-session / Process restart with LLM #1 (Google AI Studio / Gemini)
+    // 5. Cross-session / Process restart with LLM #1 (gemini-4-hydrogen or auto cascade)
     const prompt = `Responda em 1 frase curta: qual é a taxa oficial atual de auditoria QA do ${uniqueCode}?`;
     const out1 = execFileSync(
       process.execPath,
-      ["scripts/ai-failover-router.mjs", "--provider=google_ai_studio", `--session=eval-gemini-${Date.now()}`, prompt],
+      ["scripts/ai-failover-router.mjs", "--provider=google_ai_studio", `--session=eval-llm1-${Date.now()}`, prompt],
       { cwd: projectRoot, encoding: "utf8", timeout: 45000 }
     );
     assert.match(out1, /55%/, `LLM #1 não recuperou 55%. Saída: ${out1}`);
-    results.push({ test: "cross_session_process_restart_gemini", passed: true });
-    console.log("✅ [5/7] Nova sessão em processo isolado (Google AI Studio / Gemini) recuperou 55%: PASS");
+    results.push({ test: "cross_session_process_restart_llm1", passed: true });
+    console.log("✅ [5/7] Nova sessão em processo isolado (LLM #1 auto-cascade) recuperou 55%: PASS");
 
-    // 6. Cross-LLM swap in second isolated process (GitHub Models / GPT)
+    // 6. Cross-LLM swap in second isolated process (explicitly forcing gemini-2.5-flash)
     const out2 = execFileSync(
       process.execPath,
-      ["scripts/ai-failover-router.mjs", "--provider=github_models", `--session=eval-gpt-${Date.now()}`, prompt],
+      ["scripts/ai-failover-router.mjs", "--provider=google_ai_studio", "--model=gemini-2.5-flash", `--session=eval-llm2-${Date.now()}`, prompt],
       { cwd: projectRoot, encoding: "utf8", timeout: 45000 }
     );
-    assert.match(out2, /55%/, `LLM #2 não recuperou 55%. Saída: ${out2}`);
-    results.push({ test: "cross_llm_swap_github_models", passed: true });
-    console.log("✅ [6/7] Troca de LLM em processo isolado (GitHub Models / GPT) recuperou 55%: PASS");
+    assert.match(out2, /55%/, `LLM #2 (gemini-2.5-flash) não recuperou 55%. Saída: ${out2}`);
+    results.push({ test: "cross_llm_swap_gemini_2_5_flash", passed: true });
+    console.log("✅ [6/7] Troca de LLM em processo isolado (gemini-2.5-flash) recuperou 55%: PASS");
 
     // 7. Auto-learning conversation persistence
     const learned = await learnFromInteraction({

@@ -111,22 +111,18 @@ const GITHUB_MODELS_CASCADE = [
 ];
 
 function getGitHubToken() {
-  if (process.env.GITHUB_TOKEN?.trim()) return process.env.GITHUB_TOKEN.trim();
-  try {
-    return execSync("gh auth token", { encoding: "utf8", timeout: 3000 }).trim();
-  } catch {
-    return "";
-  }
+  return process.env.GITHUB_MODELS_TOKEN?.trim() || "";
 }
 
 async function callGitHubModels(modelId, prompt, maxTokens = 1200, responseFormatJson = false, systemPrompt = RODOLFO_BRAIN_SYSTEM_PROMPT) {
   const token = getGitHubToken();
-  if (!token) throw new Error("Token GitHub Models indisponível.");
+  if (!token) throw new Error("GITHUB_MODELS_TOKEN (PAT models:read) não configurado.");
   const res = await fetch("https://models.github.ai/inference/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
     signal: AbortSignal.timeout(25000),
     body: JSON.stringify({
@@ -144,6 +140,10 @@ async function callGitHubModels(modelId, prompt, maxTokens = 1200, responseForma
     const error = new Error(`HTTP ${res.status}: ${errText}`);
     error.status = res.status;
     throw error;
+  }
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(`Resposta não-JSON de GitHub Models (${ct}): ${(await res.text()).slice(0, 80)}`);
   }
   const data = await res.json();
   return data.choices?.[0]?.message?.content || "";
@@ -244,6 +244,7 @@ export async function executeWithFailover(prompt, options = {}) {
   const maxTokens = options.maxTokens || (isCode ? 2500 : 1200);
   const responseFormatJson = Boolean(options.responseFormatJson);
   const forceProvider = options.forceProvider || null;
+  const forceModel = options.forceModel || null;
   const sessionId = options.sessionId || null;
   const systemPrompt = await buildRodolfoBrainSystemPrompt({
     query: prompt,
@@ -251,7 +252,7 @@ export async function executeWithFailover(prompt, options = {}) {
     limit: options.memoryLimit || 8,
   });
 
-  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens}, Provider: ${forceProvider || "auto"}, Memória Cognitiva: ativa)...`);
+  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens}, Provider: ${forceProvider || "auto"}, Model: ${forceModel || "auto"}, Memória Cognitiva: ativa)...`);
 
   async function finalizeResult(result) {
     if (options.autoLearn && result?.content) {
@@ -268,7 +269,7 @@ export async function executeWithFailover(prompt, options = {}) {
 
   // 1. Prioridade Nativa (Camada Central Agnóstica): Google AI Studio Direto priorizando Gemini 4 Carbon -> Hydrogen
   if (googleStudioKey && (!forceProvider || forceProvider === "google_ai_studio")) {
-    const studioModels = RODOLFO_BRAIN_MODEL_PRIORITY;
+    const studioModels = forceModel ? [forceModel] : RODOLFO_BRAIN_MODEL_PRIORITY;
     for (const sm of studioModels) {
       console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm} (Thinking: ${isCode ? "HIGH" : "MEDIUM"})...`);
       try {
@@ -346,20 +347,22 @@ async function main() {
   const isCode = args.includes("--code");
   const autoLearn = args.includes("--learn");
   const providerArg = args.find((a) => a.startsWith("--provider="));
+  const modelArg = args.find((a) => a.startsWith("--model="));
   const sessionArg = args.find((a) => a.startsWith("--session="));
   const forceProvider = providerArg ? providerArg.split("=")[1] : null;
+  const forceModel = modelArg ? modelArg.split("=")[1] : null;
   const sessionId = sessionArg ? sessionArg.split("=")[1] : null;
   const promptArgs = args.filter(
-    (a) => a !== "--code" && a !== "--learn" && !a.startsWith("--provider=") && !a.startsWith("--session=")
+    (a) => a !== "--code" && a !== "--learn" && !a.startsWith("--provider=") && !a.startsWith("--model=") && !a.startsWith("--session=")
   );
   const prompt = promptArgs.join(" ").trim();
 
   if (!prompt) {
-    console.log("Uso: node scripts/ai-failover-router.mjs [--code] [--learn] [--provider=google_ai_studio|github_models] [--session=id] '<prompt>'");
+    console.log("Uso: node scripts/ai-failover-router.mjs [--code] [--learn] [--provider=google_ai_studio|github_models] [--model=nome] [--session=id] '<prompt>'");
     process.exit(1);
   }
 
-  const result = await executeWithFailover(prompt, { isCode, autoLearn, forceProvider, sessionId });
+  const result = await executeWithFailover(prompt, { isCode, autoLearn, forceProvider, forceModel, sessionId });
   console.log("\n==================== RESPOSTA ====================");
   console.log(`[Provedor Vencedor: ${result.source}]`);
   console.log("==================================================");
