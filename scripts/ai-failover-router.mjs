@@ -17,7 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { RODOLFO_BRAIN_SYSTEM_PROMPT, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
+import { RODOLFO_BRAIN_SYSTEM_PROMPT, RODOLFO_BRAIN_MODEL_PRIORITY, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -195,15 +195,9 @@ export async function executeWithFailover(prompt, options = {}) {
 
   console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens})...`);
 
-  // 1. Prioridade Nativa: Google AI Studio Direto (Custo Zero, 1M Context no Gemini 4 Hydrogen com Thinking)
+  // 1. Prioridade Nativa (Camada Central Agnóstica): Google AI Studio Direto priorizando Gemini 4 Carbon
   if (googleStudioKey) {
-    const studioModels = [
-      "gemini-4-carbon",
-      "gemini-3-flash-preview",
-      "gemini-2.5-flash",
-      "gemini-4-argon",
-      "gemini-4-hydrogen",
-    ];
+    const studioModels = RODOLFO_BRAIN_MODEL_PRIORITY;
     for (const sm of studioModels) {
       console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm} (Thinking: ${isCode ? "HIGH" : "MEDIUM"})...`);
       try {

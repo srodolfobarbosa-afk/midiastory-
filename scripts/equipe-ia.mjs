@@ -24,7 +24,7 @@
 import fs from "node:fs";
 import { execSync, spawn } from "node:child_process";
 import { getSupabaseToken } from "./lib/supabase-auth.mjs";
-import { RODOLFO_BRAIN_SYSTEM_PROMPT, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
+import { RODOLFO_BRAIN_SYSTEM_PROMPT, RODOLFO_BRAIN_MODEL_PRIORITY, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
 
 const projectDir = "C:/Users/rodolfo/midiastory-";
 const token = getSupabaseToken();
@@ -144,11 +144,11 @@ async function processNextCodex() {
   await runCodexTask(pending[0]);
 }
 
-async function callOpenRouterLlm(prompt, model = "gemini-4-hydrogen") {
+async function callOpenRouterLlm(prompt, model = "google/gemini-4-carbon") {
   const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
   const studioKey = aiKeys.GOOGLE_AI_STUDIO_API_KEY || aiKeys.GOOGLE_AQ_API_KEY;
   if (studioKey) {
-    for (const sm of ["gemini-4-hydrogen", "gemini-2.5-flash"]) {
+    for (const sm of RODOLFO_BRAIN_MODEL_PRIORITY) {
       try {
         console.log(`\n🧠 [EQUIPE IA] Consultando ${sm} direto no Google AI Studio (Custo R$ 0,00 / 1M Context)...`);
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${sm}:generateContent?key=${studioKey}`, {

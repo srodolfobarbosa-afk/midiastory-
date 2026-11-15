@@ -2328,3 +2328,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #282
 
 ---
+
+### 📍 [15/11/2026, 16:19:45] Expansao Rodolfo Brain (94 exemplos JSONL), Arquitetura Agnostica Frontier (Gemini 4 Carbon) e GEMINI.md Global
+- **📖 Estudou / Leu:** AGENTS.md, GEMINI.md, C:/Users/rodolfo/.gemini/GEMINI.md, SKILL.md, scripts/lib/rodolfo-brain-persona.mjs, scripts/equipe-ia.mjs, scripts/ai-failover-router.mjs
+- **⚙️ Tentou / Executou:** Atualizacao do perfil cognitivo para 15 diretrizes (corte/pivo analitico, alocacao dinamica 50/50, tom adaptativo, arquitetura agnostica priorizando Gemini 4 Carbon, pos-R), correcao de 20 para 12 testadores por 14 dias continuos no dataset/AGENTS/SKILL, gravacao global em C:/Users/rodolfo/.gemini/GEMINI.md e expansao do dataset para 94 pares ChatML
+- **⚠️ Erros Encontrados:** Zero erros de sintaxe ou schema
+- **🔧 Como Corrigiu:** Validados 94/94 pares JSONL, 0 referencias antigas de 20 testadores, node --check aprovado nos 3 scripts
+- **🎯 Conclusão:** Camada cognitiva agnostica Rodolfo Brain ativa globalmente (~/.gemini/GEMINI.md) e no repositorio, priorizando Gemini 4 Carbon e pronta para modelos frontier futuros
+- *Registro Supabase:* Memory #283
+
+---
