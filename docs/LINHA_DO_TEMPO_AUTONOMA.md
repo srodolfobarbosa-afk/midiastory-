@@ -2380,3 +2380,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #287
 
 ---
+
+### 📍 [15/11/2026, 17:55:56] Atualizacao Real Play Console (12 testadores batidos, Dia 2 de 14) + Regra Anti-Dado-Velho
+- **📖 Estudou / Leu:** Status ao vivo informado pelo fundador na Play Console em 2026-11-15: 12 testadores exigidos atingidos e relogio oficial no Dia 2/14 (faltam 12 dias)
+- **⚙️ Tentou / Executou:** Substituicao do dado antigo de 4 testadores em CONHECIMENTO_CONSOLIDADO_RODOLFO.md e GEMINI.md + gravacao da Regra Anti-Dado-Velho
+- **⚠️ Erros Encontrados:** Risco de agentes futuros repetirem metrica velha (4 testadores) sem checar fonte ao vivo
+- **🔧 Como Corrigiu:** Atualizado docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md e GEMINI.md com Dia 2/14 e Regra Anti-Dado-Velho obrigatoria
+- **🎯 Conclusão:** Foco dos proximos 12 dias: fechar build/testes de hoje, subir AAB v2.5.0 sem derrubar testadores, validar 1 compra real License Tester em verify-play-purchase, manter 14-15 testadores de folga e preparar formulario de producao
+- *Registro Supabase:* Memory #288
+
+---
+
+### 📍 [15/11/2026, 18:04:59] Socratic Self-Play (30 perguntas/respostas) + Manual de Guerra Producao e Escala R$ 1M
+- **📖 Estudou / Leu:** Codigo real (verify-play-purchase/index.ts, app/build.gradle.kts, MainActivity.kt), politicas Google Play, funil e precos SKUs
+- **⚙️ Tentou / Executou:** Geracao de 30 pares ChatML de alto nivel nas 4 frentes (Engenharia/Billing, Formulario Producao Google Play, Paywall/Retencao, ASO/Escala/50-50)
+- **⚠️ Erros Encontrados:** Nenhum erro de schema; 100% dos 235 pares validados com JSON.parse
+- **🔧 Como Corrigiu:** Criado docs/MANUAL_GUERRA_PRODUCAO_E_VENDAS_1M.md, atualizado docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md e expandido docs/datasets/rodolfo-brain-finetuning.jsonl para 235 pares validos
+- **🎯 Conclusão:** Manual de guerra e respostas oficiais de producao prontos para o Dia 14 enquanto acompanhamos a execucao dos testes Gradle
+- *Registro Supabase:* Memory #289
+
+---
