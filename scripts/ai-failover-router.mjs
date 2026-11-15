@@ -23,6 +23,7 @@ import {
   buildCodexPromptWithPersona,
   buildRodolfoBrainSystemPrompt,
 } from "./lib/rodolfo-brain-persona.mjs";
+import { learnFromInteraction } from "./lib/cognitive-memory.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -242,12 +243,31 @@ export async function executeWithFailover(prompt, options = {}) {
   const isCode = options.isCode || false;
   const maxTokens = options.maxTokens || (isCode ? 2500 : 1200);
   const responseFormatJson = Boolean(options.responseFormatJson);
-  const systemPrompt = await buildRodolfoBrainSystemPrompt(6);
+  const forceProvider = options.forceProvider || null;
+  const sessionId = options.sessionId || null;
+  const systemPrompt = await buildRodolfoBrainSystemPrompt({
+    query: prompt,
+    sessionId,
+    limit: options.memoryLimit || 8,
+  });
 
-  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens}, Memória Viva: ativa)...`);
+  console.log(`[FAILOVER ROUTER] Iniciando requisição (Modo: ${isCode ? "Código/Refatoração" : "Geral"}, maxTokens: ${maxTokens}, Provider: ${forceProvider || "auto"}, Memória Cognitiva: ativa)...`);
+
+  async function finalizeResult(result) {
+    if (options.autoLearn && result?.content) {
+      await learnFromInteraction({
+        question: prompt,
+        answer: result.content,
+        modelUsed: result.source,
+        sessionId,
+        extractedFacts: options.extractedFacts || [],
+      });
+    }
+    return result;
+  }
 
   // 1. Prioridade Nativa (Camada Central Agnóstica): Google AI Studio Direto priorizando Gemini 4 Carbon -> Hydrogen
-  if (googleStudioKey) {
+  if (googleStudioKey && (!forceProvider || forceProvider === "google_ai_studio")) {
     const studioModels = RODOLFO_BRAIN_MODEL_PRIORITY;
     for (const sm of studioModels) {
       console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm} (Thinking: ${isCode ? "HIGH" : "MEDIUM"})...`);
@@ -261,7 +281,7 @@ export async function executeWithFailover(prompt, options = {}) {
         });
         if (response) {
           console.log(`✅ Sucesso no Google AI Studio Direto (${sm})!`);
-          return { source: `google_ai_studio/${sm}`, content: response };
+          return finalizeResult({ source: `google_ai_studio/${sm}`, content: response });
         }
       } catch (err) {
         console.warn(`⚠️ Google AI Studio (${sm}) falhou: ${err.message.slice(0, 140)}`);
@@ -270,22 +290,24 @@ export async function executeWithFailover(prompt, options = {}) {
   }
 
   // 2. Segunda Rota Gratuita Legal: GitHub Models (GPT-4o / GPT-4o-mini / DeepSeek-R1 via conta GitHub)
-  for (const gm of GITHUB_MODELS_CASCADE) {
-    console.log(`[GitHub Models] Testando modelo gratuito: ${gm}...`);
-    try {
-      const response = await callGitHubModels(gm, prompt, maxTokens, responseFormatJson, systemPrompt);
-      if (response) {
-        console.log(`✅ Sucesso via GitHub Models (${gm})!`);
-        return { source: `github_models/${gm}`, content: response };
+  if (!forceProvider || forceProvider === "github_models") {
+    for (const gm of GITHUB_MODELS_CASCADE) {
+      console.log(`[GitHub Models] Testando modelo gratuito: ${gm}...`);
+      try {
+        const response = await callGitHubModels(gm, prompt, maxTokens, responseFormatJson, systemPrompt);
+        if (response) {
+          console.log(`✅ Sucesso via GitHub Models (${gm})!`);
+          return finalizeResult({ source: `github_models/${gm}`, content: response });
+        }
+      } catch (err) {
+        console.warn(`⚠️ GitHub Models (${gm}) falhou: ${err.message.slice(0, 140)}`);
       }
-    } catch (err) {
-      console.warn(`⚠️ GitHub Models (${gm}) falhou: ${err.message.slice(0, 140)}`);
     }
   }
 
   let lastError = null;
 
-  if (openRouterKey) {
+  if (openRouterKey && (!forceProvider || forceProvider === "openrouter")) {
     for (let i = 0; i < MODEL_CASCADE.length; i++) {
       const model = MODEL_CASCADE[i];
       console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
@@ -294,7 +316,7 @@ export async function executeWithFailover(prompt, options = {}) {
         const response = await callOpenRouter(model.id, prompt, maxTokens, reasoningEffort, responseFormatJson, systemPrompt);
         if (response) {
           console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
-          return { source: model.id, content: response };
+          return finalizeResult({ source: model.id, content: response });
         }
       } catch (err) {
         console.warn(`⚠️ Rota ${i + 1} (${model.name}) falhou: ${err.message.slice(0, 140)}`);
@@ -304,11 +326,15 @@ export async function executeWithFailover(prompt, options = {}) {
     }
   }
 
+  if (forceProvider) {
+    throw new Error(`Provedor forçado '${forceProvider}' falhou ou está indisponível.`);
+  }
+
   console.warn("⚠️ Todas as rotas de API remota esgotaram cota ou falharam. Acionando Fallback Local para o Codex CLI...");
   try {
     const localOutput = callCodexLocal(prompt);
     console.log("✅ Sucesso no Fallback Local com Codex CLI!");
-    return { source: "local_codex", content: localOutput };
+    return finalizeResult({ source: "local_codex", content: localOutput });
   } catch (codexErr) {
     console.error("❌ Falha tanto nas APIs remotas quanto no Codex local:", codexErr.message);
     throw new Error(`Falha total de failover. Último erro de API: ${lastError?.message}`);
@@ -318,15 +344,22 @@ export async function executeWithFailover(prompt, options = {}) {
 async function main() {
   const args = process.argv.slice(2);
   const isCode = args.includes("--code");
-  const promptArgs = args.filter(a => a !== "--code");
+  const autoLearn = args.includes("--learn");
+  const providerArg = args.find((a) => a.startsWith("--provider="));
+  const sessionArg = args.find((a) => a.startsWith("--session="));
+  const forceProvider = providerArg ? providerArg.split("=")[1] : null;
+  const sessionId = sessionArg ? sessionArg.split("=")[1] : null;
+  const promptArgs = args.filter(
+    (a) => a !== "--code" && a !== "--learn" && !a.startsWith("--provider=") && !a.startsWith("--session=")
+  );
   const prompt = promptArgs.join(" ").trim();
 
   if (!prompt) {
-    console.log("Uso: node scripts/ai-failover-router.mjs [--code] '<prompt>'");
+    console.log("Uso: node scripts/ai-failover-router.mjs [--code] [--learn] [--provider=google_ai_studio|github_models] [--session=id] '<prompt>'");
     process.exit(1);
   }
 
-  const result = await executeWithFailover(prompt, { isCode });
+  const result = await executeWithFailover(prompt, { isCode, autoLearn, forceProvider, sessionId });
   console.log("\n==================== RESPOSTA ====================");
   console.log(`[Provedor Vencedor: ${result.source}]`);
   console.log("==================================================");
