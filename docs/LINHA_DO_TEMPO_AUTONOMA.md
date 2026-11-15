@@ -2338,3 +2338,14 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #283
 
 ---
+
+
+### 📍 [15/11/2026, 16:36:00] Auto-Treinamento Profundo & Consolidação de Conhecimento (94 -> 174 pares ChatML)
+- **📖 Estudou / Leu:** Estrutura completa do repositório (`docs/` 243 arq, `.agents/skills/` 42 arq, `scripts/` 80 arq, `app/src/main/` 41 arq), `git log`, `MainActivity.kt`, `AndroidPlayBillingGateway.kt`, `AndroidTrashOperationCoordinator.kt`, `AndroidMediaPageRepository.kt`, `MediaScanViewModel.kt`, `verify-play-purchase/index.ts`, `ai-failover-router.mjs` e `public.memories` no Supabase (283 memórias totais, últimas 40 consultadas).
+- **⚙️ Tentou / Executou:** Criação de `docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md`, atualização do resumo enxuto em `C:\Users\rodolfo\.gemini\GEMINI.md` e expansão do dataset `docs/datasets/rodolfo-brain-finetuning.jsonl` de 94 para 174 pares ChatML reais e validados via `JSON.parse`.
+- **⚠️ Erros Encontrados:** Zero erros de schema ou validação JSONL.
+- **🔧 Como Corrigiu:** 174/174 linhas validadas com estrutura `system, user, assistant` e fatos 100% verificados do código, docs, git e Supabase.
+- **🎯 Conclusão:** Mapa técnico consolidado e auto-treinamento concluído sem simulações, sincronizado no Supabase e no GitHub.
+- *Registro Supabase:* Memory #284
+
+---
