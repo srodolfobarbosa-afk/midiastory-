@@ -2410,3 +2410,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #290
 
 ---
+
+### 📍 [15/11/2026, 18:49:48] Correcao Botao Limpeza + Mais Beneficio Gratis + Compra Real Confirmada
+- **📖 Estudou / Leu:** public.play_purchases no Supabase, MainActivity.kt (startOneTapCleanup, resumePendingOutcomeMission, openInteractiveCleanupReviewDialog, Pro Suite) e roteador gemini-4-carbon
+- **⚙️ Tentou / Executou:** Consultado public.play_purchases ao vivo, testado ai-failover-router.mjs, corrigido travamento do heroOrbButton sem permissao/first-page e liberadas Calculadora + Gerador de Senhas no modo gratis
+- **⚠️ Erros Encontrados:** gemini-4-carbon retornou HTTP 429 (cota/faturamento GCP) com failover para gemini-4-hydrogen; heroOrbButton podia travar isEnabled=false se permissao fosse negada/cancelada ou currentPage==null
+- **🔧 Como Corrigiu:** MainActivity.kt corrigido (startOneTapCleanup, resumePendingOutcomeMission, reviewDialogRef?.dismiss(), Calculadora e Gerador de Senhas gratis) e confirmada compra real GPA.3382-7822-5252-21520 em play_purchases
+- **🎯 Conclusão:** Billing ja validado ponta a ponta; correcoes aplicadas no app e rodando :domain:test :app:testDebugUnitTest agora
+- *Registro Supabase:* Memory #291
+
+---

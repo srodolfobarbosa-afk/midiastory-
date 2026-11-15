@@ -379,6 +379,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeGlobalHubTitleView: TextView
     private lateinit var homeGlobalHubSubtitleView: TextView
     private lateinit var storageRingGauge: StorageRingGaugeView
+    private lateinit var storageProgressBar: ProgressBar
     private lateinit var storageUsedHeadline: TextView
     private lateinit var storageFreeSubline: TextView
     private lateinit var heroOrbButton: MaterialButton
@@ -710,7 +711,7 @@ class MainActivity : AppCompatActivity() {
         heroHeader.addView(label(getString(R.string.home_welcome_title), 20f, R.color.sweep_text, true))
         addView(heroHeader, LinearLayout.LayoutParams(-1, -2))
 
-        // Card de Medidor de Armazenamento Real (Anel + GB usados/livres)
+        // Card de Medidor de Armazenamento Real (Anel + Barra Linear Segmentada + GB)
         val storageCard = card()
         val storageRow = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -719,13 +720,21 @@ class MainActivity : AppCompatActivity() {
         storageRingGauge = StorageRingGaugeView(this@MainActivity).apply {
             bottomLabel = getString(R.string.storage_ring_used)
         }
-        storageRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(112), dp(112)).apply { marginEnd = dp(16) })
+        storageRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(100), dp(100)).apply { marginEnd = dp(14) })
         val storageCopy = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        storageCopy.addView(label(getString(R.string.storage_title), 11f, R.color.sweep_primary_glow, true))
-        storageUsedHeadline = label(getString(R.string.storage_unavailable), 19f, R.color.sweep_text, true)
-        storageCopy.addView(storageUsedHeadline, top(4))
-        storageFreeSubline = label("", 13f, R.color.sweep_muted, false)
-        storageCopy.addView(storageFreeSubline, top(3))
+        storageCopy.addView(label(getString(R.string.storage_title), 11f, R.color.google_blue_tonal_accent, true))
+        storageUsedHeadline = label(getString(R.string.storage_unavailable), 18f, R.color.sweep_text, true)
+        storageCopy.addView(storageUsedHeadline, top(3))
+        storageFreeSubline = label("", 12.5f, R.color.sweep_muted, false)
+        storageCopy.addView(storageFreeSubline, top(2))
+        storageProgressBar = ProgressBar(this@MainActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
+            isIndeterminate = false
+            max = 100
+            progress = 0
+            progressTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            progressBackgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+        }
+        storageCopy.addView(storageProgressBar, LinearLayout.LayoutParams(-1, dp(8)).apply { topMargin = dp(8) })
         storageRow.addView(storageCopy, LinearLayout.LayoutParams(0, -2, 1f))
         storageCard.addView(storageRow)
         storageCardContainer = wrap(storageCard)
@@ -733,21 +742,24 @@ class MainActivity : AppCompatActivity() {
 
         heroOrbButton = MaterialButton(this@MainActivity).apply {
             text = getString(R.string.home_cleanup_primary)
-            textSize = 18f
+            textSize = 16f
             isAllCaps = false
-            minHeight = dp(68)
-            cornerRadius = dp(22)
+            minHeight = dp(60)
+            cornerRadius = dp(30)
             insetTop = 0
             insetBottom = 0
             tag = "primary_phone_cleaner_action"
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_delete)
+            iconTint = android.content.res.ColorStateList.valueOf(Color.WHITE)
+            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             setOnClickListener {
                 try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                 onHomeCleanupButtonClicked()
             }
         }
-        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(68)).apply { bottomMargin = dp(6) })
+        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(60)).apply { bottomMargin = dp(6) })
 
         heroOrbSubtitle = label(getString(R.string.home_cleanup_subtitle), 12f, R.color.sweep_muted, false)
         addView(heroOrbSubtitle, LinearLayout.LayoutParams(-1, -2).apply {
@@ -756,7 +768,7 @@ class MainActivity : AppCompatActivity() {
             bottomMargin = dp(12)
         })
 
-        homeCleanupResult = label("", 13f, R.color.sweep_primary_glow, true).apply {
+        homeCleanupResult = label("", 13f, R.color.google_blue_tonal_accent, true).apply {
             visibility = View.GONE
             setPadding(dp(8), dp(2), dp(8), dp(8))
         }
@@ -774,9 +786,10 @@ class MainActivity : AppCompatActivity() {
             }
             requestMoveSelectedToTrash(targets)
         }.apply {
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
             visibility = if (trashCoordinator.supportsSystemTrash()) View.VISIBLE else View.GONE
+            minHeight = dp(52)
         }
         val homeDeleteBtn = button(getString(R.string.permanent_delete_button)) {
             val targets = if (viewModel.state.value.selection.records.isNotEmpty()) {
@@ -786,39 +799,16 @@ class MainActivity : AppCompatActivity() {
             }
             requestPermanentDeleteSelected(targets)
         }.apply {
-            setTextColor(color(R.color.sweep_text))
+            setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
+            minHeight = dp(52)
         }
-        homeDirectCleanRow.addView(homeTrashBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
-        homeDirectCleanRow.addView(homeDeleteBtn, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
+        homeDirectCleanRow.addView(homeTrashBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        homeDirectCleanRow.addView(homeDeleteBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
         addView(homeDirectCleanRow, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(14) })
 
-        // Card de Destaque WhatsApp Express Cleaner (100% Grátis)
-        val homeWaCard = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(16), dp(14), dp(16), dp(14))
-        }
-        val homeWaBadge = TextView(this@MainActivity).apply {
-            text = getString(R.string.wa_card_badge)
-            textSize = 10f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#25D366"))
-        }
-        homeWaCard.addView(homeWaBadge)
-        homeWaCard.addView(label(getString(R.string.wa_card_title), 16f, R.color.sweep_text, true), top(3))
-        homeWaCard.addView(label(getString(R.string.wa_card_desc), 11.5f, R.color.sweep_muted, false), top(2))
-        val homeWaBtn = button(getString(R.string.quick_clean_whatsapp)) {
-            openWhatsAppCleanerFlow()
-        }.apply {
-            minHeight = dp(46)
-            cornerRadius = dp(14)
-            textSize = 13f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#070B14"))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#25D366"))
-        }
-        homeWaCard.addView(homeWaBtn, top(10))
-        addView(themedCard(homeWaCard, Color.parseColor("#0A1D14"), Color.parseColor("#25D366")), bottom(14))
+        // Grade 2x2 Material Quick-Clean (Padrão Google Files)
+        addView(buildQuickClean2x2Grid(), bottom(14))
 
         // Card de Conversão VIP Pro em Destaque (Logo abaixo do botão grande Liberar Espaço)
         val homeProCardContent = card()
@@ -882,6 +872,124 @@ class MainActivity : AppCompatActivity() {
         }.onFailure {
             Toast.makeText(this, R.string.share_app_unavailable, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun buildQuickClean2x2Grid(): View {
+        val gridRoot = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        gridRoot.addView(
+            label(getString(R.string.quick_clean_title).uppercase(), 11f, R.color.google_blue_tonal_accent, true).apply {
+                letterSpacing = 0.05f
+                setPadding(dp(2), 0, dp(2), dp(8))
+            }
+        )
+        fun buildGridCell(
+            iconRes: Int,
+            title: String,
+            description: String,
+            actionLabel: String,
+            bgTonalColor: Int,
+            accentColor: Int,
+            onClick: () -> Unit
+        ): View {
+            val cellContent = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(14), dp(14), dp(14), dp(14))
+                background = roundedBackground(bgTonalColor, dp(18))
+            }
+            val iconView = ImageView(this).apply {
+                setImageResource(iconRes)
+                setColorFilter(accentColor)
+                background = roundedBackground(Color.argb(35, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor)), dp(8))
+                setPadding(dp(6), dp(6), dp(6), dp(6))
+            }
+            cellContent.addView(iconView, LinearLayout.LayoutParams(dp(32), dp(32)))
+            val titleView = label(title, 14f, R.color.sweep_text, true).apply {
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
+            cellContent.addView(titleView, top(8))
+            val descView = label(description, 11f, R.color.sweep_muted, false).apply {
+                maxLines = 2
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
+            cellContent.addView(descView, top(3))
+            val actionBtn = MaterialButton(this).apply {
+                text = actionLabel
+                textSize = 11.5f
+                isAllCaps = false
+                minHeight = dp(36)
+                cornerRadius = dp(18)
+                insetTop = 0
+                insetBottom = 0
+                setTextColor(Color.WHITE)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(accentColor)
+                setOnClickListener {
+                    try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                    onClick()
+                }
+            }
+            cellContent.addView(actionBtn, LinearLayout.LayoutParams(-1, dp(36)).apply { topMargin = dp(8) })
+            return cellContent
+        }
+
+        val row1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val waCell = buildGridCell(
+            iconRes = android.R.drawable.ic_dialog_email,
+            title = "WhatsApp",
+            description = "Áudios e mídias recebidas",
+            actionLabel = "Limpar",
+            bgTonalColor = color(R.color.m3_tonal_whatsapp_bg),
+            accentColor = color(R.color.m3_tonal_whatsapp_accent),
+            onClick = { openWhatsAppCleanerFlow() }
+        )
+        val dupCell = buildGridCell(
+            iconRes = android.R.drawable.ic_menu_agenda,
+            title = "Duplicatas",
+            description = "Cópias exatas SHA-256",
+            actionLabel = "Localizar",
+            bgTonalColor = color(R.color.m3_tonal_duplicates_bg),
+            accentColor = color(R.color.m3_tonal_duplicates_accent),
+            onClick = {
+                openInteractiveDialogOnMissionFinish = true
+                runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+            }
+        )
+        row1.addView(waCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(5) })
+        row1.addView(dupCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(5) })
+        gridRoot.addView(row1)
+
+        val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val largeCell = buildGridCell(
+            iconRes = android.R.drawable.ic_media_play,
+            title = "Grandes",
+            description = "Vídeos pesados >10 MB",
+            actionLabel = "Revisar",
+            bgTonalColor = color(R.color.m3_tonal_large_bg),
+            accentColor = color(R.color.m3_tonal_large_accent),
+            onClick = {
+                openInteractiveDialogOnMissionFinish = true
+                runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+            }
+        )
+        val oldCell = buildGridCell(
+            iconRes = android.R.drawable.ic_menu_recent_history,
+            title = "Antigos",
+            description = "Mídias com mais de 30 dias",
+            actionLabel = "Examinar",
+            bgTonalColor = color(R.color.m3_tonal_old_bg),
+            accentColor = color(R.color.m3_tonal_old_accent),
+            onClick = {
+                openInteractiveDialogOnMissionFinish = true
+                runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
+            }
+        )
+        row2.addView(largeCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(5) })
+        row2.addView(oldCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(5) })
+        gridRoot.addView(row2, top(10))
+
+        return gridRoot
     }
 
     private fun buildFilesExplorerSection(): LinearLayout = LinearLayout(this).apply {
@@ -1259,7 +1367,7 @@ class MainActivity : AppCompatActivity() {
         )
         proSuiteContent.addView(
             button(getString(R.string.pro_suite_calculator_btn)) {
-                runWithProAccess { openProSmartCalculatorDialog() }
+                openProSmartCalculatorDialog()
             }.apply {
                 backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
                 setTextColor(Color.parseColor("#FFE082"))
@@ -1268,7 +1376,7 @@ class MainActivity : AppCompatActivity() {
         )
         proSuiteContent.addView(
             button(getString(R.string.pro_suite_password_btn)) {
-                runWithProAccess { openProPasswordGeneratorDialog() }
+                openProPasswordGeneratorDialog()
             }.apply {
                 backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
                 setTextColor(Color.parseColor("#FFE082"))
@@ -3674,6 +3782,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startOneTapCleanup() {
+        if (!hasAnyMediaPermission()) {
+            pendingOutcomeMission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW
+            openInteractiveDialogOnMissionFinish = true
+            heroOrbButton.isEnabled = true
+            heroOrbButton.text = getString(R.string.home_cleanup_primary)
+            requestMediaPermissions()
+            return
+        }
         homeCleanupCandidateCount = 0
         homeInteractiveRecords = emptyList()
         homeInteractiveFallback = false
@@ -3813,6 +3929,7 @@ class MainActivity : AppCompatActivity() {
         }
         root.addView(toggleAllBtn, top(8))
 
+        var reviewDialogRef: AlertDialog? = null
         val listContainer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(6), 0, dp(6))
@@ -3876,6 +3993,7 @@ class MainActivity : AppCompatActivity() {
             row.setOnClickListener { box.isChecked = !box.isChecked }
             row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f))
             val quickDeleteBtn = button("🗑") {
+                reviewDialogRef?.dismiss()
                 requestPermanentDeleteSelected(listOf(record))
             }.apply {
                 minWidth = dp(44)
@@ -3906,6 +4024,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(android.R.string.cancel, null)
 
         val dialog = builder.create()
+        reviewDialogRef = dialog
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val chosen = selectedFromDialog()
@@ -5288,7 +5407,7 @@ class MainActivity : AppCompatActivity() {
         val mission = pendingOutcomeMission ?: return
         if (state.isLoading) return
 
-        if (state.currentPage != null && state.status in setOf(ScanUiStatus.READY, ScanUiStatus.PARTIAL)) {
+        if (state.session != null && state.status in setOf(ScanUiStatus.READY, ScanUiStatus.PARTIAL)) {
             pendingOutcomeMission = null
             runOutcomeMission(mission)
             return
@@ -6014,6 +6133,9 @@ class MainActivity : AppCompatActivity() {
                 if (::storageRingGauge.isInitialized) {
                     storageRingGauge.usedFraction = usage.usedFraction.toFloat()
                     storageRingGauge.centerLabel = "${usage.usedPercent}%"
+                }
+                if (::storageProgressBar.isInitialized) {
+                    storageProgressBar.progress = usage.usedPercent
                 }
             }
         }.onFailure {
