@@ -94,6 +94,64 @@ object WorldNewsGazetteTools {
             fullBodyPt = "Neurocientistas comprovam que receber luz natural nos olhos nos primeiros 30 minutos após acordar aciona a produção de dopamina e regula o cortisol.\n\nUma caminhada rápida de 15 a 20 minutos é suficiente para aumentar o foco no trabalho e garantir um sono profundo à noite.",
             fullBodyEn = "Neuroscience studies verify natural morning photon exposure calibrates biological circadian clocks and dopamine tone.\n\nA gentle 20-minute morning stroll improves daytime cognitive sharpness and sets up restorative nighttime sleep.",
             source = "Saúde & Neurociência"
+        ),
+        WorldNewsItem(
+            id = "news_06",
+            category = "HISTÓRIA",
+            categoryBadgeHex = "#FF453A",
+            timeLabel = "Ontem às 21:40",
+            titlePt = "Como antigos cartógrafos desenhavam monstros marinhos nos oceanos",
+            titleEn = "How ancient mapmakers drew sea monsters in uncharted oceans",
+            summaryPt = "Nos séculos XV e XVI, os limites dos mapas exibiam leviatãs e sereias para indicar águas perigosas e tempestades reais aos marinheiros.",
+            summaryEn = "In the 15th century, unexplored oceans displayed mythical leviathans signaling real coral reefs and treacherous gale currents.",
+            fullBodyPt = "Na época das grandes navegações, mapas como a 'Carta Marina' de 1539 enchiam as bordas do mundo conhecido de monstros fantásticos.\n\nHistoriadores modernos descobriram que essas ilustrações não eram mera superstição: serviam como avisos de corais perigosos, redemoinhos e rotas onde caravelas anteriores haviam naufragado.",
+            fullBodyEn = "During the Age of Discovery, famous nautical charts such as the 1539 Carta Marina filled ocean borders with mythical beasts.\n\nModern cartography historians revealed these illustrations served as nautical hazard warnings for shallow reefs and lethal gale lanes.",
+            source = "Sociedade Geográfica Histórica"
+        ),
+        WorldNewsItem(
+            id = "news_07",
+            category = "MEIO AMBIENTE",
+            categoryBadgeHex = "#30D158",
+            timeLabel = "Ontem às 19:15",
+            titlePt = "Recifes de coral do Pacífico mostram surpreendente regeneração natural",
+            titleEn = "Pacific coral reefs display surprising rapid natural regeneration",
+            summaryPt = "Espécies de corais adaptadas ao calor recorde voltaram a crescer rapidamente em santuários marinhos protegidos.",
+            summaryEn = "Heat-resilient coral colonies repopulate marine sanctuaries at unprecedented recovery velocities.",
+            fullBodyPt = "Biólogos marinhos monitorando ilhas remotas no Pacífico Sul registraram o florescimento de novas colônias de corais que resistem a águas mais quentes.\n\nA proibição de pesca predatória na região permitiu que peixes herbívoros limpassem as algas das pedras, criando a base perfeita para os novos brotos de coral crescerem saudáveis.",
+            fullBodyEn = "Marine ecologists surveying remote southern atolls recorded thriving micro-colonies demonstrating thermal resilience.\n\nLocal sanctuary protections enabled herbivorous fish to graze competing algae, fostering ideal conditions for rapid coral recruitment.",
+            source = "EcoPlaneta & Oceanos"
+        ),
+        WorldNewsItem(
+            id = "news_08",
+            category = "INOVAÇÃO",
+            categoryBadgeHex = "#0A84FF",
+            timeLabel = "Ontem às 16:50",
+            titlePt = "Baterias de estado sólido prometem recarga completa em menos de 10 minutos",
+            titleEn = "Solid-state batteries promise complete charge in under 10 minutes",
+            summaryPt = "Novos eletrólitos cerâmicos eliminam risco de superaquecimento e aumentam a densidade de energia de celulares e carros elétricos.",
+            summaryEn = "Ceramic solid electrolytes eliminate thermal runaway hazards while dramatically increasing mobile energy density.",
+            fullBodyPt = "Laboratórios líderes de semicondutores anunciaram protótipos de baterias com eletrólito de cerâmica pura, substituindo os líquidos inflamáveis atuais.\n\nAlém de não pegarem fogo mesmo se perfuradas, essas baterias suportam correntes ultrarrápidas, permitindo atingir 100% de carga no tempo de um café expresso.",
+            fullBodyEn = "Advanced semiconductor labs unveiled solid ceramic electrolyte prototypes, replacing volatile liquid battery chemistries.\n\nIn addition to extreme thermal safety, solid-state cells accept ultra-high charging currents, reaching full capacity in minutes.",
+            source = "Engenharia & Futuro"
+        ),
+        WorldNewsItem(
+            id = "news_09",
+            category = "JOGOS & MENTE",
+            categoryBadgeHex = "#BF5AF2",
+            timeLabel = "Ontem às 14:05",
+            titlePt = "Caça-palavras e jogos dos 7 erros rejuvenescem o cérebro em até 10 anos",
+            titleEn = "Word puzzles and spot-the-difference games sharpen mental age by 10 years",
+            summaryPt = "Pesquisas de neurociência cognitiva mostram que 15 minutos diários de passatempos visuais estimulam novas conexões neurais e protegem a memória.",
+            summaryEn = "Cognitive neuroscience reveals 15 minutes of daily visual puzzles stimulate neurogenesis and reinforce long-term memory.",
+            fullBodyPt = "Um estudo acompanhando adultos acima de 50 anos concluiu que praticantes regulares de caça-palavras, quebra-cabeças e jogos de diferenças possuem velocidade de raciocínio equivalente a pessoas 10 anos mais jovens.\n\nA busca visual ativa exercita os lobos frontal e parietal, regiões essenciais para a concentração, memória de curto prazo e agilidade no cotidiano.",
+            fullBodyEn = "Longitudinal cognitive studies on adults over 50 demonstrate regular puzzle enthusiasts maintain processing speeds typical of peers a decade younger.\n\nActive visual target searches engage frontal and parietal cortices, reinforcing working memory and daily cognitive stamina.",
+            source = "Revista de Neurociência Cognitiva"
         )
     )
+
+    fun getFilterCategories(isPt: Boolean): List<String> = if (isPt) {
+        listOf("TODAS", "TECNOLOGIA", "CIÊNCIA & ESPAÇO", "SAÚDE & BEM-ESTAR", "DICAS & FAMÍLIA", "CURIOSIDADES", "HISTÓRIA", "INOVAÇÃO", "JOGOS & MENTE")
+    } else {
+        listOf("ALL", "TECNOLOGIA", "CIÊNCIA & ESPAÇO", "SAÚDE & BEM-ESTAR", "DICAS & FAMÍLIA", "CURIOSIDADES", "HISTÓRIA", "INOVAÇÃO", "JOGOS & MENTE")
+    }
 }

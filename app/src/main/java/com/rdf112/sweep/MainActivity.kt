@@ -23,6 +23,7 @@ import android.os.Process
 import android.os.StatFs
 import android.provider.OpenableColumns
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.SpannableString
 import android.text.Spanned
@@ -408,6 +409,7 @@ class MainActivity : AppCompatActivity() {
     private var testerVipButton: MaterialButton? = null
     private lateinit var selectAllPageButton: MaterialButton
     private var lastFilteredPageRecords: List<MediaRecord> = emptyList()
+    private var ttsEngine: TextToSpeech? = null
 
     // Widgets compartilhados e das demais abas
     private lateinit var storageText: TextView
@@ -496,6 +498,15 @@ class MainActivity : AppCompatActivity() {
         checkAndShowFirstRunOnboarding()
         handleIncomingSendIntent(intent)
 
+        runCatching {
+            ttsEngine = TextToSpeech(this) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+                    ttsEngine?.language = if (isPt) Locale("pt", "BR") else Locale.US
+                }
+            }
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.state.collect(::renderState) }
@@ -514,6 +525,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        runCatching {
+            ttsEngine?.stop()
+            ttsEngine?.shutdown()
+            ttsEngine = null
+        }
         if (::billingGateway.isInitialized) billingGateway.endConnection()
         super.onDestroy()
     }
@@ -929,68 +945,131 @@ class MainActivity : AppCompatActivity() {
         headerCard.addView(label(getString(R.string.gazette_header_subtitle), 12.5f, R.color.sweep_muted, false), top(4))
         addView(wrap(headerCard), bottom(12))
 
-        WorldNewsGazetteTools.DAILY_EDITION.forEach { news ->
-            val newsCard = card().apply {
-                isClickable = true
-                isFocusable = true
+        val newsCardsContainer = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        fun renderCards(filterCategory: String) {
+            newsCardsContainer.removeAllViews()
+            val filtered = if (filterCategory == "TODAS" || filterCategory == "ALL") {
+                WorldNewsGazetteTools.DAILY_EDITION
+            } else {
+                WorldNewsGazetteTools.DAILY_EDITION.filter { it.category.contains(filterCategory, ignoreCase = true) }
+            }
+
+            filtered.forEach { news ->
+                val newsCard = card().apply {
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener {
+                        try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                        openNewsStoryDialog(news, isPt)
+                    }
+                }
+
+                val topRow = LinearLayout(this@MainActivity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                val catBadge = TextView(this@MainActivity).apply {
+                    text = news.category
+                    textSize = 10.5f
+                    typeface = Typeface.DEFAULT_BOLD
+                    val badgeColor = Color.parseColor(news.categoryBadgeHex)
+                    setTextColor(badgeColor)
+                    background = roundedBackground(Color.argb(35, Color.red(badgeColor), Color.green(badgeColor), Color.blue(badgeColor)), dp(8))
+                    setPadding(dp(8), dp(3), dp(8), dp(3))
+                }
+                topRow.addView(catBadge)
+                topRow.addView(View(this@MainActivity), LinearLayout.LayoutParams(0, 1, 1f))
+                val timeView = TextView(this@MainActivity).apply {
+                    text = news.timeLabel
+                    textSize = 11f
+                    setTextColor(color(R.color.sweep_muted))
+                }
+                topRow.addView(timeView)
+                newsCard.addView(topRow)
+
+                val titleText = if (isPt) news.titlePt else news.titleEn
+                val titleView = label(titleText, 15f, R.color.sweep_text, true)
+                newsCard.addView(titleView, top(8))
+
+                val summaryText = if (isPt) news.summaryPt else news.summaryEn
+                val summaryView = label(summaryText, 12f, R.color.sweep_muted, false)
+                newsCard.addView(summaryView, top(4))
+
+                val footerRow = LinearLayout(this@MainActivity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                val sourceView = TextView(this@MainActivity).apply {
+                    text = "Fonte: ${news.source}"
+                    textSize = 10.5f
+                    setTextColor(color(R.color.sweep_muted))
+                }
+                footerRow.addView(sourceView, LinearLayout.LayoutParams(0, -2, 1f))
+                val readMore = TextView(this@MainActivity).apply {
+                    text = getString(R.string.gazette_read_more)
+                    textSize = 11.5f
+                    typeface = Typeface.DEFAULT_BOLD
+                    setTextColor(color(R.color.google_blue_primary))
+                }
+                footerRow.addView(readMore)
+                newsCard.addView(footerRow, top(8))
+
+                newsCardsContainer.addView(wrap(newsCard), bottom(10))
+            }
+        }
+
+        // Horizontal Category Filter Chips (Padrão Apple / Netvasco Interativo)
+        val chipScroll = HorizontalScrollView(this@MainActivity).apply {
+            isHorizontalScrollBarEnabled = false
+            clipToPadding = false
+        }
+        val chipRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(dp(2), 0, dp(2), dp(10))
+        }
+        val categories = WorldNewsGazetteTools.getFilterCategories(isPt)
+        var selectedCat = categories.first()
+        val chipButtons = mutableListOf<MaterialButton>()
+
+        categories.forEach { cat ->
+            val chip = MaterialButton(this@MainActivity).apply {
+                text = cat
+                textSize = 11f
+                minHeight = dp(36)
+                insetTop = 0
+                insetBottom = 0
+                cornerRadius = dp(14)
+                setPadding(dp(12), dp(4), dp(12), dp(4))
+                typeface = Typeface.DEFAULT_BOLD
+                val isSelected = cat == selectedCat
+                backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    if (isSelected) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
+                )
+                setTextColor(if (isSelected) Color.WHITE else color(R.color.sweep_muted))
                 setOnClickListener {
                     try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
-                    openNewsStoryDialog(news, isPt)
+                    selectedCat = cat
+                    chipButtons.forEach { b ->
+                        val active = b.text == selectedCat
+                        b.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                            if (active) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
+                        )
+                        b.setTextColor(if (active) Color.WHITE else color(R.color.sweep_muted))
+                    }
+                    renderCards(selectedCat)
                 }
             }
-
-            val topRow = LinearLayout(this@MainActivity).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-            }
-            val catBadge = TextView(this@MainActivity).apply {
-                text = news.category
-                textSize = 10.5f
-                typeface = Typeface.DEFAULT_BOLD
-                val badgeColor = Color.parseColor(news.categoryBadgeHex)
-                setTextColor(badgeColor)
-                background = roundedBackground(Color.argb(35, Color.red(badgeColor), Color.green(badgeColor), Color.blue(badgeColor)), dp(8))
-                setPadding(dp(8), dp(3), dp(8), dp(3))
-            }
-            topRow.addView(catBadge)
-            topRow.addView(View(this@MainActivity), LinearLayout.LayoutParams(0, 1, 1f))
-            val timeView = TextView(this@MainActivity).apply {
-                text = news.timeLabel
-                textSize = 11f
-                setTextColor(color(R.color.sweep_muted))
-            }
-            topRow.addView(timeView)
-            newsCard.addView(topRow)
-
-            val titleText = if (isPt) news.titlePt else news.titleEn
-            val titleView = label(titleText, 15f, R.color.sweep_text, true)
-            newsCard.addView(titleView, top(8))
-
-            val summaryText = if (isPt) news.summaryPt else news.summaryEn
-            val summaryView = label(summaryText, 12f, R.color.sweep_muted, false)
-            newsCard.addView(summaryView, top(4))
-
-            val footerRow = LinearLayout(this@MainActivity).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-            }
-            val sourceView = TextView(this@MainActivity).apply {
-                text = "Fonte: ${news.source}"
-                textSize = 10.5f
-                setTextColor(color(R.color.sweep_muted))
-            }
-            footerRow.addView(sourceView, LinearLayout.LayoutParams(0, -2, 1f))
-            val readMore = TextView(this@MainActivity).apply {
-                text = getString(R.string.gazette_read_more)
-                textSize = 11.5f
-                typeface = Typeface.DEFAULT_BOLD
-                setTextColor(color(R.color.google_blue_primary))
-            }
-            footerRow.addView(readMore)
-            newsCard.addView(footerRow, top(8))
-
-            addView(wrap(newsCard), bottom(10))
+            chipButtons.add(chip)
+            chipRow.addView(chip, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
         }
+        chipScroll.addView(chipRow)
+        addView(chipScroll, bottom(6))
+
+        renderCards(selectedCat)
+        addView(newsCardsContainer)
     }
 
     private fun openNewsStoryDialog(news: WorldNewsItem, isPt: Boolean) {
@@ -1019,10 +1098,27 @@ class MainActivity : AppCompatActivity() {
         }
         container.addView(sourceText, top(14))
 
+        val listenButton = button("🔊 " + getString(R.string.gazette_listen_audio)) {
+            try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+            val textToSpeak = "${titleText}. ${bodyText}"
+            ttsEngine?.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "news_speech")
+            Toast.makeText(this, R.string.gazette_listening_toast, Toast.LENGTH_SHORT).show()
+        }.apply {
+            minHeight = dp(46)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            setTextColor(color(R.color.google_blue_primary))
+        }
+        container.addView(listenButton, top(12))
+
         val scroll = ScrollView(this).apply { addView(container) }
         AlertDialog.Builder(this)
             .setView(scroll)
-            .setPositiveButton(android.R.string.ok, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                ttsEngine?.stop()
+            }
+            .setOnDismissListener {
+                ttsEngine?.stop()
+            }
             .show()
     }
 

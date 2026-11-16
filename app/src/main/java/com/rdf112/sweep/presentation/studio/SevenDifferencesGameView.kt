@@ -75,6 +75,10 @@ class SevenDifferencesGameView(context: Context) : View(context) {
     private val roofPaintB = Paint().apply { color = Color.parseColor("#3890E0") } // Erro 1
     private val treeTrunkPaint = Paint().apply { color = Color.parseColor("#3E2723") }
     private val treeFoliagePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#2E7D32") }
+    private val waterPaint = Paint().apply { color = Color.parseColor("#0F4C81") }
+    private val mountainPaint = Paint().apply { color = Color.parseColor("#2C3E50") }
+    private val snowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#ECF0F1") }
+    private val sandPaint = Paint().apply { color = Color.parseColor("#D4A373") }
     private val detailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#FFFFFF") }
 
     private var activeSceneIndex = 0
@@ -120,6 +124,19 @@ class SevenDifferencesGameView(context: Context) : View(context) {
                 DifferenceSpot(5, 0.85f, 0.38f, "Pinheiro extra na encosta", "Extra pine tree"),
                 DifferenceSpot(6, 0.45f, 0.85f, "Pedra redonda na margem", "Round shoreline stone"),
                 DifferenceSpot(7, 0.65f, 0.18f, "Estrela cadente / brilho", "Shooting star glow"),
+            )
+        ),
+        SceneData(
+            titlePt = "Cena 3: A Praia Tropical",
+            titleEn = "Scene 3: Tropical Beach",
+            spots = listOf(
+                DifferenceSpot(1, 0.78f, 0.18f, "Gaivota voando", "Flying seagull"),
+                DifferenceSpot(2, 0.22f, 0.42f, "Coco no coqueiro", "Coconut on palm tree"),
+                DifferenceSpot(3, 0.52f, 0.50f, "Boia salva-vidas listrada", "Striped lifebuoy"),
+                DifferenceSpot(4, 0.80f, 0.65f, "Guarda-sol colorido", "Colorful beach umbrella"),
+                DifferenceSpot(5, 0.35f, 0.75f, "Castelo de areia com bandeira", "Sandcastle with flag"),
+                DifferenceSpot(6, 0.18f, 0.85f, "Estrela-do-mar vermelha", "Red starfish"),
+                DifferenceSpot(7, 0.62f, 0.35f, "Navio no horizonte", "Horizon cruise ship"),
             )
         )
     )
@@ -237,6 +254,39 @@ class SevenDifferencesGameView(context: Context) : View(context) {
         canvas.drawRoundRect(rect, 14f * density, 14f * density, bgPaint)
         canvas.drawRoundRect(rect, 14f * density, 14f * density, borderPaint)
 
+        when (activeSceneIndex) {
+            0 -> drawCountrysideScene(canvas, left, top, w, h, isModifiedPanel)
+            1 -> drawMountainLakeScene(canvas, left, top, w, h, isModifiedPanel)
+            else -> drawTropicalBeachScene(canvas, left, top, w, h, isModifiedPanel)
+        }
+
+        // Renderização dos acertos e dicas no Painel Inferior
+        if (isModifiedPanel) {
+            val spots = scenes[activeSceneIndex].spots
+            spots.forEach { spot ->
+                val cx = left + w * spot.nx
+                val cy = top + h * spot.ny
+                val radius = 18f * density
+
+                if (spot.isFound) {
+                    canvas.drawCircle(cx, cy, radius, foundFillPaint)
+                    canvas.drawCircle(cx, cy, radius, foundCirclePaint)
+                    canvas.drawText("${spot.id}", cx, cy + 5f * density, textPaint)
+                } else if (activeHintSpotId == spot.id) {
+                    canvas.drawCircle(cx, cy, radius + 4f * density, hintPaint)
+                }
+            }
+        }
+    }
+
+    private fun drawCountrysideScene(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        w: Float,
+        h: Float,
+        isModifiedPanel: Boolean,
+    ) {
         // Céu
         val skyRect = RectF(left, top, left + w, top + h * 0.65f)
         canvas.drawRect(skyRect, skyPaint)
@@ -328,7 +378,7 @@ class SevenDifferencesGameView(context: Context) : View(context) {
                         left + w * 0.38f + p * 8f * density,
                         top + h * 0.83f + p * 6f * density,
                     ),
-                    detailPaint
+                    detailPaint,
                 )
             }
         }
@@ -338,23 +388,217 @@ class SevenDifferencesGameView(context: Context) : View(context) {
             detailPaint.color = Color.parseColor("#FFD60A")
             canvas.drawCircle(left + w * 0.78f, top + h * 0.78f, 6f * density, detailPaint)
         }
+    }
 
-        // Renderização dos acertos e dicas no Painel Inferior
+    private fun drawMountainLakeScene(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        w: Float,
+        h: Float,
+        isModifiedPanel: Boolean,
+    ) {
+        // Céu Noturno / Crepúsculo
+        canvas.drawRect(RectF(left, top, left + w, top + h * 0.55f), skyPaint)
+
+        // Erro 7: Estrela / Brilho cósmico
         if (isModifiedPanel) {
-            val spots = scenes[activeSceneIndex].spots
-            spots.forEach { spot ->
-                val cx = left + w * spot.nx
-                val cy = top + h * spot.ny
-                val radius = 18f * density
+            detailPaint.color = Color.parseColor("#FFD60A")
+            canvas.drawCircle(left + w * 0.65f, top + h * 0.18f, 5f * density, detailPaint)
+            canvas.drawLine(left + w * 0.61f, top + h * 0.18f, left + w * 0.69f, top + h * 0.18f, detailPaint)
+            canvas.drawLine(left + w * 0.65f, top + h * 0.14f, left + w * 0.65f, top + h * 0.22f, detailPaint)
+        }
 
-                if (spot.isFound) {
-                    canvas.drawCircle(cx, cy, radius, foundFillPaint)
-                    canvas.drawCircle(cx, cy, radius, foundCirclePaint)
-                    canvas.drawText("${spot.id}", cx, cy + 5f * density, textPaint)
-                } else if (activeHintSpotId == spot.id) {
-                    canvas.drawCircle(cx, cy, radius + 4f * density, hintPaint)
-                }
+        // Montanha 1 (Esquerda)
+        val m1 = android.graphics.Path().apply {
+            moveTo(left + w * 0.05f, top + h * 0.55f)
+            lineTo(left + w * 0.30f, top + h * 0.20f)
+            lineTo(left + w * 0.55f, top + h * 0.55f)
+            close()
+        }
+        canvas.drawPath(m1, mountainPaint)
+
+        // Montanha 2 (Direita)
+        val m2 = android.graphics.Path().apply {
+            moveTo(left + w * 0.38f, top + h * 0.55f)
+            lineTo(left + w * 0.70f, top + h * 0.26f)
+            lineTo(left + w * 0.96f, top + h * 0.55f)
+            close()
+        }
+        canvas.drawPath(m2, mountainPaint)
+
+        // Erro 4: Neve extra no topo da montanha
+        val snowCap = android.graphics.Path().apply {
+            moveTo(left + w * 0.25f, top + h * 0.27f)
+            lineTo(left + w * 0.30f, top + h * 0.20f)
+            lineTo(left + w * 0.35f, top + h * 0.27f)
+            close()
+        }
+        canvas.drawPath(snowCap, snowPaint)
+        if (isModifiedPanel) {
+            val extraSnow = android.graphics.Path().apply {
+                moveTo(left + w * 0.52f, top + h * 0.33f)
+                lineTo(left + w * 0.55f, top + h * 0.32f)
+                lineTo(left + w * 0.58f, top + h * 0.35f)
+                close()
             }
+            canvas.drawPath(extraSnow, snowPaint)
+        }
+
+        // Erro 1: Pássaro voando no pico
+        if (isModifiedPanel) {
+            detailPaint.color = Color.WHITE
+            val bx = left + w * 0.30f
+            val by = top + h * 0.25f
+            canvas.drawLine(bx - 8f * density, by + 4f * density, bx, by, detailPaint.apply { strokeWidth = 2f * density })
+            canvas.drawLine(bx, by, bx + 8f * density, by + 4f * density, detailPaint)
+        }
+
+        // Erro 5: Pinheiro extra na encosta
+        if (isModifiedPanel) {
+            val pineX = left + w * 0.85f
+            val pineY = top + h * 0.38f
+            canvas.drawRect(pineX - 2f * density, pineY, pineX + 2f * density, pineY + 12f * density, treeTrunkPaint)
+            val pinePath = android.graphics.Path().apply {
+                moveTo(pineX, pineY - 8f * density)
+                lineTo(pineX - 8f * density, pineY + 4f * density)
+                lineTo(pineX + 8f * density, pineY + 4f * density)
+                close()
+            }
+            canvas.drawPath(pinePath, treeFoliagePaint)
+        }
+
+        // Lago
+        canvas.drawRect(RectF(left, top + h * 0.55f, left + w, top + h * 0.82f), waterPaint)
+
+        // Barquinho no Lago
+        val boatX = left + w * 0.75f
+        val boatY = top + h * 0.65f
+        canvas.drawRect(boatX - 14f * density, boatY, boatX + 14f * density, boatY + 6f * density, treeTrunkPaint)
+        canvas.drawLine(boatX, boatY, boatX, boatY - 16f * density, detailPaint.apply { strokeWidth = 2f * density })
+        val sailPath = android.graphics.Path().apply {
+            moveTo(boatX, boatY - 16f * density)
+            lineTo(boatX + 12f * density, boatY - 4f * density)
+            lineTo(boatX, boatY - 4f * density)
+            close()
+        }
+        // Erro 2: Barquinho com vela dourada no painel B
+        detailPaint.color = if (isModifiedPanel) Color.parseColor("#FFD60A") else Color.WHITE
+        canvas.drawPath(sailPath, detailPaint)
+
+        // Erro 3: Peixinho saltando
+        if (isModifiedPanel) {
+            val fishX = left + w * 0.15f
+            val fishY = top + h * 0.70f
+            detailPaint.color = Color.parseColor("#FF9F0A")
+            canvas.drawOval(RectF(fishX - 6f * density, fishY - 3f * density, fishX + 6f * density, fishY + 3f * density), detailPaint)
+        }
+
+        // Margem do Lago
+        canvas.drawRect(RectF(left, top + h * 0.82f, left + w, top + h), grassPaint)
+
+        // Erro 6: Pedra redonda na margem
+        if (isModifiedPanel) {
+            detailPaint.color = Color.parseColor("#8E8E93")
+            canvas.drawOval(RectF(left + w * 0.43f, top + h * 0.84f, left + w * 0.47f, top + h * 0.87f), detailPaint)
+        }
+    }
+
+    private fun drawTropicalBeachScene(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        w: Float,
+        h: Float,
+        isModifiedPanel: Boolean,
+    ) {
+        // Céu ensolarado
+        canvas.drawRect(RectF(left, top, left + w, top + h * 0.42f), skyPaint)
+
+        // Sol Tropical
+        canvas.drawCircle(left + w * 0.85f, top + h * 0.20f, 18f * density, sunPaint)
+
+        // Erro 1: Gaivota voando
+        if (isModifiedPanel) {
+            detailPaint.color = Color.WHITE
+            val gx = left + w * 0.78f
+            val gy = top + h * 0.18f
+            canvas.drawLine(gx - 6f * density, gy + 3f * density, gx, gy, detailPaint.apply { strokeWidth = 2f * density })
+            canvas.drawLine(gx, gy, gx + 6f * density, gy + 3f * density, detailPaint)
+        }
+
+        // Oceano Turquesa
+        canvas.drawRect(RectF(left, top + h * 0.42f, left + w, top + h * 0.68f), waterPaint)
+
+        // Erro 7: Navio de cruzeiro no horizonte
+        if (isModifiedPanel) {
+            val shipX = left + w * 0.62f
+            val shipY = top + h * 0.35f
+            detailPaint.color = Color.WHITE
+            canvas.drawRect(shipX - 12f * density, shipY, shipX + 12f * density, shipY + 4f * density, detailPaint)
+            canvas.drawRect(shipX - 4f * density, shipY - 4f * density, shipX + 4f * density, shipY, detailPaint)
+        }
+
+        // Areia da Praia Dourada
+        canvas.drawRect(RectF(left, top + h * 0.68f, left + w, top + h), sandPaint)
+
+        // Coqueiro na Esquerda
+        val palmX = left + w * 0.20f
+        val palmY = top + h * 0.42f
+        canvas.drawRect(palmX - 3f * density, palmY, palmX + 3f * density, top + h * 0.75f, treeTrunkPaint)
+        canvas.drawCircle(palmX - 10f * density, palmY - 4f * density, 14f * density, treeFoliagePaint)
+        canvas.drawCircle(palmX + 10f * density, palmY - 4f * density, 14f * density, treeFoliagePaint)
+        canvas.drawCircle(palmX, palmY - 12f * density, 16f * density, treeFoliagePaint)
+
+        // Erro 2: Coco marrom no coqueiro
+        if (isModifiedPanel) {
+            detailPaint.color = Color.parseColor("#5A3E26")
+            canvas.drawCircle(palmX - 4f * density, palmY + 2f * density, 4f * density, detailPaint)
+            canvas.drawCircle(palmX + 4f * density, palmY + 2f * density, 4f * density, detailPaint)
+        }
+
+        // Erro 3: Boia salva-vidas listrada no mar
+        if (isModifiedPanel) {
+            val buX = left + w * 0.52f
+            val buY = top + h * 0.50f
+            detailPaint.color = Color.parseColor("#FF453A")
+            canvas.drawCircle(buX, buY, 8f * density, detailPaint)
+            detailPaint.color = Color.WHITE
+            canvas.drawCircle(buX, buY, 4f * density, detailPaint)
+        }
+
+        // Erro 4: Guarda-sol colorido na praia
+        if (isModifiedPanel) {
+            val umbX = left + w * 0.80f
+            val umbY = top + h * 0.65f
+            detailPaint.color = Color.WHITE
+            canvas.drawLine(umbX, umbY, umbX, umbY + 20f * density, detailPaint.apply { strokeWidth = 2f * density })
+            val umbPath = android.graphics.Path().apply {
+                moveTo(umbX - 14f * density, umbY + 6f * density)
+                lineTo(umbX, umbY - 6f * density)
+                lineTo(umbX + 14f * density, umbY + 6f * density)
+                close()
+            }
+            detailPaint.color = Color.parseColor("#FF9F0A")
+            canvas.drawPath(umbPath, detailPaint)
+        }
+
+        // Erro 5: Castelo de areia com bandeira
+        if (isModifiedPanel) {
+            val castX = left + w * 0.35f
+            val castY = top + h * 0.75f
+            detailPaint.color = Color.parseColor("#C28F58")
+            canvas.drawRect(castX - 8f * density, castY, castX + 8f * density, castY + 12f * density, detailPaint)
+            detailPaint.color = Color.parseColor("#FF3B30")
+            canvas.drawLine(castX, castY, castX, castY - 8f * density, detailPaint.apply { strokeWidth = 1.5f * density })
+        }
+
+        // Erro 6: Estrela-do-mar vermelha
+        if (isModifiedPanel) {
+            val starX = left + w * 0.18f
+            val starY = top + h * 0.85f
+            detailPaint.color = Color.parseColor("#FF453A")
+            canvas.drawCircle(starX, starY, 6f * density, detailPaint)
         }
     }
 }

@@ -567,4 +567,7 @@ Total: %3$s</string>
     <string name="seven_diff_hint_btn">💡 Revelar Dica</string>
     <string name="seven_diff_next_btn">Próxima Imagem ➡️</string>
     <string name="seven_diff_win_toast">🏆 Parabéns! Você encontrou todos os 7 erros!</string>
+    <string name="gazette_listen_audio">Ouvir Notícia em Voz Alta</string>
+    <string name="gazette_listening_toast">Lendo notícia em voz alta...</string>
+    <string name="gazette_filter_all">Todas</string>
 </resources>
