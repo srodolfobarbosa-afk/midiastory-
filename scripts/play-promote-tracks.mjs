@@ -72,18 +72,18 @@ async function main() {
         track: targetTrack,
         releases: [
           {
-            name: `${versionCode} (2.3.1)`,
+            name: `2.5.0 (${versionCode})`,
             versionCodes: [String(versionCode)],
             status: releaseStatus,
             releaseNotes: [
-              {
-                language: "pt-BR",
-                text: "Novo painel Big Tech 2027, medidor de armazenamento real, ações rápidas de limpeza e suporte a 8 idiomas.",
-              },
-              {
-                language: "en-US",
-                text: "New 2027 dashboard, real-time storage gauge, quick cleanup actions, and 8-language support.",
-              },
+              { language: "pt-BR", text: "v2.5.0: Visual redesenhado em 7 abas organizadas (Início limpo, Limpeza, Arquivos, Estúdio, Jogos Offline, Mundo e Planos Pro), cabeçalho refinado, Modo Fácil (Aa+), Tema VIP Preto & Ouro 24K, Caça-Palavras Pro 9x9, Cobrinha, Blocos, Hub Mundial offline, Notas/Calculadora/QR Pro e 14 idiomas!" },
+              { language: "en-US", text: "v2.5.0: Clean 7-tab separation (Home, Cleanup, Files, Media Studio, Offline Games, World Hub & Pro), polished header, Senior Easy Mode (Aa+), Royal Black & 24K Gold VIP theme, Pro Word Search 9x9, Retro Snake, Falling Blocks, offline World Clock & Currency, Notes/Calc/QR Pro & 14 languages!" },
+              { language: "es-ES", text: "v2.5.0: Diseño limpio en 7 pestañas separadas (Inicio, Limpieza, Archivos, Estudio, Juegos Offline, Mundo y Pro), Modo Fácil (Aa+), Tema VIP Oro 24K, Sopa de Letras Pro, Serpiente, Bloques, Reloj Mundial y Conversor offline, Notas/Calculadora/QR Pro en 14 idiomas." },
+              { language: "fr-FR", text: "v2.5.0 : Interface épurée en 7 onglets dédiés (Accueil, Nettoyage, Fichiers, Studio, Jeux hors-ligne, Monde et Pro), Mode Facile (Aa+), Thème VIP Or 24K, Mots Mêlés Pro, Serpent, Blocs, Horloge Mondiale et Devises hors-ligne en 14 langues." },
+              { language: "de-DE", text: "v2.5.0: Saubere 7-Tab-Struktur (Start, Bereinigung, Dateien, Studio, Offline-Spiele, Welt & Pro), Senioren-Modus (Aa+), VIP Schwarz-Gold-Design, Wortsuche Pro, Snake, Blöcke, Offline-Weltzeituhr & Währungsrechner in 14 Sprachen." },
+              { language: "hi-IN", text: "v2.5.0: 7 साफ अलग-अलग टैब (होम, सफाई, फ़ाइलें, स्टूडियो, ऑफ़लाइन गेम्स, दुनिया और Pro), बड़ा फ़ॉन्ट मोड (Aa+), VIP ब्लैक-गोल्ड थीम, शब्द खोज Pro 9x9, स्नेक, ब्लॉक्स, विश्व घड़ी व मुद्रा परिवर्तक 14 भाषाओं में!" },
+              { language: "ja-JP", text: "v2.5.0：機能別に整理された7タブUI（ホーム・整理・ファイル・スタジオ・オフラインゲーム・世界・Pro）、大文字モード(Aa+)、ゴールドVIPテーマ、単語探しPro・スネーク・ブロック、世界時計＆通貨換算を14言語で搭載！" },
+              { language: "zh-CN", text: "v2.5.0：全新清晰的7大独立标签页（首页、清理、文件、媒体工作室、离线游戏、世界工具、Pro）、长辈大字模式(Aa+)、黑金VIP主题、寻字Pro/贪吃蛇/方块、离线世界时钟与汇率换算，支持14种语言！" }
             ],
           },
         ],
