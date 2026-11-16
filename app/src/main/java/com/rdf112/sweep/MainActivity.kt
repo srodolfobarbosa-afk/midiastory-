@@ -983,8 +983,8 @@ class MainActivity : AppCompatActivity() {
             insetBottom = 0
             cornerRadius = dp(14)
             typeface = Typeface.DEFAULT_BOLD
-            setOnClickListener {
-                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+            setOnClickListener { v ->
+                try { v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                 if (activeScope != WorldNewsGazetteTools.NewsScope.COUNTRY) {
                     activeScope = WorldNewsGazetteTools.NewsScope.COUNTRY
                     updateScopeStyles()
@@ -1001,8 +1001,8 @@ class MainActivity : AppCompatActivity() {
             insetBottom = 0
             cornerRadius = dp(14)
             typeface = Typeface.DEFAULT_BOLD
-            setOnClickListener {
-                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+            setOnClickListener { v ->
+                try { v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                 if (activeScope != WorldNewsGazetteTools.NewsScope.WORLD) {
                     activeScope = WorldNewsGazetteTools.NewsScope.WORLD
                     updateScopeStyles()
@@ -1045,8 +1045,8 @@ class MainActivity : AppCompatActivity() {
                 val newsCard = card().apply {
                     isClickable = true
                     isFocusable = true
-                    setOnClickListener {
-                        try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                    setOnClickListener { v ->
+                        try { v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                         openNewsStoryDialog(news, isPt)
                     }
                 }
@@ -1126,8 +1126,8 @@ class MainActivity : AppCompatActivity() {
                         if (isSelected) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
                     )
                     setTextColor(if (isSelected) Color.WHITE else color(R.color.sweep_muted))
-                    setOnClickListener {
-                        try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                    setOnClickListener { v ->
+                        try { v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                         selectedCat = cat
                         chipButtons.forEach { b ->
                             val active = b.text == selectedCat
@@ -1176,10 +1176,9 @@ class MainActivity : AppCompatActivity() {
         container.addView(sourceText, top(14))
 
         val listenButton = button("🔊 " + getString(R.string.gazette_listen_audio)) {
-            try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
             val textToSpeak = "${titleText}. ${bodyText}"
             ttsEngine?.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, "news_speech")
-            Toast.makeText(this, R.string.gazette_listening_toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, R.string.gazette_listening_toast, Toast.LENGTH_SHORT).show()
         }.apply {
             minHeight = dp(46)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
