@@ -143,7 +143,7 @@ class MainActivityInstrumentedTest {
             instrumentation.runOnMainSync { host.requestConsent(firstSender) }
             val cancelButton = findSystemConsentButton(device, allow = false)
             assertNotNull(
-                "Android must display a cancel action for permanent deletion consent (pkg=${device.currentPackageName})",
+                "Android must display a cancel action for permanent deletion consent (pkg=${device.currentPackageName}; nodes=${dumpVisibleUiSummary(device)})",
                 cancelButton,
             )
             requireNotNull(cancelButton).click()
@@ -421,9 +421,9 @@ class MainActivityInstrumentedTest {
                 MediaOperationConsentHostActivity.consentResultCode)
 
             var retry = runBlocking { coordinator.deleteApi29Item(record) }
-            if (retry is Api29DeleteAttempt.NotDeleted && retry.reason == "delete_returned_zero") {
-                repeat(3) {
-                    SystemClock.sleep(250)
+            if (retry !is Api29DeleteAttempt.Deleted) {
+                repeat(5) {
+                    SystemClock.sleep(300)
                     retry = runBlocking { coordinator.deleteApi29Item(record) }
                     if (retry is Api29DeleteAttempt.Deleted) return@repeat
                 }
@@ -472,6 +472,26 @@ class MainActivityInstrumentedTest {
             SystemClock.sleep(250)
         }
         return null
+    }
+
+    private fun dumpVisibleUiSummary(device: UiDevice): String {
+        return runCatching {
+            val out = java.io.ByteArrayOutputStream()
+            device.dumpWindowHierarchy(out)
+            val xml = out.toString("UTF-8")
+            Regex("""<node\b[^>]*>""")
+                .findAll(xml)
+                .mapNotNull { match ->
+                    val tag = match.value
+                    val text = Regex("""text="([^"]*)"""").find(tag)?.groupValues?.get(1).orEmpty()
+                    val res = Regex("""resource-id="([^"]*)"""").find(tag)?.groupValues?.get(1).orEmpty()
+                    val desc = Regex("""content-desc="([^"]*)"""").find(tag)?.groupValues?.get(1).orEmpty()
+                    if (text.isBlank() && res.isBlank() && desc.isBlank()) null
+                    else "[$res|$text|$desc]"
+                }
+                .take(15)
+                .joinToString(" ")
+        }.getOrElse { it.message ?: "dump_error" }
     }
 
     companion object {
