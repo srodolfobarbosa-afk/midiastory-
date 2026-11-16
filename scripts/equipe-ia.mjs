@@ -24,7 +24,14 @@
 import fs from "node:fs";
 import { execSync, spawn } from "node:child_process";
 import { getSupabaseToken } from "./lib/supabase-auth.mjs";
-import { RODOLFO_BRAIN_SYSTEM_PROMPT, RODOLFO_BRAIN_MODEL_PRIORITY, buildCodexPromptWithPersona } from "./lib/rodolfo-brain-persona.mjs";
+import { saveValidatedMemory } from "./lib/cognitive-memory.mjs";
+import {
+  RODOLFO_BRAIN_SYSTEM_PROMPT,
+  RODOLFO_BRAIN_MODEL_PRIORITY,
+  buildCodexPromptWithContext,
+  buildCodexPromptWithPersona,
+  buildRodolfoBrainSystemPrompt,
+} from "./lib/rodolfo-brain-persona.mjs";
 
 const projectDir = "C:/Users/rodolfo/midiastory-";
 const token = getSupabaseToken();
@@ -112,10 +119,12 @@ async function runCodexTask(task) {
       WHERE id = ${task.id};
     `);
 
-    await runSql(`
-      INSERT INTO public.memories (content)
-      VALUES ('[Equipe IA - Codex] Tarefa #${task.id} ("${task.title.replace(/'/g, "''")}") concluída com sucesso pelo codex.exe.');
-    `);
+    await saveValidatedMemory({
+      content: `[Equipe IA - Codex] Tarefa #${task.id} ("${task.title}") concluída com sucesso pelo codex.exe.`,
+      origem: "equipe_ia_codex",
+      categoria: "episodic",
+      confianca: 0.9,
+    });
   } catch (err) {
     console.error(`❌ Erro na execução do Codex:`, err.message);
     const escapedErr = JSON.stringify({ error: err.message }).replace(/'/g, "''");
@@ -146,6 +155,7 @@ async function processNextCodex() {
 
 async function callOpenRouterLlm(prompt, model = "google/gemini-4-carbon") {
   const aiKeys = JSON.parse(fs.readFileSync(`${projectDir}/.secrets/ai-media-keys.json`, "utf8"));
+  const hydratedSystemPrompt = await buildRodolfoBrainSystemPrompt({ query: prompt, limit: 8 });
   const studioKey = aiKeys.GOOGLE_AI_STUDIO_API_KEY || aiKeys.GOOGLE_AQ_API_KEY;
   if (studioKey) {
     for (const sm of RODOLFO_BRAIN_MODEL_PRIORITY) {
@@ -155,7 +165,7 @@ async function callOpenRouterLlm(prompt, model = "google/gemini-4-carbon") {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            systemInstruction: { parts: [{ text: RODOLFO_BRAIN_SYSTEM_PROMPT }] },
+            systemInstruction: { parts: [{ text: hydratedSystemPrompt }] },
             contents: [{ parts: [{ text: prompt }] }],
             ...(sm.includes("gemini-4") ? { generationConfig: { thinkingConfig: { thinkingLevel: "HIGH" } } } : {}),
           }),
@@ -204,7 +214,7 @@ async function callOpenRouterLlm(prompt, model = "google/gemini-4-carbon") {
           max_tokens: 1500,
           ...(isReasoning ? { reasoning: { effort: "medium" } } : {}),
           messages: [
-            { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+            { role: "system", content: hydratedSystemPrompt },
             { role: "user", content: prompt },
           ],
         }),
@@ -228,7 +238,7 @@ async function callOpenRouterLlm(prompt, model = "google/gemini-4-carbon") {
             model: m,
             max_tokens: affordableTokens,
             messages: [
-            { role: "system", content: RODOLFO_BRAIN_SYSTEM_PROMPT },
+            { role: "system", content: hydratedSystemPrompt },
             { role: "user", content: prompt },
           ],
           }),
@@ -256,7 +266,7 @@ async function callCodexDirect(prompt) {
   console.log(`Prompt: "${prompt}"`);
 
   try {
-    const fullPrompt = buildCodexPromptWithPersona(prompt);
+    const fullPrompt = await buildCodexPromptWithContext(prompt);
     const child = spawn(
       codexPath,
       ["exec", "--cd", projectDir, "--dangerously-bypass-approvals-and-sandbox", fullPrompt],

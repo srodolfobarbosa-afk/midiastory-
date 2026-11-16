@@ -2540,3 +2540,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #315
 
 ---
+
+### 📍 [16/11/2026, 15:19:57] Fechamento da Arquitetura Cognitiva Permanente, Embeddings Neurais 100% e Hooks Antigravity
+- **📖 Estudou / Leu:** agy-customizations hooks.md, supabase-postgres-best-practices, public.memories, ai-failover-router.mjs
+- **⚙️ Tentou / Executou:** Migration 20261116151500, embeddings gemini-embedding-001 384d em 100% das 304 memorias, extrator pos-turno, hooks SessionStart/PreInvocation/Stop, unificacao de scripts legados e teste cross-LLM
+- **⚠️ Erros Encontrados:** Backfill inicial atingiu rate-limit em 92 linhas e regex de Errou/Corrigiu marcou registros sem erro como correction
+- **🔧 Como Corrigiu:** Adicionada pausa controlada entre lotes no backfill (304/304 = 100% neural), corrigido parser de Errou/Corrigiu e testado failover Gemini <-> NVIDIA Nemotron + hooks nativos (9/9 PASS)
+- **🎯 Conclusão:** Ciclo continuo ativo com 100% cobertura semantica, RLS ativo em todas tabelas (16.58 MB / 500 MB) e validado em public.cognitive_evaluations #3.
+- *Registro Supabase:* Memory #320
+
+---

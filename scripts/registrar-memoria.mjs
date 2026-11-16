@@ -1,55 +1,20 @@
 #!/usr/bin/env node
 /**
  * REGISTRADOR DE MEMÓRIA & LINHA DO TEMPO AUTÔNOMA (Regra de Ouro Midiastore)
- * 
- * Regra: Após qualquer ação relevante, anote imediatamente:
- * - O que leu e estudou
- * - O que tentou
- * - O que errou
- * - Como corrigiu
- * - O que concluiu
- * 
+ *
  * Persiste sincronizadamente em:
- * 1. Supabase (tabela public.memories e public.orchestrator_tasks)
+ * 1. Supabase (public.memories via saveValidatedMemory com hash, categoria e embedding 384d)
  * 2. Repositório (docs/LINHA_DO_TEMPO_AUTONOMA.md)
- * 
- * Uso:
- *   node scripts/registrar-memoria.mjs \
- *     --action "Implementação X" \
- *     --studied "Doc Y, código Z" \
- *     --attempted "Tentativa de compilação" \
- *     --errors "Erro 404 em rota antiga" \
- *     --fixes "Atualizado para modelo ativo" \
- *     --conclusions "Sistema operando 100%"
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-
-import { getSupabaseToken, SUPABASE_PROJECT_REF } from "./lib/supabase-auth.mjs";
+import { classifyMemoryCategory, saveValidatedMemory, VALID_MEMORY_CATEGORIES } from "./lib/cognitive-memory.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const projectRef = SUPABASE_PROJECT_REF;
 const timelinePath = path.join(projectRoot, "docs", "LINHA_DO_TEMPO_AUTONOMA.md");
-
-function getToken() {
-  return getSupabaseToken();
-}
-
-async function runSql(query) {
-  const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query }),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-  return res.json();
-}
 
 export async function registrarMemoria(entry) {
   const now = new Date();
@@ -67,23 +32,27 @@ export async function registrarMemoria(entry) {
   };
 
   const formattedMemoryText = `[${timestampBr}] ${record.action} | Estudou: ${record.studied} | Tentou: ${record.attempted} | Errou: ${record.errors} | Corrigiu: ${record.fixes} | Conclusão: ${record.conclusions}`;
+  const rawCategory = entry.category || classifyMemoryCategory(formattedMemoryText, "episodic");
+  const categoria = VALID_MEMORY_CATEGORIES.has(rawCategory) ? rawCategory : "episodic";
 
-  // 1. Gravar no Supabase (public.memories)
   let supabaseMemoryId = null;
   try {
-    const escapedContent = formattedMemoryText.replace(/'/g, "''");
-    const insertRes = await runSql(`
-      INSERT INTO public.memories (content, created_at)
-      VALUES ('${escapedContent}', NOW())
-      RETURNING id;
-    `);
-    supabaseMemoryId = insertRes[0]?.id || null;
-    console.log(`✅ Memória gravada no Supabase (ID: #${supabaseMemoryId}).`);
+    const res = await saveValidatedMemory({
+      content: formattedMemoryText,
+      origem: entry.origem || "timeline_registrar",
+      categoria,
+      confianca: entry.confianca ?? (categoria === "correction" || categoria === "preference" ? 0.96 : 0.9),
+      supersedesId: entry.supersedesId || null,
+      allowSpeculative: true, // Preserva registros operacionais contendo campos descritivos de erro/tentativa
+    });
+    supabaseMemoryId = res.id || res.existingId || null;
+    console.log(
+      `✅ Memória gravada no Supabase (ID: #${supabaseMemoryId}, cat=${categoria}, emb=${res.embeddingModel || "cached"}).`
+    );
   } catch (err) {
     console.warn("⚠️ Aviso ao gravar memória no Supabase:", err.message);
   }
 
-  // 2. Gravar no Repositório (docs/LINHA_DO_TEMPO_AUTONOMA.md)
   try {
     const mdEntry = `
 ### 📍 [${timestampBr}] ${record.action}
@@ -125,20 +94,24 @@ function parseCliArgs() {
     errors: getArg("--errors"),
     fixes: getArg("--fixes"),
     conclusions: getArg("--conclusions"),
+    category: getArg("--category"),
+    supersedesId: getArg("--supersedes") ? Number(getArg("--supersedes")) : null,
   };
 }
 
 async function main() {
   const parsed = parseCliArgs();
   if (!parsed.action) {
-    console.log("Uso: node scripts/registrar-memoria.mjs --action '...' --studied '...' --attempted '...' --errors '...' --fixes '...' --conclusions '...'");
+    console.log(
+      "Uso: node scripts/registrar-memoria.mjs --action '...' --studied '...' --attempted '...' --errors '...' --fixes '...' --conclusions '...' [--category ...]"
+    );
     process.exit(1);
   }
   await registrarMemoria(parsed);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  main().catch(e => {
+  main().catch((e) => {
     console.error("Erro fatal:", e.message);
     process.exit(1);
   });

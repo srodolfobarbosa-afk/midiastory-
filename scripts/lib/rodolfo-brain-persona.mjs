@@ -49,6 +49,16 @@ export async function buildRodolfoBrainSystemPrompt(options = {}) {
   return `${RODOLFO_BRAIN_SYSTEM_PROMPT}\n\n[MEMÓRIA COGNITIVA RECUPERADA (${ctx.source})]\n${ctx.formattedContext}`;
 }
 
-export function buildCodexPromptWithPersona(taskPrompt) {
-  return `[PERFIL COGNITIVO DO FUNDADOR - RODOLFO BRAIN]\n${RODOLFO_BRAIN_SYSTEM_PROMPT}\n\n[ORDEM EXECUTÁVEL]\n${taskPrompt}`;
+export function buildCodexPromptWithPersona(taskPrompt, hydratedSystemPrompt = null) {
+  const base = hydratedSystemPrompt || RODOLFO_BRAIN_SYSTEM_PROMPT;
+  return `[PERFIL COGNITIVO DO FUNDADOR - RODOLFO BRAIN]\n${base}\n\n[ORDEM EXECUTÁVEL]\n${taskPrompt}`;
+}
+
+export async function buildCodexPromptWithContext(taskPrompt, options = {}) {
+  const sys = await buildRodolfoBrainSystemPrompt({
+    query: typeof options === "string" ? options : (options.query || taskPrompt),
+    sessionId: typeof options === "object" ? options.sessionId || null : null,
+    limit: typeof options === "object" ? options.limit || 8 : 8,
+  });
+  return buildCodexPromptWithPersona(taskPrompt, sys);
 }

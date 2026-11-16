@@ -211,6 +211,7 @@ class AndroidMediaPageRepository(
             MediaStore.MediaColumns.SIZE,
             MediaStore.MediaColumns.MIME_TYPE,
             MediaStore.MediaColumns.DATE_MODIFIED,
+            MediaStore.MediaColumns.RELATIVE_PATH,
             MediaStore.MediaColumns.IS_PENDING,
         ) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             arrayOf(MediaStore.MediaColumns.IS_TRASHED)
@@ -252,6 +253,7 @@ class AndroidMediaPageRepository(
             val sizeColumn = c.getColumnIndex(MediaStore.MediaColumns.SIZE)
             val mimeColumn = c.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE)
             val modifiedColumn = c.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED)
+            val relativePathColumn = c.getColumnIndex(MediaStore.MediaColumns.RELATIVE_PATH)
             val pendingColumn = c.getColumnIndex(MediaStore.MediaColumns.IS_PENDING)
             val trashedColumn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 c.getColumnIndex(MediaStore.MediaColumns.IS_TRASHED)
@@ -331,6 +333,11 @@ class AndroidMediaPageRepository(
                 } else {
                     null
                 }
+                val relativePath = if (relativePathColumn >= 0 && !c.isNull(relativePathColumn)) {
+                    runCatching { c.getString(relativePathColumn) }.getOrNull()?.takeIf(String::isNotBlank)
+                } else {
+                    null
+                }
                 records += MediaRecord(
                     uri = rowUri,
                     volumeName = request.volumeName,
@@ -339,6 +346,7 @@ class AndroidMediaPageRepository(
                     mimeType = mime,
                     sizeBytes = size,
                     dateModifiedEpochSeconds = modified,
+                    relativePath = relativePath,
                 )
             }
 

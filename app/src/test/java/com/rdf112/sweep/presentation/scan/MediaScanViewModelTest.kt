@@ -256,11 +256,32 @@ class MediaScanViewModelTest {
         assertTrue(viewModel.state.value.selection.isEmpty)
     }
 
+    @Test
+    fun globalScreenshots30dMissionSelectsOldScreenshotsAndSetsFilter() = runTest {
+        val repository = GlobalMissionFakeRepository(screenshotMode = true)
+        val viewModel = MediaScanViewModel(repository)
+
+        viewModel.startSession()
+        advanceUntilIdle()
+        viewModel.executeGlobalOutcomeMission(
+            DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D,
+            nowEpochSeconds = 1_700_000_000L,
+        )
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertEquals(com.rdf112.sweep.domain.grouping.SmartFilterMode.SCREENSHOTS_30D, state.smartFilter)
+        val plan = requireNotNull(state.missionProgress?.plan)
+        assertEquals(2, plan.autoSelectedRecords.size)
+        assertEquals(2, state.selection.records.size)
+    }
+
     private class GlobalMissionFakeRepository(
         private val failVideoSource: Boolean = false,
         private val unverifiedPagingArgs: Boolean = false,
         private val imageRecordCount: Int = 2,
         private val imageFileSizeBytes: Long = 12L * 1024L * 1024L,
+        private val screenshotMode: Boolean = false,
     ) : MediaPageRepository {
         private val volume = "external_primary"
         private val access = mapOf(
@@ -333,10 +354,11 @@ class MediaScanViewModelTest {
                 uri = "content://media/$volume/images/$id",
                 volumeName = volume,
                 kind = MediaKind.IMAGE,
-                displayName = "$id.jpg",
-                mimeType = "image/jpeg",
+                displayName = if (screenshotMode) "Screenshot_$id.png" else "$id.jpg",
+                mimeType = if (screenshotMode) "image/png" else "image/jpeg",
                 sizeBytes = imageFileSizeBytes,
                 dateModifiedEpochSeconds = 100L + request.offset,
+                relativePath = if (screenshotMode) "Pictures/Screenshots/" else "DCIM/Camera/",
             )
             val more = request.offset < imageRecordCount - 1
             return MediaPage(

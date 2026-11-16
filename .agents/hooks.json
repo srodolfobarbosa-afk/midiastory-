@@ -1,0 +1,25 @@
+{
+  "rodolfo-cognitive-memory": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node ../scripts/hooks/cognitive-hook.mjs SessionStart",
+        "timeout": 10
+      }
+    ],
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node ../scripts/hooks/cognitive-hook.mjs PreInvocation",
+        "timeout": 10
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node ../scripts/hooks/cognitive-hook.mjs Stop",
+        "timeout": 35
+      }
+    ]
+  }
+}

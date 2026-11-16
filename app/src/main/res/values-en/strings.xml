@@ -38,6 +38,7 @@ Total: %3$s</string>
     <string name="filter_all">All files</string>
     <string name="filter_large_10mb">Large (over 10 MB)</string>
     <string name="filter_same_size">Exact copies (SHA-256)</string>
+    <string name="filter_screenshots_30d">Screenshots (+30d)</string>
     <string name="filter_older_30d">Older (+30 days)</string>
     <string name="smart_filter_empty_in_page">No files on this page match the filter. Move to another page to check more files.</string>
     <string name="protected_reference_badge">Protected original</string>

@@ -43,4 +43,30 @@ class OutcomeServiceEngineTest {
             ProcessExecutionStage.RECONCILIAR,
         )))
     }
+
+    @Test
+    fun buildsAutomatedOutcomePlanForOldScreenshots30d() {
+        val now = 60L * 24L * 3600L
+        val oldShot = MediaRecord(
+            uri = "content://media/external_primary/images/media/201",
+            volumeName = "external_primary",
+            kind = MediaKind.IMAGE,
+            displayName = "Screenshot_20260901.png",
+            mimeType = "image/png",
+            sizeBytes = 3L * 1024L * 1024L,
+            dateModifiedEpochSeconds = 10L * 24L * 3600L,
+            relativePath = "Pictures/Screenshots/",
+        )
+        val regularPhoto = rec("202", 5L * 1024L * 1024L, 10L * 24L * 3600L)
+
+        val plan = OutcomeServiceEngine.buildAutomatedOutcomePlan(
+            mission = DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D,
+            pageRecords = listOf(oldShot, regularPhoto),
+            nowEpochSeconds = now,
+        )
+
+        assertTrue(plan.isReadyToDeliver)
+        assertEquals(listOf(oldShot.uri), plan.autoSelectedRecords.map { it.uri })
+        assertEquals(3L * 1024L * 1024L, plan.estimatedDeliverableBytes)
+    }
 }

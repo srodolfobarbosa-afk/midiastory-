@@ -32,6 +32,10 @@ enum class DesiredOutcomeMission(
         id = "archive_old_media_30d",
         minimum10xDimension = "Encontrar mídias antigas (>= 30 dias) e preparar lote de revisão",
     ),
+    CLEAN_OLD_SCREENSHOTS_30D(
+        id = "clean_old_screenshots_30d",
+        minimum10xDimension = "Identificar capturas de tela com mais de 30 dias para revisão e remoção segura",
+    ),
 }
 
 enum class ProcessExecutionStage {
@@ -90,6 +94,8 @@ object OutcomeServiceEngine {
                 SmartMediaGroupingPolicy.applyFilter(pageRecords, SmartFilterMode.SAME_SIZE_CANDIDATES, nowEpochSeconds)
             DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D ->
                 SmartMediaGroupingPolicy.applyFilter(pageRecords, SmartFilterMode.OLDER_THAN_30_DAYS, nowEpochSeconds)
+            DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D ->
+                SmartMediaGroupingPolicy.applyFilter(pageRecords, SmartFilterMode.SCREENSHOTS_30D, nowEpochSeconds)
         }
 
         val unconfirmedCount = if (mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES) {
@@ -131,7 +137,9 @@ object OutcomeServiceEngine {
             .filter { it.isSelectable && !it.isProtected }
         val old = SmartMediaGroupingPolicy.applyFilter(pageRecords, SmartFilterMode.OLDER_THAN_30_DAYS, nowEpochSeconds)
             .filter { it.isSelectable && !it.isProtected }
-        val combinedUnique = (large + dups + old).distinctBy { it.uri }
+        val screenshots = SmartMediaGroupingPolicy.applyFilter(pageRecords, SmartFilterMode.SCREENSHOTS_30D, nowEpochSeconds)
+            .filter { it.isSelectable && !it.isProtected }
+        val combinedUnique = (large + dups + old + screenshots).distinctBy { it.uri }
         return safeSumBytes(combinedUnique)
     }
 

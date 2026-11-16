@@ -30,7 +30,9 @@ import android.text.Spanned
 import android.text.TextWatcher
 import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
+import android.util.LruCache
 import android.util.Size
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -55,10 +57,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.rdf112.sweep.data.WhatsAppCleanerDataSource
@@ -66,6 +71,8 @@ import com.rdf112.sweep.data.WhatsAppMediaCategory
 import com.rdf112.sweep.data.WhatsAppMediaItem
 import com.rdf112.sweep.data.billing.AndroidPlayBillingGateway
 import com.rdf112.sweep.data.billing.PlayCatalogProductUi
+import com.rdf112.sweep.data.media.AndroidBlurPhotoScanner
+import com.rdf112.sweep.data.media.AndroidMediaBreakdownReader
 import com.rdf112.sweep.data.media.AndroidMediaPageRepository
 import com.rdf112.sweep.data.media.AndroidTrashOperationCoordinator
 import com.rdf112.sweep.data.media.Api29DeleteAttempt
@@ -87,7 +94,9 @@ import com.rdf112.sweep.presentation.scan.GlobalMissionProgress
 import com.rdf112.sweep.presentation.scan.MediaScanUiState
 import com.rdf112.sweep.presentation.scan.MediaScanViewModel
 import com.rdf112.sweep.presentation.scan.ScanUiStatus
+import com.rdf112.sweep.presentation.ui.StorageBarSegment
 import com.rdf112.sweep.presentation.ui.StorageRingGaugeView
+import com.rdf112.sweep.presentation.ui.StorageSegmentedBarView
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -146,13 +155,16 @@ class MainActivity : AppCompatActivity() {
     ) {
         val homeCleanupPending = pendingOutcomeMission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW
         val whatsAppPending = pendingWhatsAppCleanerAfterPermission
+        val blurPending = pendingBlurScanAfterPermission
         pendingWhatsAppCleanerAfterPermission = false
+        pendingBlurScanAfterPermission = false
         if (hasAnyMediaPermission()) {
             viewModel.startSession()
-            if (whatsAppPending) {
-                openWhatsAppCleanerFlow()
-            } else {
-                switchTab(if (homeCleanupPending) AppTab.HOME else if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
+            refreshStorageStats()
+            when {
+                whatsAppPending -> openWhatsAppCleanerFlow()
+                blurPending -> openBlurCleanerFlow()
+                else -> switchTab(if (homeCleanupPending) AppTab.HOME else if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
             }
         } else {
             pendingKindAfterPermission = null
@@ -385,6 +397,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeGlobalHubTitleView: TextView
     private lateinit var homeGlobalHubSubtitleView: TextView
     private lateinit var storageRingGauge: StorageRingGaugeView
+    private lateinit var storageSegmentedBar: StorageSegmentedBarView
+    private lateinit var storageBreakdownLegend: TextView
     private lateinit var storageProgressBar: ProgressBar
     private lateinit var storageUsedHeadline: TextView
     private lateinit var storageFreeSubline: TextView
@@ -441,9 +455,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var filterAllButton: MaterialButton
     private lateinit var filterLargeButton: MaterialButton
     private lateinit var filterDuplicatesButton: MaterialButton
+    private lateinit var filterScreenshotsButton: MaterialButton
     private lateinit var filterOldButton: MaterialButton
     private lateinit var oaasMissionLargeButton: MaterialButton
     private lateinit var oaasMissionDuplicatesButton: MaterialButton
+    private lateinit var oaasMissionScreenshotsButton: MaterialButton
     private lateinit var oaasMissionOldButton: MaterialButton
     private lateinit var customOutcomeInput: EditText
     private lateinit var registerCustomOutcomeButton: MaterialButton
@@ -467,8 +483,17 @@ class MainActivity : AppCompatActivity() {
     private var pendingKindAfterPermission: MediaKind? = null
     private var renderedVolumes: List<String> = emptyList()
     private var renderedPageKey: String? = null
+    private var storageBreakdownJob: Job? = null
+    private var blurScanJob: Job? = null
+    private var pendingBlurScanAfterPermission = false
     private val thumbnailJobs = mutableListOf<Job>()
     private val thumbnailDispatcher by lazy { Dispatchers.IO.limitedParallelism(4) }
+    private val thumbnailCache: LruCache<String, Bitmap> by lazy {
+        val maxKb = (Runtime.getRuntime().maxMemory() / 1024L / 8L).toInt().coerceIn(4 * 1024, 16 * 1024)
+        object : LruCache<String, Bitmap>(maxKb) {
+            override fun sizeOf(key: String, value: Bitmap): Int = (value.byteCount / 1024).coerceAtLeast(1)
+        }
+    }
     private val checkBoxesByUri = mutableMapOf<String, CheckBox>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -518,7 +543,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (::storageText.isInitialized) refreshStorageStats()
+        if (::storageText.isInitialized || ::storageUsedHeadline.isInitialized) refreshStorageStats()
         if (::viewModel.isInitialized) viewModel.checkSessionFreshness()
         if (::billingGateway.isInitialized) billingGateway.startAndReconcile()
         if (::restoreTrashButton.isInitialized) updateRestoreButtonState()
@@ -555,6 +580,7 @@ class MainActivity : AppCompatActivity() {
         val brandLockup = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
+            background = null
             setPadding(0, dp(4), dp(8), dp(4))
         }
         brandLockupCard = brandLockup
@@ -715,6 +741,13 @@ class MainActivity : AppCompatActivity() {
         storageCopy.addView(storageProgressBar)
         storageRow.addView(storageCopy, LinearLayout.LayoutParams(0, -2, 1f))
         storageCard.addView(storageRow)
+        storageSegmentedBar = StorageSegmentedBarView(this@MainActivity)
+        storageCard.addView(storageSegmentedBar, LinearLayout.LayoutParams(-1, dp(10)).apply { topMargin = dp(14) })
+        storageBreakdownLegend = label("", 11.5f, R.color.sweep_muted, false).apply {
+            visibility = View.GONE
+            maxLines = 2
+        }
+        storageCard.addView(storageBreakdownLegend, top(8))
         storageCardContainer = wrap(storageCard)
         addView(storageCardContainer, bottom(16))
 
@@ -1104,11 +1137,11 @@ class MainActivity : AppCompatActivity() {
         )
         fun buildGridCell(
             iconRes: Int,
+            accentColor: Int,
             title: String,
             description: String,
             onClick: () -> Unit
         ): View {
-            val accentColor = color(R.color.google_blue_primary)
             val cellContent = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER_HORIZONTAL
@@ -1132,10 +1165,17 @@ class MainActivity : AppCompatActivity() {
             }
             cellContent.addView(iconView, LinearLayout.LayoutParams(dp(28), dp(28)))
 
-            val titleView = label(title, 14.5f, R.color.sweep_text, true).apply {
+            val titleView = label(title, 14f, R.color.sweep_text, true).apply {
                 gravity = Gravity.CENTER_HORIZONTAL
                 maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.END
+                isSingleLine = true
+                TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    this,
+                    11,
+                    14,
+                    1,
+                    TypedValue.COMPLEX_UNIT_SP,
+                )
             }
             cellContent.addView(titleView, top(10))
             val descView = label(description, 12f, R.color.sweep_muted, false).apply {
@@ -1151,12 +1191,14 @@ class MainActivity : AppCompatActivity() {
         val row1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val waCell = buildGridCell(
             iconRes = R.drawable.ic_apple_whatsapp,
+            accentColor = color(R.color.sweep_success),
             title = getString(R.string.quick_clean_whatsapp_title),
             description = getString(R.string.quick_clean_whatsapp_desc),
             onClick = { openWhatsAppCleanerFlow() }
         )
         val dupCell = buildGridCell(
             iconRes = R.drawable.ic_apple_duplicates,
+            accentColor = color(R.color.google_blue_primary),
             title = getString(R.string.quick_clean_duplicates_title),
             description = getString(R.string.quick_clean_duplicates_desc),
             onClick = {
@@ -1171,6 +1213,7 @@ class MainActivity : AppCompatActivity() {
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val largeCell = buildGridCell(
             iconRes = R.drawable.ic_apple_large_video,
+            accentColor = color(R.color.sweep_accent_amber),
             title = getString(R.string.quick_clean_large_title),
             description = getString(R.string.quick_clean_large_desc),
             onClick = {
@@ -1178,18 +1221,56 @@ class MainActivity : AppCompatActivity() {
                 runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
             }
         )
-        val oldCell = buildGridCell(
-            iconRes = R.drawable.ic_apple_old_photos,
-            title = getString(R.string.quick_clean_old_title),
-            description = getString(R.string.quick_clean_old_desc),
+        val screenshotsCell = buildGridCell(
+            iconRes = R.drawable.ic_apple_screenshots,
+            accentColor = Color.parseColor("#BF5AF2"),
+            title = getString(R.string.quick_clean_screenshots_title),
+            description = getString(R.string.quick_clean_screenshots_desc),
             onClick = {
                 openInteractiveDialogOnMissionFinish = true
-                runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
+                runOutcomeMission(DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D)
             }
         )
         row2.addView(largeCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(6) })
-        row2.addView(oldCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
+        row2.addView(screenshotsCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
         gridRoot.addView(row2, top(12))
+
+        val blurCard = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(16), dp(14), dp(16), dp(14))
+            background = borderedPill(
+                color(R.color.sweep_surface),
+                color(R.color.sweep_surface_alt),
+                dp(18),
+                dp(1),
+            )
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { v ->
+                try { v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                openBlurCleanerFlow()
+            }
+        }
+        val blurIcon = ImageView(this).apply {
+            setImageResource(R.drawable.ic_apple_blur)
+            setColorFilter(Color.parseColor("#FF375F"))
+        }
+        blurCard.addView(blurIcon, LinearLayout.LayoutParams(dp(26), dp(26)).apply { marginEnd = dp(12) })
+        val blurTextCol = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        blurTextCol.addView(label(getString(R.string.quick_clean_blur_title), 14f, R.color.sweep_text, true).apply {
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        })
+        blurTextCol.addView(label(getString(R.string.quick_clean_blur_desc), 12f, R.color.sweep_muted, false).apply {
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }, top(2))
+        blurCard.addView(blurTextCol, LinearLayout.LayoutParams(0, -2, 1f))
+        blurCard.addView(label("›", 20f, R.color.sweep_muted, false).apply {
+            setPadding(dp(8), 0, dp(2), 0)
+        })
+        gridRoot.addView(blurCard, top(12))
 
         return gridRoot
     }
@@ -1251,6 +1332,12 @@ class MainActivity : AppCompatActivity() {
             textSize = 12f
             setPadding(dp(14), dp(4), dp(14), dp(4))
         }
+        filterScreenshotsButton = button(getString(R.string.filter_screenshots_30d)) { viewModel.selectSmartFilter(SmartFilterMode.SCREENSHOTS_30D) }.apply {
+            minHeight = dp(36)
+            cornerRadius = dp(18)
+            textSize = 12f
+            setPadding(dp(14), dp(4), dp(14), dp(4))
+        }
         filterOldButton = button(getString(R.string.filter_older_30d)) { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }.apply {
             minHeight = dp(36)
             cornerRadius = dp(18)
@@ -1260,6 +1347,7 @@ class MainActivity : AppCompatActivity() {
         filterRow.addView(filterAllButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
         filterRow.addView(filterLargeButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
         filterRow.addView(filterDuplicatesButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
+        filterRow.addView(filterScreenshotsButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
         filterRow.addView(filterOldButton, LinearLayout.LayoutParams(-2, -2))
         filterScroll.addView(filterRow)
         addView(filterScroll, bottom(12))
@@ -1320,13 +1408,20 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        previousButton = button(getString(R.string.previous_page)) { viewModel.loadPreviousPage() }
+        previousButton = button(getString(R.string.previous_page)) { viewModel.loadPreviousPage() }.apply {
+            minHeight = dp(48)
+            maxLines = 2
+            setPadding(dp(10), dp(10), dp(10), dp(10))
+        }
         nextButton = button(getString(R.string.next_page)) { viewModel.loadNextPage() }.apply {
+            minHeight = dp(48)
+            maxLines = 2
+            setPadding(dp(10), dp(10), dp(10), dp(10))
             setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
-        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginEnd = dp(6) })
-        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(6) })
+        navigation.addView(previousButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(6) })
+        navigation.addView(nextButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
         resultsCard.addView(navigation, top(12))
         addView(wrap(resultsCard), bottom(14))
 
@@ -1404,6 +1499,12 @@ class MainActivity : AppCompatActivity() {
             runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
         }.apply { minHeight = dp(52) }
         oaasCard.addView(oaasMissionOldButton, top(8))
+
+        oaasMissionScreenshotsButton = button(getString(R.string.oaas_mission_screenshots)) {
+            openInteractiveDialogOnMissionFinish = true
+            runOutcomeMission(DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D)
+        }.apply { minHeight = dp(52) }
+        oaasCard.addView(oaasMissionScreenshotsButton, top(8))
 
         val cleanExtrasRow = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -1983,12 +2084,7 @@ class MainActivity : AppCompatActivity() {
             appRootView.setBackgroundColor(color(R.color.sweep_background))
         }
         if (::brandLockupCard.isInitialized) {
-            brandLockupCard.background = borderedPill(
-                color(R.color.sweep_surface),
-                color(R.color.sweep_surface_alt),
-                dp(16),
-                dp(1),
-            )
+            brandLockupCard.background = null
         }
         if (::brandWordmarkView.isInitialized) {
             renderBrandWordmark(isPro)
@@ -4013,11 +4109,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun createAppleBottomSheet(
+        title: String,
+        subtitle: String? = null,
+    ): Pair<BottomSheetDialog, LinearLayout> {
+        val dialog = BottomSheetDialog(this)
+        val sheetBg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(color(R.color.sweep_surface))
+            val r = dp(24).toFloat()
+            cornerRadii = floatArrayOf(r, r, r, r, 0f, 0f, 0f, 0f)
+        }
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = sheetBg
+            setPadding(dp(20), dp(12), dp(20), dp(22))
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(container) { view, insets ->
+            val nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            view.setPadding(dp(20), dp(12), dp(20), dp(22) + nav.bottom)
+            insets
+        }
+        val handle = View(this).apply {
+            background = roundedBackground(color(R.color.sweep_surface_highest), dp(3))
+        }
+        container.addView(handle, LinearLayout.LayoutParams(dp(38), dp(4)).apply {
+            gravity = Gravity.CENTER_HORIZONTAL
+            bottomMargin = dp(14)
+        })
+        container.addView(label(title, 18.5f, R.color.sweep_text, true))
+        if (!subtitle.isNullOrBlank()) {
+            container.addView(label(subtitle, 12.5f, R.color.sweep_muted, false), top(4))
+        }
+        dialog.setContentView(container)
+        dialog.setOnShowListener {
+            val bottomSheet = dialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let { sheet ->
+                sheet.setBackgroundColor(Color.TRANSPARENT)
+                BottomSheetBehavior.from(sheet).apply {
+                    state = BottomSheetBehavior.STATE_EXPANDED
+                    skipCollapsed = true
+                }
+            }
+        }
+        return dialog to container
+    }
+
     private fun openInteractiveCleanupReviewDialog(
         records: List<MediaRecord>,
         isFallbackList: Boolean,
         mission: DesiredOutcomeMission?,
         coverageComplete: Boolean,
+        customSubtitle: String? = null,
     ) {
         if (records.isEmpty()) {
             AlertDialog.Builder(this)
@@ -4052,20 +4195,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(16), dp(12), dp(16), dp(8))
-        }
-        root.addView(
-            label(
-                getString(
-                    if (isFallbackList) R.string.cleanup_dialog_subtitle_fallback
-                    else R.string.cleanup_dialog_subtitle_candidates,
-                ),
-                12f,
-                R.color.sweep_muted,
-                false,
-            ),
+        val headerSubtitle = customSubtitle ?: getString(
+            if (isFallbackList) R.string.cleanup_dialog_subtitle_fallback
+            else R.string.cleanup_dialog_subtitle_candidates,
+        )
+        val (dialog, root) = createAppleBottomSheet(
+            title = getString(R.string.cleanup_sheet_title),
+            subtitle = headerSubtitle,
         )
 
         val summaryLabel = label("", 13f, R.color.sweep_primary_glow, true)
@@ -4111,7 +4247,6 @@ class MainActivity : AppCompatActivity() {
         }
         root.addView(toggleAllBtn, top(8))
 
-        var reviewDialogRef: AlertDialog? = null
         val listContainer = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(6), 0, dp(6))
@@ -4121,12 +4256,12 @@ class MainActivity : AppCompatActivity() {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
                 setPadding(dp(8), dp(6), dp(8), dp(6))
-                background = roundedBackground(color(R.color.sweep_surface_alt), dp(10))
+                background = roundedBackground(color(R.color.sweep_surface_alt), dp(12))
             }
             val box = CheckBox(this).apply {
                 isChecked = initialChecked[idx]
-                minWidth = dp(44)
-                minHeight = dp(44)
+                minWidth = dp(48)
+                minHeight = dp(48)
                 setOnCheckedChangeListener { _, isChecked ->
                     initialChecked[idx] = isChecked
                     refreshSummary()
@@ -4175,7 +4310,7 @@ class MainActivity : AppCompatActivity() {
             row.setOnClickListener { box.isChecked = !box.isChecked }
             row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f))
             val quickDeleteBtn = button("×") {
-                reviewDialogRef?.dismiss()
+                dialog.dismiss()
                 requestPermanentDeleteSelected(listOf(record))
             }.apply {
                 minWidth = dp(44)
@@ -4189,51 +4324,67 @@ class MainActivity : AppCompatActivity() {
             listContainer.addView(row, bottom(6))
         }
 
+        val maxListHeight = (resources.displayMetrics.heightPixels * 0.42f).toInt().coerceIn(dp(200), dp(360))
         val listScroll = ScrollView(this).apply {
             addView(listContainer, ViewGroup.LayoutParams(-1, -2))
         }
-        root.addView(listScroll, LinearLayout.LayoutParams(-1, dp(290)).apply { topMargin = dp(8) })
+        root.addView(listScroll, LinearLayout.LayoutParams(-1, maxListHeight).apply { topMargin = dp(8) })
         refreshSummary()
 
         fun selectedFromDialog(): List<MediaRecord> =
             cappedRecords.indices.filter { initialChecked[it] }.map { cappedRecords[it] }
 
         val supportsTrash = trashCoordinator.supportsSystemTrash()
-        val builder = AlertDialog.Builder(this)
-            .setTitle(R.string.cleanup_dialog_title)
-            .setView(root)
-            .setPositiveButton(R.string.permanent_delete_button, null)
-            .setNeutralButton(if (supportsTrash) R.string.move_to_trash_button else R.string.cleanup_dialog_open_files_tab, null)
-            .setNegativeButton(android.R.string.cancel, null)
-
-        val dialog = builder.create()
-        reviewDialogRef = dialog
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val chosen = selectedFromDialog()
-                if (chosen.isEmpty()) {
-                    Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                dialog.dismiss()
-                viewModel.prepareExternalReviewSelection(chosen)
-                requestPermanentDeleteSelected(chosen)
+        val deleteActionBtn = button(getString(R.string.permanent_delete_button)) {
+            val chosen = selectedFromDialog()
+            if (chosen.isEmpty()) {
+                Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                return@button
             }
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                val chosen = selectedFromDialog()
-                if (chosen.isEmpty()) {
-                    Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                dialog.dismiss()
-                viewModel.prepareExternalReviewSelection(chosen)
-                if (supportsTrash) {
-                    requestMoveSelectedToTrash(chosen)
-                } else {
-                    switchTab(AppTab.FILES)
-                }
-            }
+            dialog.dismiss()
+            viewModel.prepareExternalReviewSelection(chosen)
+            requestPermanentDeleteSelected(chosen)
+        }.apply {
+            minHeight = dp(50)
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
         }
+        root.addView(deleteActionBtn, top(12))
+
+        val secondaryBtn = button(
+            if (supportsTrash) getString(R.string.move_to_trash_button)
+            else getString(R.string.cleanup_dialog_open_files_tab),
+        ) {
+            val chosen = selectedFromDialog()
+            if (chosen.isEmpty()) {
+                Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                return@button
+            }
+            dialog.dismiss()
+            viewModel.prepareExternalReviewSelection(chosen)
+            if (supportsTrash) {
+                requestMoveSelectedToTrash(chosen)
+            } else {
+                switchTab(AppTab.FILES)
+            }
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(
+                color(if (supportsTrash) R.color.google_blue_primary else R.color.sweep_surface_alt),
+            )
+        }
+        root.addView(secondaryBtn, top(8))
+
+        val cancelSheetBtn = button(getString(android.R.string.cancel)) {
+            dialog.dismiss()
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        root.addView(cancelSheetBtn, top(4))
+
         dialog.show()
     }
 
@@ -4347,50 +4498,189 @@ class MainActivity : AppCompatActivity() {
                 WhatsAppMediaCategory.OTHER to getString(R.string.wa_cat_other),
             ).filter { (cat, _) -> !mediaRecordsByCategory[cat].isNullOrEmpty() }
 
-            val labels = orderedCategories.map { (cat, title) ->
+            val checked = BooleanArray(orderedCategories.size) { true }
+            val (waSheet, waRoot) = createAppleBottomSheet(
+                title = getString(R.string.wa_found_title),
+                subtitle = getString(R.string.wa_sheet_subtitle),
+            )
+            val waSummary = label("", 13f, R.color.sweep_primary_glow, true)
+            waRoot.addView(waSummary, top(8))
+
+            fun refreshWaSummary() {
+                val selectedRecords = orderedCategories.indices
+                    .filter { checked[it] }
+                    .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
+                val totalBytes = selectedRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+                waSummary.text = getString(
+                    R.string.cleanup_dialog_selected_summary,
+                    selectedRecords.size,
+                    mediaRecordsByCategory.values.sumOf { it.size },
+                    Formatter.formatFileSize(this@MainActivity, totalBytes),
+                )
+            }
+
+            val waList = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(6), 0, dp(6))
+            }
+            orderedCategories.forEachIndexed { idx, (cat, title) ->
                 val list = mediaRecordsByCategory[cat].orEmpty()
                 val bytes = list.sumOf { it.sizeBytes }
                 val sizeFmt = Formatter.formatFileSize(this@MainActivity, bytes)
-                getString(R.string.wa_cat_item_count, title, list.size, sizeFmt)
-            }.toTypedArray()
-            val checked = BooleanArray(orderedCategories.size) { true }
+                val row = LinearLayout(this@MainActivity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(dp(10), dp(8), dp(10), dp(8))
+                    background = roundedBackground(color(R.color.sweep_surface_alt), dp(12))
+                }
+                val box = CheckBox(this@MainActivity).apply {
+                    isChecked = checked[idx]
+                    minWidth = dp(48)
+                    minHeight = dp(48)
+                    setOnCheckedChangeListener { _, isChecked ->
+                        checked[idx] = isChecked
+                        refreshWaSummary()
+                    }
+                }
+                row.addView(box, LinearLayout.LayoutParams(-2, -2))
+                val meta = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+                meta.addView(label(title, 13.5f, R.color.sweep_text, true))
+                meta.addView(
+                    label(getString(R.string.wa_cat_item_count, title, list.size, sizeFmt), 11.5f, R.color.sweep_primary_glow, false),
+                    top(2),
+                )
+                row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
+                row.setOnClickListener { box.isChecked = !box.isChecked }
+                waList.addView(row, bottom(6))
+            }
+            val waMaxHeight = (resources.displayMetrics.heightPixels * 0.38f).toInt().coerceIn(dp(180), dp(340))
+            waRoot.addView(
+                ScrollView(this@MainActivity).apply { addView(waList, ViewGroup.LayoutParams(-1, -2)) },
+                LinearLayout.LayoutParams(-1, waMaxHeight).apply { topMargin = dp(8) },
+            )
+            refreshWaSummary()
 
-            AlertDialog.Builder(this@MainActivity)
-                .setTitle(R.string.wa_found_title)
-                .setMultiChoiceItems(labels, checked) { _, which, isChecked ->
-                    checked[which] = isChecked
+            fun chosenWaRecords(): List<MediaRecord> = orderedCategories.indices
+                .filter { checked[it] }
+                .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
+
+            val supportsTrash = trashCoordinator.supportsSystemTrash()
+            val waDeleteBtn = button(getString(R.string.permanent_delete_button)) {
+                val chosenRecords = chosenWaRecords()
+                if (chosenRecords.isEmpty()) {
+                    Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
+                    return@button
                 }
-                .setPositiveButton(R.string.permanent_delete_button) { _, _ ->
-                    val chosenRecords = orderedCategories.indices
-                        .filter { checked[it] }
-                        .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
-                    if (chosenRecords.isEmpty()) {
-                        Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
-                        return@setPositiveButton
-                    }
-                    viewModel.prepareExternalReviewSelection(chosenRecords)
-                    requestPermanentDeleteSelected(chosenRecords)
+                waSheet.dismiss()
+                viewModel.prepareExternalReviewSelection(chosenRecords)
+                requestPermanentDeleteSelected(chosenRecords)
+            }.apply {
+                minHeight = dp(50)
+                setTextColor(Color.WHITE)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
+            }
+            waRoot.addView(waDeleteBtn, top(12))
+
+            val waTrashBtn = button(
+                if (supportsTrash) getString(R.string.move_to_trash_button)
+                else getString(R.string.cleanup_dialog_open_files_tab),
+            ) {
+                val chosenRecords = chosenWaRecords()
+                if (chosenRecords.isEmpty()) {
+                    Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
+                    return@button
                 }
-                .setNeutralButton(
-                    if (trashCoordinator.supportsSystemTrash()) getString(R.string.move_to_trash_button)
-                    else getString(R.string.cleanup_dialog_open_files_tab)
-                ) { _, _ ->
-                    val chosenRecords = orderedCategories.indices
-                        .filter { checked[it] }
-                        .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
-                    if (chosenRecords.isEmpty()) {
-                        Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
-                        return@setNeutralButton
-                    }
-                    viewModel.prepareExternalReviewSelection(chosenRecords)
-                    if (trashCoordinator.supportsSystemTrash()) {
-                        requestMoveSelectedToTrash(chosenRecords)
-                    } else {
-                        switchTab(AppTab.FILES)
-                    }
+                waSheet.dismiss()
+                viewModel.prepareExternalReviewSelection(chosenRecords)
+                if (supportsTrash) {
+                    requestMoveSelectedToTrash(chosenRecords)
+                } else {
+                    switchTab(AppTab.FILES)
                 }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
+            }.apply {
+                minHeight = dp(48)
+                setTextColor(Color.WHITE)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    color(if (supportsTrash) R.color.google_blue_primary else R.color.sweep_surface_alt),
+                )
+            }
+            waRoot.addView(waTrashBtn, top(8))
+
+            val waCancelBtn = button(getString(android.R.string.cancel)) {
+                waSheet.dismiss()
+            }.apply {
+                minHeight = dp(48)
+                setTextColor(color(R.color.sweep_muted))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+            }
+            waRoot.addView(waCancelBtn, top(4))
+            waSheet.show()
+        }
+    }
+
+    private fun openBlurCleanerFlow() {
+        if (!hasAnyMediaPermission()) {
+            pendingBlurScanAfterPermission = true
+            requestMediaPermissions()
+            return
+        }
+        blurScanJob?.cancel()
+        val (progressSheet, progressRoot) = createAppleBottomSheet(
+            title = getString(R.string.blur_scan_title),
+            subtitle = getString(R.string.quick_clean_blur_desc),
+        )
+        val statusLabel = label(getString(R.string.blur_scan_progress, 0, 0), 13f, R.color.sweep_primary_glow, true)
+        progressRoot.addView(statusLabel, top(12))
+        val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            isIndeterminate = true
+            indeterminateTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        progressRoot.addView(bar, top(12))
+        val cancelBtn = button(getString(android.R.string.cancel)) {
+            blurScanJob?.cancel()
+            progressSheet.dismiss()
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        progressRoot.addView(cancelBtn, top(12))
+        progressSheet.setOnCancelListener { blurScanJob?.cancel() }
+        progressSheet.show()
+
+        blurScanJob = lifecycleScope.launch {
+            val result = try {
+                AndroidBlurPhotoScanner.scanRecentPhotos(
+                    context = this@MainActivity,
+                    onProgress = { analyzed, found ->
+                        if (progressSheet.isShowing) {
+                            statusLabel.text = getString(R.string.blur_scan_progress, analyzed, found)
+                        }
+                    },
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            } finally {
+                if (progressSheet.isShowing) progressSheet.dismiss()
+            }
+            if (result == null) return@launch
+            if (result.candidates.isEmpty()) {
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.blur_scan_empty, result.photosAnalyzed),
+                    Toast.LENGTH_LONG,
+                ).show()
+                return@launch
+            }
+            openInteractiveCleanupReviewDialog(
+                records = result.candidates.map { it.record },
+                isFallbackList = false,
+                mission = null,
+                coverageComplete = !result.capReached,
+                customSubtitle = getString(R.string.blur_sheet_subtitle),
+            )
         }
     }
 
@@ -5519,11 +5809,14 @@ class MainActivity : AppCompatActivity() {
         filterLargeButton.isEnabled = !state.isLoading
         oaasMissionLargeButton.isEnabled = !state.isLoading
         oaasMissionDuplicatesButton.isEnabled = !state.isLoading
+        oaasMissionScreenshotsButton.isEnabled = !state.isLoading
         oaasMissionOldButton.isEnabled = !state.isLoading
         oaasCancelMissionButton.visibility = if (state.isLoading) View.VISIBLE else View.GONE
         oaasCancelMissionButton.isEnabled = state.isLoading
         filterDuplicatesButton.isEnabled = !state.isLoading
+        filterScreenshotsButton.isEnabled = !state.isLoading
         filterOldButton.isEnabled = !state.isLoading
+        updateFilesControlsVisuals(state)
         previousButton.isEnabled = state.canLoadPrevious
         nextButton.isEnabled = state.canLoadNext
 
@@ -5802,6 +6095,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadThumbnail(target: ImageView, record: MediaRecord) {
+        val cached = thumbnailCache.get(record.uri)
+        if (cached != null && !cached.isRecycled) {
+            target.setImageBitmap(cached)
+            return
+        }
         val signal = CancellationSignal()
         val job = lifecycleScope.launch {
             val bitmap: Bitmap? = withContext(thumbnailDispatcher) {
@@ -5817,6 +6115,9 @@ class MainActivity : AppCompatActivity() {
                     null
                 }
             }
+            if (bitmap != null) {
+                thumbnailCache.put(record.uri, bitmap)
+            }
             if (target.tag == record.uri && bitmap != null) target.setImageBitmap(bitmap)
             else if (target.tag == record.uri) target.setImageResource(android.R.drawable.ic_menu_gallery)
         }
@@ -5824,6 +6125,39 @@ class MainActivity : AppCompatActivity() {
             if (cause is CancellationException) signal.cancel()
         }
         thumbnailJobs += job
+    }
+
+    private fun updateFilesControlsVisuals(state: MediaScanUiState) {
+        val selectedColor = color(R.color.sweep_surface_alt)
+        val activeText = color(R.color.sweep_text)
+        val mutedText = color(R.color.sweep_muted)
+        val blueFill = color(R.color.google_blue_primary)
+
+        fun styleSegment(button: MaterialButton, selected: Boolean) {
+            button.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                if (selected) selectedColor else Color.TRANSPARENT,
+            )
+            button.setTextColor(if (selected) activeText else mutedText)
+            button.typeface = if (selected) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        }
+
+        fun styleFilterPill(button: MaterialButton, selected: Boolean) {
+            button.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                if (selected) blueFill else selectedColor,
+            )
+            button.setTextColor(if (selected) Color.WHITE else mutedText)
+            button.typeface = if (selected) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        }
+
+        if (::photosButton.isInitialized) styleSegment(photosButton, state.selectedKind == MediaKind.IMAGE)
+        if (::videosButton.isInitialized) styleSegment(videosButton, state.selectedKind == MediaKind.VIDEO)
+        if (::audioButton.isInitialized) styleSegment(audioButton, state.selectedKind == MediaKind.AUDIO)
+
+        if (::filterAllButton.isInitialized) styleFilterPill(filterAllButton, state.smartFilter == SmartFilterMode.ALL_ITEMS)
+        if (::filterLargeButton.isInitialized) styleFilterPill(filterLargeButton, state.smartFilter == SmartFilterMode.LARGE_FILES_10MB)
+        if (::filterDuplicatesButton.isInitialized) styleFilterPill(filterDuplicatesButton, state.smartFilter == SmartFilterMode.SAME_SIZE_CANDIDATES)
+        if (::filterScreenshotsButton.isInitialized) styleFilterPill(filterScreenshotsButton, state.smartFilter == SmartFilterMode.SCREENSHOTS_30D)
+        if (::filterOldButton.isInitialized) styleFilterPill(filterOldButton, state.smartFilter == SmartFilterMode.OLDER_THAN_30_DAYS)
     }
 
     private fun updateReview(state: MediaScanUiState) {
@@ -6319,6 +6653,43 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (::storageProgressBar.isInitialized) {
                     storageProgressBar.progress = usage.usedPercent
+                }
+                if (::storageSegmentedBar.isInitialized) {
+                    val neutralUsedColor = Color.parseColor("#636366")
+                    storageSegmentedBar.segments = listOf(
+                        StorageBarSegment(usage.usedFraction.toFloat(), neutralUsedColor),
+                    )
+                    storageBreakdownJob?.cancel()
+                    if (hasAnyMediaPermission()) {
+                        storageBreakdownJob = lifecycleScope.launch {
+                            val breakdown = runCatching {
+                                AndroidMediaBreakdownReader.read(this@MainActivity)
+                            }.getOrNull() ?: return@launch
+                            if (!breakdown.hasAnyBreakdown) return@launch
+                            val totalBytes = usage.totalBytes.coerceAtLeast(1L).toDouble()
+                            val pFrac = (breakdown.photosBytes / totalBytes).toFloat().coerceIn(0f, 1f)
+                            val vFrac = (breakdown.videosBytes / totalBytes).toFloat().coerceIn(0f, 1f)
+                            val aFrac = (breakdown.audioBytes / totalBytes).toFloat().coerceIn(0f, 1f)
+                            val mediaSum = breakdown.totalAccessibleMediaBytes
+                            val otherBytes = (usage.usedBytes - mediaSum).coerceAtLeast(0L)
+                            val oFrac = (otherBytes / totalBytes).toFloat().coerceIn(0f, 1f)
+                            storageSegmentedBar.segments = listOf(
+                                StorageBarSegment(pFrac, color(R.color.google_blue_primary)),
+                                StorageBarSegment(vFrac, color(R.color.sweep_success)),
+                                StorageBarSegment(aFrac, Color.parseColor("#BF5AF2")),
+                                StorageBarSegment(oFrac, neutralUsedColor),
+                            )
+                            if (::storageBreakdownLegend.isInitialized) {
+                                val pFmt = if (breakdown.photosAccessible) Formatter.formatShortFileSize(this@MainActivity, breakdown.photosBytes) else "—"
+                                val vFmt = if (breakdown.videosAccessible) Formatter.formatShortFileSize(this@MainActivity, breakdown.videosBytes) else "—"
+                                val aFmt = if (breakdown.audioAccessible) Formatter.formatShortFileSize(this@MainActivity, breakdown.audioBytes) else "—"
+                                storageBreakdownLegend.text = getString(R.string.storage_legend_summary, pFmt, vFmt, aFmt)
+                                storageBreakdownLegend.visibility = View.VISIBLE
+                            }
+                        }
+                    } else if (::storageBreakdownLegend.isInitialized) {
+                        storageBreakdownLegend.visibility = View.GONE
+                    }
                 }
             }
         }.onFailure {

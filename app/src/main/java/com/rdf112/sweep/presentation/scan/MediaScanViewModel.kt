@@ -221,6 +221,7 @@ class MediaScanViewModel(
             DesiredOutcomeMission.FREE_MAX_SPACE_NOW -> SmartFilterMode.LARGE_FILES_10MB
             DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> SmartFilterMode.SAME_SIZE_CANDIDATES
             DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D -> SmartFilterMode.OLDER_THAN_30_DAYS
+            DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D -> SmartFilterMode.SCREENSHOTS_30D
         }
         val plan = OutcomeServiceEngine.buildAutomatedOutcomePlan(
             mission = mission,
@@ -420,6 +421,15 @@ class MediaScanViewModel(
                                         }
                                     }
                                 }
+                                DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D -> {
+                                    if (SmartMediaGroupingPolicy.isOldScreenshot(record, nowEpochSeconds)) {
+                                        rankedCandidates += record
+                                        if (rankedCandidates.size > 500) {
+                                            rankedCandidates.sortByDescending { it.sizeBytes }
+                                            rankedCandidates.removeAt(rankedCandidates.lastIndex)
+                                        }
+                                    }
+                                }
                                 DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> {
                                     if (record.sizeBytes <= 0L) continue
                                     val duplicateBucket = duplicateGroups[record.sizeBytes]
@@ -494,7 +504,8 @@ class MediaScanViewModel(
 
                 val missionRecords = when (mission) {
                     DesiredOutcomeMission.FREE_MAX_SPACE_NOW,
-                    DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D -> rankedCandidates
+                    DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D,
+                    DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D -> rankedCandidates
                     DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> {
                         val groups = duplicateGroups.values
                         val candidateRows = groups.sumOf { it.size }
@@ -613,6 +624,7 @@ class MediaScanViewModel(
                         DesiredOutcomeMission.FREE_MAX_SPACE_NOW -> SmartFilterMode.LARGE_FILES_10MB
                         DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> SmartFilterMode.SAME_SIZE_CANDIDATES
                         DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D -> SmartFilterMode.OLDER_THAN_30_DAYS
+                        DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D -> SmartFilterMode.SCREENSHOTS_30D
                     },
                     selection = nextLedger,
                     message = null,

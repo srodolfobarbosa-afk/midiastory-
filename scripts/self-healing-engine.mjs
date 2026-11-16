@@ -14,33 +14,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { getSupabaseToken } from "./lib/supabase-auth.mjs";
+import { saveValidatedMemory } from "./lib/cognitive-memory.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 const codexPath = "C:\\Users\\rodolfo\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe";
-const supabaseRef = "usmqtnlsaavxqguwrtix";
-const supabaseToken = getSupabaseToken();
-
-async function runSql(query) {
-  const res = await fetch(`https://api.supabase.com/v1/projects/${supabaseRef}/database/query`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${supabaseToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query }),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-  return res.json();
-}
 
 async function recordMemory(lesson) {
-  const escaped = lesson.replace(/'/g, "''");
-  await runSql(`
-    INSERT INTO public.memories (content)
-    VALUES ('[Self-Healing] ${escaped}');
-  `);
+  await saveValidatedMemory({
+    content: `[Self-Healing] ${lesson}`,
+    origem: "self_healing_engine",
+    categoria: "procedural",
+    confianca: 0.9,
+    allowSpeculative: true,
+  });
 }
 
 function runVerificationCommand(cmd) {

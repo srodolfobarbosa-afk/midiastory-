@@ -44,6 +44,8 @@ data class MediaRecord(
     val contentSha256: String? = null,
     /** Exact original retained when this record is proven to be a duplicate. */
     val duplicateReferenceSnapshot: DuplicateReferenceSnapshot? = null,
+    /** Normalized MediaStore RELATIVE_PATH (API 29+) when exposed by the provider. */
+    val relativePath: String? = null,
 ) {
     init {
         require(uri.startsWith("content://")) { "uri must use the content:// scheme" }

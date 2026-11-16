@@ -15,7 +15,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { execSync } from "node:child_process";
+import { execSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import {
   RODOLFO_BRAIN_SYSTEM_PROMPT,
@@ -23,7 +23,7 @@ import {
   buildCodexPromptWithPersona,
   buildRodolfoBrainSystemPrompt,
 } from "./lib/rodolfo-brain-persona.mjs";
-import { learnFromInteraction } from "./lib/cognitive-memory.mjs";
+import { analyzeAndLearnTurn, learnFromInteraction } from "./lib/cognitive-memory.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -97,14 +97,15 @@ const MODEL_CASCADE = [
   { id: "google/gemini-3.1-flash-lite", name: "Gemini 3.1 Flash-Lite" },
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
 
-  // 2. Modelos Gratuitos Validados no OpenRouter (Custo Zero, Sem 402, Imunes ao Bloqueio de 156h Google)
+  // 2. Modelos Gratuitos Validados no OpenRouter (Custo Zero, Sem 402)
+  { id: "nvidia/nemotron-3.5-lightning:free", name: "NVIDIA Nemotron 3.5 Lightning (Free)" },
+  { id: "openrouter/free", name: "OpenRouter Free Auto-Router" },
+  { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 31B (Free)" },
   { id: "nvidia/nemotron-3-ultra-550b-a55b:free", name: "NVIDIA Nemotron 3 Ultra 550B (Free)" },
   { id: "nvidia/nemotron-3.5-super-vl:free", name: "NVIDIA Nemotron 3.5 Super VL (Free)" },
   { id: "cohere/north-mini-code:free", name: "Cohere North Mini Code (Free)" },
-  { id: "nvidia/nemotron-3.5-lightning:free", name: "NVIDIA Nemotron 3.5 Lightning (Free)" },
   { id: "baidu/ernie-5.5-flash-preview:free", name: "Baidu ERNIE 5.5 Flash (Free)" },
   { id: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", name: "NVIDIA Nemotron 3 Nano Omni (Free)" },
-  { id: "google/gemma-4-31b-it:free", name: "Google Gemma 4 31B (Free)" },
 ];
 
 const GITHUB_MODELS_CASCADE = [
@@ -222,7 +223,30 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
   return data.choices?.[0]?.message?.content || "";
 }
 
-function callCodexLocal(prompt) {
+let cachedOpenRouterHasCredit = null;
+async function hasOpenRouterPaidCredits() {
+  if (cachedOpenRouterHasCredit !== null) return cachedOpenRouterHasCredit;
+  if (!openRouterKey) {
+    cachedOpenRouterHasCredit = false;
+    return false;
+  }
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/credits", {
+      headers: { Authorization: `Bearer ${openRouterKey}` },
+      signal: AbortSignal.timeout(2500),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const remaining = Number(data?.data?.total_credits || 0) - Number(data?.data?.total_usage || 0);
+      cachedOpenRouterHasCredit = remaining > 0.005;
+      return cachedOpenRouterHasCredit;
+    }
+  } catch {}
+  cachedOpenRouterHasCredit = false;
+  return false;
+}
+
+function callCodexLocal(prompt, systemPrompt = null) {
   let bin = codexPath;
   if (!fs.existsSync(bin)) {
     try {
@@ -235,11 +259,17 @@ function callCodexLocal(prompt) {
     throw new Error(`Codex CLI não encontrado no ambiente (${process.platform})`);
   }
   console.log("⚡ Executando via OpenAI Codex CLI Local (Zero dependência de quota externa)...");
-  const cleanPrompt = buildCodexPromptWithPersona(prompt).replace(/"/g, '\\"');
-  return execSync(
-    `"${bin}" exec --cd "${projectRoot}" --dangerously-bypass-approvals-and-sandbox "${cleanPrompt}"`,
-    { encoding: "utf8", maxBuffer: 10 * 1024 * 1024 }
+  const fullPrompt = buildCodexPromptWithPersona(prompt, systemPrompt);
+  const res = spawnSync(
+    bin,
+    ["exec", "--cd", projectRoot, "--dangerously-bypass-approvals-and-sandbox", "-"],
+    { input: fullPrompt, encoding: "utf8", timeout: 30000, maxBuffer: 10 * 1024 * 1024 }
   );
+  if (res.error) throw res.error;
+  if (res.status !== 0 && !res.stdout) {
+    throw new Error(`Codex CLI saiu com código ${res.status}: ${(res.stderr || "").slice(0, 200)}`);
+  }
+  return (res.stdout || "").trim();
 }
 
 export async function executeWithFailover(prompt, options = {}) {
@@ -259,13 +289,24 @@ export async function executeWithFailover(prompt, options = {}) {
 
   async function finalizeResult(result) {
     if (options.autoLearn && result?.content) {
-      await learnFromInteraction({
-        question: prompt,
-        answer: result.content,
-        modelUsed: result.source,
-        sessionId,
-        extractedFacts: options.extractedFacts || [],
-      });
+      if ((options.extractedFacts && options.extractedFacts.length > 0) || options.userCorrection) {
+        await learnFromInteraction({
+          question: prompt,
+          answer: result.content,
+          modelUsed: result.source,
+          sessionId,
+          userCorrection: options.userCorrection || null,
+          extractedFacts: options.extractedFacts || [],
+        });
+      } else {
+        await analyzeAndLearnTurn({
+          question: prompt,
+          answer: result.content,
+          modelUsed: result.source,
+          sessionId,
+          origem: "failover_router_auto_learn",
+        });
+      }
     }
     return result;
   }
@@ -312,9 +353,17 @@ export async function executeWithFailover(prompt, options = {}) {
   let lastError = null;
 
   if (openRouterKey && (!forceProvider || forceProvider === "openrouter")) {
-    for (let i = 0; i < MODEL_CASCADE.length; i++) {
-      const model = MODEL_CASCADE[i];
-      console.log(`[Rota ${i + 1}/${MODEL_CASCADE.length}] Testando modelo: ${model.name} (${model.id})...`);
+    const paidAllowed = await hasOpenRouterPaidCredits();
+    const baseCascade = paidAllowed
+      ? MODEL_CASCADE
+      : MODEL_CASCADE.filter((m) => m.id.endsWith(":free") || m.id === "openrouter/free");
+    const orCascade =
+      forceProvider === "openrouter" && forceModel
+        ? [{ id: forceModel, name: forceModel }, ...baseCascade.filter((m) => m.id !== forceModel)]
+        : baseCascade;
+    for (let i = 0; i < orCascade.length; i++) {
+      const model = orCascade[i];
+      console.log(`[Rota ${i + 1}/${orCascade.length}] Testando modelo: ${model.name} (${model.id})...`);
       try {
         const reasoningEffort = options.reasoningEffort || (isCode ? "high" : "medium");
         const response = await callOpenRouter(model.id, prompt, maxTokens, reasoningEffort, responseFormatJson, systemPrompt);
@@ -330,13 +379,13 @@ export async function executeWithFailover(prompt, options = {}) {
     }
   }
 
-  if (forceProvider) {
+  if (forceProvider && forceProvider !== "codex_local") {
     throw new Error(`Provedor forçado '${forceProvider}' falhou ou está indisponível.`);
   }
 
   console.warn("⚠️ Todas as rotas de API remota esgotaram cota ou falharam. Acionando Fallback Local para o Codex CLI...");
   try {
-    const localOutput = callCodexLocal(prompt);
+    const localOutput = callCodexLocal(prompt, systemPrompt);
     console.log("✅ Sucesso no Fallback Local com Codex CLI!");
     return finalizeResult({ source: "local_codex", content: localOutput });
   } catch (codexErr) {

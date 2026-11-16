@@ -1,5 +1,6 @@
 package com.rdf112.sweep.domain.grouping
 
+import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaRecord
 import com.rdf112.sweep.domain.model.DuplicateReferenceSnapshot
 
@@ -8,6 +9,7 @@ enum class SmartFilterMode {
     LARGE_FILES_10MB,
     SAME_SIZE_CANDIDATES,
     OLDER_THAN_30_DAYS,
+    SCREENSHOTS_30D,
 }
 
 /**
@@ -17,7 +19,7 @@ enum class SmartFilterMode {
  *    - Se os arquivos tiverem contentSha256 preenchido, exige igualdade de (sizeBytes, contentSha256.lowercase()).
  *      Arquivos de mesmo tamanho mas hash diferente (falso positivo) NUNCA são classificados como duplicados.
  *    - Protege automaticamente 1 referência original por grupo confirmado (isProtected = true, isSelectable = false).
- * 3. Filtra mídias antigas (>= 30 dias).
+ * 3. Filtra mídias antigas (>= 30 dias) e capturas de tela antigas (>= 30 dias).
  */
 object SmartMediaGroupingPolicy {
     const val LARGE_FILE_THRESHOLD_BYTES: Long = 10L * 1024L * 1024L // 10 MB
@@ -33,12 +35,41 @@ object SmartMediaGroupingPolicy {
             .sortedByDescending { it.sizeBytes }
         SmartFilterMode.SAME_SIZE_CANDIDATES -> markProtectedReferencesForSameSizeGroups(records)
         SmartFilterMode.OLDER_THAN_30_DAYS -> {
-            val cutoff = (nowEpochSeconds - THIRTY_DAYS_SECONDS).coerceAtLeast(0L)
-            records.filter { record ->
-                val mod = record.dateModifiedEpochSeconds
-                mod != null && mod in 1..cutoff
-            }
+            val cutoff = olderThan30DaysCutoff(nowEpochSeconds)
+            records.filter { isModifiedOnOrBefore(it, cutoff) }
         }
+        SmartFilterMode.SCREENSHOTS_30D -> {
+            val cutoff = olderThan30DaysCutoff(nowEpochSeconds)
+            records.filter { isScreenshot(it) && isModifiedOnOrBefore(it, cutoff) }
+                .sortedByDescending { it.sizeBytes }
+        }
+    }
+
+    fun isScreenshot(record: MediaRecord): Boolean {
+        if (record.kind != MediaKind.IMAGE) return false
+        val normalizedPath = record.relativePath
+            ?.replace('\\', '/')
+            ?.lowercase()
+            .orEmpty()
+        if (normalizedPath.contains("screenshots") || normalizedPath.contains("capturas")) {
+            return true
+        }
+        val name = record.displayName?.trim()?.lowercase().orEmpty()
+        return name.startsWith("screenshot") ||
+            name.startsWith("captura") ||
+            name.contains("screenshot_") ||
+            name.contains("screenshot-")
+    }
+
+    fun isOldScreenshot(record: MediaRecord, nowEpochSeconds: Long): Boolean =
+        isScreenshot(record) && isModifiedOnOrBefore(record, olderThan30DaysCutoff(nowEpochSeconds))
+
+    private fun olderThan30DaysCutoff(nowEpochSeconds: Long): Long =
+        (nowEpochSeconds - THIRTY_DAYS_SECONDS).coerceAtLeast(0L)
+
+    private fun isModifiedOnOrBefore(record: MediaRecord, cutoffEpochSeconds: Long): Boolean {
+        val mod = record.dateModifiedEpochSeconds
+        return mod != null && mod in 1..cutoffEpochSeconds
     }
 
     /**

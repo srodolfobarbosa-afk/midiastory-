@@ -80,4 +80,55 @@ class SmartMediaGroupingPolicyTest {
         assertTrue(confirmed.isEmpty())
     }
 
+    @Test
+    fun filtersOldScreenshotsOlderThan30DaysOnlyForImages() {
+        val now = 40L * 24L * 3600L
+        val oldShotByPath = MediaRecord(
+            uri = "content://media/external_primary/images/media/101",
+            volumeName = "external_primary",
+            kind = MediaKind.IMAGE,
+            displayName = "IMG_20260101.png",
+            mimeType = "image/png",
+            sizeBytes = 2L * 1024L * 1024L,
+            dateModifiedEpochSeconds = 5L * 24L * 3600L,
+            relativePath = "Pictures/Screenshots/",
+        )
+        val recentShotByName = MediaRecord(
+            uri = "content://media/external_primary/images/media/102",
+            volumeName = "external_primary",
+            kind = MediaKind.IMAGE,
+            displayName = "Screenshot_20261115.png",
+            mimeType = "image/png",
+            sizeBytes = 1L * 1024L * 1024L,
+            dateModifiedEpochSeconds = now - 3600L,
+            relativePath = "DCIM/Screenshots/",
+        )
+        val oldCameraPhoto = MediaRecord(
+            uri = "content://media/external_primary/images/media/103",
+            volumeName = "external_primary",
+            kind = MediaKind.IMAGE,
+            displayName = "IMG_CAMERA_001.jpg",
+            mimeType = "image/jpeg",
+            sizeBytes = 4L * 1024L * 1024L,
+            dateModifiedEpochSeconds = 5L * 24L * 3600L,
+            relativePath = "DCIM/Camera/",
+        )
+        val oldVideoNamedScreenshot = MediaRecord(
+            uri = "content://media/external_primary/video/media/104",
+            volumeName = "external_primary",
+            kind = MediaKind.VIDEO,
+            displayName = "Screenshot_screen_record.mp4",
+            mimeType = "video/mp4",
+            sizeBytes = 9L * 1024L * 1024L,
+            dateModifiedEpochSeconds = 5L * 24L * 3600L,
+            relativePath = "Movies/Screenshots/",
+        )
+
+        val filtered = SmartMediaGroupingPolicy.applyFilter(
+            listOf(oldShotByPath, recentShotByName, oldCameraPhoto, oldVideoNamedScreenshot),
+            SmartFilterMode.SCREENSHOTS_30D,
+            now,
+        )
+        assertEquals(listOf(oldShotByPath.uri), filtered.map { it.uri })
+    }
 }
