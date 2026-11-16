@@ -2470,3 +2470,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #308
 
 ---
+
+### 📍 [16/11/2026, 01:24:42] Construcao da v2.6.0 Padrao Apple Dark OLED e Escudo de Protecao Familiar
+- **📖 Estudou / Leu:** CleanMyPhone MacPaw UX Design Awards, Apple HIG, eliminacao de neons no dark mode e psicologia de alivio de ansiedade de delecao para familias
+- **⚙️ Tentou / Executou:** Refatoracao completa de colors.xml, ModernDashboardWidgets.kt, MainActivity.kt com Escudo de Protecao Familiar e grade 2x2 com ripple e sem botoes espremidos
+- **⚠️ Erros Encontrados:** Uso previo de 6 neons conflitantes, textos espremidos em cards 2x2 no Moto G84 e strings de limpeza hardcoded em portugues
+- **🔧 Como Corrigiu:** Substituicao por Preto OLED puro (#000000), cinzas nobres Apple (#1C1C1E e #2C2C2E), azul nobre (#0A84FF), Escudo de Protecao de Memorias de Familia e internacionalizacao completa de strings
+- **🎯 Conclusão:** Versao 2.6.0 (vc 23) construida com acabamento maduro e profissional, submetida ao CI de GitHub Actions para geracao de release
+- *Registro Supabase:* Memory #309
+
+---
