@@ -650,22 +650,22 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(8), dp(4), dp(8), dp(6))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }.apply {
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_delete)
+            icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_apple_clean)
             iconGravity = MaterialButton.ICON_GRAVITY_TOP
-            iconSize = dp(20)
-            iconPadding = dp(2)
+            iconSize = dp(22)
+            iconPadding = dp(3)
         }
         navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }.apply {
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_gallery)
+            icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_apple_files)
             iconGravity = MaterialButton.ICON_GRAVITY_TOP
-            iconSize = dp(20)
-            iconPadding = dp(2)
+            iconSize = dp(22)
+            iconPadding = dp(3)
         }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }.apply {
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.btn_star_big_off)
+            icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_apple_pro)
             iconGravity = MaterialButton.ICON_GRAVITY_TOP
-            iconSize = dp(20)
-            iconPadding = dp(2)
+            iconSize = dp(22)
+            iconPadding = dp(3)
         }
         navNewsBtn = navTabButton("") {}.apply { visibility = View.GONE }
         navGamesBtn = navTabButton("") {}.apply { visibility = View.GONE }
@@ -1150,13 +1150,13 @@ class MainActivity : AppCompatActivity() {
 
         val row1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val waCell = buildGridCell(
-            iconRes = android.R.drawable.stat_notify_chat,
+            iconRes = R.drawable.ic_apple_whatsapp,
             title = getString(R.string.quick_clean_whatsapp_title),
             description = getString(R.string.quick_clean_whatsapp_desc),
             onClick = { openWhatsAppCleanerFlow() }
         )
         val dupCell = buildGridCell(
-            iconRes = android.R.drawable.ic_menu_agenda,
+            iconRes = R.drawable.ic_apple_duplicates,
             title = getString(R.string.quick_clean_duplicates_title),
             description = getString(R.string.quick_clean_duplicates_desc),
             onClick = {
@@ -1170,7 +1170,7 @@ class MainActivity : AppCompatActivity() {
 
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val largeCell = buildGridCell(
-            iconRes = android.R.drawable.ic_media_play,
+            iconRes = R.drawable.ic_apple_large_video,
             title = getString(R.string.quick_clean_large_title),
             description = getString(R.string.quick_clean_large_desc),
             onClick = {
@@ -1179,7 +1179,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
         val oldCell = buildGridCell(
-            iconRes = android.R.drawable.ic_menu_recent_history,
+            iconRes = R.drawable.ic_apple_old_photos,
             title = getString(R.string.quick_clean_old_title),
             description = getString(R.string.quick_clean_old_desc),
             onClick = {
@@ -1197,48 +1197,76 @@ class MainActivity : AppCompatActivity() {
     private fun buildFilesExplorerSection(): LinearLayout = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
 
-        val controls = card()
-        controls.addView(label(getString(R.string.media_kind_title), 11f, R.color.sweep_primary_glow, true), bottom(8))
-        val typeRow = LinearLayout(this@MainActivity).apply {
+        // 1. Controle Segmentado Limpo (Fotos | Vídeos | Áudios)
+        val segmentedBar = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            background = borderedPill(color(R.color.sweep_surface), color(R.color.sweep_surface_alt), dp(14), dp(1))
+            setPadding(dp(4), dp(4), dp(4), dp(4))
+        }
+        photosButton = button(getString(R.string.photos_tab)) { viewModel.selectKind(MediaKind.IMAGE) }.apply {
+            minHeight = dp(38)
+            cornerRadius = dp(10)
+            textSize = 12.5f
+        }
+        videosButton = button(getString(R.string.videos_tab)) { viewModel.selectKind(MediaKind.VIDEO) }.apply {
+            minHeight = dp(38)
+            cornerRadius = dp(10)
+            textSize = 12.5f
+        }
+        audioButton = button(getString(R.string.audio_tab)) { viewModel.selectKind(MediaKind.AUDIO) }.apply {
+            minHeight = dp(38)
+            cornerRadius = dp(10)
+            textSize = 12.5f
+        }
+        segmentedBar.addView(photosButton, LinearLayout.LayoutParams(0, dp(38), 1f))
+        segmentedBar.addView(videosButton, LinearLayout.LayoutParams(0, dp(38), 1f))
+        segmentedBar.addView(audioButton, LinearLayout.LayoutParams(0, dp(38), 1f))
+        addView(segmentedBar, bottom(10))
+
+        // 2. Pílulas Horizontais de Filtro (Todos | Grandes | Duplicatas | Antigos)
+        val filterScroll = HorizontalScrollView(this@MainActivity).apply {
+            isHorizontalScrollBarEnabled = false
+            clipToPadding = false
+        }
+        val filterRow = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        photosButton = button(getString(R.string.photos_tab)) { viewModel.selectKind(MediaKind.IMAGE) }
-        videosButton = button(getString(R.string.videos_tab)) { viewModel.selectKind(MediaKind.VIDEO) }
-        audioButton = button(getString(R.string.audio_tab)) { viewModel.selectKind(MediaKind.AUDIO) }
-        typeRow.addView(photosButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
-        typeRow.addView(videosButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4); marginEnd = dp(4) })
-        typeRow.addView(audioButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(4) })
-        controls.addView(typeRow, bottom(12))
-
-        controls.addView(label(getString(R.string.smart_filter_title), 11f, R.color.sweep_primary_glow, true), bottom(6))
-        val filterRow1 = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+        filterAllButton = button(getString(R.string.filter_all)) { viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS) }.apply {
+            minHeight = dp(36)
+            cornerRadius = dp(18)
+            textSize = 12f
+            setPadding(dp(14), dp(4), dp(14), dp(4))
         }
-        filterAllButton = button(getString(R.string.filter_all)) { viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS) }.apply { minHeight = dp(52) }
-        filterLargeButton = button(getString(R.string.filter_large_10mb)) { viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB) }.apply { minHeight = dp(52) }
-        filterRow1.addView(filterAllButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-        filterRow1.addView(filterLargeButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
-        controls.addView(filterRow1, bottom(6))
-
-        val filterRow2 = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+        filterLargeButton = button(getString(R.string.filter_large_10mb)) { viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB) }.apply {
+            minHeight = dp(36)
+            cornerRadius = dp(18)
+            textSize = 12f
+            setPadding(dp(14), dp(4), dp(14), dp(4))
         }
-        filterDuplicatesButton = button(getString(R.string.filter_same_size)) {
-            viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES)
-        }.apply { minHeight = dp(52) }
-        filterOldButton = button(getString(R.string.filter_older_30d)) {
-            viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS)
-        }.apply { minHeight = dp(52) }
-        filterRow2.addView(filterDuplicatesButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
-        filterRow2.addView(filterOldButton, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
-        controls.addView(filterRow2, bottom(12))
+        filterDuplicatesButton = button(getString(R.string.filter_same_size)) { viewModel.selectSmartFilter(SmartFilterMode.SAME_SIZE_CANDIDATES) }.apply {
+            minHeight = dp(36)
+            cornerRadius = dp(18)
+            textSize = 12f
+            setPadding(dp(14), dp(4), dp(14), dp(4))
+        }
+        filterOldButton = button(getString(R.string.filter_older_30d)) { viewModel.selectSmartFilter(SmartFilterMode.OLDER_THAN_30_DAYS) }.apply {
+            minHeight = dp(36)
+            cornerRadius = dp(18)
+            textSize = 12f
+            setPadding(dp(14), dp(4), dp(14), dp(4))
+        }
+        filterRow.addView(filterAllButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
+        filterRow.addView(filterLargeButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
+        filterRow.addView(filterDuplicatesButton, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
+        filterRow.addView(filterOldButton, LinearLayout.LayoutParams(-2, -2))
+        filterScroll.addView(filterRow)
+        addView(filterScroll, bottom(12))
 
-        controls.addView(label(getString(R.string.volume_title), 11f, R.color.sweep_muted, true), bottom(4))
         volumeSpinner = Spinner(this@MainActivity).apply {
             contentDescription = getString(R.string.volume_title)
+            visibility = View.GONE
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -1248,57 +1276,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        controls.addView(volumeSpinner, LinearLayout.LayoutParams(-1, dp(48)))
+        addView(volumeSpinner)
+
         filesPermissionButton = button(getString(R.string.permission_continue)) {
             requestMediaPermissions()
         }.apply {
             visibility = View.GONE
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            setTextColor(Color.WHITE)
         }
-        controls.addView(filesPermissionButton, top(8))
-        addView(wrap(controls), bottom(14))
+        addView(filesPermissionButton, bottom(10))
 
-        val reviewCard = card()
-        reviewCard.addView(label(getString(R.string.review_title), 11f, R.color.sweep_primary_glow, true))
-        reviewCard.addView(label(getString(R.string.space_accounting_title), 11f, R.color.sweep_primary_glow, true), top(8))
-        spaceMetricsText = label(
-            getString(R.string.space_metrics_summary, "0 B", "0 B", "0 B", "0 B"),
-            11f,
-            R.color.sweep_muted,
-            false,
-        )
-        reviewCard.addView(spaceMetricsText, top(4))
-        selectionSummary = label(getString(R.string.nothing_selected), 15f, R.color.sweep_text, true)
-        reviewCard.addView(selectionSummary, top(8))
-        reviewCard.addView(label(getString(R.string.review_readonly_note), 12f, R.color.sweep_muted, false), top(6))
-        selectedContainer = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        reviewCard.addView(selectedContainer, top(8))
-
-        moveToTrashButton = button(getString(R.string.move_to_trash_button)) { requestMoveSelectedToTrash() }.apply {
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
-        }
-        reviewCard.addView(moveToTrashButton, top(10))
-
-        permanentDeleteButton = button(getString(R.string.permanent_delete_button)) { requestPermanentDeleteSelected() }
-        reviewCard.addView(permanentDeleteButton, top(8))
-
-        restoreTrashButton = button(getString(R.string.restore_trash_button, 0)) { requestRestoreFromTrash() }
-        reviewCard.addView(restoreTrashButton, top(8))
-
-        exportSelectionButton = button(getString(R.string.export_review_summary)) { exportOrUnlockProSummary() }
-        reviewCard.addView(exportSelectionButton, top(8))
-
-        clearSelectionButton = button(getString(R.string.clear_review)) { viewModel.clearSelection() }
-        reviewCard.addView(clearSelectionButton, top(8))
-        filesReviewCard = wrap(reviewCard)
-        addView(filesReviewCard, bottom(14))
-
+        // 3. Lista de Arquivos (Logo no topo para revisão rápida)
         val resultsCard = card()
-        resultsCard.addView(label(getString(R.string.results_title), 11f, R.color.sweep_primary_glow, true))
-        pageLabel = label(getString(R.string.not_scanned), 16f, R.color.sweep_text, true)
-        resultsCard.addView(pageLabel, top(8))
+        pageLabel = label(getString(R.string.not_scanned), 15f, R.color.sweep_text, true)
+        resultsCard.addView(pageLabel)
         resultSummary = label(getString(R.string.page_results_hint), 12f, R.color.sweep_muted, false)
-        resultsCard.addView(resultSummary, top(6))
+        resultsCard.addView(resultSummary, top(4))
         selectAllPageButton = button(getString(R.string.select_all_page_button, 0)) {
             val eligible = lastFilteredPageRecords.filter { it.isSelectable && !it.isProtected }
             if (eligible.isNotEmpty()) {
@@ -1328,13 +1322,47 @@ class MainActivity : AppCompatActivity() {
         }
         previousButton = button(getString(R.string.previous_page)) { viewModel.loadPreviousPage() }
         nextButton = button(getString(R.string.next_page)) { viewModel.loadNextPage() }.apply {
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
-        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(6) })
-        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginStart = dp(6) })
+        navigation.addView(previousButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginEnd = dp(6) })
+        navigation.addView(nextButton, LinearLayout.LayoutParams(0, dp(46), 1f).apply { marginStart = dp(6) })
         resultsCard.addView(navigation, top(12))
         addView(wrap(resultsCard), bottom(14))
+
+        // 4. Painel de Ação Segura (Lixeira & Exclusão)
+        val reviewCard = card()
+        selectionSummary = label(getString(R.string.nothing_selected), 15f, R.color.sweep_text, true)
+        reviewCard.addView(selectionSummary)
+        spaceMetricsText = label(
+            getString(R.string.space_metrics_summary, "0 B", "0 B", "0 B", "0 B"),
+            11f,
+            R.color.sweep_muted,
+            false,
+        )
+        reviewCard.addView(spaceMetricsText, top(4))
+        selectedContainer = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+        reviewCard.addView(selectedContainer, top(6))
+
+        moveToTrashButton = button(getString(R.string.move_to_trash_button)) { requestMoveSelectedToTrash() }.apply {
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        reviewCard.addView(moveToTrashButton, top(10))
+
+        permanentDeleteButton = button(getString(R.string.permanent_delete_button)) { requestPermanentDeleteSelected() }
+        reviewCard.addView(permanentDeleteButton, top(8))
+
+        restoreTrashButton = button(getString(R.string.restore_trash_button, 0)) { requestRestoreFromTrash() }
+        reviewCard.addView(restoreTrashButton, top(8))
+
+        exportSelectionButton = button(getString(R.string.export_review_summary)) { exportOrUnlockProSummary() }
+        reviewCard.addView(exportSelectionButton, top(8))
+
+        clearSelectionButton = button(getString(R.string.clear_review)) { viewModel.clearSelection() }
+        reviewCard.addView(clearSelectionButton, top(8))
+        filesReviewCard = wrap(reviewCard)
+        addView(filesReviewCard, bottom(14))
     }
 
     private fun buildOaasMissionsSection(): LinearLayout = LinearLayout(this).apply {
@@ -1503,7 +1531,12 @@ class MainActivity : AppCompatActivity() {
         addView(proStatusBadge, top(4))
         addView(label(getString(R.string.pro_card_subtitle), 13.5f, R.color.sweep_muted, false), top(6))
 
-        // Cartão limpo com 3 benefícios diretos (sem paredes de texto)
+        // Cartão 1: Plano Grátis Completo (Muitos benefícios liberados para todos)
+        val freeIncludedCard = card()
+        freeIncludedCard.addView(label(getString(R.string.pro_free_included), 13f, R.color.sweep_text, false))
+        addView(wrap(freeIncludedCard), top(12))
+
+        // Cartão 2: Benefícios Extras dos 3 Planos Pro
         val benefitsCard = card()
         val benefits = listOf(
             getString(R.string.pro_unused_apps_button),
@@ -1516,14 +1549,14 @@ class MainActivity : AppCompatActivity() {
                 gravity = Gravity.CENTER_VERTICAL
             }
             val checkIcon = ImageView(this@MainActivity).apply {
-                setImageResource(android.R.drawable.checkbox_on_background)
+                setImageResource(R.drawable.ic_apple_check)
                 setColorFilter(color(R.color.google_blue_primary))
             }
             row.addView(checkIcon, LinearLayout.LayoutParams(dp(18), dp(18)).apply { marginEnd = dp(10) })
             row.addView(label(lineText, 13.5f, R.color.sweep_text, false), LinearLayout.LayoutParams(0, -2, 1f))
             benefitsCard.addView(row, top(if (idx == 0) 0 else 10))
         }
-        addView(wrap(benefitsCard), top(16))
+        addView(wrap(benefitsCard), top(12))
 
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
