@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 
 const keyPath = ".secrets/play-service-account.json";
 const packageName = "com.rdf112.midiastore";
-const versionCode = process.argv[2] || "20";
+const versionCode = process.argv[2] || "27";
 const targetTrack = process.argv[3] || "production";
 const releaseStatus = process.argv[4] || "completed";
 
@@ -72,18 +72,18 @@ async function main() {
         track: targetTrack,
         releases: [
           {
-            name: `2.6.0 (${versionCode})`,
+            name: `2.7.2 (${versionCode})`,
             versionCodes: [String(versionCode)],
             status: releaseStatus,
             releaseNotes: [
-              { language: "pt-BR", text: "v2.6.0: Padrão Apple Dark OLED, Escudo de Proteção Familiar com blindagem de fotos favoritas, grade rápida com toque suave sem poluição visual, anel de armazenamento ultra nítido e foco total em segurança e tranquilidade para toda a família." },
-              { language: "en-US", text: "v2.6.0: Apple Dark OLED design, Family Shield with favorite photos protection, polished non-cluttered quick-clean grid, ultra-sharp storage ring, and peace-of-mind cleanup for the whole family." },
-              { language: "es-ES", text: "v2.6.0: Diseño Apple Dark OLED, Escudo de Protección Familiar con resguardo de favoritos, cuadrícula de limpieza sin saturación, medidor de almacenamiento nítido y tranquilidad total para la familia." },
-              { language: "fr-FR", text: "v2.6.0 : Design Apple Dark OLED, Bouclier Familial protégeant les photos favorites, grille de nettoyage rapide épurée, jauge de stockage nette et sérénité absolue pour toute la famille." },
-              { language: "de-DE", text: "v2.6.0: Apple Dark OLED Design, Familienschutz-Schild zum Schutz von Favoriten, aufgeräumtes Schnellreinigungs-Raster, hochpräziser Speicherring und sichere Bereinigung für die ganze Familie." },
-              { language: "hi-IN", text: "v2.6.0: Apple Dark OLED डिज़ाइन, पसंदीदा फ़ोटो सुरक्षा के लिए पारिवारिक शील्ड, स्वच्छ और सरल त्वरित सफाई ग्रिड, स्पष्ट स्टोरेज रिंग और पूरे परिवार के लिए安心!" },
-              { language: "ja-JP", text: "v2.6.0：Apple基準のDark OLEDデザイン、お気に入り写真を保護するファミリーシールド、洗練されたクイック整理グリッド、見やすいストレージリングを搭載！" },
-              { language: "zh-CN", text: "v2.6.0：全新Apple级纯黑OLED设计、保护家人与收藏照片的安全盾牌、极简触控快捷清理网格与超高清存储环，让全家放心使用！" }
+              { language: "pt-BR", text: "v2.7.2: Novo visual Limpador Puro em Preto OLED, ícones vetoriais finos, abas limpas (Limpar, Arquivos, Pro), limpeza completa grátis (WhatsApp, Duplicatas, Grandes e Antigos) e 3 planos Pro." },
+              { language: "en-US", text: "v2.7.2: New Pure Cleaner OLED Dark UI, crisp vector icons, clean 3-tab navigation (Clean, Files, Pro), full free cleanup (WhatsApp, Duplicates, Large & Old), and 3 Pro plans." },
+              { language: "es-ES", text: "v2.7.2: Nuevo diseño Limpiador Puro OLED, íconos vectoriales nítidos, 3 pestañas limpias (Limpiar, Archivos, Pro), limpieza completa gratis y 3 planes Pro." },
+              { language: "fr-FR", text: "v2.7.2 : Nouveau design Pure Cleaner OLED, icônes vectorielles épurées, 3 onglets clairs (Nettoyer, Fichiers, Pro), nettoyage complet gratuit et 3 offres Pro." },
+              { language: "de-DE", text: "v2.7.2: Neues Pure-Cleaner-OLED-Design, klare Vektor-Icons, 3 übersichtliche Tabs (Bereinigen, Dateien, Pro), kostenlose Komplettreinigung und 3 Pro-Tarife." },
+              { language: "hi-IN", text: "v2.7.2: नया प्योर क्लीनर OLED डार्क डिज़ाइन, शार्प वेक्टर आइकन, 3 स्वच्छ टैब, पूरी तरह मुफ़्त क्लीनअप और 3 Pro प्लान।" },
+              { language: "ja-JP", text: "v2.7.2：洗練されたPure Cleaner OLEDデザイン、クリアなベクターアイコン、3つのシンプルなタブ、無料クリーンアップ機能と3つのProプラン。" },
+              { language: "zh-CN", text: "v2.7.2：全新纯净清理OLED深色界面、精致矢量图标、3个简洁标签页、完整免费清理功能及3个Pro方案。" }
             ],
           },
         ],

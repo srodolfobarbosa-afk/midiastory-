@@ -1540,8 +1540,8 @@ class MainActivity : AppCompatActivity() {
         val benefitsCard = card()
         val benefits = listOf(
             getString(R.string.pro_unused_apps_button),
-            getString(R.string.quick_clean_duplicates_title) + " • " + getString(R.string.quick_clean_duplicates_desc),
             getString(R.string.export_review_summary),
+            getString(R.string.pro_paid_included),
         )
         benefits.forEachIndexed { idx, lineText ->
             val row = LinearLayout(this@MainActivity).apply {
@@ -3789,8 +3789,8 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(58)
             textSize = 14f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#070B14"))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
         box.addView(annualBtn, top(14))
 
@@ -3800,8 +3800,8 @@ class MainActivity : AppCompatActivity() {
         }.apply {
             minHeight = dp(52)
             textSize = 13f
-            setTextColor(Color.parseColor("#070B14"))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         }
         box.addView(monthlyBtn, top(10))
 
@@ -3905,12 +3905,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun stylePlanPurchaseButton(button: MaterialButton, isProductAvailable: Boolean) {
         val purchasable = billingGateway.securePurchaseVerificationAvailable() && isProductAvailable
-        // Keep unavailable offers tappable so they can explain why checkout is not ready.
+        val isAnnual = ::planAnnualButton.isInitialized && button === planAnnualButton
         button.isEnabled = true
-        button.backgroundTintList = android.content.res.ColorStateList.valueOf(
-            color(if (purchasable) R.color.sweep_primary else R.color.sweep_surface_alt),
+        button.cornerRadius = dp(16)
+        button.minHeight = dp(58)
+        button.strokeWidth = dp(1)
+        button.strokeColor = android.content.res.ColorStateList.valueOf(
+            color(if (isAnnual) R.color.google_blue_primary else R.color.sweep_surface_alt),
         )
-        button.setTextColor(color(if (purchasable) R.color.sweep_background else R.color.sweep_muted))
+        button.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            color(if (purchasable && isAnnual) R.color.google_blue_primary else R.color.sweep_surface),
+        )
+        button.setTextColor(
+            if (purchasable && isAnnual) Color.WHITE else color(if (purchasable) R.color.sweep_text else R.color.sweep_muted),
+        )
     }
 
     private fun requestPlanPurchase(productId: String) {
@@ -4166,14 +4174,15 @@ class MainActivity : AppCompatActivity() {
             )
             row.setOnClickListener { box.isChecked = !box.isChecked }
             row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f))
-            val quickDeleteBtn = button("🗑") {
+            val quickDeleteBtn = button("×") {
                 reviewDialogRef?.dismiss()
                 requestPermanentDeleteSelected(listOf(record))
             }.apply {
                 minWidth = dp(44)
                 minHeight = dp(44)
+                textSize = 18f
                 setTextColor(color(R.color.sweep_danger))
-                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#22FF4444"))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#22FF453A"))
                 setPadding(dp(4), dp(4), dp(4), dp(4))
             }
             row.addView(quickDeleteBtn, LinearLayout.LayoutParams(dp(44), dp(44)).apply { marginStart = dp(4) })
