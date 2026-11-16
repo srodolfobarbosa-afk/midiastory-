@@ -2500,3 +2500,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #311
 
 ---
+
+### 📍 [16/11/2026, 02:08:43] Construção Completa da Gazeta com Dupla Perspectiva (Meu País vs Mundo), Curadoria Familiar e Netvasco UX
+- **📖 Estudou / Leu:** Decisão estratégica de não dividir ou limitar o app: permitir alternância instantânea entre notícias úteis do país do usuário e grandes descobertas cósmicas/históricas do mundo
+- **⚙️ Tentou / Executou:** Implementação do seletor de escopo no topo, duas edições ricas e dedicadas (COUNTRY_EDITION e WORLD_EDITION), chips de filtro dinâmicos e leitor TTS em voz alta
+- **⚠️ Erros Encontrados:** Risco de notícias puramente mundiais parecerem distantes ou notícias locais descambarem para sensacionalismo e crimes
+- **🔧 Como Corrigiu:** Curadoria blindada para famílias: Meu País foca em segurança de WhatsApp/celular, saúde e dicas diárias; Mundo foca em astronomia, arqueologia e inovações do planeta
+- **🎯 Conclusão:** A Gazeta agora é completa, agradável e de classe A; retém o usuário diariamente com conteúdo nobre sem meia-boca
+- *Registro Supabase:* Memory #312
+
+---
