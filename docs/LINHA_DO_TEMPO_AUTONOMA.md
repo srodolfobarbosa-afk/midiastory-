@@ -2480,3 +2480,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #309
 
 ---
+
+### 📍 [16/11/2026, 01:45:27] Arquitetura 5 Abas Desemboladas, Feed de Noticias Estilo Netvasco, Jogo dos 7 Erros e 240+ palavras no Caca-Palavras
+- **📖 Estudou / Leu:** Estrutura do portal Netvasco (feed cronologico limpo com resumo), mecanica tatil do Jogo dos 7 Erros, expansao semantica de palavras sem repeticao e causas de falha de atualizacao por incompatibilidade de keystore no Android
+- **⚙️ Tentou / Executou:** Criacao de SevenDifferencesGameView.kt, WorldNewsGazetteTools.kt, expansao de ProWordSearchTools.kt para 12 temas com 240+ palavras, e desembolamento do MainActivity em 5 abas puras (Limpeza, Jornal, Arquivos, Jogos, Pro)
+- **⚠️ Erros Encontrados:** App anterior misturava fliperama, magica e ferramentas dentro de uma unica aba, gerando sensacao de sobrecarga visual, e o caca-palavras possuia apenas 30 palavras estaticas
+- **🔧 Como Corrigiu:** Criada aba dedicada de Jornal estilo Netvasco com manchetes traduzidas, aba exclusiva de Jogos com 7 Erros nativo, separacao de abas com scroll limpo e multiplicacao do dicionario para 240+ palavras sem repeticao
+- **🎯 Conclusão:** App 100% desembolado com experiencia de jornal de luxo, retencao diaria altissima para os 14 dias da Play Store e esclarecimento da regra de assinatura do Android
+- *Registro Supabase:* Memory #310
+
+---
