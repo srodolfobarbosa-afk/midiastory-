@@ -2510,3 +2510,33 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #312
 
 ---
+
+### 📍 [16/11/2026, 03:24:35] Correcao Critica do Fundador: Planta Antes do Codigo e App 100% Limpador Puro (Sem Jogos, Sem Jornal, Sem Carnaval)
+- **📖 Estudou / Leu:** Feedback visual real no Moto G84 5G e correcao direta do fundador Rodolfo
+- **⚙️ Tentou / Executou:** Anteriormente foram adicionadas 5 abas, Jornal, Jogos, emojis coloridos e tema Pro marrom/amarelo/verde-neon
+- **⚠️ Erros Encontrados:** Poluicao visual, excesso de funcionalidades nao pedidas, carnaval de cores e construir codigo sem aprovar a planta visual primeiro
+- **🔧 Como Corrigiu:** Criada a planta limpa (planta-limpador-puro.md): remover jogos, jornal, estudio, emojis e cores berrantes; manter apenas Limpar, Arquivos e Pro em Preto OLED (#000000), Grafite (#1C1C1E) e Azul Apple (#0A84FF)
+- **🎯 Conclusão:** REGRA PERMANENTE: Sempre apresentar a planta visual antes de alterar UI; o Midiastore deve ser exclusivamente um limpador limpo, bonito e organizado.
+- *Registro Supabase:* Memory #313
+
+---
+
+### 📍 [16/11/2026, 04:59:13] Lancamento Visual Apple Dark OLED Limpador Puro v2.7.2 (vc 27) validado no Moto G84 5G
+- **📖 Estudou / Leu:** Apple HIG Dark Mode, VectorDrawables finos estilo SF Symbols e auditoria de 2 subagentes
+- **⚙️ Tentou / Executou:** Reconstrucao em 3 abas puras (Limpar, Arquivos, Pro), troca de icones antigos por 8 vetores ic_apple_*.xml, garantia completa do plano Gratis e 3 planos Pro
+- **⚠️ Erros Encontrados:** Versoes anteriores tinham tema Pro marrom/verde/amarelo e emojis amadores; na v2.7.2 notamos dois micro-detalhes no print real (borda em brandLockupCard e reticencias em Arquivos Grand...)
+- **🔧 Como Corrigiu:** Visual principal 100% limpo instalado por cima de vc 23 sem desinstalar (Success) e validado em captura de tela real do Moto G84
+- **🎯 Conclusão:** Salto visual brutal de app amador para produto nivel Apple; proximos micro-ajustes no titulo Grandes e brandLockupCard background=null deixarao 100% sem defeitos.
+- *Registro Supabase:* Memory #314
+
+---
+
+### 📍 [16/11/2026, 05:23:57] TREINAMENTO COMPLETO DO FUNDADOR: Padrao Apple Limpador Puro v2.7.2 (vc 27) + Plano 500% Melhor para Amanha
+- **📖 Estudou / Leu:** Testes reais no Motorola Moto G84 5G (screenshots v272_home, v272_files, v272_pro), Apple HIG Dark Mode e engenharia de acabamento Android
+- **⚙️ Tentou / Executou:** Reconstrucao completa em 3 abas puras (Limpar, Arquivos, Pro), 8 VectorDrawables finos ic_apple_*.xml, Free generoso + 3 planos Pro e auditoria de 2 subagentes
+- **⚠️ Erros Encontrados:** Micro-detalhes identificados nos prints reais do Moto G84: 1) caixa em brandLockupCard tocando o M de Midiastore; 2) texto Arquivos Grand... cortando com reticencias; 3) botoes Pagina anterior / Proxima pagina cortando 2a linha em 46dp na aba Arquivos e segmentacao Fotos/Videos/Audios pouco contrastada
+- **🔧 Como Corrigiu:** Visual base aprovado no Moto G84 (Preto OLED #000000, Grafite #1C1C1E, Azul #0A84FF, zero emojis, zero carnaval). Ajustes locais em stylePlanPurchaseButton iniciados.
+- **🎯 Conclusão:** REGRAS FIXAS PARA AMANHA: 1) Nunca misturar jogos/noticias/carnaval no Limpador Puro; 2) Sempre desenhar planta+mockup antes de codar UI; 3) Manter Gratis completo e 3 planos Pro claros; 4) Corrigir os 3 micro-bugs dos prints reais e evoluir 500% (barra segmentada estilo iPhone Storage, Bottom Sheets Apple, LruCache de miniaturas, Prints >30d e Fotos Borradas por Variancia Laplaciana).
+- *Registro Supabase:* Memory #315
+
+---
