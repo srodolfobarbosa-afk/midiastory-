@@ -625,17 +625,17 @@ class MainActivity : AppCompatActivity() {
         topBarProButton = button(getString(R.string.premium_area_button)) {
             switchTab(AppTab.PRO)
         }.apply {
-            minHeight = dp(44)
+            minHeight = dp(40)
             insetTop = 0
             insetBottom = 0
-            cornerRadius = dp(20)
-            setPadding(dp(16), dp(8), dp(16), dp(8))
+            cornerRadius = dp(18)
+            setPadding(dp(14), dp(6), dp(14), dp(6))
             textSize = 12f
             maxLines = 1
             isSingleLine = true
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#070B14"))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(color(R.color.google_blue_primary))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         }
         topBar.addView(topBarProButton, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(10) })
         root.addView(topBar, LinearLayout.LayoutParams(-1, -2))
@@ -698,11 +698,11 @@ class MainActivity : AppCompatActivity() {
         bodyContainer.addView(worldSection)
         bodyContainer.addView(proSection)
 
-        // 3. BARRA DE NAVEGAÇÃO FIXA & ESPAÇOSA (5 Abas Limpas)
+        // 3. BARRA DE NAVEGAÇÃO FIXA & MINIMALISTA (5 Abas Apple Clean)
         bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setBackgroundColor(color(R.color.sweep_surface))
+            setBackgroundColor(Color.parseColor("#0A0A0C"))
             setPadding(dp(4), dp(6), dp(4), dp(6))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
@@ -878,10 +878,10 @@ class MainActivity : AppCompatActivity() {
             insetBottom = 0
             typeface = Typeface.DEFAULT_BOLD
             tag = "home_pro_subscribe_cta"
-            setTextColor(Color.parseColor("#070B14"))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
             icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.btn_star_big_on)
-            iconTint = android.content.res.ColorStateList.valueOf(Color.parseColor("#070B14"))
+            iconTint = android.content.res.ColorStateList.valueOf(Color.WHITE)
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             setOnClickListener {
                 try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
@@ -896,7 +896,7 @@ class MainActivity : AppCompatActivity() {
             label(getString(R.string.home_pro_cta_footnote), 10.5f, R.color.sweep_muted, false),
             top(8),
         )
-        homeProCtaCard = themedCard(homeProCardContent, Color.parseColor("#1D1405"), Color.parseColor("#FFB300"))
+        homeProCtaCard = themedCard(homeProCardContent, color(R.color.sweep_surface), color(R.color.sweep_surface_alt))
         addView(homeProCtaCard, bottom(18))
 
         // Mantém as referências dos botões inicializadas para compatibilidade com renderCatalogPrices
@@ -1644,12 +1644,15 @@ class MainActivity : AppCompatActivity() {
         proCard.addView(proHeaderRow)
         proCard.addView(label(getString(R.string.pro_card_subtitle), 13f, R.color.sweep_muted, false), top(6))
         proCard.addView(label(getString(R.string.pro_free_included), 12f, R.color.sweep_text, false), top(12))
-        proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.sweep_accent_amber, false), top(10))
+        proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.google_blue_tonal_accent, false), top(10))
 
-        // Card VIP Bonus para Testadores Fechados (libera Pro gratis com 1 toque)
-        val vipCardContent = card()
-        vipCardContent.addView(label(getString(R.string.tester_vip_card_title), 12f, R.color.sweep_primary_glow, true))
-        vipCardContent.addView(label(getString(R.string.tester_vip_card_subtitle), 12f, R.color.sweep_text, false), top(6))
+        // Card VIP Bonus para Testadores Fechados (visual limpo Apple Dark)
+        val vipCardContent = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(14), dp(14), dp(14))
+        }
+        vipCardContent.addView(label(getString(R.string.tester_vip_card_title), 12f, R.color.google_blue_primary, true))
+        vipCardContent.addView(label(getString(R.string.tester_vip_card_subtitle), 12f, R.color.sweep_muted, false), top(6))
         val vipBtn = button(
             getString(if (isTesterVipProEnabled()) R.string.tester_vip_active_button else R.string.tester_vip_activate_button),
         ) {
@@ -1662,12 +1665,12 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG,
             ).show()
         }.apply {
-            minHeight = dp(52)
+            minHeight = dp(50)
         }
         testerVipButton = vipBtn
         styleTesterVipButton(vipBtn, isTesterVipProEnabled())
         vipCardContent.addView(vipBtn, top(12))
-        proCard.addView(themedCard(vipCardContent, Color.parseColor("#0A1D14"), Color.parseColor("#00E676")), top(14))
+        proCard.addView(themedCard(vipCardContent, color(R.color.sweep_surface_alt), color(R.color.sweep_surface_alt)), top(14))
 
         val unusedAppsButton = button(getString(R.string.pro_unused_apps_button)) {
             runWithProAccess { requestUnusedAppSuggestions() }
@@ -1681,8 +1684,8 @@ class MainActivity : AppCompatActivity() {
         proSuiteContent.addView(
             TextView(this@MainActivity).apply {
                 text = getString(R.string.pro_suite_section_title)
-                setTextColor(Color.parseColor("#FFD54F"))
-                textSize = 13f
+                setTextColor(color(R.color.google_blue_primary))
+                textSize = 12.5f
                 setTypeface(typeface, Typeface.BOLD)
                 letterSpacing = 0.05f
             },
@@ -1691,8 +1694,8 @@ class MainActivity : AppCompatActivity() {
             button(getString(R.string.pro_suite_notepad_btn)) {
                 runWithProAccess { openProNotesVaultDialog() }
             }.apply {
-                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
-                setTextColor(Color.parseColor("#FFE082"))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface))
+                setTextColor(color(R.color.sweep_text))
             },
             top(10),
         )
@@ -1700,8 +1703,8 @@ class MainActivity : AppCompatActivity() {
             button(getString(R.string.pro_suite_calculator_btn)) {
                 openProSmartCalculatorDialog()
             }.apply {
-                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
-                setTextColor(Color.parseColor("#FFE082"))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface))
+                setTextColor(color(R.color.sweep_text))
             },
             top(8),
         )
@@ -1709,13 +1712,13 @@ class MainActivity : AppCompatActivity() {
             button(getString(R.string.pro_suite_password_btn)) {
                 openProPasswordGeneratorDialog()
             }.apply {
-                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2A2109"))
-                setTextColor(Color.parseColor("#FFE082"))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface))
+                setTextColor(color(R.color.sweep_text))
             },
             top(8),
         )
         proCard.addView(
-            themedCard(proSuiteContent, Color.parseColor("#161105"), Color.parseColor("#FFB300")),
+            themedCard(proSuiteContent, color(R.color.sweep_surface_alt), color(R.color.sweep_surface_alt)),
             top(14),
         )
 
@@ -2015,24 +2018,24 @@ class MainActivity : AppCompatActivity() {
             mainScrollView.post { mainScrollView.scrollTo(0, 0) }
         }
 
-        val tabAccent = if (hasEffectiveProAccess()) Color.parseColor("#FFD54F") else color(R.color.sweep_primary)
+        val tabAccent = color(R.color.google_blue_primary)
         styleNavButton(navHomeBtn, tab == AppTab.HOME, customSelectedColor = tabAccent)
         styleNavButton(navNewsBtn, tab == AppTab.NEWS, customSelectedColor = tabAccent)
         styleNavButton(navFilesBtn, tab == AppTab.FILES || tab == AppTab.OAAS, customSelectedColor = tabAccent)
         styleNavButton(navGamesBtn, tab == AppTab.GAMES, customSelectedColor = tabAccent)
-        styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = Color.parseColor("#FFB300"))
+        styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = tabAccent)
     }
 
     private fun styleNavButton(btn: MaterialButton, selected: Boolean, customSelectedColor: Int? = null) {
         if (selected) {
-            val bg = customSelectedColor ?: color(R.color.sweep_primary)
-            // Se o fundo for claro (como Dourado, Ciano, Azul Claro ou Menta), usa texto escuro para contraste impecável
-            val isLightBg = (bg == Color.parseColor("#FFD700") || bg == Color.parseColor("#00E5FF") || bg == Color.parseColor("#00E5B0") || bg == Color.parseColor("#38BDF8"))
-            btn.setTextColor(if (isLightBg) Color.parseColor("#070B14") else Color.WHITE)
-            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(bg)
+            val accent = customSelectedColor ?: color(R.color.google_blue_primary)
+            btn.setTextColor(accent)
+            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                Color.argb(32, Color.red(accent), Color.green(accent), Color.blue(accent)),
+            )
         } else {
             btn.setTextColor(color(R.color.sweep_muted))
-            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
         }
     }
 
@@ -2054,9 +2057,9 @@ class MainActivity : AppCompatActivity() {
     private fun styleTesterVipButton(button: MaterialButton, active: Boolean) {
         button.text = getString(if (active) R.string.tester_vip_active_button else R.string.tester_vip_activate_button)
         button.backgroundTintList = android.content.res.ColorStateList.valueOf(
-            Color.parseColor(if (active) "#FFD700" else "#00E676"),
+            if (active) color(R.color.sweep_surface) else color(R.color.google_blue_primary),
         )
-        button.setTextColor(Color.parseColor("#070B14"))
+        button.setTextColor(if (active) color(R.color.google_blue_primary) else Color.WHITE)
     }
 
     private fun renderBillingState(state: ProAccessSummaryState) {
@@ -2096,26 +2099,26 @@ class MainActivity : AppCompatActivity() {
         if (::topBarProButton.isInitialized) {
             topBarProButton.text = getString(if (isPro) R.string.top_pro_active_pill else R.string.premium_area_button)
             topBarProButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                Color.parseColor(if (isPro) "#00E676" else "#FFB300"),
+                color(R.color.sweep_surface_alt),
             )
-            topBarProButton.setTextColor(Color.parseColor("#070B14"))
+            topBarProButton.setTextColor(
+                if (isPro) color(R.color.google_blue_primary) else color(R.color.sweep_text),
+            )
         }
         applyDynamicProTheme(isPro)
         applyEasySeniorMode(isEasySeniorModeEnabled())
         if (!::homeProSubscribeButton.isInitialized) return
+        homeProCtaCard.setCardBackgroundColor(color(R.color.sweep_surface))
+        homeProCtaCard.strokeColor = color(R.color.sweep_surface_alt)
+        homeProCtaBadge.setTextColor(color(R.color.google_blue_primary))
+        homeProSubscribeButton.icon = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on)
         if (isPro) {
-            homeProCtaCard.setCardBackgroundColor(Color.parseColor("#1D1605"))
-            homeProCtaCard.strokeColor = Color.parseColor("#FFD54F")
-            homeProCtaBadge.setTextColor(Color.parseColor("#FFD54F"))
             homeProCtaTitle.text = getString(R.string.home_pro_cta_active_title)
             homeProSubscribeButton.text = getString(R.string.home_pro_active_button)
-            homeProSubscribeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFD54F"))
-            homeProSubscribeButton.setTextColor(Color.parseColor("#120D03"))
-            homeProSubscribeButton.icon = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on)
+            homeProSubscribeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            homeProSubscribeButton.setTextColor(color(R.color.google_blue_primary))
+            homeProSubscribeButton.iconTint = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         } else {
-            homeProCtaCard.setCardBackgroundColor(Color.parseColor("#1D1405"))
-            homeProCtaCard.strokeColor = Color.parseColor("#FFB300")
-            homeProCtaBadge.setTextColor(color(R.color.sweep_accent_amber))
             homeProCtaTitle.text = getString(R.string.home_pro_cta_title)
             val priceHint = latestHeroPriceBadge
             homeProSubscribeButton.text = if (!priceHint.isNullOrBlank()) {
@@ -2123,24 +2126,21 @@ class MainActivity : AppCompatActivity() {
             } else {
                 getString(R.string.home_pro_subscribe_button)
             }
-            homeProSubscribeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
-            homeProSubscribeButton.setTextColor(Color.parseColor("#070B14"))
-            homeProSubscribeButton.icon = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on)
+            homeProSubscribeButton.backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            homeProSubscribeButton.setTextColor(Color.WHITE)
+            homeProSubscribeButton.iconTint = android.content.res.ColorStateList.valueOf(Color.WHITE)
         }
-        homeProSubscribeButton.iconTint = android.content.res.ColorStateList.valueOf(Color.parseColor("#070B14"))
     }
 
-    /** Switches visual palette between Obsidian Cyber Mint (Free) and Royal 24K Gold (Pro VIP). */
+    /** Mantém a paleta unificada Apple Dark OLED (#000000 / #1C1C1E / #0A84FF) sem poluição visual. */
     private fun applyDynamicProTheme(isPro: Boolean) {
         if (::appRootView.isInitialized) {
-            appRootView.setBackgroundColor(
-                if (isPro) Color.parseColor("#0D0A03") else color(R.color.sweep_background),
-            )
+            appRootView.setBackgroundColor(color(R.color.sweep_background))
         }
         if (::brandLockupCard.isInitialized) {
             brandLockupCard.background = borderedPill(
-                if (isPro) Color.parseColor("#231906") else color(R.color.sweep_surface),
-                Color.parseColor(if (isPro) "#73FFD54F" else "#4000E5FF"),
+                color(R.color.sweep_surface),
+                color(R.color.sweep_surface_alt),
                 dp(16),
                 dp(1),
             )
@@ -2152,42 +2152,26 @@ class MainActivity : AppCompatActivity() {
             brandTaglineLabel.text = getString(
                 if (isPro) R.string.brand_tagline_pro else R.string.brand_tagline,
             )
-            brandTaglineLabel.setTextColor(
-                if (isPro) Color.parseColor("#FFE082") else color(R.color.sweep_primary_glow),
-            )
+            brandTaglineLabel.setTextColor(color(R.color.sweep_muted))
         }
         if (::storageCardContainer.isInitialized) {
-            storageCardContainer.setCardBackgroundColor(
-                if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
-            )
-            storageCardContainer.strokeColor = if (isPro) Color.parseColor("#FFB300") else color(R.color.sweep_surface_alt)
+            storageCardContainer.setCardBackgroundColor(color(R.color.sweep_surface))
+            storageCardContainer.strokeColor = color(R.color.sweep_surface_alt)
         }
         if (::storageRingGauge.isInitialized) {
-            storageRingGauge.isProVipTheme = isPro
+            storageRingGauge.isProVipTheme = false
         }
         if (::heroOrbButton.isInitialized) {
-            heroOrbButton.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                if (isPro) Color.parseColor("#FFD54F") else color(R.color.sweep_primary),
-            )
-            heroOrbButton.setTextColor(
-                if (isPro) Color.parseColor("#120D03") else color(R.color.sweep_background),
-            )
+            heroOrbButton.backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            heroOrbButton.setTextColor(Color.WHITE)
         }
         if (::bottomNavContainer.isInitialized) {
-            bottomNavContainer.background = roundedBackground(
-                if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
-                0,
-            )
-        }
-        if (::bottomNavContainer.isInitialized) {
-            bottomNavContainer.setBackgroundColor(
-                if (isPro) Color.parseColor("#1B1406") else color(R.color.sweep_surface),
-            )
+            bottomNavContainer.setBackgroundColor(Color.parseColor("#0A0A0C"))
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             @Suppress("DEPRECATION")
             run {
-                val barColor = if (isPro) Color.parseColor("#120D03") else color(R.color.sweep_background)
+                val barColor = color(R.color.sweep_background)
                 window.statusBarColor = barColor
                 window.navigationBarColor = barColor
             }
@@ -2982,13 +2966,13 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.seven_diff_badge),
-                badgeHex = "#30D158",
+                badgeHex = "#0A84FF",
                 titleText = getString(R.string.seven_diff_title),
                 subtitleText = getString(R.string.seven_diff_subtitle),
                 cardBgHex = "#1C1C1E",
                 strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.seven_diff_btn, "#30D158", "#070B14") {
+                    WorldButtonSpec(R.string.seven_diff_btn, "#0A84FF", "#FFFFFF") {
                         openSevenDifferencesDialog()
                     },
                 ),
@@ -3000,13 +2984,13 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.pro_ws_daily_btn).uppercase(java.util.Locale.getDefault()),
-                badgeHex = "#FFD54F",
+                badgeHex = "#0A84FF",
                 titleText = getString(R.string.games_wordsearch_card_title),
                 subtitleText = getString(R.string.pro_ws_subtitle),
-                cardBgHex = "#151208",
-                strokeHex = "#FFB300",
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.pro_suite_wordsearch_btn, "#FFB300", "#070B14") {
+                    WorldButtonSpec(R.string.pro_suite_wordsearch_btn, "#0A84FF", "#FFFFFF") {
                         openProWordSearchDialog()
                     },
                 ),
@@ -3018,7 +3002,7 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_arcade_badge),
-                badgeHex = "#64D2FF",
+                badgeHex = "#0A84FF",
                 titleText = getString(R.string.snake_dialog_title),
                 subtitleText = getString(R.string.snake_hint_offline),
                 cardBgHex = "#1C1C1E",
@@ -3035,14 +3019,14 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_magic_badge),
-                badgeHex = "#64D2FF",
+                badgeHex = "#0A84FF",
                 titleText = getString(R.string.magic_lab_title),
                 subtitleText = getString(R.string.magic_lab_subtitle),
                 cardBgHex = "#1C1C1E",
                 strokeHex = "#2C2C2E",
                 buttons = listOf(
                     WorldButtonSpec(R.string.home_btn_magic, "#2C2C2E", "#FFFFFF") { openMagicSecretLabDialog() },
-                    WorldButtonSpec(R.string.dice_title, "#2C2C2E", "#FFD54F") { openMagicDiceDialog() },
+                    WorldButtonSpec(R.string.dice_title, "#2C2C2E", "#FFFFFF") { openMagicDiceDialog() },
                 ),
             ),
             bottom(18),
@@ -6578,8 +6562,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderBrandWordmark(isPro: Boolean) {
         if (!::brandWordmarkView.isInitialized) return
-        val baseColor = if (isPro) Color.parseColor("#FFF8E1") else color(R.color.sweep_text)
-        val accentColor = if (isPro) Color.parseColor("#FFD54F") else color(R.color.sweep_primary)
+        val baseColor = color(R.color.sweep_text)
+        val accentColor = color(R.color.google_blue_primary)
         val brandName = getString(R.string.app_name)
         brandWordmarkView.setTextColor(baseColor)
         val accentStart = brandName.indexOf("store", ignoreCase = true)
