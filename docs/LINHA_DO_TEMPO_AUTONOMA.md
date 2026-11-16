@@ -2430,3 +2430,43 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #292
 
 ---
+
+### 📍 [15/11/2026, 19:47:26] Decisao Definitiva: Carbon via Caixa Real do Midiastore
+- **📖 Estudou / Leu:** Testes reais Google AI Studio (Carbon 429, Hydrogen 200), GitHub Models (200) e OpenRouter (402)
+- **⚙️ Tentou / Executou:** Validar acesso gratuito ao Gemini 4 Carbon
+- **⚠️ Erros Encontrados:** Carbon exige faturamento ativo (429/402); nao ha rota gratuita legal para Carbon
+- **🔧 Como Corrigiu:** Operar em custo zero com Hydrogen + GitHub Models + Antigravity e focar 100% nos 4 portoes P0 do Midiastore para gerar os primeiros R$ 5.000 (50% = R$ 2.500 para API Carbon)
+- **🎯 Conclusão:** Regra gravada: nunca mais repetir debate de Carbon sem caixa; prioridade total em publicar Midiastore v2.5.0 e converter vendas reais
+- *Registro Supabase:* Memory #293
+
+---
+
+### 📍 [15/11/2026, 19:56:52] Portao P0 Fechado: 32 phoneScreenshots nos 8 idiomas enviados para Play Console
+- **📖 Estudou / Leu:** scripts/play-update-store-listings.mjs e docs/campaigns/store-screenshots/
+- **⚙️ Tentou / Executou:** Verificar cobertura de screenshots na Play Console API v3
+- **⚠️ Erros Encontrados:** 6 idiomas (es-ES, fr-FR, de-DE, hi-IN, ja-JP, zh-CN) estavam com 0 screenshots porque script anterior so enviava pt-BR e en-US
+- **🔧 Como Corrigiu:** Criado scripts/play-upload-screenshots.mjs e enviado 4/4 PNGs para todos os 8 idiomas (Edit 08796976838705080284 commitado HTTP 200)
+- **🎯 Conclusão:** Cobertura visual completa de 32 screenshots na Google Play Console pronta para conversao global
+- *Registro Supabase:* Memory #294
+
+---
+
+### 📍 [15/11/2026, 20:11:02] Fix CI API 29 Emulator Readiness
+- **📖 Estudou / Leu:** android-test-reports-api29 (emulator-readiness-failure.txt) e scripts/ci/run_android_instrumented_tests.sh
+- **⚙️ Tentou / Executou:** Validar build e testes instrumentados API 29 no Run 43771260741
+- **⚠️ Erros Encontrados:** Android 10 (API 29) retorna 'emulated mounted' sem ';0', falhando na regex 'emulated;[0-9]+ mounted'
+- **🔧 Como Corrigiu:** Atualizada regex para 'emulated(;[0-9]+)?[[:space:]]+mounted' (commit a1fd8a5) e disparado Run 43773361690
+- **🎯 Conclusão:** Armadilha API 29 vs API 30+ resolvida e gravada para zero reincidencia
+- *Registro Supabase:* Memory #304
+
+---
+
+### 📍 [15/11/2026, 23:52:10] Publicação v2.5.0 (vc 22) na Google Play Console
+- **📖 Estudou / Leu:** CI failures API 29 e API 35 (ANR overlay) e configuração de secrets para signed-release
+- **⚙️ Tentou / Executou:** Execução do CI completo 100% verde com upload do AAB
+- **⚠️ Erros Encontrados:** API 35 falhava por ANR da System UI no emulador; signed-release falhava por ausência dos secrets de upload
+- **🔧 Como Corrigiu:** Desativadas animações do emulador, criado dismiss de ANR no teste e configurados secrets no GitHub
+- **🎯 Conclusão:** CI 100% aprovado (API 29 + API 35 + signed-release). AAB v2.5.0 (vc 22) gerado e publicado nas tracks internal e alpha da Play Console.
+- *Registro Supabase:* Memory #308
+
+---
