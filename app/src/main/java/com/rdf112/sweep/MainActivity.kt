@@ -590,11 +590,13 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT,
             ).show()
         }.apply {
-            minHeight = dp(38)
+            minHeight = dp(44)
             minWidth = dp(48)
+            insetTop = 0
+            insetBottom = 0
             cornerRadius = dp(18)
-            setPadding(dp(12), 0, dp(12), 0)
-            textSize = 11f
+            setPadding(dp(14), dp(8), dp(14), dp(8))
+            textSize = 11.5f
             typeface = Typeface.DEFAULT_BOLD
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
             setTextColor(color(R.color.sweep_text))
@@ -603,8 +605,10 @@ class MainActivity : AppCompatActivity() {
             switchTab(AppTab.PRO)
         }.apply {
             minHeight = dp(44)
+            insetTop = 0
+            insetBottom = 0
             cornerRadius = dp(20)
-            setPadding(dp(14), 0, dp(14), 0)
+            setPadding(dp(16), dp(8), dp(16), dp(8))
             textSize = 12f
             maxLines = 1
             isSingleLine = true
@@ -612,7 +616,7 @@ class MainActivity : AppCompatActivity() {
             setTextColor(Color.parseColor("#070B14"))
             backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFB300"))
         }
-        topBar.addView(topBarProButton, LinearLayout.LayoutParams(-2, dp(44)).apply { marginStart = dp(10) })
+        topBar.addView(topBarProButton, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(10) })
         root.addView(topBar, LinearLayout.LayoutParams(-1, -2))
 
         val topUtilityRow = LinearLayout(this).apply {
@@ -625,7 +629,7 @@ class MainActivity : AppCompatActivity() {
             ellipsize = android.text.TextUtils.TruncateAt.END
         }
         topUtilityRow.addView(brandTaglineLabel, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(10) })
-        topUtilityRow.addView(easyModeButton, LinearLayout.LayoutParams(-2, dp(38)))
+        topUtilityRow.addView(easyModeButton, LinearLayout.LayoutParams(-2, -2))
         root.addView(topUtilityRow, LinearLayout.LayoutParams(-1, -2))
 
         // Barra de progresso fina e moderna
@@ -684,14 +688,14 @@ class MainActivity : AppCompatActivity() {
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
 
         listOf(navHomeBtn, navFilesBtn, navStudioBtn, navProBtn).forEach { tabBtn ->
-            tabBtn.textSize = 12.5f
-            tabBtn.minHeight = dp(46)
+            tabBtn.textSize = 12f
+            tabBtn.minHeight = dp(52)
             tabBtn.typeface = Typeface.DEFAULT_BOLD
             bottomNavContainer.addView(
                 tabBtn,
-                LinearLayout.LayoutParams(0, dp(46), 1f).apply {
-                    marginStart = dp(3)
-                    marginEnd = dp(3)
+                LinearLayout.LayoutParams(0, -2, 1f).apply {
+                    marginStart = dp(4)
+                    marginEnd = dp(4)
                 },
             )
         }
@@ -6190,12 +6194,12 @@ class MainActivity : AppCompatActivity() {
     private fun button(text: String, onClick: () -> Unit): MaterialButton = MaterialButton(this).apply {
         this.text = text
         isAllCaps = false
-        textSize = 12f
+        textSize = 13.5f
         cornerRadius = dp(16)
-        minHeight = dp(48)
+        minHeight = dp(52)
         insetTop = 0
         insetBottom = 0
-        setPadding(dp(10), dp(8), dp(10), dp(8))
+        setPadding(dp(16), dp(12), dp(16), dp(12))
         backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         setTextColor(color(R.color.sweep_text))
         setOnClickListener {
@@ -6207,10 +6211,12 @@ class MainActivity : AppCompatActivity() {
     private fun navTabButton(text: String, onClick: () -> Unit): MaterialButton = MaterialButton(this).apply {
         this.text = text
         isAllCaps = false
-        textSize = 11f
+        textSize = 11.5f
         cornerRadius = dp(14)
-        minHeight = dp(48)
-        setPadding(dp(2), 0, dp(2), 0)
+        minHeight = dp(52)
+        insetTop = 0
+        insetBottom = 0
+        setPadding(dp(6), dp(8), dp(6), dp(8))
         setOnClickListener {
             try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
             onClick()
@@ -6218,7 +6224,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fullButton(height: Int, bottom: Int): LinearLayout.LayoutParams =
-        LinearLayout.LayoutParams(-1, dp(height)).apply { bottomMargin = dp(bottom) }
+        LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(bottom) }
 
     private fun bottom(value: Int): LinearLayout.LayoutParams =
         LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(value) }
