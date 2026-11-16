@@ -67,6 +67,10 @@ fi
 
 echo "Emulator ready: serial=$serial api=$api package_service=found activity_service=found external_storage=mounted"
 
+adb -s "$serial" shell settings put global window_animation_scale 0 || true
+adb -s "$serial" shell settings put global transition_animation_scale 0 || true
+adb -s "$serial" shell settings put global animator_duration_scale 0 || true
+
 if (( expected_api >= 34 )); then
   debug_package="com.rdf112.midiastore.debug"
   selected_permission="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"

@@ -141,7 +141,12 @@ class MainActivityInstrumentedTest {
 
             MediaOperationConsentHostActivity.resetConsentResult()
             instrumentation.runOnMainSync { host.requestConsent(firstSender) }
-            val cancelButton = findSystemConsentButton(device, allow = false)
+            var cancelButton = findSystemConsentButton(device, allow = false, timeoutMs = 15_000)
+            if (cancelButton == null) {
+                dismissSystemAnrIfPresent(device)
+                instrumentation.runOnMainSync { host.requestConsent(firstSender) }
+                cancelButton = findSystemConsentButton(device, allow = false, timeoutMs = 25_000)
+            }
             assertNotNull(
                 "Android must display a cancel action for permanent deletion consent (pkg=${device.currentPackageName}; nodes=${dumpVisibleUiSummary(device)})",
                 cancelButton,
@@ -166,7 +171,12 @@ class MainActivityInstrumentedTest {
             val retrySender = requireNotNull(coordinator.createPermanentDeleteIntentSender(retryPlan.uriBatches.single()))
             MediaOperationConsentHostActivity.resetConsentResult()
             instrumentation.runOnMainSync { host.requestConsent(retrySender) }
-            val allowButton = findSystemConsentButton(device, allow = true)
+            var allowButton = findSystemConsentButton(device, allow = true, timeoutMs = 15_000)
+            if (allowButton == null) {
+                dismissSystemAnrIfPresent(device)
+                instrumentation.runOnMainSync { host.requestConsent(retrySender) }
+                allowButton = findSystemConsentButton(device, allow = true, timeoutMs = 25_000)
+            }
             assertNotNull(
                 "Android must display the confirmation action for permanent deletion (pkg=${device.currentPackageName})",
                 allowButton,
@@ -466,12 +476,23 @@ class MainActivityInstrumentedTest {
         }
         val deadline = SystemClock.uptimeMillis() + timeoutMs
         while (SystemClock.uptimeMillis() < deadline) {
+            dismissSystemAnrIfPresent(device)
             for (selector in selectors) {
                 device.findObject(selector)?.let { return it }
             }
             SystemClock.sleep(250)
         }
         return null
+    }
+
+    private fun dismissSystemAnrIfPresent(device: UiDevice) {
+        runCatching {
+            val waitBtn = device.findObject(By.res("android", "aerr_wait"))
+                ?: device.findObject(By.text(Pattern.compile("(?i)^wait$")))
+                ?: device.findObject(By.res("android", "aerr_close"))
+                ?: device.findObject(By.text(Pattern.compile("(?i)^close app$")))
+            waitBtn?.click()
+        }
     }
 
     private fun dumpVisibleUiSummary(device: UiDevice): String {
