@@ -570,4 +570,8 @@ Total: %3$s</string>
     <string name="gazette_listen_audio">Ouvir Notícia em Voz Alta</string>
     <string name="gazette_listening_toast">Lendo notícia em voz alta...</string>
     <string name="gazette_filter_all">Todas</string>
+    <string name="gazette_scope_country">🇧🇷 Meu País</string>
+    <string name="gazette_scope_world">🌐 Mundo &amp; Descobertas</string>
+    <string name="gazette_country_subtitle">Alertas de segurança no celular, dicas de saúde e utilidades para o seu dia a dia.</string>
+    <string name="gazette_world_subtitle">Astronomia, maravilhas da história antiga e inovações que transformam o planeta.</string>
 </resources>

@@ -570,4 +570,8 @@ Total: %3$s</string>
     <string name="gazette_listen_audio">Listen to Story Aloud</string>
     <string name="gazette_listening_toast">Reading story aloud...</string>
     <string name="gazette_filter_all">All</string>
+    <string name="gazette_scope_country">📍 My Country</string>
+    <string name="gazette_scope_world">🌐 World &amp; Discoveries</string>
+    <string name="gazette_country_subtitle">Essential mobile security tips, family wellness, and daily practical insights.</string>
+    <string name="gazette_world_subtitle">Astronomy, ancient history wonders, and breakthroughs transforming our planet.</string>
 </resources>

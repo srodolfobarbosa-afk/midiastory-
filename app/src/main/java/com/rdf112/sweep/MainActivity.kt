@@ -931,6 +931,7 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         visibility = View.GONE
         val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+        var activeScope = WorldNewsGazetteTools.NewsScope.COUNTRY
 
         val headerCard = card()
         val dateLabel = TextView(this@MainActivity).apply {
@@ -942,19 +943,102 @@ class MainActivity : AppCompatActivity() {
         }
         headerCard.addView(dateLabel)
         headerCard.addView(label(getString(R.string.gazette_header_title), 19f, R.color.sweep_text, true), top(4))
-        headerCard.addView(label(getString(R.string.gazette_header_subtitle), 12.5f, R.color.sweep_muted, false), top(4))
-        addView(wrap(headerCard), bottom(12))
+        val subtitleLabel = label(getString(R.string.gazette_country_subtitle), 12.5f, R.color.sweep_muted, false)
+        headerCard.addView(subtitleLabel, top(4))
+        addView(wrap(headerCard), bottom(10))
+
+        // Seletor de Escopo: [ 🇧🇷 Meu País ] vs [ 🌐 Mundo & Descobertas ]
+        val scopeRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(dp(2), 0, dp(2), dp(10))
+        }
+
+        lateinit var scopeCountryBtn: MaterialButton
+        lateinit var scopeWorldBtn: MaterialButton
+        lateinit var renderCards: (String) -> Unit
+        lateinit var rebuildChips: () -> Unit
+
+        fun updateScopeStyles() {
+            val isCountry = activeScope == WorldNewsGazetteTools.NewsScope.COUNTRY
+            scopeCountryBtn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                if (isCountry) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
+            )
+            scopeCountryBtn.setTextColor(if (isCountry) Color.WHITE else color(R.color.sweep_muted))
+
+            scopeWorldBtn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                if (!isCountry) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
+            )
+            scopeWorldBtn.setTextColor(if (!isCountry) Color.WHITE else color(R.color.sweep_muted))
+
+            subtitleLabel.text = getString(
+                if (isCountry) R.string.gazette_country_subtitle else R.string.gazette_world_subtitle
+            )
+        }
+
+        scopeCountryBtn = MaterialButton(this@MainActivity).apply {
+            text = getString(R.string.gazette_scope_country)
+            textSize = 12f
+            minHeight = dp(44)
+            insetTop = 0
+            insetBottom = 0
+            cornerRadius = dp(14)
+            typeface = Typeface.DEFAULT_BOLD
+            setOnClickListener {
+                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                if (activeScope != WorldNewsGazetteTools.NewsScope.COUNTRY) {
+                    activeScope = WorldNewsGazetteTools.NewsScope.COUNTRY
+                    updateScopeStyles()
+                    rebuildChips()
+                }
+            }
+        }
+
+        scopeWorldBtn = MaterialButton(this@MainActivity).apply {
+            text = getString(R.string.gazette_scope_world)
+            textSize = 12f
+            minHeight = dp(44)
+            insetTop = 0
+            insetBottom = 0
+            cornerRadius = dp(14)
+            typeface = Typeface.DEFAULT_BOLD
+            setOnClickListener {
+                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                if (activeScope != WorldNewsGazetteTools.NewsScope.WORLD) {
+                    activeScope = WorldNewsGazetteTools.NewsScope.WORLD
+                    updateScopeStyles()
+                    rebuildChips()
+                }
+            }
+        }
+
+        scopeRow.addView(scopeCountryBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(4) })
+        scopeRow.addView(scopeWorldBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
+        addView(scopeRow)
+
+        // Chips horizontais de categoria
+        val chipScroll = HorizontalScrollView(this@MainActivity).apply {
+            isHorizontalScrollBarEnabled = false
+            clipToPadding = false
+        }
+        val chipRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(dp(2), 0, dp(2), dp(10))
+        }
+        chipScroll.addView(chipRow)
+        addView(chipScroll, bottom(6))
 
         val newsCardsContainer = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.VERTICAL
         }
+        addView(newsCardsContainer)
 
-        fun renderCards(filterCategory: String) {
+        renderCards = { filterCategory ->
             newsCardsContainer.removeAllViews()
+            val allNews = WorldNewsGazetteTools.getNewsForScope(activeScope)
             val filtered = if (filterCategory == "TODAS" || filterCategory == "ALL") {
-                WorldNewsGazetteTools.DAILY_EDITION
+                allNews
             } else {
-                WorldNewsGazetteTools.DAILY_EDITION.filter { it.category.contains(filterCategory, ignoreCase = true) }
+                allNews.filter { it.category.contains(filterCategory, ignoreCase = true) }
             }
 
             filtered.forEach { news ->
@@ -1021,55 +1105,48 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Horizontal Category Filter Chips (Padrão Apple / Netvasco Interativo)
-        val chipScroll = HorizontalScrollView(this@MainActivity).apply {
-            isHorizontalScrollBarEnabled = false
-            clipToPadding = false
-        }
-        val chipRow = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setPadding(dp(2), 0, dp(2), dp(10))
-        }
-        val categories = WorldNewsGazetteTools.getFilterCategories(isPt)
-        var selectedCat = categories.first()
-        val chipButtons = mutableListOf<MaterialButton>()
+        rebuildChips = {
+            chipRow.removeAllViews()
+            val categories = WorldNewsGazetteTools.getFilterCategories(activeScope, isPt)
+            var selectedCat = categories.first()
+            val chipButtons = mutableListOf<MaterialButton>()
 
-        categories.forEach { cat ->
-            val chip = MaterialButton(this@MainActivity).apply {
-                text = cat
-                textSize = 11f
-                minHeight = dp(36)
-                insetTop = 0
-                insetBottom = 0
-                cornerRadius = dp(14)
-                setPadding(dp(12), dp(4), dp(12), dp(4))
-                typeface = Typeface.DEFAULT_BOLD
-                val isSelected = cat == selectedCat
-                backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    if (isSelected) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
-                )
-                setTextColor(if (isSelected) Color.WHITE else color(R.color.sweep_muted))
-                setOnClickListener {
-                    try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
-                    selectedCat = cat
-                    chipButtons.forEach { b ->
-                        val active = b.text == selectedCat
-                        b.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                            if (active) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
-                        )
-                        b.setTextColor(if (active) Color.WHITE else color(R.color.sweep_muted))
+            categories.forEach { cat ->
+                val chip = MaterialButton(this@MainActivity).apply {
+                    text = cat
+                    textSize = 11f
+                    minHeight = dp(36)
+                    insetTop = 0
+                    insetBottom = 0
+                    cornerRadius = dp(14)
+                    setPadding(dp(12), dp(4), dp(12), dp(4))
+                    typeface = Typeface.DEFAULT_BOLD
+                    val isSelected = cat == selectedCat
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(
+                        if (isSelected) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
+                    )
+                    setTextColor(if (isSelected) Color.WHITE else color(R.color.sweep_muted))
+                    setOnClickListener {
+                        try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                        selectedCat = cat
+                        chipButtons.forEach { b ->
+                            val active = b.text == selectedCat
+                            b.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                                if (active) color(R.color.google_blue_primary) else color(R.color.sweep_surface_alt)
+                            )
+                            b.setTextColor(if (active) Color.WHITE else color(R.color.sweep_muted))
+                        }
+                        renderCards(selectedCat)
                     }
-                    renderCards(selectedCat)
                 }
+                chipButtons.add(chip)
+                chipRow.addView(chip, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
             }
-            chipButtons.add(chip)
-            chipRow.addView(chip, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
+            renderCards(selectedCat)
         }
-        chipScroll.addView(chipRow)
-        addView(chipScroll, bottom(6))
 
-        renderCards(selectedCat)
-        addView(newsCardsContainer)
+        updateScopeStyles()
+        rebuildChips()
     }
 
     private fun openNewsStoryDialog(news: WorldNewsItem, isPt: Boolean) {
