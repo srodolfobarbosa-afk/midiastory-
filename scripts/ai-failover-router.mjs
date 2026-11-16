@@ -98,6 +98,9 @@ const MODEL_CASCADE = [
   { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
 
   // 2. Modelos Gratuitos Validados no OpenRouter (Custo Zero, Sem 402, Imunes ao Bloqueio de 156h Google)
+  { id: "nvidia/nemotron-3-ultra-550b-a55b:free", name: "NVIDIA Nemotron 3 Ultra 550B (Free)" },
+  { id: "nvidia/nemotron-3.5-super-vl:free", name: "NVIDIA Nemotron 3.5 Super VL (Free)" },
+  { id: "cohere/north-mini-code:free", name: "Cohere North Mini Code (Free)" },
   { id: "nvidia/nemotron-3.5-lightning:free", name: "NVIDIA Nemotron 3.5 Lightning (Free)" },
   { id: "baidu/ernie-5.5-flash-preview:free", name: "Baidu ERNIE 5.5 Flash (Free)" },
   { id: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", name: "NVIDIA Nemotron 3 Nano Omni (Free)" },
@@ -290,8 +293,8 @@ export async function executeWithFailover(prompt, options = {}) {
     }
   }
 
-  // 2. Segunda Rota Gratuita Legal: GitHub Models (GPT-4o / GPT-4o-mini / DeepSeek-R1 via conta GitHub)
-  if (!forceProvider || forceProvider === "github_models") {
+  // 2. Segunda Rota Gratuita Legal (somente se explicitamente solicitada — GitHub Models foi descontinuado em 2026-07-30)
+  if (forceProvider === "github_models") {
     for (const gm of GITHUB_MODELS_CASCADE) {
       console.log(`[GitHub Models] Testando modelo gratuito: ${gm}...`);
       try {

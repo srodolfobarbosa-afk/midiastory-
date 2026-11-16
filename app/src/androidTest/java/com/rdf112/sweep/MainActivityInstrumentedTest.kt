@@ -33,9 +33,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityInstrumentedTest {
@@ -139,8 +141,11 @@ class MainActivityInstrumentedTest {
 
             MediaOperationConsentHostActivity.resetConsentResult()
             instrumentation.runOnMainSync { host.requestConsent(firstSender) }
-            val cancelButton = device.wait(Until.findObject(By.res("android", "button2")), 30_000)
-            assertNotNull("Android must display a cancel action for permanent deletion consent", cancelButton)
+            val cancelButton = findSystemConsentButton(device, allow = false)
+            assertNotNull(
+                "Android must display a cancel action for permanent deletion consent (pkg=${device.currentPackageName})",
+                cancelButton,
+            )
             requireNotNull(cancelButton).click()
             assertTrue(
                 "Cancelling system deletion must return a result",
@@ -161,8 +166,11 @@ class MainActivityInstrumentedTest {
             val retrySender = requireNotNull(coordinator.createPermanentDeleteIntentSender(retryPlan.uriBatches.single()))
             MediaOperationConsentHostActivity.resetConsentResult()
             instrumentation.runOnMainSync { host.requestConsent(retrySender) }
-            val allowButton = device.wait(Until.findObject(By.res("android", "button1")), 30_000)
-            assertNotNull("Android must display the confirmation action for permanent deletion", allowButton)
+            val allowButton = findSystemConsentButton(device, allow = true)
+            assertNotNull(
+                "Android must display the confirmation action for permanent deletion (pkg=${device.currentPackageName})",
+                allowButton,
+            )
             requireNotNull(allowButton).click()
             assertTrue(
                 "Approved system deletion must return a result before the 120-second provider timeout",
@@ -426,6 +434,34 @@ class MainActivityInstrumentedTest {
                 )
             }
         }
+    }
+
+    private fun findSystemConsentButton(
+        device: UiDevice,
+        allow: Boolean,
+        timeoutMs: Long = 30_000,
+    ): UiObject2? {
+        val selectors = if (allow) {
+            listOf(
+                By.res("android", "button1"),
+                By.res(Pattern.compile(".*providers\\.media.*:id/(button_allow|allow|positive|delete).*")),
+                By.text(Pattern.compile("(?i)^(allow|delete|yes|ok)$")).clickable(true),
+            )
+        } else {
+            listOf(
+                By.res("android", "button2"),
+                By.res(Pattern.compile(".*providers\\.media.*:id/(button_deny|cancel|negative|deny).*")),
+                By.text(Pattern.compile("(?i)^(cancel|deny|don't allow|no|not now)$")).clickable(true),
+            )
+        }
+        val deadline = SystemClock.uptimeMillis() + timeoutMs
+        while (SystemClock.uptimeMillis() < deadline) {
+            for (selector in selectors) {
+                device.findObject(selector)?.let { return it }
+            }
+            SystemClock.sleep(250)
+        }
+        return null
     }
 
     companion object {
