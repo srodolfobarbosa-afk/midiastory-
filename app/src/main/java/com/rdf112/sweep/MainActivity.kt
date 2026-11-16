@@ -113,6 +113,9 @@ import com.rdf112.sweep.presentation.studio.MagicRiddlesTools
 import com.rdf112.sweep.presentation.studio.MediaStudioTools
 import com.rdf112.sweep.presentation.studio.SnakeGameView
 import com.rdf112.sweep.presentation.studio.TwentyOneCardTrickEngine
+import com.rdf112.sweep.presentation.studio.SevenDifferencesGameView
+import com.rdf112.sweep.presentation.studio.WorldNewsGazetteTools
+import com.rdf112.sweep.presentation.studio.WorldNewsItem
 
 /**
  * Midiastore (`com.rdf112.midiastore`, namespace interno `com.rdf112.sweep`).
@@ -120,7 +123,7 @@ import com.rdf112.sweep.presentation.studio.TwentyOneCardTrickEngine
  * Hub Mundial Offline (Cobrinha, Relógio, Moedas, Turismo) e Salão Secreto de Mágica & Charadas.
  */
 class MainActivity : AppCompatActivity() {
-    private enum class AppTab { HOME, FILES, STUDIO, OAAS, GAMES, WORLD, PRO }
+    private enum class AppTab { HOME, NEWS, FILES, GAMES, STUDIO, OAAS, WORLD, PRO }
     private data class UnusedAppInfo(
         val packageName: String,
         val displayName: String,
@@ -349,8 +352,9 @@ class MainActivity : AppCompatActivity() {
     private var pendingOutcomeMission: DesiredOutcomeMission? = null
     private var lastRecordedMissionProgress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress? = null
 
-    // Containers das 7 Abas Dedicadas (cada recurso separado com clareza)
+    // Containers das Abas Dedicadas (Fim do app embolado: cada recurso em sua página)
     private lateinit var homeSection: LinearLayout
+    private lateinit var newsSection: LinearLayout
     private lateinit var filesSection: LinearLayout
     private lateinit var studioSection: LinearLayout
     private lateinit var oaasSection: LinearLayout
@@ -358,10 +362,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var worldSection: LinearLayout
     private lateinit var proSection: LinearLayout
 
-    // Botões da Barra de Navegação Inferior (4 Abas Padrão Mundial)
+    // Botões da Barra de Navegação Inferior (5 Abas Limpas)
     private lateinit var navHomeBtn: MaterialButton
+    private lateinit var navNewsBtn: MaterialButton
     private lateinit var navFilesBtn: MaterialButton
-    private lateinit var navStudioBtn: MaterialButton
+    private lateinit var navGamesBtn: MaterialButton
     private lateinit var navProBtn: MaterialButton
     private lateinit var bottomNavContainer: LinearLayout
     private var logoEasterEggTapCount = 0
@@ -658,8 +663,9 @@ class MainActivity : AppCompatActivity() {
         }
         bodyContainer.addView(statusText)
 
-        // Construção das 7 Abas Puras e Separadas por Finalidade
+        // Construção das Abas Puras e Separadas por Finalidade (Padrão Jornal & Fim do app embolado)
         homeSection = buildHomeDashboardSection()
+        newsSection = buildNewsGazetteSection()
         filesSection = buildFilesExplorerSection()
         studioSection = buildStudioToolsSection()
         oaasSection = buildOaasMissionsSection()
@@ -668,6 +674,7 @@ class MainActivity : AppCompatActivity() {
         proSection = buildProPaywallSection()
 
         bodyContainer.addView(homeSection)
+        bodyContainer.addView(newsSection)
         bodyContainer.addView(filesSection)
         bodyContainer.addView(studioSection)
         bodyContainer.addView(oaasSection)
@@ -675,27 +682,31 @@ class MainActivity : AppCompatActivity() {
         bodyContainer.addView(worldSection)
         bodyContainer.addView(proSection)
 
-        // 3. BARRA DE NAVEGAÇÃO FIXA & ESPAÇOSA (4 Abas Principais Padrão Mundial com largura balanceada)
+        // 3. BARRA DE NAVEGAÇÃO FIXA & ESPAÇOSA (5 Abas Limpas)
         bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(color(R.color.sweep_surface))
-            setPadding(dp(6), dp(8), dp(6), dp(8))
+            setPadding(dp(4), dp(6), dp(4), dp(6))
         }
         navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
+        navNewsBtn = navTabButton(getString(R.string.nav_news)) { switchTab(AppTab.NEWS) }
         navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
-        navStudioBtn = navTabButton(getString(R.string.nav_studio)) { switchTab(AppTab.STUDIO) }
+        navGamesBtn = navTabButton(getString(R.string.nav_games)) { switchTab(AppTab.GAMES) }
         navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
 
-        listOf(navHomeBtn, navFilesBtn, navStudioBtn, navProBtn).forEach { tabBtn ->
-            tabBtn.textSize = 12f
+        listOf(navHomeBtn, navNewsBtn, navFilesBtn, navGamesBtn, navProBtn).forEach { tabBtn ->
+            tabBtn.textSize = 10.5f
             tabBtn.minHeight = dp(52)
+            tabBtn.insetLeft = 0
+            tabBtn.insetRight = 0
+            tabBtn.setPadding(dp(2), dp(4), dp(2), dp(4))
             tabBtn.typeface = Typeface.DEFAULT_BOLD
             bottomNavContainer.addView(
                 tabBtn,
                 LinearLayout.LayoutParams(0, -2, 1f).apply {
-                    marginStart = dp(4)
-                    marginEnd = dp(4)
+                    marginStart = dp(2)
+                    marginEnd = dp(2)
                 },
             )
         }
@@ -898,6 +909,121 @@ class MainActivity : AppCompatActivity() {
         }.onFailure {
             Toast.makeText(this, R.string.share_app_unavailable, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun buildNewsGazetteSection(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        visibility = View.GONE
+        val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+
+        val headerCard = card()
+        val dateLabel = TextView(this@MainActivity).apply {
+            text = WorldNewsGazetteTools.getTodayDateFormatted(isPt)
+            textSize = 11.5f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(color(R.color.google_blue_primary))
+            letterSpacing = 0.05f
+        }
+        headerCard.addView(dateLabel)
+        headerCard.addView(label(getString(R.string.gazette_header_title), 19f, R.color.sweep_text, true), top(4))
+        headerCard.addView(label(getString(R.string.gazette_header_subtitle), 12.5f, R.color.sweep_muted, false), top(4))
+        addView(wrap(headerCard), bottom(12))
+
+        WorldNewsGazetteTools.DAILY_EDITION.forEach { news ->
+            val newsCard = card().apply {
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                    openNewsStoryDialog(news, isPt)
+                }
+            }
+
+            val topRow = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val catBadge = TextView(this@MainActivity).apply {
+                text = news.category
+                textSize = 10.5f
+                typeface = Typeface.DEFAULT_BOLD
+                val badgeColor = Color.parseColor(news.categoryBadgeHex)
+                setTextColor(badgeColor)
+                background = roundedBackground(Color.argb(35, Color.red(badgeColor), Color.green(badgeColor), Color.blue(badgeColor)), dp(8))
+                setPadding(dp(8), dp(3), dp(8), dp(3))
+            }
+            topRow.addView(catBadge)
+            topRow.addView(View(this@MainActivity), LinearLayout.LayoutParams(0, 1, 1f))
+            val timeView = TextView(this@MainActivity).apply {
+                text = news.timeLabel
+                textSize = 11f
+                setTextColor(color(R.color.sweep_muted))
+            }
+            topRow.addView(timeView)
+            newsCard.addView(topRow)
+
+            val titleText = if (isPt) news.titlePt else news.titleEn
+            val titleView = label(titleText, 15f, R.color.sweep_text, true)
+            newsCard.addView(titleView, top(8))
+
+            val summaryText = if (isPt) news.summaryPt else news.summaryEn
+            val summaryView = label(summaryText, 12f, R.color.sweep_muted, false)
+            newsCard.addView(summaryView, top(4))
+
+            val footerRow = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val sourceView = TextView(this@MainActivity).apply {
+                text = "Fonte: ${news.source}"
+                textSize = 10.5f
+                setTextColor(color(R.color.sweep_muted))
+            }
+            footerRow.addView(sourceView, LinearLayout.LayoutParams(0, -2, 1f))
+            val readMore = TextView(this@MainActivity).apply {
+                text = getString(R.string.gazette_read_more)
+                textSize = 11.5f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(color(R.color.google_blue_primary))
+            }
+            footerRow.addView(readMore)
+            newsCard.addView(footerRow, top(8))
+
+            addView(wrap(newsCard), bottom(10))
+        }
+    }
+
+    private fun openNewsStoryDialog(news: WorldNewsItem, isPt: Boolean) {
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(18), dp(16), dp(18), dp(16))
+        }
+        val topBadge = TextView(this).apply {
+            text = "${news.category} • ${news.timeLabel}"
+            textSize = 11f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor(news.categoryBadgeHex))
+        }
+        container.addView(topBadge)
+        val titleText = if (isPt) news.titlePt else news.titleEn
+        container.addView(label(titleText, 17f, R.color.sweep_text, true), top(6))
+
+        val bodyText = if (isPt) news.fullBodyPt else news.fullBodyEn
+        container.addView(label(bodyText, 13.5f, R.color.sweep_muted, false), top(10))
+
+        val sourceText = TextView(this).apply {
+            text = "Publicado por: ${news.source}"
+            textSize = 11f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(color(R.color.sweep_muted))
+        }
+        container.addView(sourceText, top(14))
+
+        val scroll = ScrollView(this).apply { addView(container) }
+        AlertDialog.Builder(this)
+            .setView(scroll)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun buildQuickClean2x2Grid(): View {
@@ -1700,113 +1826,28 @@ class MainActivity : AppCompatActivity() {
         }
         pdfCard.addView(openPdfBtn, top(12))
         addView(themedCard(pdfCard, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)), bottom(14))
-
-        // SEÇÃO: FLIPERAMA & PASSATEMPOS 100% OFFLINE
-        val arcadeHeader = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(4), dp(16), dp(4), dp(10))
-        }
-        val arcadeBadge = TextView(this@MainActivity).apply {
-            text = getString(R.string.games_arcade_badge)
-            textSize = 10.5f
-            typeface = Typeface.DEFAULT_BOLD
-            setTextColor(color(R.color.google_blue_tonal_accent))
-        }
-        arcadeHeader.addView(arcadeBadge)
-        arcadeHeader.addView(label(getString(R.string.snake_dialog_title), 18f, R.color.sweep_text, true), top(4))
-        arcadeHeader.addView(label(getString(R.string.home_global_subtitle), 12f, R.color.sweep_muted, false), top(4))
-        addView(arcadeHeader)
-
-        // Card 1: Fliperama Offline (Cobrinha Retrô + Blocos em Queda)
-        addView(
-            buildActionGroupCard(
-                badgeText = getString(R.string.games_arcade_badge),
-                badgeHex = "#64D2FF",
-                titleText = getString(R.string.snake_dialog_title),
-                subtitleText = getString(R.string.snake_hint_offline),
-                cardBgHex = "#1C1C1E",
-                strokeHex = "#2C2C2E",
-                buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_snake, "#0A84FF", "#FFFFFF") { openOfflineSnakeGameDialog() },
-                    WorldButtonSpec(R.string.home_btn_blocks, "#2C2C2E", "#FFFFFF") { openFallingBlocksGameDialog() },
-                ),
-            ),
-            bottom(14),
-        )
-
-        // Card 2: Salão Secreto de Mágicas & Charadas
-        addView(
-            buildActionGroupCard(
-                badgeText = getString(R.string.games_magic_badge),
-                badgeHex = "#64D2FF",
-                titleText = getString(R.string.magic_lab_title),
-                subtitleText = getString(R.string.magic_lab_subtitle),
-                cardBgHex = "#1C1C1E",
-                strokeHex = "#2C2C2E",
-                buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_magic, "#2C2C2E", "#FFFFFF") { openMagicSecretLabDialog() },
-                    WorldButtonSpec(R.string.dice_title, "#2C2C2E", "#FFD54F") { openMagicDiceDialog() },
-                ),
-            ),
-            bottom(14),
-        )
-
-        // Card 3: Caça-Palavras Pro (Desafio Diário Offline)
-        addView(
-            buildActionGroupCard(
-                badgeText = getString(R.string.pro_ws_daily_btn).uppercase(java.util.Locale.getDefault()),
-                badgeHex = "#FFD54F",
-                titleText = getString(R.string.games_wordsearch_card_title),
-                subtitleText = getString(R.string.pro_ws_subtitle),
-                cardBgHex = "#151208",
-                strokeHex = "#FFB300",
-                buttons = listOf(
-                    WorldButtonSpec(R.string.pro_suite_wordsearch_btn, "#FFB300", "#070B14") {
-                        openProWordSearchDialog()
-                    },
-                ),
-            ),
-            bottom(14),
-        )
-
-        // Card 4: Hub Global Offline (Relógio Mundial + Moedas + Clima/Turismo)
-        addView(
-            buildActionGroupCard(
-                badgeText = getString(R.string.home_global_badge),
-                badgeHex = "#5DF5D3",
-                titleText = getString(R.string.home_global_title),
-                subtitleText = getString(R.string.home_global_subtitle),
-                cardBgHex = "#101827",
-                strokeHex = "#24344D",
-                buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_clock, "#1C2942", "#F8FAFC") { openWorldClockDialog() },
-                    WorldButtonSpec(R.string.home_btn_currency, "#1C2942", "#F8FAFC") { openCurrencyConverterDialog() },
-                    WorldButtonSpec(R.string.home_btn_travel, "#1C2942", "#F8FAFC") { openCountryTravelAndPlacesDialog() },
-                ),
-            ),
-            bottom(18),
-        )
     }
 
     private fun switchTab(tab: AppTab) {
         activeTab = tab
         statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS || tab == AppTab.HOME)) View.VISIBLE else View.GONE
         homeSection.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
+        newsSection.visibility = if (tab == AppTab.NEWS) View.VISIBLE else View.GONE
         filesSection.visibility = if (tab == AppTab.FILES || tab == AppTab.OAAS) View.VISIBLE else View.GONE
-        studioSection.visibility = if (tab == AppTab.STUDIO || tab == AppTab.GAMES || tab == AppTab.WORLD) View.VISIBLE else View.GONE
+        gamesSection.visibility = if (tab == AppTab.GAMES) View.VISIBLE else View.GONE
+        studioSection.visibility = if (tab == AppTab.STUDIO) View.VISIBLE else View.GONE
         oaasSection.visibility = View.GONE
-        gamesSection.visibility = View.GONE
         worldSection.visibility = View.GONE
         proSection.visibility = if (tab == AppTab.PRO) View.VISIBLE else View.GONE
         if (::mainScrollView.isInitialized) {
             mainScrollView.post { mainScrollView.scrollTo(0, 0) }
         }
 
-        // Paleta coesa em todo o app: Mint Teal (#00E5B0) nas abas padrão (ou Ouro 24K no VIP) e Âmbar no Pro
         val tabAccent = if (hasEffectiveProAccess()) Color.parseColor("#FFD54F") else color(R.color.sweep_primary)
         styleNavButton(navHomeBtn, tab == AppTab.HOME, customSelectedColor = tabAccent)
+        styleNavButton(navNewsBtn, tab == AppTab.NEWS, customSelectedColor = tabAccent)
         styleNavButton(navFilesBtn, tab == AppTab.FILES || tab == AppTab.OAAS, customSelectedColor = tabAccent)
-        styleNavButton(navStudioBtn, tab == AppTab.STUDIO || tab == AppTab.GAMES || tab == AppTab.WORLD, customSelectedColor = tabAccent)
+        styleNavButton(navGamesBtn, tab == AppTab.GAMES, customSelectedColor = tabAccent)
         styleNavButton(navProBtn, tab == AppTab.PRO, customSelectedColor = Color.parseColor("#FFB300"))
     }
 
@@ -1849,8 +1890,9 @@ class MainActivity : AppCompatActivity() {
     private fun renderBillingState(state: ProAccessSummaryState) {
         if (!::proStatusBadge.isInitialized) return
         if (::bottomNavContainer.isInitialized) {
+            navNewsBtn.visibility = View.VISIBLE
             navFilesBtn.visibility = View.VISIBLE
-            navStudioBtn.visibility = View.VISIBLE
+            navGamesBtn.visibility = View.VISIBLE
             navProBtn.visibility = View.VISIBLE
         }
         testerVipButton?.let { styleTesterVipButton(it, isTesterVipProEnabled()) }
@@ -2764,7 +2806,25 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         visibility = View.GONE
 
-        // Card 1: Caça-Palavras Pro (100% Offline + Desafio Diário)
+        // Card 1: NOVO • O Jogo dos 7 Erros (Spot the Differences)
+        addView(
+            buildActionGroupCard(
+                badgeText = getString(R.string.seven_diff_badge),
+                badgeHex = "#30D158",
+                titleText = getString(R.string.seven_diff_title),
+                subtitleText = getString(R.string.seven_diff_subtitle),
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
+                buttons = listOf(
+                    WorldButtonSpec(R.string.seven_diff_btn, "#30D158", "#070B14") {
+                        openSevenDifferencesDialog()
+                    },
+                ),
+            ),
+            bottom(14),
+        )
+
+        // Card 2: Super Caça-Palavras Pro (12 Temas • 240+ Palavras sem repetição)
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.pro_ws_daily_btn).uppercase(java.util.Locale.getDefault()),
@@ -2775,14 +2835,14 @@ class MainActivity : AppCompatActivity() {
                 strokeHex = "#FFB300",
                 buttons = listOf(
                     WorldButtonSpec(R.string.pro_suite_wordsearch_btn, "#FFB300", "#070B14") {
-                        runWithProAccess { openProWordSearchDialog() }
+                        openProWordSearchDialog()
                     },
                 ),
             ),
             bottom(14),
         )
 
-        // Card 2: Fliperama 100% Offline (Cobrinha Retrô + Blocos em Queda)
+        // Card 3: Fliperama 100% Offline (Cobrinha Retrô + Blocos em Queda)
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_arcade_badge),
@@ -2799,7 +2859,7 @@ class MainActivity : AppCompatActivity() {
             bottom(14),
         )
 
-        // Card 3: Curiosidade & Segredo Oculto (Mágica de Cartas, Dados Mágicos & Charadas)
+        // Card 4: Curiosidade & Segredo Oculto (Mágica de Cartas, Dados Mágicos & Charadas)
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_magic_badge),
@@ -2815,6 +2875,86 @@ class MainActivity : AppCompatActivity() {
             ),
             bottom(18),
         )
+    }
+
+    private fun openSevenDifferencesDialog() {
+        val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(12), dp(16), dp(16))
+        }
+
+        val statusRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val statusLabel = TextView(this).apply {
+            text = getString(R.string.seven_diff_found_status, 0, 7)
+            textSize = 14.5f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(color(R.color.google_blue_primary))
+        }
+        statusRow.addView(statusLabel, LinearLayout.LayoutParams(0, -2, 1f))
+
+        val hintButton = MaterialButton(this).apply {
+            text = getString(R.string.seven_diff_hint_btn)
+            textSize = 11.5f
+            isAllCaps = false
+            cornerRadius = dp(12)
+            minHeight = dp(40)
+            setTextColor(Color.parseColor("#070B14"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FFD60A"))
+        }
+        statusRow.addView(hintButton)
+        container.addView(statusRow, bottom(8))
+
+        val gameView = SevenDifferencesGameView(this).apply {
+            setLanguage(isPt)
+        }
+        val displayH = resources.displayMetrics.heightPixels
+        val gameViewH = (displayH * 0.52f).toInt().coerceIn(dp(320), dp(440))
+        container.addView(gameView, LinearLayout.LayoutParams(-1, gameViewH))
+
+        hintButton.setOnClickListener {
+            if (!gameView.provideHint()) {
+                Toast.makeText(this, if (isPt) "Você já encontrou todos os erros desta cena!" else "All differences found in this scene!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val actionRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val nextSceneBtn = button(getString(R.string.seven_diff_next_btn)) {
+            gameView.nextScene()
+            statusLabel.text = getString(R.string.seven_diff_found_status, 0, 7)
+        }.apply {
+            minHeight = dp(48)
+            textSize = 13f
+        }
+        actionRow.addView(nextSceneBtn, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
+        container.addView(actionRow)
+
+        gameView.onProgressChanged = { found, total, lastFoundName ->
+            statusLabel.text = getString(R.string.seven_diff_found_status, found, total)
+            if (lastFoundName.isNotBlank()) {
+                val toastMsg = if (isPt) "✨ Encontrado: $lastFoundName!" else "✨ Found: $lastFoundName!"
+                Toast.makeText(this, toastMsg, Toast.LENGTH_SHORT).show()
+            }
+        }
+        gameView.onAllFound = {
+            Toast.makeText(this, R.string.seven_diff_win_toast, Toast.LENGTH_LONG).show()
+        }
+
+        val scroll = ScrollView(this).apply { addView(container) }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.seven_diff_title)
+            .setView(scroll)
+            .setPositiveButton(android.R.string.ok, null)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
     }
 
     private fun buildWorldGlobalSection(): LinearLayout = LinearLayout(this).apply {

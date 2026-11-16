@@ -555,4 +555,16 @@ Total: %3$s</string>
     <string name="quick_clean_action_review">Review</string>
     <string name="quick_clean_action_find">Find</string>
     <string name="quick_clean_action_examine">Examine</string>
+    <string name="nav_news">📰 News</string>
+    <string name="gazette_header_title">📰 Daily Gazette &amp; World News</string>
+    <string name="gazette_header_subtitle">Clean daily headlines, technology insights, and world curiosities translated for you.</string>
+    <string name="gazette_read_more">Read full story →</string>
+    <string name="seven_diff_badge">NEW • 100% OFFLINE</string>
+    <string name="seven_diff_title">🔍 Spot the 7 Differences</string>
+    <string name="seven_diff_subtitle">Compare both pictures and tap on all 7 hidden errors!</string>
+    <string name="seven_diff_btn">Play 7 Differences</string>
+    <string name="seven_diff_found_status">Found: %1$d of %2$d</string>
+    <string name="seven_diff_hint_btn">💡 Reveal Hint</string>
+    <string name="seven_diff_next_btn">Next Scene ➡️</string>
+    <string name="seven_diff_win_toast">🏆 Awesome! You found all 7 differences!</string>
 </resources>

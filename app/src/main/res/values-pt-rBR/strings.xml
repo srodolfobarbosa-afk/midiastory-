@@ -555,4 +555,16 @@ Total: %3$s</string>
     <string name="quick_clean_action_review">Revisar</string>
     <string name="quick_clean_action_find">Localizar</string>
     <string name="quick_clean_action_examine">Examinar</string>
+    <string name="nav_news">📰 Jornal</string>
+    <string name="gazette_header_title">📰 Jornal Diário &amp; Notícias do Mundo</string>
+    <string name="gazette_header_subtitle">Manchetes do dia, dicas de tecnologia e curiosidades globais traduzidas para você.</string>
+    <string name="gazette_read_more">Ler matéria completa →</string>
+    <string name="seven_diff_badge">NOVO • 100% OFFLINE</string>
+    <string name="seven_diff_title">🔍 Jogo dos 7 Erros</string>
+    <string name="seven_diff_subtitle">Compare as duas imagens e toque nos 7 erros escondidos!</string>
+    <string name="seven_diff_btn">Jogar 7 Erros</string>
+    <string name="seven_diff_found_status">Encontrados: %1$d de %2$d</string>
+    <string name="seven_diff_hint_btn">💡 Revelar Dica</string>
+    <string name="seven_diff_next_btn">Próxima Imagem ➡️</string>
+    <string name="seven_diff_win_toast">🏆 Parabéns! Você encontrou todos os 7 erros!</string>
 </resources>
