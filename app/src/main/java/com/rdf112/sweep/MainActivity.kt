@@ -921,20 +921,21 @@ class MainActivity : AppCompatActivity() {
             cellContent.addView(descView, top(3))
             val actionBtn = MaterialButton(this).apply {
                 text = actionLabel
-                textSize = 11.5f
+                textSize = 12f
                 isAllCaps = false
-                minHeight = dp(36)
+                minHeight = dp(44)
                 cornerRadius = dp(18)
                 insetTop = 0
                 insetBottom = 0
-                setTextColor(Color.WHITE)
+                setPadding(dp(12), dp(8), dp(12), dp(8))
+                setTextColor(Color.parseColor("#0B0F19"))
                 backgroundTintList = android.content.res.ColorStateList.valueOf(accentColor)
                 setOnClickListener {
                     try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                     onClick()
                 }
             }
-            cellContent.addView(actionBtn, LinearLayout.LayoutParams(-1, dp(36)).apply { topMargin = dp(8) })
+            cellContent.addView(actionBtn, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
             return cellContent
         }
 

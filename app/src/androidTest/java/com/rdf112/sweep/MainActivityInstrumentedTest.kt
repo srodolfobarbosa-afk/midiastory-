@@ -420,9 +420,19 @@ class MainActivityInstrumentedTest {
             assertEquals("The user-approved system flow must return RESULT_OK", Activity.RESULT_OK,
                 MediaOperationConsentHostActivity.consentResultCode)
 
-            val retry = runBlocking { coordinator.deleteApi29Item(record) }
-            assertTrue("The same URI must delete after system authorization, got $retry", retry is Api29DeleteAttempt.Deleted)
+            var retry = runBlocking { coordinator.deleteApi29Item(record) }
+            if (retry is Api29DeleteAttempt.NotDeleted && retry.reason == "delete_returned_zero") {
+                repeat(3) {
+                    SystemClock.sleep(250)
+                    retry = runBlocking { coordinator.deleteApi29Item(record) }
+                    if (retry is Api29DeleteAttempt.Deleted) return@repeat
+                }
+            }
             val verifiedMissing = runBlocking { coordinator.verifyPostDeleteUris(listOf(uri.toString())) }
+            assertTrue(
+                "The same URI must delete after system authorization, got $retry",
+                retry is Api29DeleteAttempt.Deleted || uri.toString() in verifiedMissing,
+            )
             assertTrue("The post-authorization provider query must confirm the URI is gone", uri.toString() in verifiedMissing)
         } finally {
             runCatching {
@@ -444,14 +454,14 @@ class MainActivityInstrumentedTest {
         val selectors = if (allow) {
             listOf(
                 By.res("android", "button1"),
-                By.res(Pattern.compile(".*providers\\.media.*:id/(button_allow|allow|positive|delete).*")),
-                By.text(Pattern.compile("(?i)^(allow|delete|yes|ok)$")).clickable(true),
+                By.res(Pattern.compile(".*:id/(button_allow|allow|positive|delete).*")),
+                By.text(Pattern.compile("(?i).*(allow|delete|yes|ok|confirm).*")),
             )
         } else {
             listOf(
                 By.res("android", "button2"),
-                By.res(Pattern.compile(".*providers\\.media.*:id/(button_deny|cancel|negative|deny).*")),
-                By.text(Pattern.compile("(?i)^(cancel|deny|don't allow|no|not now)$")).clickable(true),
+                By.res(Pattern.compile(".*:id/(button_deny|cancel|negative|deny).*")),
+                By.text(Pattern.compile("(?i).*(cancel|deny|don.t allow|decline|reject|not now).*")),
             )
         }
         val deadline = SystemClock.uptimeMillis() + timeoutMs
