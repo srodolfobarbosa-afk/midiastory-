@@ -541,4 +541,18 @@ Total: %3$s</string>
     <string name="games_arcade_badge">🎮 FLIPERAMA 100% OFFLINE</string>
     <string name="games_magic_badge">🔮 MÁGICA &amp; CHARADAS OFFLINE</string>
     <string name="games_wordsearch_card_title">Caça-Palavras Pro &amp; Desafio Diário</string>
+    <string name="family_shield_title">Memórias de Família Protegidas</string>
+    <string name="family_shield_subtitle">Suas fotos favoritas e registros recentes estão blindados contra exclusão acidental.</string>
+    <string name="quick_clean_whatsapp_title">WhatsApp</string>
+    <string name="quick_clean_whatsapp_desc">Áudios e mídias recebidas</string>
+    <string name="quick_clean_duplicates_title">Duplicatas</string>
+    <string name="quick_clean_duplicates_desc">Cópias exatas confirmadas</string>
+    <string name="quick_clean_large_title">Grandes</string>
+    <string name="quick_clean_large_desc">Vídeos pesados (+10 MB)</string>
+    <string name="quick_clean_old_title">Antigos</string>
+    <string name="quick_clean_old_desc">Mídias com mais de 30 dias</string>
+    <string name="quick_clean_action_clean">Limpar</string>
+    <string name="quick_clean_action_review">Revisar</string>
+    <string name="quick_clean_action_find">Localizar</string>
+    <string name="quick_clean_action_examine">Examinar</string>
 </resources>

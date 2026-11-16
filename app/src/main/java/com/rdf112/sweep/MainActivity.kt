@@ -715,6 +715,28 @@ class MainActivity : AppCompatActivity() {
         heroHeader.addView(label(getString(R.string.home_welcome_title), 20f, R.color.sweep_text, true))
         addView(heroHeader, LinearLayout.LayoutParams(-1, -2))
 
+        // Card do Escudo de Proteção Familiar (Padrão Apple Clean / Zero Medo para Mães)
+        val familyShieldCard = card().apply {
+            val shieldRow = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(2), dp(2), dp(2), dp(2))
+            }
+            val shieldIcon = ImageView(this@MainActivity).apply {
+                setImageResource(android.R.drawable.ic_lock_lock)
+                setColorFilter(color(R.color.google_blue_primary))
+                background = roundedBackground(Color.argb(30, 10, 132, 255), dp(10))
+                setPadding(dp(6), dp(6), dp(6), dp(6))
+            }
+            shieldRow.addView(shieldIcon, LinearLayout.LayoutParams(dp(34), dp(34)).apply { marginEnd = dp(12) })
+            val shieldTexts = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+            shieldTexts.addView(label(getString(R.string.family_shield_title), 13.5f, R.color.sweep_text, true))
+            shieldTexts.addView(label(getString(R.string.family_shield_subtitle), 11.5f, R.color.sweep_muted, false), top(2))
+            shieldRow.addView(shieldTexts, LinearLayout.LayoutParams(0, -2, 1f))
+            addView(shieldRow)
+        }
+        addView(wrap(familyShieldCard), bottom(12))
+
         // Card de Medidor de Armazenamento Real (Anel + Barra Linear Segmentada + GB)
         val storageCard = card()
         val storageRow = LinearLayout(this@MainActivity).apply {
@@ -901,6 +923,16 @@ class MainActivity : AppCompatActivity() {
                 orientation = LinearLayout.VERTICAL
                 setPadding(dp(14), dp(14), dp(14), dp(14))
                 background = roundedBackground(bgTonalColor, dp(18))
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                    onClick()
+                }
+            }
+            val topRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
             }
             val iconView = ImageView(this).apply {
                 setImageResource(iconRes)
@@ -908,8 +940,20 @@ class MainActivity : AppCompatActivity() {
                 background = roundedBackground(Color.argb(35, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor)), dp(8))
                 setPadding(dp(6), dp(6), dp(6), dp(6))
             }
-            cellContent.addView(iconView, LinearLayout.LayoutParams(dp(32), dp(32)))
-            val titleView = label(title, 14f, R.color.sweep_text, true).apply {
+            topRow.addView(iconView, LinearLayout.LayoutParams(dp(30), dp(30)))
+            topRow.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
+            val actionPill = TextView(this).apply {
+                text = actionLabel
+                textSize = 11f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(accentColor)
+                background = roundedBackground(Color.argb(35, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor)), dp(10))
+                setPadding(dp(10), dp(3), dp(10), dp(3))
+            }
+            topRow.addView(actionPill)
+            cellContent.addView(topRow)
+
+            val titleView = label(title, 14.5f, R.color.sweep_text, true).apply {
                 maxLines = 1
                 ellipsize = android.text.TextUtils.TruncateAt.END
             }
@@ -918,42 +962,26 @@ class MainActivity : AppCompatActivity() {
                 maxLines = 2
                 ellipsize = android.text.TextUtils.TruncateAt.END
             }
-            cellContent.addView(descView, top(3))
-            val actionBtn = MaterialButton(this).apply {
-                text = actionLabel
-                textSize = 12f
-                isAllCaps = false
-                minHeight = dp(44)
-                cornerRadius = dp(18)
-                insetTop = 0
-                insetBottom = 0
-                setPadding(dp(12), dp(8), dp(12), dp(8))
-                setTextColor(Color.parseColor("#0B0F19"))
-                backgroundTintList = android.content.res.ColorStateList.valueOf(accentColor)
-                setOnClickListener {
-                    try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
-                    onClick()
-                }
-            }
-            cellContent.addView(actionBtn, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
+            cellContent.addView(descView, top(2))
+
             return cellContent
         }
 
         val row1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val waCell = buildGridCell(
             iconRes = android.R.drawable.ic_dialog_email,
-            title = "WhatsApp",
-            description = "Áudios e mídias recebidas",
-            actionLabel = "Limpar",
+            title = getString(R.string.quick_clean_whatsapp_title),
+            description = getString(R.string.quick_clean_whatsapp_desc),
+            actionLabel = getString(R.string.quick_clean_action_clean),
             bgTonalColor = color(R.color.m3_tonal_whatsapp_bg),
             accentColor = color(R.color.m3_tonal_whatsapp_accent),
             onClick = { openWhatsAppCleanerFlow() }
         )
         val dupCell = buildGridCell(
             iconRes = android.R.drawable.ic_menu_agenda,
-            title = "Duplicatas",
-            description = "Cópias exatas SHA-256",
-            actionLabel = "Localizar",
+            title = getString(R.string.quick_clean_duplicates_title),
+            description = getString(R.string.quick_clean_duplicates_desc),
+            actionLabel = getString(R.string.quick_clean_action_find),
             bgTonalColor = color(R.color.m3_tonal_duplicates_bg),
             accentColor = color(R.color.m3_tonal_duplicates_accent),
             onClick = {
@@ -968,9 +996,9 @@ class MainActivity : AppCompatActivity() {
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val largeCell = buildGridCell(
             iconRes = android.R.drawable.ic_media_play,
-            title = "Grandes",
-            description = "Vídeos pesados >10 MB",
-            actionLabel = "Revisar",
+            title = getString(R.string.quick_clean_large_title),
+            description = getString(R.string.quick_clean_large_desc),
+            actionLabel = getString(R.string.quick_clean_action_review),
             bgTonalColor = color(R.color.m3_tonal_large_bg),
             accentColor = color(R.color.m3_tonal_large_accent),
             onClick = {
@@ -980,9 +1008,9 @@ class MainActivity : AppCompatActivity() {
         )
         val oldCell = buildGridCell(
             iconRes = android.R.drawable.ic_menu_recent_history,
-            title = "Antigos",
-            description = "Mídias com mais de 30 dias",
-            actionLabel = "Examinar",
+            title = getString(R.string.quick_clean_old_title),
+            description = getString(R.string.quick_clean_old_desc),
+            actionLabel = getString(R.string.quick_clean_action_examine),
             bgTonalColor = color(R.color.m3_tonal_old_bg),
             accentColor = color(R.color.m3_tonal_old_accent),
             onClick = {
@@ -1563,7 +1591,7 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(48)
         }
         photoCard.addView(openFiltersBtn, top(12))
-        addView(themedCard(photoCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
+        addView(themedCard(photoCard, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)), bottom(14))
 
         // AMBIENTE 2: Áudio & Vídeo (Harmony Slate + Mint Accent)
         val videoCard = LinearLayout(this@MainActivity).apply {
@@ -1590,7 +1618,7 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(48)
         }
         videoCard.addView(openVideoBtn, top(12))
-        addView(themedCard(videoCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
+        addView(themedCard(videoCard, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)), bottom(14))
 
         // AMBIENTE 3: Limpador de Privacidade EXIF (Harmony Slate + Emerald)
         val exifCard = LinearLayout(this@MainActivity).apply {
@@ -1617,7 +1645,7 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(48)
         }
         exifCard.addView(openExifBtn, top(12))
-        addView(themedCard(exifCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
+        addView(themedCard(exifCard, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)), bottom(14))
 
         // AMBIENTE 4: Gerador de QR Code (Harmony Slate + Amber)
         val qrCard = LinearLayout(this@MainActivity).apply {
@@ -1644,7 +1672,7 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(48)
         }
         qrCard.addView(openQrBtn, top(12))
-        addView(themedCard(qrCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
+        addView(themedCard(qrCard, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)), bottom(14))
 
         // AMBIENTE 5: Fotos para PDF (Harmony Slate + Slate Alt)
         val pdfCard = LinearLayout(this@MainActivity).apply {
@@ -1671,7 +1699,7 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(48)
         }
         pdfCard.addView(openPdfBtn, top(12))
-        addView(themedCard(pdfCard, color(R.color.sweep_surface), Color.parseColor("#24344D")), bottom(14))
+        addView(themedCard(pdfCard, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)), bottom(14))
 
         // SEÇÃO: FLIPERAMA & PASSATEMPOS 100% OFFLINE
         val arcadeHeader = LinearLayout(this@MainActivity).apply {
@@ -1682,7 +1710,7 @@ class MainActivity : AppCompatActivity() {
             text = getString(R.string.games_arcade_badge)
             textSize = 10.5f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#5DF5D3"))
+            setTextColor(color(R.color.google_blue_tonal_accent))
         }
         arcadeHeader.addView(arcadeBadge)
         arcadeHeader.addView(label(getString(R.string.snake_dialog_title), 18f, R.color.sweep_text, true), top(4))
@@ -1693,14 +1721,14 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_arcade_badge),
-                badgeHex = "#5DF5D3",
+                badgeHex = "#64D2FF",
                 titleText = getString(R.string.snake_dialog_title),
                 subtitleText = getString(R.string.snake_hint_offline),
-                cardBgHex = "#101827",
-                strokeHex = "#24344D",
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_snake, "#00E5B0", "#070B14") { openOfflineSnakeGameDialog() },
-                    WorldButtonSpec(R.string.home_btn_blocks, "#1C2942", "#F8FAFC") { openFallingBlocksGameDialog() },
+                    WorldButtonSpec(R.string.home_btn_snake, "#0A84FF", "#FFFFFF") { openOfflineSnakeGameDialog() },
+                    WorldButtonSpec(R.string.home_btn_blocks, "#2C2C2E", "#FFFFFF") { openFallingBlocksGameDialog() },
                 ),
             ),
             bottom(14),
@@ -1710,14 +1738,14 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_magic_badge),
-                badgeHex = "#5DF5D3",
+                badgeHex = "#64D2FF",
                 titleText = getString(R.string.magic_lab_title),
                 subtitleText = getString(R.string.magic_lab_subtitle),
-                cardBgHex = "#101827",
-                strokeHex = "#24344D",
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_magic, "#1C2942", "#F8FAFC") { openMagicSecretLabDialog() },
-                    WorldButtonSpec(R.string.dice_title, "#1C2942", "#FFD54F") { openMagicDiceDialog() },
+                    WorldButtonSpec(R.string.home_btn_magic, "#2C2C2E", "#FFFFFF") { openMagicSecretLabDialog() },
+                    WorldButtonSpec(R.string.dice_title, "#2C2C2E", "#FFD54F") { openMagicDiceDialog() },
                 ),
             ),
             bottom(14),
@@ -2758,14 +2786,14 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_arcade_badge),
-                badgeHex = "#5DF5D3",
+                badgeHex = "#64D2FF",
                 titleText = getString(R.string.snake_dialog_title),
                 subtitleText = getString(R.string.snake_hint_offline),
-                cardBgHex = "#101827",
-                strokeHex = "#24344D",
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_snake, "#00E5B0", "#070B14") { openOfflineSnakeGameDialog() },
-                    WorldButtonSpec(R.string.home_btn_blocks, "#1C2942", "#F8FAFC") { openFallingBlocksGameDialog() },
+                    WorldButtonSpec(R.string.home_btn_snake, "#0A84FF", "#FFFFFF") { openOfflineSnakeGameDialog() },
+                    WorldButtonSpec(R.string.home_btn_blocks, "#2C2C2E", "#FFFFFF") { openFallingBlocksGameDialog() },
                 ),
             ),
             bottom(14),
@@ -2775,14 +2803,14 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.games_magic_badge),
-                badgeHex = "#5DF5D3",
+                badgeHex = "#64D2FF",
                 titleText = getString(R.string.magic_lab_title),
                 subtitleText = getString(R.string.magic_lab_subtitle),
-                cardBgHex = "#101827",
-                strokeHex = "#24344D",
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_magic, "#1C2942", "#F8FAFC") { openMagicSecretLabDialog() },
-                    WorldButtonSpec(R.string.dice_title, "#1C2942", "#FFD54F") { openMagicDiceDialog() },
+                    WorldButtonSpec(R.string.home_btn_magic, "#2C2C2E", "#FFFFFF") { openMagicSecretLabDialog() },
+                    WorldButtonSpec(R.string.dice_title, "#2C2C2E", "#FFD54F") { openMagicDiceDialog() },
                 ),
             ),
             bottom(18),
@@ -2797,15 +2825,15 @@ class MainActivity : AppCompatActivity() {
         addView(
             buildActionGroupCard(
                 badgeText = getString(R.string.home_global_badge),
-                badgeHex = "#5DF5D3",
+                badgeHex = "#64D2FF",
                 titleText = getString(R.string.home_global_title),
                 subtitleText = getString(R.string.home_global_subtitle),
-                cardBgHex = "#101827",
-                strokeHex = "#24344D",
+                cardBgHex = "#1C1C1E",
+                strokeHex = "#2C2C2E",
                 buttons = listOf(
-                    WorldButtonSpec(R.string.home_btn_clock, "#00E5B0", "#070B14") { openWorldClockDialog() },
-                    WorldButtonSpec(R.string.home_btn_currency, "#1C2942", "#F8FAFC") { openCurrencyConverterDialog() },
-                    WorldButtonSpec(R.string.home_btn_travel, "#1C2942", "#5DF5D3") { openCountryTravelAndPlacesDialog() },
+                    WorldButtonSpec(R.string.home_btn_clock, "#0A84FF", "#FFFFFF") { openWorldClockDialog() },
+                    WorldButtonSpec(R.string.home_btn_currency, "#2C2C2E", "#FFFFFF") { openCurrencyConverterDialog() },
+                    WorldButtonSpec(R.string.home_btn_travel, "#2C2C2E", "#64D2FF") { openCountryTravelAndPlacesDialog() },
                 ),
                 saveTitleRefs = true,
             ),

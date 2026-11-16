@@ -541,4 +541,18 @@ Total: %3$s</string>
     <string name="games_arcade_badge">🎮 100% OFFLINE ARCADE</string>
     <string name="games_magic_badge">🔮 MAGIC VAULT &amp; RIDDLES</string>
     <string name="games_wordsearch_card_title">Word Search Pro &amp; Daily Brain Challenge</string>
+    <string name="family_shield_title">Family Photos Protected</string>
+    <string name="family_shield_subtitle">Your favorites and recent memories are guarded and safe from accidental deletion.</string>
+    <string name="quick_clean_whatsapp_title">WhatsApp</string>
+    <string name="quick_clean_whatsapp_desc">Received voice notes &amp; media</string>
+    <string name="quick_clean_duplicates_title">Duplicates</string>
+    <string name="quick_clean_duplicates_desc">Exact SHA-256 identical copies</string>
+    <string name="quick_clean_large_title">Large Files</string>
+    <string name="quick_clean_large_desc">Heavy videos over 10 MB</string>
+    <string name="quick_clean_old_title">Old Media</string>
+    <string name="quick_clean_old_desc">Files older than 30 days</string>
+    <string name="quick_clean_action_clean">Clean</string>
+    <string name="quick_clean_action_review">Review</string>
+    <string name="quick_clean_action_find">Find</string>
+    <string name="quick_clean_action_examine">Examine</string>
 </resources>

@@ -12,12 +12,12 @@ import android.util.TypedValue
 import android.view.View
 
 /**
- * Medidor Circular Premium do Sweep com arco gradiente Esmeralda -> Ciano -> Âmbar,
- * trilha translúcida e percentual centralizado de alta nitidez (sem warnings de compilação).
+ * Medidor Circular Apple-Grade do Midiastore com arco gradiente Apple Blue / VIP Gold,
+ * trilha neutra translúcida e percentual centralizado de alta nitidez.
  */
 class StorageRingGaugeView(context: Context) : View(context) {
     private val density = resources.displayMetrics.density
-    private val strokePx = 12f * density
+    private val strokePx = 11f * density
     private val arcRect = RectF()
 
     private fun sp(value: Float): Float =
@@ -27,26 +27,26 @@ class StorageRingGaugeView(context: Context) : View(context) {
         style = Paint.Style.STROKE
         strokeWidth = strokePx
         strokeCap = Paint.Cap.ROUND
-        color = Color.parseColor("#1C2942")
+        color = Color.parseColor("#2C2C2E")
     }
 
     private val progressPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = strokePx
         strokeCap = Paint.Cap.ROUND
-        color = Color.parseColor("#00E5B0")
+        color = Color.parseColor("#0A84FF")
     }
 
     private val percentTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#F8FAFC")
+        color = Color.WHITE
         textSize = sp(24f)
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         textAlign = Paint.Align.CENTER
     }
 
     private val subTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#5DF5D3")
-        textSize = sp(10f)
+        color = Color.parseColor("#8E8E93")
+        textSize = sp(10.5f)
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         textAlign = Paint.Align.CENTER
     }
@@ -65,7 +65,7 @@ class StorageRingGaugeView(context: Context) : View(context) {
             invalidate()
         }
 
-    var bottomLabel: String = "USED"
+    var bottomLabel: String = "USADO"
         set(value) {
             field = value
             updateAccessibilityLabel()
@@ -76,8 +76,8 @@ class StorageRingGaugeView(context: Context) : View(context) {
         set(value) {
             if (field != value) {
                 field = value
-                trackPaint.color = Color.parseColor(if (value) "#2C2208" else "#1C2942")
-                subTextPaint.color = Color.parseColor(if (value) "#FFD700" else "#5DF5D3")
+                trackPaint.color = Color.parseColor(if (value) "#3A2E0F" else "#2C2C2E")
+                subTextPaint.color = Color.parseColor(if (value) "#FFD60A" else "#8E8E93")
                 updateProgressShader()
                 invalidate()
             }
@@ -91,15 +91,13 @@ class StorageRingGaugeView(context: Context) : View(context) {
         if (arcRect.width() <= 0f || arcRect.height() <= 0f) return
         val colors = if (isProVipTheme) {
             intArrayOf(
-                Color.parseColor("#FFD700"),
-                Color.parseColor("#FFAB00"),
-                Color.parseColor("#FEF08A"),
+                Color.parseColor("#FFD60A"),
+                Color.parseColor("#FF9F0A"),
             )
         } else {
             intArrayOf(
-                Color.parseColor("#00E5B0"),
-                Color.parseColor("#38BDF8"),
-                Color.parseColor("#FBBF24"),
+                Color.parseColor("#0A84FF"),
+                Color.parseColor("#64D2FF"),
             )
         }
         progressPaint.shader = LinearGradient(
@@ -108,7 +106,7 @@ class StorageRingGaugeView(context: Context) : View(context) {
             arcRect.right,
             arcRect.bottom,
             colors,
-            floatArrayOf(0f, 0.7f, 1f),
+            floatArrayOf(0f, 1f),
             Shader.TileMode.CLAMP,
         )
     }

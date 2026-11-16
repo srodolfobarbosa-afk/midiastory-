@@ -72,18 +72,18 @@ async function main() {
         track: targetTrack,
         releases: [
           {
-            name: `2.5.0 (${versionCode})`,
+            name: `2.6.0 (${versionCode})`,
             versionCodes: [String(versionCode)],
             status: releaseStatus,
             releaseNotes: [
-              { language: "pt-BR", text: "v2.5.0: Visual redesenhado em 7 abas organizadas (Início limpo, Limpeza, Arquivos, Estúdio, Jogos Offline, Mundo e Planos Pro), cabeçalho refinado, Modo Fácil (Aa+), Tema VIP Preto & Ouro 24K, Caça-Palavras Pro 9x9, Cobrinha, Blocos, Hub Mundial offline, Notas/Calculadora/QR Pro e 14 idiomas!" },
-              { language: "en-US", text: "v2.5.0: Clean 7-tab separation (Home, Cleanup, Files, Media Studio, Offline Games, World Hub & Pro), polished header, Senior Easy Mode (Aa+), Royal Black & 24K Gold VIP theme, Pro Word Search 9x9, Retro Snake, Falling Blocks, offline World Clock & Currency, Notes/Calc/QR Pro & 14 languages!" },
-              { language: "es-ES", text: "v2.5.0: Diseño limpio en 7 pestañas separadas (Inicio, Limpieza, Archivos, Estudio, Juegos Offline, Mundo y Pro), Modo Fácil (Aa+), Tema VIP Oro 24K, Sopa de Letras Pro, Serpiente, Bloques, Reloj Mundial y Conversor offline, Notas/Calculadora/QR Pro en 14 idiomas." },
-              { language: "fr-FR", text: "v2.5.0 : Interface épurée en 7 onglets dédiés (Accueil, Nettoyage, Fichiers, Studio, Jeux hors-ligne, Monde et Pro), Mode Facile (Aa+), Thème VIP Or 24K, Mots Mêlés Pro, Serpent, Blocs, Horloge Mondiale et Devises hors-ligne en 14 langues." },
-              { language: "de-DE", text: "v2.5.0: Saubere 7-Tab-Struktur (Start, Bereinigung, Dateien, Studio, Offline-Spiele, Welt & Pro), Senioren-Modus (Aa+), VIP Schwarz-Gold-Design, Wortsuche Pro, Snake, Blöcke, Offline-Weltzeituhr & Währungsrechner in 14 Sprachen." },
-              { language: "hi-IN", text: "v2.5.0: 7 साफ अलग-अलग टैब (होम, सफाई, फ़ाइलें, स्टूडियो, ऑफ़लाइन गेम्स, दुनिया और Pro), बड़ा फ़ॉन्ट मोड (Aa+), VIP ब्लैक-गोल्ड थीम, शब्द खोज Pro 9x9, स्नेक, ब्लॉक्स, विश्व घड़ी व मुद्रा परिवर्तक 14 भाषाओं में!" },
-              { language: "ja-JP", text: "v2.5.0：機能別に整理された7タブUI（ホーム・整理・ファイル・スタジオ・オフラインゲーム・世界・Pro）、大文字モード(Aa+)、ゴールドVIPテーマ、単語探しPro・スネーク・ブロック、世界時計＆通貨換算を14言語で搭載！" },
-              { language: "zh-CN", text: "v2.5.0：全新清晰的7大独立标签页（首页、清理、文件、媒体工作室、离线游戏、世界工具、Pro）、长辈大字模式(Aa+)、黑金VIP主题、寻字Pro/贪吃蛇/方块、离线世界时钟与汇率换算，支持14种语言！" }
+              { language: "pt-BR", text: "v2.6.0: Padrão Apple Dark OLED, Escudo de Proteção Familiar com blindagem de fotos favoritas, grade rápida com toque suave sem poluição visual, anel de armazenamento ultra nítido e foco total em segurança e tranquilidade para toda a família." },
+              { language: "en-US", text: "v2.6.0: Apple Dark OLED design, Family Shield with favorite photos protection, polished non-cluttered quick-clean grid, ultra-sharp storage ring, and peace-of-mind cleanup for the whole family." },
+              { language: "es-ES", text: "v2.6.0: Diseño Apple Dark OLED, Escudo de Protección Familiar con resguardo de favoritos, cuadrícula de limpieza sin saturación, medidor de almacenamiento nítido y tranquilidad total para la familia." },
+              { language: "fr-FR", text: "v2.6.0 : Design Apple Dark OLED, Bouclier Familial protégeant les photos favorites, grille de nettoyage rapide épurée, jauge de stockage nette et sérénité absolue pour toute la famille." },
+              { language: "de-DE", text: "v2.6.0: Apple Dark OLED Design, Familienschutz-Schild zum Schutz von Favoriten, aufgeräumtes Schnellreinigungs-Raster, hochpräziser Speicherring und sichere Bereinigung für die ganze Familie." },
+              { language: "hi-IN", text: "v2.6.0: Apple Dark OLED डिज़ाइन, पसंदीदा फ़ोटो सुरक्षा के लिए पारिवारिक शील्ड, स्वच्छ और सरल त्वरित सफाई ग्रिड, स्पष्ट स्टोरेज रिंग और पूरे परिवार के लिए安心!" },
+              { language: "ja-JP", text: "v2.6.0：Apple基準のDark OLEDデザイン、お気に入り写真を保護するファミリーシールド、洗練されたクイック整理グリッド、見やすいストレージリングを搭載！" },
+              { language: "zh-CN", text: "v2.6.0：全新Apple级纯黑OLED设计、保护家人与收藏照片的安全盾牌、极简触控快捷清理网格与超高清存储环，让全家放心使用！" }
             ],
           },
         ],
