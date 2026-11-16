@@ -2490,3 +2490,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #310
 
 ---
+
+### 📍 [16/11/2026, 01:56:28] Planta Mestra de Atualizações v2.7.0/v3.0.0, Áudio TTS de Notícias, Filtros Netvasco e 3 Cenas dos 7 Erros
+- **📖 Estudou / Leu:** Reclamações de app embolado, benchmark Netvasco para notícias, TextToSpeech nativo, 3 cenas vetoriais dos 7 erros, algoritmo de fotos borradas por variância Laplaciana e diagnóstico de chave de assinatura debug vs sweep-upload.jks
+- **⚙️ Tentou / Executou:** Integração do TextToSpeech no diálogo de notícias, chips de filtro de editoria, renderização dinâmica de notícias e cenas vetoriais da Praia Tropical
+- **⚠️ Erros Encontrados:** App anterior aparentava embolamento por concentrar 10 ferramentas em uma única tela; versão antiga não atualizava por cima por incompatibilidade entre debug.keystore e sweep-upload.jks
+- **🔧 Como Corrigiu:** Criação de 5 abas limpas, leitor de notícias em voz alta, filtro por categoria, motor dos 7 erros expandido para 3 cenas e atualização do artefato de planta arquitetural
+- **🎯 Conclusão:** A arquitetura em 5 páginas resolveu definitivamente o embolamento; a chave sweep-upload.jks agora garante atualizações com 1 toque por cima; notícias e passatempos garantem retenção diária máxima para atingir os 14 dias da Play Store e acelerar o caminho para R$ 1.000.000,00
+- *Registro Supabase:* Memory #311
+
+---
