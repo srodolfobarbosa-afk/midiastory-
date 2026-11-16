@@ -550,48 +550,19 @@ class MainActivity : AppCompatActivity() {
         val topBar = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(16), dp(12), dp(16), dp(6))
+            setPadding(dp(20), dp(14), dp(20), dp(10))
         }
         val brandLockup = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            background = borderedPill(
-                color(R.color.sweep_surface),
-                Color.parseColor("#4000E5FF"),
-                dp(16),
-                dp(1),
-            )
-            setPadding(dp(10), dp(6), dp(14), dp(6))
-            isClickable = true
-            isFocusable = true
-            setOnClickListener {
-                val now = System.currentTimeMillis()
-                if (now - logoLastTapMs > 1800L) logoEasterEggTapCount = 0
-                logoLastTapMs = now
-                logoEasterEggTapCount++
-                if (logoEasterEggTapCount in 3..4) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.logo_easter_egg_step, logoEasterEggTapCount, 5),
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                } else if (logoEasterEggTapCount >= 5) {
-                    logoEasterEggTapCount = 0
-                    openMagicSecretLabDialog()
-                }
-            }
+            setPadding(0, dp(4), dp(8), dp(4))
         }
         brandLockupCard = brandLockup
-        val mark = ImageView(this).apply {
-            setImageResource(R.mipmap.ic_launcher)
-            contentDescription = getString(R.string.app_name)
-        }
-        brandLockup.addView(mark, LinearLayout.LayoutParams(dp(34), dp(34)))
 
         val brandCopy = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        val wordmark = label(getString(R.string.app_name), 19.5f, R.color.sweep_text, true).apply {
+        val wordmark = label(getString(R.string.app_name), 22f, R.color.sweep_text, true).apply {
             typeface = Typeface.create("sans-serif-medium", Typeface.BOLD)
-            letterSpacing = -0.01f
+            letterSpacing = -0.02f
             maxLines = 1
             isSingleLine = true
             ellipsize = android.text.TextUtils.TruncateAt.END
@@ -599,59 +570,27 @@ class MainActivity : AppCompatActivity() {
         brandWordmarkView = wordmark
         renderBrandWordmark(isPro = false)
         brandCopy.addView(wordmark)
-        brandLockup.addView(brandCopy, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(8) })
+        brandLockup.addView(brandCopy, LinearLayout.LayoutParams(-2, -2))
         topBar.addView(brandLockup, LinearLayout.LayoutParams(0, -2, 1f))
-        easyModeButton = button(getString(if (isEasySeniorModeEnabled()) R.string.easy_mode_btn_on else R.string.easy_mode_btn_off)) {
-            val next = !isEasySeniorModeEnabled()
-            setEasySeniorModeEnabled(next)
-            applyEasySeniorMode(next)
-            Toast.makeText(
-                this,
-                if (next) R.string.easy_mode_on_toast else R.string.easy_mode_off_toast,
-                Toast.LENGTH_SHORT,
-            ).show()
-        }.apply {
-            minHeight = dp(44)
-            minWidth = dp(48)
-            insetTop = 0
-            insetBottom = 0
-            cornerRadius = dp(18)
-            setPadding(dp(14), dp(8), dp(14), dp(8))
-            textSize = 11.5f
-            typeface = Typeface.DEFAULT_BOLD
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
-            setTextColor(color(R.color.sweep_text))
-        }
+        easyModeButton = button("") {}.apply { visibility = View.GONE }
+        brandTaglineLabel = label("", 11f, R.color.sweep_muted, false).apply { visibility = View.GONE }
         topBarProButton = button(getString(R.string.premium_area_button)) {
             switchTab(AppTab.PRO)
         }.apply {
-            minHeight = dp(40)
+            minHeight = dp(34)
             insetTop = 0
             insetBottom = 0
-            cornerRadius = dp(18)
-            setPadding(dp(14), dp(6), dp(14), dp(6))
+            cornerRadius = dp(17)
+            setPadding(dp(14), dp(4), dp(14), dp(4))
             textSize = 12f
             maxLines = 1
             isSingleLine = true
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(color(R.color.google_blue_primary))
+            setTextColor(color(R.color.sweep_muted))
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         }
         topBar.addView(topBarProButton, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(10) })
         root.addView(topBar, LinearLayout.LayoutParams(-1, -2))
-
-        val topUtilityRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(18), dp(2), dp(16), dp(8))
-        }
-        brandTaglineLabel = label(getString(R.string.brand_tagline), 11f, R.color.sweep_primary_glow, true).apply {
-            maxLines = 2
-            ellipsize = android.text.TextUtils.TruncateAt.END
-        }
-        topUtilityRow.addView(brandTaglineLabel, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(10) })
-        topUtilityRow.addView(easyModeButton, LinearLayout.LayoutParams(-2, -2))
-        root.addView(topUtilityRow, LinearLayout.LayoutParams(-1, -2))
 
         // Barra de progresso fina e moderna
         progress = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
@@ -698,32 +637,49 @@ class MainActivity : AppCompatActivity() {
         bodyContainer.addView(worldSection)
         bodyContainer.addView(proSection)
 
-        // 3. BARRA DE NAVEGAÇÃO FIXA & MINIMALISTA (5 Abas Apple Clean)
+        // 3. BARRA DE NAVEGAÇÃO FIXA & MINIMALISTA (3 Abas Limpas Apple HIG: Limpar, Arquivos, Pro)
+        val navDivider = View(this).apply {
+            setBackgroundColor(color(R.color.sweep_surface_alt))
+        }
+        root.addView(navDivider, LinearLayout.LayoutParams(-1, dp(1)))
+
         bottomNavContainer = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(Color.parseColor("#0A0A0C"))
-            setPadding(dp(4), dp(6), dp(4), dp(6))
+            setPadding(dp(8), dp(4), dp(8), dp(6))
         }
-        navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }
-        navNewsBtn = navTabButton(getString(R.string.nav_news)) { switchTab(AppTab.NEWS) }
-        navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }
-        navGamesBtn = navTabButton(getString(R.string.nav_games)) { switchTab(AppTab.GAMES) }
-        navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }
+        navHomeBtn = navTabButton(getString(R.string.nav_home)) { switchTab(AppTab.HOME) }.apply {
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_delete)
+            iconGravity = MaterialButton.ICON_GRAVITY_TOP
+            iconSize = dp(20)
+            iconPadding = dp(2)
+        }
+        navFilesBtn = navTabButton(getString(R.string.nav_files)) { switchTab(AppTab.FILES) }.apply {
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_gallery)
+            iconGravity = MaterialButton.ICON_GRAVITY_TOP
+            iconSize = dp(20)
+            iconPadding = dp(2)
+        }
+        navProBtn = navTabButton(getString(R.string.nav_pro)) { switchTab(AppTab.PRO) }.apply {
+            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.btn_star_big_off)
+            iconGravity = MaterialButton.ICON_GRAVITY_TOP
+            iconSize = dp(20)
+            iconPadding = dp(2)
+        }
+        navNewsBtn = navTabButton("") {}.apply { visibility = View.GONE }
+        navGamesBtn = navTabButton("") {}.apply { visibility = View.GONE }
 
-        listOf(navHomeBtn, navNewsBtn, navFilesBtn, navGamesBtn, navProBtn).forEach { tabBtn ->
-            tabBtn.textSize = 10.5f
+        listOf(navHomeBtn, navFilesBtn, navProBtn).forEach { tabBtn ->
+            tabBtn.textSize = 11f
             tabBtn.minHeight = dp(52)
             tabBtn.insetLeft = 0
             tabBtn.insetRight = 0
-            tabBtn.setPadding(dp(2), dp(4), dp(2), dp(4))
+            tabBtn.setPadding(dp(4), dp(6), dp(4), dp(6))
             tabBtn.typeface = Typeface.DEFAULT_BOLD
             bottomNavContainer.addView(
                 tabBtn,
-                LinearLayout.LayoutParams(0, -2, 1f).apply {
-                    marginStart = dp(2)
-                    marginEnd = dp(2)
-                },
+                LinearLayout.LayoutParams(0, -2, 1f),
             )
         }
         root.addView(bottomNavContainer, LinearLayout.LayoutParams(-1, -2))
@@ -735,95 +691,60 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
 
-        val heroHeader = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(4), dp(0), dp(4), dp(10))
-        }
-        heroHeader.addView(label(getString(R.string.home_welcome_title), 20f, R.color.sweep_text, true))
-        addView(heroHeader, LinearLayout.LayoutParams(-1, -2))
-
-        // Card do Escudo de Proteção Familiar (Padrão Apple Clean / Zero Medo para Mães)
-        val familyShieldCard = card().apply {
-            val shieldRow = LinearLayout(this@MainActivity).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                setPadding(dp(2), dp(2), dp(2), dp(2))
-            }
-            val shieldIcon = ImageView(this@MainActivity).apply {
-                setImageResource(android.R.drawable.ic_lock_lock)
-                setColorFilter(color(R.color.google_blue_primary))
-                background = roundedBackground(Color.argb(30, 10, 132, 255), dp(10))
-                setPadding(dp(6), dp(6), dp(6), dp(6))
-            }
-            shieldRow.addView(shieldIcon, LinearLayout.LayoutParams(dp(34), dp(34)).apply { marginEnd = dp(12) })
-            val shieldTexts = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-            shieldTexts.addView(label(getString(R.string.family_shield_title), 13.5f, R.color.sweep_text, true))
-            shieldTexts.addView(label(getString(R.string.family_shield_subtitle), 11.5f, R.color.sweep_muted, false), top(2))
-            shieldRow.addView(shieldTexts, LinearLayout.LayoutParams(0, -2, 1f))
-            addView(shieldRow)
-        }
-        addView(wrap(familyShieldCard), bottom(12))
-
-        // Card de Medidor de Armazenamento Real (Anel + Barra Linear Segmentada + GB)
+        // Card de Medidor de Armazenamento Real (Padrão Apple Clean)
         val storageCard = card()
         val storageRow = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
         storageRingGauge = StorageRingGaugeView(this@MainActivity).apply {
-            bottomLabel = getString(R.string.storage_ring_used)
+            bottomLabel = ""
         }
-        storageRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(100), dp(100)).apply { marginEnd = dp(14) })
+        storageRow.addView(storageRingGauge, LinearLayout.LayoutParams(dp(92), dp(92)).apply { marginEnd = dp(16) })
         val storageCopy = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        storageCopy.addView(label(getString(R.string.storage_title), 11f, R.color.google_blue_tonal_accent, true))
-        storageUsedHeadline = label(getString(R.string.storage_unavailable), 18f, R.color.sweep_text, true)
-        storageCopy.addView(storageUsedHeadline, top(3))
-        storageFreeSubline = label("", 12.5f, R.color.sweep_muted, false)
-        storageCopy.addView(storageFreeSubline, top(2))
+        storageUsedHeadline = label(getString(R.string.storage_unavailable), 19f, R.color.sweep_text, true)
+        storageCopy.addView(storageUsedHeadline)
+        storageFreeSubline = label("", 13f, R.color.sweep_muted, false)
+        storageCopy.addView(storageFreeSubline, top(4))
         storageProgressBar = ProgressBar(this@MainActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
+            visibility = View.GONE
             isIndeterminate = false
             max = 100
             progress = 0
-            progressTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
-            progressBackgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         }
-        storageCopy.addView(storageProgressBar, LinearLayout.LayoutParams(-1, dp(8)).apply { topMargin = dp(8) })
+        storageCopy.addView(storageProgressBar)
         storageRow.addView(storageCopy, LinearLayout.LayoutParams(0, -2, 1f))
         storageCard.addView(storageRow)
         storageCardContainer = wrap(storageCard)
-        addView(storageCardContainer, bottom(14))
+        addView(storageCardContainer, bottom(16))
 
         heroOrbButton = MaterialButton(this@MainActivity).apply {
             text = getString(R.string.home_cleanup_primary)
-            textSize = 16f
+            textSize = 15.5f
             isAllCaps = false
-            minHeight = dp(60)
-            cornerRadius = dp(30)
+            minHeight = dp(56)
+            cornerRadius = dp(16)
             insetTop = 0
             insetBottom = 0
+            typeface = Typeface.DEFAULT_BOLD
             tag = "primary_phone_cleaner_action"
             setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_delete)
-            iconTint = android.content.res.ColorStateList.valueOf(Color.WHITE)
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             setOnClickListener {
-                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                try { it.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                 onHomeCleanupButtonClicked()
             }
         }
-        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(60)).apply { bottomMargin = dp(6) })
+        addView(heroOrbButton, LinearLayout.LayoutParams(-1, dp(56)).apply { bottomMargin = dp(16) })
 
-        heroOrbSubtitle = label(getString(R.string.home_cleanup_subtitle), 12f, R.color.sweep_muted, false)
-        addView(heroOrbSubtitle, LinearLayout.LayoutParams(-1, -2).apply {
-            leftMargin = dp(6)
-            rightMargin = dp(6)
-            bottomMargin = dp(12)
-        })
-
-        homeCleanupResult = label("", 13f, R.color.google_blue_tonal_accent, true).apply {
+        heroOrbSubtitle = label(getString(R.string.home_cleanup_subtitle), 12f, R.color.sweep_muted, false).apply {
             visibility = View.GONE
-            setPadding(dp(8), dp(2), dp(8), dp(8))
+        }
+        addView(heroOrbSubtitle)
+
+        homeCleanupResult = label("", 13f, R.color.google_blue_primary, true).apply {
+            visibility = View.GONE
+            setPadding(dp(8), dp(2), dp(8), dp(10))
         }
         addView(homeCleanupResult)
 
@@ -860,58 +781,31 @@ class MainActivity : AppCompatActivity() {
         homeDirectCleanRow.addView(homeDeleteBtn, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(4) })
         addView(homeDirectCleanRow, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(14) })
 
-        // Grade 2x2 Material Quick-Clean (Padrão Google Files)
-        addView(buildQuickClean2x2Grid(), bottom(14))
+        // Grade 2x2 Limpeza Rápida (Padrão Apple Clean)
+        addView(buildQuickClean2x2Grid(), bottom(18))
 
-        // Card de Conversão VIP Pro em Destaque (Logo abaixo do botão grande Liberar Espaço)
-        val homeProCardContent = card()
-        homeProCtaBadge = label(getString(R.string.home_pro_cta_badge), 11f, R.color.sweep_accent_amber, true)
-        homeProCtaTitle = label(getString(R.string.home_pro_cta_title), 16f, R.color.sweep_text, true)
-        homeProCtaSubtitle = label(getString(R.string.home_pro_cta_subtitle), 12f, R.color.sweep_muted, false)
-        homeProSubscribeButton = MaterialButton(this@MainActivity).apply {
-            text = getString(R.string.home_pro_subscribe_button)
-            textSize = 15f
-            isAllCaps = false
-            minHeight = dp(60)
-            cornerRadius = dp(18)
-            insetTop = 0
-            insetBottom = 0
-            typeface = Typeface.DEFAULT_BOLD
-            tag = "home_pro_subscribe_cta"
-            setTextColor(Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.btn_star_big_on)
-            iconTint = android.content.res.ColorStateList.valueOf(Color.WHITE)
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
-            setOnClickListener {
-                try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
-                onHomeProSubscribeClicked()
-            }
-        }
-        homeProCardContent.addView(homeProCtaBadge)
-        homeProCardContent.addView(homeProCtaTitle, top(4))
-        homeProCardContent.addView(homeProCtaSubtitle, top(4))
-        homeProCardContent.addView(homeProSubscribeButton, LinearLayout.LayoutParams(-1, dp(60)).apply { topMargin = dp(12) })
-        homeProCardContent.addView(
-            label(getString(R.string.home_pro_cta_footnote), 10.5f, R.color.sweep_muted, false),
-            top(8),
+        // Linha discreta de confiança (Sem card pesado)
+        addView(
+            label(getString(R.string.family_shield_title), 12f, R.color.sweep_muted, false).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+            },
+            bottom(12),
         )
-        homeProCtaCard = themedCard(homeProCardContent, color(R.color.sweep_surface), color(R.color.sweep_surface_alt))
-        addView(homeProCtaCard, bottom(18))
 
-        // Mantém as referências dos botões inicializadas para compatibilidade com renderCatalogPrices
+        // Referências internas mantidas ocultas para compatibilidade com Billing
+        val homeProCardContent = card()
+        homeProCtaBadge = label("", 11f, R.color.google_blue_primary, true)
+        homeProCtaTitle = label("", 15f, R.color.sweep_text, true)
+        homeProCtaSubtitle = label("", 12f, R.color.sweep_muted, false)
+        homeProSubscribeButton = button("") { onHomeProSubscribeClicked() }
+        homeProCtaCard = themedCard(homeProCardContent, color(R.color.sweep_surface), color(R.color.sweep_surface_alt)).apply {
+            visibility = View.GONE
+        }
+        addView(homeProCtaCard)
+
         homePlanMonthlyButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY) }.apply { visibility = View.GONE }
         homePlanAnnualButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL) }.apply { visibility = View.GONE }
         homePlanLifetimeButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME) }.apply { visibility = View.GONE }
-
-        val shareAppButton = button(getString(R.string.share_app_button)) { shareApp() }.apply {
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
-            setTextColor(color(R.color.sweep_text))
-            icon = ContextCompat.getDrawable(this@MainActivity, android.R.drawable.ic_menu_share)
-            iconTint = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary_glow))
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
-        }
-        addView(shareAppButton, LinearLayout.LayoutParams(-1, dp(52)).apply { bottomMargin = dp(8) })
     }
 
     private fun shareApp() {
@@ -1203,61 +1097,50 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
         }
         gridRoot.addView(
-            label(getString(R.string.quick_clean_title).uppercase(), 11f, R.color.google_blue_tonal_accent, true).apply {
-                letterSpacing = 0.05f
-                setPadding(dp(2), 0, dp(2), dp(8))
+            label(getString(R.string.quick_clean_title).uppercase(), 11f, R.color.sweep_muted, true).apply {
+                letterSpacing = 0.06f
+                setPadding(dp(2), 0, dp(2), dp(10))
             }
         )
         fun buildGridCell(
             iconRes: Int,
             title: String,
             description: String,
-            actionLabel: String,
-            bgTonalColor: Int,
-            accentColor: Int,
             onClick: () -> Unit
         ): View {
+            val accentColor = color(R.color.google_blue_primary)
             val cellContent = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                setPadding(dp(14), dp(14), dp(14), dp(14))
-                background = roundedBackground(bgTonalColor, dp(18))
+                gravity = Gravity.CENTER_HORIZONTAL
+                setPadding(dp(14), dp(18), dp(14), dp(18))
+                background = borderedPill(
+                    color(R.color.sweep_surface),
+                    color(R.color.sweep_surface_alt),
+                    dp(18),
+                    dp(1),
+                )
                 isClickable = true
                 isFocusable = true
-                setOnClickListener {
-                    try { performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
+                setOnClickListener { v ->
+                    try { v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP) } catch (_: Exception) {}
                     onClick()
                 }
-            }
-            val topRow = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
             }
             val iconView = ImageView(this).apply {
                 setImageResource(iconRes)
                 setColorFilter(accentColor)
-                background = roundedBackground(Color.argb(35, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor)), dp(8))
-                setPadding(dp(6), dp(6), dp(6), dp(6))
             }
-            topRow.addView(iconView, LinearLayout.LayoutParams(dp(30), dp(30)))
-            topRow.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
-            val actionPill = TextView(this).apply {
-                text = actionLabel
-                textSize = 11f
-                typeface = Typeface.DEFAULT_BOLD
-                setTextColor(accentColor)
-                background = roundedBackground(Color.argb(35, Color.red(accentColor), Color.green(accentColor), Color.blue(accentColor)), dp(10))
-                setPadding(dp(10), dp(3), dp(10), dp(3))
-            }
-            topRow.addView(actionPill)
-            cellContent.addView(topRow)
+            cellContent.addView(iconView, LinearLayout.LayoutParams(dp(28), dp(28)))
 
             val titleView = label(title, 14.5f, R.color.sweep_text, true).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
                 maxLines = 1
                 ellipsize = android.text.TextUtils.TruncateAt.END
             }
-            cellContent.addView(titleView, top(8))
-            val descView = label(description, 11f, R.color.sweep_muted, false).apply {
-                maxLines = 2
+            cellContent.addView(titleView, top(10))
+            val descView = label(description, 12f, R.color.sweep_muted, false).apply {
+                gravity = Gravity.CENTER_HORIZONTAL
+                maxLines = 1
                 ellipsize = android.text.TextUtils.TruncateAt.END
             }
             cellContent.addView(descView, top(2))
@@ -1267,28 +1150,22 @@ class MainActivity : AppCompatActivity() {
 
         val row1 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         val waCell = buildGridCell(
-            iconRes = android.R.drawable.ic_dialog_email,
+            iconRes = android.R.drawable.stat_notify_chat,
             title = getString(R.string.quick_clean_whatsapp_title),
             description = getString(R.string.quick_clean_whatsapp_desc),
-            actionLabel = getString(R.string.quick_clean_action_clean),
-            bgTonalColor = color(R.color.m3_tonal_whatsapp_bg),
-            accentColor = color(R.color.m3_tonal_whatsapp_accent),
             onClick = { openWhatsAppCleanerFlow() }
         )
         val dupCell = buildGridCell(
             iconRes = android.R.drawable.ic_menu_agenda,
             title = getString(R.string.quick_clean_duplicates_title),
             description = getString(R.string.quick_clean_duplicates_desc),
-            actionLabel = getString(R.string.quick_clean_action_find),
-            bgTonalColor = color(R.color.m3_tonal_duplicates_bg),
-            accentColor = color(R.color.m3_tonal_duplicates_accent),
             onClick = {
                 openInteractiveDialogOnMissionFinish = true
                 runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
             }
         )
-        row1.addView(waCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(5) })
-        row1.addView(dupCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(5) })
+        row1.addView(waCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(6) })
+        row1.addView(dupCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
         gridRoot.addView(row1)
 
         val row2 = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -1296,9 +1173,6 @@ class MainActivity : AppCompatActivity() {
             iconRes = android.R.drawable.ic_media_play,
             title = getString(R.string.quick_clean_large_title),
             description = getString(R.string.quick_clean_large_desc),
-            actionLabel = getString(R.string.quick_clean_action_review),
-            bgTonalColor = color(R.color.m3_tonal_large_bg),
-            accentColor = color(R.color.m3_tonal_large_accent),
             onClick = {
                 openInteractiveDialogOnMissionFinish = true
                 runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
@@ -1308,17 +1182,14 @@ class MainActivity : AppCompatActivity() {
             iconRes = android.R.drawable.ic_menu_recent_history,
             title = getString(R.string.quick_clean_old_title),
             description = getString(R.string.quick_clean_old_desc),
-            actionLabel = getString(R.string.quick_clean_action_examine),
-            bgTonalColor = color(R.color.m3_tonal_old_bg),
-            accentColor = color(R.color.m3_tonal_old_accent),
             onClick = {
                 openInteractiveDialogOnMissionFinish = true
                 runOutcomeMission(DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D)
             }
         )
-        row2.addView(largeCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(5) })
-        row2.addView(oldCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(5) })
-        gridRoot.addView(row2, top(10))
+        row2.addView(largeCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(6) })
+        row2.addView(oldCell, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
+        gridRoot.addView(row2, top(12))
 
         return gridRoot
     }
@@ -1625,126 +1496,91 @@ class MainActivity : AppCompatActivity() {
 
     private fun buildProPaywallSection(): LinearLayout = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
+        setPadding(dp(2), dp(4), dp(2), dp(16))
 
-        val proCard = card()
-        val proHeaderRow = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        val proHeaderLogo = ImageView(this@MainActivity).apply {
-            setImageResource(R.mipmap.ic_launcher)
-            contentDescription = getString(R.string.app_name)
-        }
-        proHeaderRow.addView(proHeaderLogo, LinearLayout.LayoutParams(dp(42), dp(42)).apply { marginEnd = dp(12) })
-        val proHeaderTextCol = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
-        proHeaderTextCol.addView(label(getString(R.string.pro_card_title), 11f, R.color.sweep_accent_amber, true))
-        proStatusBadge = label(getString(R.string.pro_status_free), 17f, R.color.sweep_text, true)
-        proHeaderTextCol.addView(proStatusBadge, top(2))
-        proHeaderRow.addView(proHeaderTextCol, LinearLayout.LayoutParams(0, -2, 1f))
-        proCard.addView(proHeaderRow)
-        proCard.addView(label(getString(R.string.pro_card_subtitle), 13f, R.color.sweep_muted, false), top(6))
-        proCard.addView(label(getString(R.string.pro_free_included), 12f, R.color.sweep_text, false), top(12))
-        proCard.addView(label(getString(R.string.pro_paid_included), 12f, R.color.google_blue_tonal_accent, false), top(10))
+        addView(label(getString(R.string.pro_card_title), 24f, R.color.sweep_text, true))
+        proStatusBadge = label(getString(R.string.pro_status_free), 12f, R.color.google_blue_primary, true)
+        addView(proStatusBadge, top(4))
+        addView(label(getString(R.string.pro_card_subtitle), 13.5f, R.color.sweep_muted, false), top(6))
 
-        // Card VIP Bonus para Testadores Fechados (visual limpo Apple Dark)
-        val vipCardContent = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(14), dp(14), dp(14), dp(14))
+        // Cartão limpo com 3 benefícios diretos (sem paredes de texto)
+        val benefitsCard = card()
+        val benefits = listOf(
+            getString(R.string.pro_unused_apps_button),
+            getString(R.string.quick_clean_duplicates_title) + " • " + getString(R.string.quick_clean_duplicates_desc),
+            getString(R.string.export_review_summary),
+        )
+        benefits.forEachIndexed { idx, lineText ->
+            val row = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val checkIcon = ImageView(this@MainActivity).apply {
+                setImageResource(android.R.drawable.checkbox_on_background)
+                setColorFilter(color(R.color.google_blue_primary))
+            }
+            row.addView(checkIcon, LinearLayout.LayoutParams(dp(18), dp(18)).apply { marginEnd = dp(10) })
+            row.addView(label(lineText, 13.5f, R.color.sweep_text, false), LinearLayout.LayoutParams(0, -2, 1f))
+            benefitsCard.addView(row, top(if (idx == 0) 0 else 10))
         }
-        vipCardContent.addView(label(getString(R.string.tester_vip_card_title), 12f, R.color.google_blue_primary, true))
-        vipCardContent.addView(label(getString(R.string.tester_vip_card_subtitle), 12f, R.color.sweep_muted, false), top(6))
-        val vipBtn = button(
-            getString(if (isTesterVipProEnabled()) R.string.tester_vip_active_button else R.string.tester_vip_activate_button),
-        ) {
-            val nextEnabled = !isTesterVipProEnabled()
-            setTesterVipProEnabled(nextEnabled)
-            renderBillingState(billingGateway.accessState.value)
-            Toast.makeText(
-                this@MainActivity,
-                if (nextEnabled) R.string.tester_vip_activated_toast else R.string.tester_vip_deactivated_toast,
-                Toast.LENGTH_LONG,
-            ).show()
-        }.apply {
-            minHeight = dp(50)
-        }
-        testerVipButton = vipBtn
-        styleTesterVipButton(vipBtn, isTesterVipProEnabled())
-        vipCardContent.addView(vipBtn, top(12))
-        proCard.addView(themedCard(vipCardContent, color(R.color.sweep_surface_alt), color(R.color.sweep_surface_alt)), top(14))
-
-        val unusedAppsButton = button(getString(R.string.pro_unused_apps_button)) {
-            runWithProAccess { requestUnusedAppSuggestions() }
-        }
-        proCard.addView(unusedAppsButton, top(12))
-
-        val proSuiteContent = LinearLayout(this@MainActivity).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(14), dp(14), dp(14), dp(14))
-        }
-        proSuiteContent.addView(
-            TextView(this@MainActivity).apply {
-                text = getString(R.string.pro_suite_section_title)
-                setTextColor(color(R.color.google_blue_primary))
-                textSize = 12.5f
-                setTypeface(typeface, Typeface.BOLD)
-                letterSpacing = 0.05f
-            },
-        )
-        proSuiteContent.addView(
-            button(getString(R.string.pro_suite_notepad_btn)) {
-                runWithProAccess { openProNotesVaultDialog() }
-            }.apply {
-                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface))
-                setTextColor(color(R.color.sweep_text))
-            },
-            top(10),
-        )
-        proSuiteContent.addView(
-            button(getString(R.string.pro_suite_calculator_btn)) {
-                openProSmartCalculatorDialog()
-            }.apply {
-                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface))
-                setTextColor(color(R.color.sweep_text))
-            },
-            top(8),
-        )
-        proSuiteContent.addView(
-            button(getString(R.string.pro_suite_password_btn)) {
-                openProPasswordGeneratorDialog()
-            }.apply {
-                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface))
-                setTextColor(color(R.color.sweep_text))
-            },
-            top(8),
-        )
-        proCard.addView(
-            themedCard(proSuiteContent, color(R.color.sweep_surface_alt), color(R.color.sweep_surface_alt)),
-            top(14),
-        )
+        addView(wrap(benefitsCard), top(16))
 
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
         }.apply {
-            setTextColor(color(R.color.sweep_background))
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_primary))
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
         stylePlanPurchaseButton(planAnnualButton, isProductAvailable = false)
-        proCard.addView(planAnnualButton, top(14))
+        addView(planAnnualButton, top(18))
 
         planMonthlyButton = button(getString(R.string.plan_monthly_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
         }
         stylePlanPurchaseButton(planMonthlyButton, isProductAvailable = false)
-        proCard.addView(planMonthlyButton, top(8))
+        addView(planMonthlyButton, top(10))
 
         planLifetimeButton = button(getString(R.string.plan_lifetime_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
         }
         stylePlanPurchaseButton(planLifetimeButton, isProductAvailable = false)
-        proCard.addView(planLifetimeButton, top(8))
-        proCard.addView(label(getString(R.string.pro_billing_terms_disclosure), 11f, R.color.sweep_muted, false), top(10))
+        addView(planLifetimeButton, top(10))
+
+        val unusedAppsButton = button(getString(R.string.pro_unused_apps_button)) {
+            runWithProAccess { requestUnusedAppSuggestions() }
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            setTextColor(color(R.color.sweep_text))
+        }
+        addView(unusedAppsButton, top(16))
+
+        val linksRow = LinearLayout(this@MainActivity).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_HORIZONTAL
+        }
+        restorePurchasesButton = button(getString(R.string.restore_purchases_button)) {
+            billingGateway.startAndReconcile()
+            statusText.text = getString(R.string.restoring_purchases_status)
+            Toast.makeText(this@MainActivity, R.string.restoring_purchases_status, Toast.LENGTH_SHORT).show()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+            setTextColor(color(R.color.sweep_muted))
+            textSize = 12f
+        }
+        manageSubscriptionButton = button(getString(R.string.manage_subscriptions_button)) {
+            openPlayStoreSubscriptions()
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+            setTextColor(color(R.color.sweep_muted))
+            textSize = 12f
+        }
+        linksRow.addView(restorePurchasesButton, LinearLayout.LayoutParams(0, -2, 1f))
+        linksRow.addView(manageSubscriptionButton, LinearLayout.LayoutParams(0, -2, 1f))
+        addView(linksRow, top(12))
+
+        addView(label(getString(R.string.pro_billing_terms_disclosure), 10.5f, R.color.sweep_muted, false), top(8))
         if (!billingGateway.securePurchaseVerificationAvailable()) {
-            proCard.addView(label(getString(R.string.pro_purchase_unavailable_notice), 11f, R.color.sweep_muted, false), top(12))
+            addView(label(getString(R.string.pro_purchase_unavailable_notice), 10.5f, R.color.sweep_muted, false), top(6))
         }
 
         if (isDevelopmentBuild) {
@@ -1754,33 +1590,15 @@ class MainActivity : AppCompatActivity() {
                     if (debugProPreviewEnabled) R.string.pro_debug_preview_on else R.string.pro_debug_preview_off,
                 )
                 renderBillingState(billingGateway.accessState.value)
-                statusText.text = getString(
-                    if (debugProPreviewEnabled) R.string.pro_debug_preview_enabled else R.string.pro_debug_preview_disabled,
-                )
                 updateReview(viewModel.state.value)
+            }.apply {
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+                setTextColor(color(R.color.sweep_muted))
+                textSize = 11f
             }
             debugProPreviewButton = debugPreviewButton
-            proCard.addView(debugPreviewButton, top(10))
-            proCard.addView(label(getString(R.string.pro_debug_preview_note), 11f, R.color.sweep_muted, false), top(4))
+            addView(debugPreviewButton, top(12))
         }
-
-        restorePurchasesButton = button(getString(R.string.restore_purchases_button)) {
-            billingGateway.startAndReconcile()
-            statusText.text = getString(R.string.restoring_purchases_status)
-            Toast.makeText(this@MainActivity, R.string.restoring_purchases_status, Toast.LENGTH_SHORT).show()
-        }
-        proCard.addView(restorePurchasesButton, top(10))
-
-        manageSubscriptionButton = button(getString(R.string.manage_subscriptions_button)) {
-            openPlayStoreSubscriptions()
-        }
-        proCard.addView(manageSubscriptionButton, top(6))
-        addView(wrap(proCard), bottom(14))
-
-        val privacy = card()
-        privacy.addView(label(getString(R.string.privacy_title), 11f, R.color.sweep_muted, true))
-        privacy.addView(label(getString(R.string.privacy_body), 12f, R.color.sweep_muted, false), top(8))
-        addView(wrap(privacy))
     }
 
     private fun buildStudioToolsSection(): LinearLayout = LinearLayout(this).apply {
@@ -2005,7 +1823,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchTab(tab: AppTab) {
         activeTab = tab
-        statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS || tab == AppTab.HOME)) View.VISIBLE else View.GONE
+        statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS)) View.VISIBLE else View.GONE
         homeSection.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
         newsSection.visibility = if (tab == AppTab.NEWS) View.VISIBLE else View.GONE
         filesSection.visibility = if (tab == AppTab.FILES || tab == AppTab.OAAS) View.VISIBLE else View.GONE
@@ -2027,16 +1845,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun styleNavButton(btn: MaterialButton, selected: Boolean, customSelectedColor: Int? = null) {
-        if (selected) {
-            val accent = customSelectedColor ?: color(R.color.google_blue_primary)
-            btn.setTextColor(accent)
-            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                Color.argb(32, Color.red(accent), Color.green(accent), Color.blue(accent)),
-            )
-        } else {
-            btn.setTextColor(color(R.color.sweep_muted))
-            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
-        }
+        val tintColor = if (selected) (customSelectedColor ?: color(R.color.google_blue_primary)) else color(R.color.sweep_muted)
+        btn.setTextColor(tintColor)
+        btn.iconTint = android.content.res.ColorStateList.valueOf(tintColor)
+        btn.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
     }
 
     private fun isTesterVipProEnabled(): Boolean =
@@ -2065,9 +1877,9 @@ class MainActivity : AppCompatActivity() {
     private fun renderBillingState(state: ProAccessSummaryState) {
         if (!::proStatusBadge.isInitialized) return
         if (::bottomNavContainer.isInitialized) {
-            navNewsBtn.visibility = View.VISIBLE
+            navNewsBtn.visibility = View.GONE
             navFilesBtn.visibility = View.VISIBLE
-            navGamesBtn.visibility = View.VISIBLE
+            navGamesBtn.visibility = View.GONE
             navProBtn.visibility = View.VISIBLE
         }
         testerVipButton?.let { styleTesterVipButton(it, isTesterVipProEnabled()) }
