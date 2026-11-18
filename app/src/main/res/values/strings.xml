@@ -608,12 +608,12 @@ Total: %3$s</string>
     <string name="cleaner_home_items_count">%1$d items</string>
     <string name="cleaner_home_fallback_duplicates_title">Duplicates</string>
     <string name="cleaner_home_fallback_duplicates_sub">SHA-256</string>
-    <string name="cleaner_home_fallback_large_videos_title">Large videos</string>
-    <string name="cleaner_home_fallback_large_videos_sub">Heavy files</string>
+    <string name="cleaner_home_fallback_large_videos_title">Videos</string>
+    <string name="cleaner_home_fallback_large_videos_sub">&gt; 10 MB</string>
     <string name="cleaner_home_fallback_whatsapp_title">WhatsApp</string>
-    <string name="cleaner_home_fallback_whatsapp_sub">Received media</string>
-    <string name="cleaner_home_fallback_screenshots_title">Screenshots &gt;30d</string>
-    <string name="cleaner_home_fallback_screenshots_sub">Screenshots</string>
+    <string name="cleaner_home_fallback_whatsapp_sub">Media</string>
+    <string name="cleaner_home_fallback_screenshots_title">Screenshots</string>
+    <string name="cleaner_home_fallback_screenshots_sub">&gt;30 days</string>
     <string name="cleaner_home_fallback_blur_title">Blurry photos</string>
     <string name="cleaner_home_fallback_blur_sub">Low sharpness</string>
 </resources>

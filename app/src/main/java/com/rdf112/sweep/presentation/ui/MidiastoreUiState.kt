@@ -18,6 +18,8 @@ data class HomeUiState(
     val usedLabel: String = "—",
     val totalLabel: String = "—",
     val freeLabel: String = "",
+    val usedPercent: Int = 0,
+    val usedFraction: Float = 0f,
     val recoverableBytes: Long = 0L,
     val recoverableLabel: String = "0 MB",
     val categoryFractions: List<Float> = emptyList(),

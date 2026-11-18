@@ -6730,6 +6730,8 @@ class MainActivity : AppCompatActivity() {
                 usedLabel = usedFmt,
                 freeLabel = freeFmt,
                 totalLabel = totalFmt,
+                usedPercent = usage.usedPercent,
+                usedFraction = usage.usedFraction.toFloat().coerceIn(0f, 1f),
                 collections = buildDefaultHomeCollections(),
             )
             if (::storageText.isInitialized) {
