@@ -7,20 +7,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,104 +48,92 @@ fun CleanerHomeScreen(
     onOpenPro: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
+    Column(
         modifier = modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF0A192F),
-                        MidiastoreColors.OledBlack,
-                        MidiastoreColors.OledBlack,
-                    ),
-                ),
-            ),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+            .fillMaxWidth()
+            .background(MidiastoreColors.OledBlack)
+            .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.cleaner_home_space_title),
+                style = MaterialTheme.typography.headlineLarge,
+                color = MidiastoreColors.TextPrimary,
+            )
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = if (isProActive) MidiastoreColors.AccentBlueSoft else MidiastoreColors.CardSurface,
+                modifier = Modifier
+                    .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(999.dp))
+                    .clip(RoundedCornerShape(999.dp))
+                    .clickable(onClick = onOpenPro),
+            ) {
+                Text(
+                    text = stringResource(
+                        if (isProActive) R.string.cleaner_home_pro_badge else R.string.cleaner_home_free_badge,
+                    ),
+                    color = if (isProActive) MidiastoreColors.AccentBlue else MidiastoreColors.TextPrimary,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                )
+            }
+        }
+
+        StorageNowBanner(
+            state = state,
+            onAnalyze = onAnalyze,
+        )
+
+        QuickMissionGrid(
+            collections = state.collections,
+            onMissionClick = onMissionClick,
+        )
+
+        if (state.collections.isNotEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.cleaner_home_space_title),
-                    style = MaterialTheme.typography.headlineLarge,
+                    text = stringResource(R.string.cleaner_home_mixes_title),
+                    style = MaterialTheme.typography.titleLarge,
                     color = MidiastoreColors.TextPrimary,
                 )
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = if (isProActive) MidiastoreColors.AccentBlueSoft else MidiastoreColors.CardSurface,
-                    modifier = Modifier
-                        .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(999.dp))
-                        .clip(RoundedCornerShape(999.dp))
-                        .clickable(onClick = onOpenPro),
-                ) {
-                    Text(
-                        text = stringResource(
-                            if (isProActive) R.string.cleaner_home_pro_badge else R.string.cleaner_home_free_badge,
-                        ),
-                        color = if (isProActive) MidiastoreColors.AccentBlue else MidiastoreColors.TextPrimary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                Text(
+                    text = stringResource(R.string.cleaner_home_review),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MidiastoreColors.AccentBlue,
+                    modifier = Modifier.clickable { onMissionClick(state.collections.first().mission) },
+                )
+            }
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(state.collections, key = { it.mission.name }) { collection ->
+                    MixCarouselCard(
+                        collection = collection,
+                        onClick = { onMissionClick(collection.mission) },
                     )
                 }
             }
         }
 
-        item {
-            QuickMissionGrid(
-                collections = state.collections,
-                onMissionClick = onMissionClick,
-            )
-        }
-
-        item {
-            StorageNowBanner(
-                state = state,
-                onAnalyze = onAnalyze,
-            )
-        }
-
-        if (state.collections.isNotEmpty()) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(R.string.cleaner_home_mixes_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MidiastoreColors.TextPrimary,
-                    )
-                    Text(
-                        text = stringResource(R.string.cleaner_home_review),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MidiastoreColors.TextMuted,
-                        modifier = Modifier.clickable { onMissionClick(state.collections.first().mission) },
-                    )
-                }
-            }
-
-            item {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(state.collections, key = { it.mission.name }) { collection ->
-                        MixCarouselCard(
-                            collection = collection,
-                            onClick = { onMissionClick(collection.mission) },
-                        )
-                    }
-                }
-            }
-        }
-
-        item { Spacer(Modifier.height(12.dp)) }
+        Text(
+            text = stringResource(R.string.cleaner_home_manual_review),
+            color = MidiastoreColors.TextSubtle,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp),
+        )
     }
 }
 
@@ -275,64 +262,92 @@ private fun StorageNowBanner(
             .fillMaxWidth()
             .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(16.dp)),
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.cleaner_home_recoverable_eyebrow),
-                    color = MidiastoreColors.TextMuted,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.6.sp,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = state.recoverableLabel,
-                    color = MidiastoreColors.TextPrimary,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-                Text(
-                    text = stringResource(R.string.cleaner_home_used_of_total, state.usedLabel, state.totalLabel),
-                    color = MidiastoreColors.TextMuted,
-                    fontSize = 12.sp,
-                )
-                Spacer(Modifier.height(10.dp))
-                SegmentedBar(fractions = state.categoryFractions)
-            }
-
-            Spacer(Modifier.width(14.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(CircleShape)
-                    .background(MidiastoreColors.AccentBlue)
-                    .clickable(enabled = !state.isScanning, onClick = onAnalyze),
-                contentAlignment = Alignment.Center,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                if (state.isScanning) {
-                    CircularProgressIndicator(
-                        color = Color.White,
-                        strokeWidth = 2.5.dp,
-                        modifier = Modifier.size(22.dp),
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.cleaner_home_recoverable_eyebrow),
+                        color = MidiastoreColors.TextMuted,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.6.sp,
                     )
-                } else {
-                    Canvas(modifier = Modifier.size(20.dp)) {
-                        val path = Path().apply {
-                            moveTo(size.width * 0.28f, size.height * 0.16f)
-                            lineTo(size.width * 0.84f, size.height * 0.50f)
-                            lineTo(size.width * 0.28f, size.height * 0.84f)
-                            close()
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = state.recoverableLabel,
+                        color = MidiastoreColors.TextPrimary,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                    Text(
+                        text = stringResource(R.string.cleaner_home_used_of_total, state.usedLabel, state.totalLabel),
+                        color = MidiastoreColors.TextMuted,
+                        fontSize = 12.sp,
+                    )
+                }
+
+                Spacer(Modifier.width(14.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MidiastoreColors.AccentBlueSoft)
+                        .clickable(enabled = !state.isScanning, onClick = onAnalyze),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (state.isScanning) {
+                        CircularProgressIndicator(
+                            color = MidiastoreColors.AccentBlue,
+                            strokeWidth = 2.5.dp,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    } else {
+                        Canvas(modifier = Modifier.size(18.dp)) {
+                            val path = Path().apply {
+                                moveTo(size.width * 0.28f, size.height * 0.16f)
+                                lineTo(size.width * 0.84f, size.height * 0.50f)
+                                lineTo(size.width * 0.28f, size.height * 0.84f)
+                                close()
+                            }
+                            drawPath(path = path, color = MidiastoreColors.AccentBlue)
                         }
-                        drawPath(path = path, color = Color.White)
                     }
                 }
+            }
+
+            Spacer(Modifier.height(12.dp))
+            SegmentedBar(fractions = state.categoryFractions)
+            Spacer(Modifier.height(14.dp))
+
+            Button(
+                onClick = onAnalyze,
+                enabled = !state.isScanning,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MidiastoreColors.AccentBlue,
+                    contentColor = Color.White,
+                    disabledContainerColor = MidiastoreColors.CardSurfaceAlt,
+                    disabledContentColor = MidiastoreColors.TextMuted,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(
+                        if (state.isScanning) R.string.cleaner_home_scanning else R.string.cleaner_home_analyze,
+                    ),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                )
             }
         }
     }

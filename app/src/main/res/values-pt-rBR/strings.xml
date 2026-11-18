@@ -614,4 +614,6 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_whatsapp_sub">Mídia recebida</string>
     <string name="cleaner_home_fallback_screenshots_title">Capturas &gt;30d</string>
     <string name="cleaner_home_fallback_screenshots_sub">Screenshots</string>
+    <string name="cleaner_home_fallback_blur_title">Fotos borradas</string>
+    <string name="cleaner_home_fallback_blur_sub">Baixa nitidez</string>
 </resources>

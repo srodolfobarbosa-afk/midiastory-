@@ -663,12 +663,16 @@ class MainActivity : AppCompatActivity() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val scanState by viewModel.state.collectAsStateWithLifecycle()
+                val billingAccessState by billingGateway.accessState.collectAsStateWithLifecycle()
+                val isProNow = billingAccessState == ProAccessSummaryState.PRO_GRANTED ||
+                    isTesterVipProEnabled() ||
+                    (isDevelopmentBuild && debugProPreviewEnabled)
                 MidiastoreTheme {
                     CleanerHomeScreen(
                         state = homeComposeState.value.copy(
                             isScanning = scanState.missionProgress?.isRunning == true,
                         ),
-                        isProActive = hasEffectiveProAccess(),
+                        isProActive = isProNow,
                         onAnalyze = { onHomeCleanupButtonClicked() },
                         onMissionClick = ::onCleanMissionClick,
                         onOpenPro = { switchTab(AppTab.PRO) },
@@ -2029,30 +2033,37 @@ class MainActivity : AppCompatActivity() {
     private fun buildDefaultHomeCollections(): List<CleanCollectionUiModel> = listOf(
         CleanCollectionUiModel(
             mission = CleanMission.DUPLICATES,
-            title = getString(R.string.mission_duplicates_title),
-            subtitle = getString(R.string.mission_duplicates_desc),
+            title = getString(R.string.cleaner_home_fallback_duplicates_title),
+            subtitle = getString(R.string.cleaner_home_fallback_duplicates_sub),
             sizeLabel = "SHA-256",
             itemCount = 0,
         ),
         CleanCollectionUiModel(
             mission = CleanMission.LARGE_VIDEOS,
-            title = getString(R.string.mission_free_max_title),
-            subtitle = getString(R.string.mission_free_max_desc),
+            title = getString(R.string.cleaner_home_fallback_large_videos_title),
+            subtitle = getString(R.string.cleaner_home_fallback_large_videos_sub),
             sizeLabel = "> 10 MB",
             itemCount = 0,
         ),
         CleanCollectionUiModel(
             mission = CleanMission.WHATSAPP,
-            title = getString(R.string.whatsapp_cleaner_title),
-            subtitle = getString(R.string.whatsapp_cleaner_subtitle),
+            title = getString(R.string.cleaner_home_fallback_whatsapp_title),
+            subtitle = getString(R.string.cleaner_home_fallback_whatsapp_sub),
             sizeLabel = "MediaStore",
             itemCount = 0,
         ),
         CleanCollectionUiModel(
             mission = CleanMission.OLD_SCREENSHOTS,
-            title = getString(R.string.mission_old_screenshots_title),
-            subtitle = getString(R.string.mission_old_screenshots_desc),
+            title = getString(R.string.cleaner_home_fallback_screenshots_title),
+            subtitle = getString(R.string.cleaner_home_fallback_screenshots_sub),
             sizeLabel = "> 30d",
+            itemCount = 0,
+        ),
+        CleanCollectionUiModel(
+            mission = CleanMission.BLURRY_PHOTOS,
+            title = getString(R.string.cleaner_home_fallback_blur_title),
+            subtitle = getString(R.string.cleaner_home_fallback_blur_sub),
+            sizeLabel = "Local",
             itemCount = 0,
         ),
     )
