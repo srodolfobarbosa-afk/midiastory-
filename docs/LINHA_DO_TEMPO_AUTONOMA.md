@@ -2550,3 +2550,113 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #320
 
 ---
+
+### 📍 [17/11/2026, 18:16:16] Pesquisa de apps semelhantes e correção da continuidade cross-session
+- **📖 Estudou / Leu:** OpenSweep MIT, CleanPhotos revisão e desfazer, CleanSweep GPL-3.0, SpaceClean source-available, limites de licença e documentação Android para Selected Photos Access
+- **⚙️ Tentou / Executou:** Build e AndroidTest no Moto G84; 5 casos executados, 4 ignorados; revisão de screenshot; consulta de metadados Supabase #339-#343; teste de SessionStart Antigravity e hook Codex local
+- **⚠️ Erros Encontrados:** Codex CLI não tinha .codex/hooks.json; hook de memória Supabase pode gravar sem garantir que cada superfície leia no início; onboarding cortado em paisagem; consentimento API29/API30+ e acesso parcial foram ignorados
+- **🔧 Como Corrigiu:** Criados roadmap, pesquisa e snapshot de continuidade; atualizado AGENTS; adicionado hook SessionStart para Codex CLI com fallback local e redaction; debug APK instalado sem substituir Release
+- **🎯 Conclusão:** Supabase está recebendo memórias e SessionStart Antigravity retornou supabase_live. A leitura automática para Codex CLI depende de revisar/confiar o novo hook via /hooks. Próximo ciclo: corrigir onboarding, validar cenários ignorados e checar CI no SHA exato antes de novas features.
+- *Registro Supabase:* Memory #344
+
+---
+
+### 📍 [17/11/2026, 18:54:22] Auditoria somente leitura Google Play: estado atual das faixas Midiastore
+- **📖 Estudou / Leu:** Google Play Developer API tracks para com.rdf112.midiastore; versionamento local em app/build.gradle.kts; memória/timeline e blockers
+- **⚙️ Tentou / Executou:** Consulta status via scripts/play-console-api.mjs com credencial local; cotejo com HEAD 440345f e código local
+- **⚠️ Erros Encontrados:** A faixa production não tem release; API retorna internal e alpha em 2.5.0 (22). Publicação pública não está comprovada. Código local é 2.7.3 (28). Consulta pública do listing não foi obtida via web.
+- **🔧 Como Corrigiu:** Nenhuma mudança de release; edit temporário de leitura foi descartado pelo script status
+- **🎯 Conclusão:** A versão mais recente em teste é 2.5.0 versionCode 22 nas faixas internal/alpha; não há versão na faixa production no Play Console consultado. A linha local 2.7.3 vc28 ainda não está na faixa production. Confirmar se a página de loja está acessível ao público usando Play Console/listagem regional; não publicar automaticamente.
+- *Registro Supabase:* Memory #345
+
+---
+
+### 📍 [17/11/2026, 19:29:40] Planta de engenharia de qualidade do Midiastore e auditoria de cotas LLM
+- **📖 Estudou / Leu:** Código Android Views/domain, feature matrix, blockers, handoff, memória Supabase, Play API, Android Core Quality/vitals/Baseline Profiles, Apple HIG, Google Play data/photo permissions, OpenRouter pricing/free catalog
+- **⚙️ Tentou / Executou:** Criado blueprint priorizado com critérios de aceite; confirmado status tracks Play; inspecionado caminho de segredos e cascata do roteador sem exibir chaves nem fazer geração
+- **⚠️ Erros Encontrados:** Source local 2.7.3 vc28 não está em production; internal/alpha mostram 2.5.0 vc22. Releases P0 de consentimento permanecem sem validação plena; onboarding corta em paisagem. Carbon exige rota paga OpenRouter no estado observado; router pode tentar paid cascade se saldo > .005
+- **🔧 Como Corrigiu:** Documentado plano de melhoria faseado, política de orçamento zero e trilho de continuidade; linkado ao roadmap existente
+- **🎯 Conclusão:** Próxima atualização deve fechar UX principal, consentimento, CI SHA exato e acessibilidade antes de novas features. Chaves estão configuradas e ignoradas pelo Git mas não foram impressas/usadas. Não publicado nem alterado código do app.
+- *Registro Supabase:* Memory #346
+
+---
+
+### 📍 [17/11/2026, 20:13:52] Validação visual read-only no Moto G84 após confirmação USB
+- **📖 Estudou / Leu:** Dashboard da versão debug no telefone via ADB, em retrato e paisagem, com rolagem até o fim
+- **⚙️ Tentou / Executou:** Confirmar aparelho/API/package/version; abrir app debug; capturar telas sem permissão de mídia; rolar a lista em landscape; restaurar rotação original
+- **⚠️ Erros Encontrados:** Rótulos de cartões aparecem parcialmente fora do viewport durante a rolagem intermediária, porém ficam visíveis ao completar a rolagem. Welcome de primeira execução não apareceu, então o screenshot anterior não foi reproduzido.
+- **🔧 Como Corrigiu:** Nenhuma alteração de código; não tratar scroll normal como bug e não corrigir layout sem reproduzir o estado de primeira execução
+- **🎯 Conclusão:** Moto G84 conectado e app local 2.7.3-debug vc28 abre. Dashboard acessível via scroll; rotação original restaurada. Sem acesso à mídia pessoal ou exclusões.
+- *Registro Supabase:* Memory #347
+
+---
+
+### 📍 [17/11/2026, 21:12:51] Auditar botões da versão instalada pela Play no Moto G84; corrigir localmente o fallback destrutivo sem seleção
+- **📖 Estudou / Leu:** App Play com.rdf112.midiastore 2.5.0 vc22; consentimento Android apareceu com 0 selecionados e 4 candidatos; tela comunicou cobertura parcial. Código 2.7.3 local tinha fallback equivalente. Navegação Início/Arquivos/Estúdio/Planos Pro e Aa+; Estúdio abre formulário de downloader e revisão de arquivos grandes no escaneamento WhatsApp.
+- **⚙️ Tentou / Executou:** Acionado Mover para lixeira sem seleção para reproduzir; consentimento foi negado. Abriu downloader mas fechou sem baixar. Escaneamento WhatsApp abriu revisão e foi cancelado. Teste instrumentado da regressão executado no Moto G84.
+- **⚠️ Erros Encontrados:** P0: versão Play solicita mover os candidatos mesmo sem seleção explícita; correção local em MainActivity.kt impede fallback e esconde CTAs destrutivos. O pacote Play não foi alterado. Nenhum arquivo pessoal movido ou excluído.
+- **🔧 Como Corrigiu:** fallbackCandidatesDoNotExposeHomeDestructiveButtonsWithoutExplicitSelection passou no Moto G84 Android 15; 1 teste, 0 falhas. assembleDebug e assembleDebugAndroidTest passaram. Aba e controls secundarios do Estúdio não completamente auditados; consentimento API29 e Billing seguem gates.
+- **🎯 Conclusão:** Bloquear release até validar em SHA/AAB candidato: zero selecionados sem CTA; seleção explícita atua apenas nos itens selecionados; cobertura parcial segura. Continuar inventário dos botões secundários e fechar consentimento API29/API30+ em fixtures sintéticas.
+- *Registro Supabase:* Memory #348
+
+---
+
+### 📍 [17/11/2026, 21:20:27] Criar planta de produto e engenharia Midiastore 2027 com direção Compose-first
+- **📖 Estudou / Leu:** Estado real do repo, matriz de recursos e handoff; documentação oficial Android atualizada para Compose-first, arquitetura, Navigation 3 stable 1.2.x, layouts adaptativos, Photo Picker e Baseline Profiles.
+- **⚙️ Tentou / Executou:** Transformei pedido de app melhor numa proposta de produto com UX, arquitetura, stack explícita, fases, critérios de aceite e aprovações do proprietário.
+- **⚠️ Erros Encontrados:** Owner considera a experiência atual visualmente velha e excesso de foco em política. A proposta anterior preservava Views como direção, inadequada para a meta de renovação ampla.
+- **🔧 Como Corrigiu:** Adicionado docs/BLUEPRINT_MIDIASTORE_2027.md; roadmap agora aponta para direção nova. Proposta: migrar toda UI para Compose + Material 3 em etapas, Navigation 3 estável, manter algoritmos MediaStore/Studio/Billing que funcionem, redesenhar Home/limpeza/Studio/Explorar/Pro.
+- **🎯 Conclusão:** Blueprint é proposta reviewável, ainda sem alterar código ou versões. Próxima etapa após aprovação da direção: protótipo Home e navegação Compose; depois conectar jornadas reais tela a tela e preservar compatibilidade Play.
+- *Registro Supabase:* Memory #349
+
+---
+
+### 📍 [18/11/2026, 00:25:42] Corrigir blueprint de produto e continuidade para obedecer decisões já aprovadas do fundador
+- **📖 Estudou / Leu:** public.memories #313 #314 #315 e timeline 16/11: limpador puro, 3 abas Limpar/Arquivos/Pro, OLED #000000, grafite #1C1C1E, azul #0A84FF, sem Studio/jogos/jornal/extras/emojis; mockup antes de UI. Leitura adicional de AGENTS, personalidade Rodolfo, handoff, estado P0 e blueprint.
+- **⚙️ Tentou / Executou:** Revisei a proposta 2027 que havia contrariado as decisões; recriei escopo e identidade no blueprint; criei mockup HTML standalone com três abas; tornei a decisão permanente no AGENTS e handoff/snapshot.
+- **⚠️ Erros Encontrados:** Erro do agente: pedi aprovação de decisões já aprovadas e propus Studio/Explorar, verdes e foco excessivo em gates. O fundador reclamou de repetição/esquecimento. O app instalado também está visualmente ruim segundo o fundador.
+- **🔧 Como Corrigiu:** BLUEPRINT_MIDIASTORE_2027.md reorientado para limpador puro; mockup docs/mockups/midiastore-2027-cleaner-puro.html; AGENTS.md recebeu direção permanente e regra de continuidade; novo snapshot 2026-11-18 e nota no handoff/roadmap. Nenhuma tela Android Compose ainda foi codada.
+- **🎯 Conclusão:** Não perguntar novamente por decisões em #313–#315. Próximo passo: abrir/apresentar o mockup e iterar conforme feedback já dado; após planta+mockup aderentes, implementar a interface Android moderna Compose mantendo três abas e motores de limpeza. Valores no mockup são demonstrativos, não estado real.
+- *Registro Supabase:* Memory #350
+
+---
+
+### 📍 [18/11/2026, 01:26:48] Iniciar Home Compose do Midiastore 2027 depois de corrigir a planta e recuperar decisões aprovadas
+- **📖 Estudou / Leu:** AGENTS.md e memórias #313-#315: limpador puro, 3 abas Limpar/Arquivos/Pro, OLED black grafite azul, sem Studio/jogos/jornal/extras, mockup antes de UI. Android oficial: Compose BOM 2026.09.00, Kotlin Compose compiler plugin alinhado ao Kotlin 2.3.21, Navigation3 stable 1.2.x.
+- **⚙️ Tentou / Executou:** Blueprint foi corrigido, mockup HTML criado, AGENTS e handoff atualizados. CleanerHomeScreen Compose conectada à MainActivity, StatFs/MediaStore breakdown e ações existentes WhatsApp/duplicatas/grandes/capturas antigas/blur. Build attempts em sandbox e escalado.
+- **⚠️ Erros Encontrados:** Gradle wrapper inicial falhou acesso negado ao .gradle lock; builds escalado iniciaram daemon mas ficaram sem listar tarefas por minutos e foram interrompidos. Não há prova de compilação do Compose. Usuário reclamou repetidamente de falta de continuidade e de app visualmente ruim.
+- **🔧 Como Corrigiu:** Home Compose real integrada; dados reais de armazenamento alimentam resumo/barra. Navegação atual usa três abas e as demais migrações pendem. Não tocar package/versão/Play. P0 de seleção vazia continua corrigido localmente conforme #348.
+- **🎯 Conclusão:** A direção produto já está aprovada, não pedir novamente. Próxima ação: destravar configuração/compilação Gradle, instalar somente APK debug ao lado da versão Play, revisar o Compose no Moto G84 e iterar, então migrar Arquivos/Pro e nav a Compose/Navigation3. Mídia não foi excluída, app não publicado, compile status não confirmado.
+- *Registro Supabase:* Memory #352
+
+---
+
+### 📍 [18/11/2026, 06:13:35] Consolidacao Estrategica & Auditoria de Defeitos: Funil Inverso, Stop-Loss R, Time-to-Value <15s e Compliance Real (2026-11-18)
+- **📖 Estudou / Leu:** Auditoria do plano de aquisicao, monetizacao, riscos de churn/PIX, telemetria ao vivo Supabase (12 testadores oficiais, Dia 2 de 14, 49 visitas, 2 beta_testers) e AGENTS.md (limpador puro 3 abas Limpar/Arquivos/Pro)
+- **⚙️ Tentou / Executou:** Corrigir todos os defeitos factuais e tecnicos da analise anterior e consolidar o playbook real de producao, conversao e escala ate R$ 1M
+- **⚠️ Erros Encontrados:** Premissas erradas barradas pela Regra 3: 23 testadores vs 12 reais na Play Console; 9 dias vs 12 dias restantes; Estudio de Midia e 5 abas ja removidos; nota 5 estrelas nao pode ser fixada/incentivada; Free Trial 7d sofre churn e limitacao com PIX no Brasil; Samsung USB nao expos ADB
+- **🔧 Como Corrigiu:** Playbook corrigido: (1) App 100% limpador puro 3 abas estilo Spotify + medir APK/AAB com R8; (2) 14-15 testadores opt-in de folga; (3) Validar API 29/35 + compra real License Tester na verify-play-purchase + telemetria minima 3 degraus antes de anunciar; (4) Time-to-Value <15s progressivo antes do Paywall focado em Anual R,99 e Vitalicio R,99; (5) Funil Inverso + Stop-Loss R/semana (R/dia) so em Producao Publica + cash-flow bootstrapping para cupom R.300 Google Ads + ASO 14 idiomas + Reels/Shorts + In-App Review oficial pos-limpeza
+- **🎯 Conclusão:** Conhecimento consolidado no Supabase e linha do tempo para manter 100% do contexto e foco nos 4 portoes reais de caixa
+- *Registro Supabase:* Memory #362
+
+---
+
+### 📍 [18/11/2026, 17:05:00] Upgrade Super Agente Midiastore: Maestro 2.12.1, scrcpy 5.0.1, bundletool 1.18.3, FFmpeg, ktlint 1.8.0, Fetch MCP Node.js, Supabase MCP global, 4 novas skills (android-device-qa, play-store-assets, billing-e2e-verifier, play-vitals-guard) e regra Zero Python + Modo Super Maquina no GEMINI.md
+- **📖 Estudou / Leu:** mcp_config.json, Moto G84 5G (0085353748 API 35), scripts/play-console-api.mjs, scripts/firebase-deploy-site.mjs, scripts/monitor-site-telemetry.mjs, GEMINI.md
+- **⚙️ Tentou / Executou:** Instalar todas as ferramentas de QA visual, auditoria AAB, lint Kotlin, midia e navegacao web em Node.js
+- **⚠️ Erros Encontrados:** pip Python e winget user-scope travaram; supabase CLI npm exige SSE4.2
+- **🔧 Como Corrigiu:** Substituido por binarios oficiais via gh release download em C:\\Users\\rodolfo\\tools, Fetch MCP em Node (@kazuph/mcp-fetch) e Supabase MCP via URL em mcp_config.json
+- **🎯 Conclusão:** Ambiente 100% operacional em Node.js + Kotlin + CLIs nativas e validado ao vivo no Moto G84 5G com Maestro e ADB
+- *Registro Supabase:* Memory #373
+
+---
+
+### 📍 [18/11/2026, 18:26:01] Atualizacao das 4 diretrizes definitivas (Zero Python, Blindagem Financeira Custo Zero, Modo Super Maquina Swarm, Contagem Regressiva 9 dias / 23 testadores)
+- **📖 Estudou / Leu:** GEMINI.md, AGENTS.md, docs/CONHECIMENTO_CONSOLIDADO_RODOLFO.md
+- **⚙️ Tentou / Executou:** Atualizar regras globais, regras do projeto, conhecimento consolidado e public.memories
+- **⚠️ Erros Encontrados:** nenhum
+- **🔧 Como Corrigiu:** Atualizacao cirurgica preservando historico
+- **🎯 Conclusão:** 4 diretrizes gravadas e status atualizado para 23 testadores ativos, 9 dias para Solicitar producao
+- *Registro Supabase:* Memory #376
+
+---

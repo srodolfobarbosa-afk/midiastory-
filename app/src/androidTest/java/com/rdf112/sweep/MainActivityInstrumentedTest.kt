@@ -13,15 +13,19 @@ import android.os.Environment
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.View
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.rdf112.sweep.data.media.AndroidTrashOperationCoordinator
 import com.rdf112.sweep.data.media.Api29DeleteAttempt
+import com.rdf112.sweep.domain.oaas.DesiredOutcomeMission
+import com.rdf112.sweep.domain.oaas.OutcomeExecutionPlan
 import com.rdf112.sweep.domain.operations.MediaOperationMode
 import com.rdf112.sweep.domain.model.MediaKind
 import com.rdf112.sweep.domain.model.MediaRecord
+import com.rdf112.sweep.presentation.scan.GlobalMissionProgress
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -41,6 +45,49 @@ import java.util.regex.Pattern
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityInstrumentedTest {
+    @Test
+    fun fallbackCandidatesDoNotExposeHomeDestructiveButtonsWithoutExplicitSelection() {
+        val candidate = MediaRecord(
+            uri = "content://media/external/audio/media/987654321",
+            volumeName = "external_primary",
+            kind = MediaKind.AUDIO,
+            displayName = "synthetic-unselected-audio.mp3",
+            mimeType = "audio/mpeg",
+            sizeBytes = 1024L,
+            dateModifiedEpochSeconds = 1L,
+        )
+        val mission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW
+        val progress = GlobalMissionProgress(
+            mission = mission,
+            isRunning = false,
+            plan = OutcomeExecutionPlan(
+                mission = mission,
+                completedStages = emptyList(),
+                autoSelectedRecords = emptyList(),
+                protectedReferencesKept = 0,
+                estimatedDeliverableBytes = 0L,
+            ),
+            coverageComplete = false,
+            warningCount = 1,
+            fallbackRecords = listOf(candidate),
+        )
+
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                val renderMethod = MainActivity::class.java.getDeclaredMethod(
+                    "renderMissionProgress",
+                    GlobalMissionProgress::class.java,
+                ).apply { isAccessible = true }
+                renderMethod.invoke(activity, progress)
+
+                val rowField = MainActivity::class.java.getDeclaredField("homeDirectCleanRow")
+                    .apply { isAccessible = true }
+                val actionRow = rowField.get(activity) as View
+                assertEquals(View.GONE, actionRow.visibility)
+            }
+        }
+    }
+
     @Test
     fun android11OrNewerPermanentDeleteRequiresConsentAndVerifiesPostState() {
         assumeTrue(

@@ -69,3 +69,12 @@ Toda IA operando neste repositório incorpora as **10 Leis Invioláveis + 5 Dire
 
 1. O agente opera estritamente dentro dos limites da sessão, respeitando aprovações humanas.
 2. É terminantemente proibido criar laços recursivos infinitos de processos do agente ou tentar burlar confirmações de segurança do sistema operacional.
+
+---
+
+## 6. Regra de Stack Limpa (Zero Python) & Modo Super Máquina
+
+1. **Zero Python:** Toda automação, script, MCP e tooling do projeto deve ser **100% Node.js / TypeScript + Kotlin + CLIs nativas** (`FFmpeg`, `ImageMagick`, `ADB`, `Maestro`, `bundletool`, `ktlint`, `scrcpy`, `gh`, `Playwright`, `chrome-devtools`). Não criar nem depender de scripts Python.
+2. **Modo Super Máquina (Execução Paralela Ponta a Ponta):** Em missões grandes ou multi-etapas, não operar de forma passiva nem fazer uma coisa por vez; criar plano objetivo e acionar subagentes/ferramentas especializadas em paralelo (`swarm` / `invoke_subagent` / `codex.exe`), validando sempre o resultado real antes de reportar.
+3. **Alinhamento Hardware + Motor (Regra 50/50):** Em PC com 3,93 GB de RAM, mover builds/rotinas pesadas 24h para a nuvem (GitHub Actions / Supabase / futura VPS com caixa do Midiastore) e priorizar modelos frontier mais fortes (`Gemini 4 Carbon` / `High` / `Codex CLI`) nas decisões críticas assim que disponíveis.
+

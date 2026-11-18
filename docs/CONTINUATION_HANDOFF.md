@@ -322,3 +322,11 @@ This section is the durable continuity checkpoint for future conversations. Cont
 - No moto g84 5G/API35, a aÁ„o Home encontrou 5 itens grandes (84,30 MB), atualizou a CTA para revis„o e abriu a lista. A revis„o mostra consentimento antes de qualquer operaÁ„o. A exclus„o foi deixada intocada.
 - Navegar para Planos Pro funcionou. Mensal/anual/vitalÌcio continuam indicados como sugeridos e inativos; o app n„o pode concluir compra enquanto Play Console n„o tiver cat·logo ativo e falta backend de purchaseToken.
 - Build :app:assembleDebug pÛs-ajustes passou. Testes JVM/Lint est„o em execuÁ„o; o AAB assinado n„o foi gerado. Bloqueios Play Console, versionCode/certificado e validaÁ„o release/API29/CI permanecem.
+
+## Checkpoint priorit√°rio ‚Äî 2026-11-18
+
+Antes de usar checkpoints antigos, consulte `docs/CONTINUATION_UPDATE_2026-11-18.md`. As decis√µes j√° aprovadas nas mem√≥rias Supabase #313‚Äì#315 prevalecem: limpador puro, abas Limpar/Arquivos/Pro, preto OLED/grafite/azul, sem Studio/jogos/jornal/extras; planta e mockup antes de c√≥digo de UI. Mockup: `docs/mockups/midiastore-2027-cleaner-puro.html`. Blueprint corrigido: `docs/BLUEPRINT_MIDIASTORE_2027.md`. Uma proposta que adicionava Studio/Explorar contrariou a decis√£o e foi corrigida; n√£o reabrir decis√µes j√° tomadas.
+
+## Atualiza√ß√£o adicional ‚Äî 2026-11-18: implementa√ß√£o Compose iniciada
+
+A planta/mockup respeitando #313/#315 foi seguido pela primeira tela real `CleanerHomeScreen.kt`, conectada √† Activity e aos fluxos MediaStore j√° existentes. A compila√ß√£o ainda n√£o foi confirmada: o Gradle inicia o daemon e trava antes de reportar tarefas; a execu√ß√£o foi interrompida. Veja `docs/CONTINUATION_UPDATE_2026-11-18.md`. Pr√≥xima etapa: destravar build, instalar o Debug separadamente e revisar visual no Moto; depois migrar Arquivos/Pro e navega√ß√£o, sem adicionar Studio/extras.

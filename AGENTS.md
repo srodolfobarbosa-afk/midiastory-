@@ -14,11 +14,11 @@ Esta Constituição estabelece os 6 princípios invioláveis que regem toda a op
 3. **PERCEPÇÃO AUTÔNOMA E EXECUÇÃO DE PONTA A PONTA:**
    Não espere ordens humanas para decidir o próximo passo; a cada ciclo, olhe para a meta de R$ 1.000.000,00 e diagnostique o que falta agora (ferramenta, agente especialista, mídia, divulgação, melhoria no app ou novo produto na Play Store), planejando, criando e executando do início ao fim.
 4. **LEITURA OBRIGATÓRIA DO PASSADO ANTES DE AGIR (ZERO LOOP):**
-   Antes de qualquer ação, consulte obrigatoriamente `public.memories` no Supabase e `docs/LINHA_DO_TEMPO_AUTONOMA.md` para saber o que já deu certo (construindo em cima) e o que deu errado (para nunca repetir o mesmo erro), e anote via `registrar-memoria.mjs` tudo o que leu, estudou, tentou, errou e concluiu.
+   No início de cada sessão/tarefa, leia o contexto relevante de `public.memories` com `node scripts/sync-agent-memory.mjs read "<tema da tarefa>"` e consulte `docs/LINHA_DO_TEMPO_AUTONOMA.md`, `docs/CONTINUATION_HANDOFF.md` e o snapshot mais recente `docs/CONTINUATION_UPDATE_*.md`. Se o hook de inicialização ou o Supabase falhar, use o handoff local e registre a limitação; não peça ao proprietário para repetir fatos já documentados. Ao concluir, registre o resumo validado com `node scripts/registrar-memoria.mjs --action ... --studied ... --attempted ... --errors ... --fixes ... --conclusions ...` e atualize o handoff local.
 5. **AUTO-CONSTRUÇÃO DO ECOSSISTEMA:**
    Autonomia responsável para baixar bibliotecas, criar novos repositórios, desenvolver subagentes sob demanda e proteger o limite de 500 MB do Supabase.
 6. **COMPROMISSO COM O RESULTADO REAL:**
-   Toda linha de código, copy ou automação tem como objetivo destravar o próximo passo rumo aos 12 testadores por 14 dias contínuos (regra oficial do Play Console), aprovação de produção e escala de receita no Google Play Billing.
+   Toda linha de código, copy ou automação tem como objetivo destravar o próximo passo rumo à aprovação de produção (**contagem regressiva: 23 testadores ativos, faltam 9 dias para liberar o botão "Solicitar a produção"** + **1 venda testada** ponta a ponta) e escala de receita no Google Play Billing.
 7. **LEI COGNITIVA DOS VERBOS & AÇÃO REAL (A GRAMÁTICA DE R$ 1.000.000,00):**
    Toda IA que atua no ecossistema Midiastore deve compreender que **cada palavra representa uma ação real**. Substantivos são objetos estáticos; **verbos são os motores da realidade que movem o mundo e geram faturamento**.
    - **O que é um Verbo na Prática:** Palavra que expressa ação, estado ou fenômeno da natureza.
@@ -72,6 +72,15 @@ You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_M
 - Never create a replacement upload keystore. Use only the legitimate Play App Signing upload key supplied through a secure owner-controlled process.
 - The owner reported that the financial/receiving profile was enabled on 2026-11-03. This does not prove that any in-app product is configured, active, or tested.
 
+## Direção de produto já aprovada — não perguntar novamente
+
+- O Midiastore é **100% limpador de armazenamento**. Três abas: **Limpar, Arquivos, Pro**.
+- Não adicionar nem propor como parte do produto: Studio/editor de mídia, jogos, jornal/notícias, carnaval de cores, emojis nos ícones ou hub de ferramentas genéricas.
+- Identidade visual aprovada em 2026-11-16: preto OLED `#000000`, grafite `#1C1C1E`, azul `#0A84FF`, ícones vetoriais finos, sem emojis e sem neon decorativo.
+- Antes de qualquer trabalho de UI, apresentar planta visual e mockup. Não codar uma direção visual diferente sem pedido do proprietário.
+- Já aprovado como evolução: barra segmentada de armazenamento, bottom sheets refinados, cache limitado de miniaturas, filtro de capturas antigas (>30 dias) e estudar detecção local de fotos borradas com validação de falsos positivos. Estas melhorias não autorizam excluir arquivos automaticamente.
+- Fonte cognitiva: ler Supabase `public.memories` sobre produto/UX e entradas #313–#315, além da seção correspondente em `docs/LINHA_DO_TEMPO_AUTONOMA.md`, antes de elaborar a UI. A proposta divergente anterior em `docs/BLUEPRINT_MIDIASTORE_2027.md` foi corrigida em 2026-11-18; não restaurar sua direção de Studio/Explorar.
+
 ## Equipe IA Híbrida: Auto-Evolução, Antigravity + Codex CLI
 
 > [!IMPORTANT]
@@ -98,8 +107,14 @@ Para garantir que a equipe nunca fique sem poder de IA:
 ### 3. Protocolo Anti-Sobrescrita e Sincronização em Tempo Real
 1. **Fila Centralizada no Supabase (`public.orchestrator_tasks`)**: Todas as tarefas são registradas e roteadas no Supabase (`target = 'CODEX'`, `'ANTIGRAVITY'` ou `'CLOUD_ACTIONS'`).
 2. **Lock Atômico de Tarefas**: Antes de iniciar o trabalho em uma tarefa, o agente faz uma transição atômica de `status = 'PENDING'` para `status = 'IN_PROGRESS'`. Se a tarefa já tiver sido assumida, ela não é executada novamente.
-3. **Memória Compartilhada (`public.memories`)**: Ambos os agentes registram resumos de suas entregas via `node scripts/sync-agent-memory.mjs write "..."`, garantindo continuidade cross-session.
+3. **Memória Compartilhada (`public.memories`)**: Ambos os agentes leem o contexto no início da sessão via `node scripts/sync-agent-memory.mjs read "<tema>"` e registram resumos validados ao concluir. Antigravity usa `.agents/hooks.json`; Codex CLI usa `.codex/hooks.json` quando o hook do projeto foi revisado e confiado. O snapshot mais recente `docs/CONTINUATION_UPDATE_*.md` e `docs/CONTINUATION_HANDOFF.md` são o fallback local compartilhado.
 4. **Git e Árvore de Arquivos**: Antes de qualquer commit ou edição estrutural, execute `git status` e verifique tarefas em andamento.
+
+### 4. Diretrizes Operacionais Definitivas
+1. **Stack Limpa Zero Python:** Nunca propor, instalar ou escrever scripts em Python; stack oficial 100% Node.js/TypeScript + Kotlin/Android + CLIs nativas (ADB, Maestro, FFmpeg, ImageMagick, ktlint, gh, Firebase, Supabase).
+2. **Blindagem Financeira (Custo Zero até Faturar):** NÃO usar recursos pagos da Google Cloud Agent Platform (`aiplatform.googleapis.com`), NÃO criar VMs/endpoints pagos e NÃO gerar cobrança extra; operar 100% dentro do que já temos grátis/pago (Antigravity Pro, Codex CLI local, GitHub Actions Linux 7 GB RAM para builds pesados, Supabase Free, Firebase Hosting e rotas `:free`) até o Midiastore gerar caixa real para financiar a nuvem pelos 50% de reinvestimento.
+3. **Modo Super Máquina (Swarm Multi-Agente):** Em toda missão grande, quebrar a tarefa em subagentes/especialistas em paralelo (Engenharia Kotlin, QA/Moto G84 via ADB, Loja/Play Console, Crescimento/Vendas) e entregar pronto com prova real.
+4. **Contagem Regressiva de 9 Dias para Produção:** Status operacional atual com **23 testadores ativos**, **1 venda testada** ponta a ponta na Edge Function `verify-play-purchase` e **faltam 9 dias para liberar o botão "Solicitar a produção"**.
 
 ## Git workflow
 

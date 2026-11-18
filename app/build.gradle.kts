@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 val uploadPropertiesFile = rootProject.file("keystore.properties")
@@ -45,6 +46,10 @@ val uploadSigningReady = uploadStoreFile != null &&
 android {
     namespace = "com.rdf112.sweep"
     compileSdk = 36
+
+    buildFeatures {
+        compose = true
+    }
 
     defaultConfig {
         applicationId = "com.rdf112.midiastore"
@@ -118,6 +123,14 @@ tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
 
 dependencies {
     implementation(project(":domain"))
+    val composeBom = platform("androidx.compose:compose-bom:2026.09.00")
+    implementation(composeBom)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
+    debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.8.0")
     implementation("androidx.activity:activity-ktx:1.13.0")

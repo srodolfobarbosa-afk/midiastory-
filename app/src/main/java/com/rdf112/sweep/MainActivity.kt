@@ -51,6 +51,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -94,9 +99,14 @@ import com.rdf112.sweep.presentation.scan.GlobalMissionProgress
 import com.rdf112.sweep.presentation.scan.MediaScanUiState
 import com.rdf112.sweep.presentation.scan.MediaScanViewModel
 import com.rdf112.sweep.presentation.scan.ScanUiStatus
+import com.rdf112.sweep.presentation.ui.CleanCollectionUiModel
+import com.rdf112.sweep.presentation.ui.CleanMission
+import com.rdf112.sweep.presentation.ui.CleanerHomeScreen
+import com.rdf112.sweep.presentation.ui.HomeUiState
 import com.rdf112.sweep.presentation.ui.StorageBarSegment
 import com.rdf112.sweep.presentation.ui.StorageRingGaugeView
 import com.rdf112.sweep.presentation.ui.StorageSegmentedBarView
+import com.rdf112.sweep.presentation.ui.theme.MidiastoreTheme
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -367,6 +377,8 @@ class MainActivity : AppCompatActivity() {
 
     // Containers das Abas Dedicadas (Fim do app embolado: cada recurso em sua página)
     private lateinit var homeSection: LinearLayout
+    private lateinit var homeComposeView: ComposeView
+    private val homeComposeState = mutableStateOf(HomeUiState())
     private lateinit var newsSection: LinearLayout
     private lateinit var filesSection: LinearLayout
     private lateinit var studioSection: LinearLayout
@@ -645,7 +657,25 @@ class MainActivity : AppCompatActivity() {
         bodyContainer.addView(statusText)
 
         // Construção das Abas Puras e Separadas por Finalidade (Padrão Jornal & Fim do app embolado)
-        homeSection = buildHomeDashboardSection()
+        homeSection = buildHomeDashboardSection().apply { visibility = View.GONE }
+        homeComposeView = ComposeView(this@MainActivity).apply {
+            id = View.generateViewId()
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val scanState by viewModel.state.collectAsStateWithLifecycle()
+                MidiastoreTheme {
+                    CleanerHomeScreen(
+                        state = homeComposeState.value.copy(
+                            isScanning = scanState.missionProgress?.isRunning == true,
+                        ),
+                        isProActive = hasEffectiveProAccess(),
+                        onAnalyze = { onHomeCleanupButtonClicked() },
+                        onMissionClick = ::onCleanMissionClick,
+                        onOpenPro = { switchTab(AppTab.PRO) },
+                    )
+                }
+            }
+        }
         newsSection = buildNewsGazetteSection()
         filesSection = buildFilesExplorerSection()
         studioSection = buildStudioToolsSection()
@@ -655,6 +685,7 @@ class MainActivity : AppCompatActivity() {
         proSection = buildProPaywallSection()
 
         bodyContainer.addView(homeSection)
+        bodyContainer.addView(homeComposeView)
         bodyContainer.addView(newsSection)
         bodyContainer.addView(filesSection)
         bodyContainer.addView(studioSection)
@@ -786,12 +817,7 @@ class MainActivity : AppCompatActivity() {
             visibility = View.GONE
         }
         val homeTrashBtn = button(getString(R.string.move_to_trash_button)) {
-            val targets = if (viewModel.state.value.selection.records.isNotEmpty()) {
-                viewModel.state.value.selection.records
-            } else {
-                homeInteractiveRecords
-            }
-            requestMoveSelectedToTrash(targets)
+            requestMoveSelectedToTrash()
         }.apply {
             setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
@@ -799,12 +825,7 @@ class MainActivity : AppCompatActivity() {
             minHeight = dp(52)
         }
         val homeDeleteBtn = button(getString(R.string.permanent_delete_button)) {
-            val targets = if (viewModel.state.value.selection.records.isNotEmpty()) {
-                viewModel.state.value.selection.records
-            } else {
-                homeInteractiveRecords
-            }
-            requestPermanentDeleteSelected(targets)
+            requestPermanentDeleteSelected()
         }.apply {
             setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
@@ -1958,7 +1979,8 @@ class MainActivity : AppCompatActivity() {
     private fun switchTab(tab: AppTab) {
         activeTab = tab
         statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS)) View.VISIBLE else View.GONE
-        homeSection.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
+        homeSection.visibility = View.GONE
+        homeComposeView.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
         newsSection.visibility = if (tab == AppTab.NEWS) View.VISIBLE else View.GONE
         filesSection.visibility = if (tab == AppTab.FILES || tab == AppTab.OAAS) View.VISIBLE else View.GONE
         gamesSection.visibility = if (tab == AppTab.GAMES) View.VISIBLE else View.GONE
@@ -1985,8 +2007,59 @@ class MainActivity : AppCompatActivity() {
         btn.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
     }
 
+    private fun onCleanMissionClick(mission: CleanMission) {
+        when (mission) {
+            CleanMission.WHATSAPP -> openWhatsAppCleanerFlow()
+            CleanMission.DUPLICATES -> {
+                openInteractiveDialogOnMissionFinish = true
+                runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+            }
+            CleanMission.LARGE_VIDEOS -> {
+                openInteractiveDialogOnMissionFinish = true
+                runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+            }
+            CleanMission.OLD_SCREENSHOTS -> {
+                openInteractiveDialogOnMissionFinish = true
+                runOutcomeMission(DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D)
+            }
+            CleanMission.BLURRY_PHOTOS -> openBlurCleanerFlow()
+        }
+    }
+
+    private fun buildDefaultHomeCollections(): List<CleanCollectionUiModel> = listOf(
+        CleanCollectionUiModel(
+            mission = CleanMission.DUPLICATES,
+            title = getString(R.string.mission_duplicates_title),
+            subtitle = getString(R.string.mission_duplicates_desc),
+            sizeLabel = "SHA-256",
+            itemCount = 0,
+        ),
+        CleanCollectionUiModel(
+            mission = CleanMission.LARGE_VIDEOS,
+            title = getString(R.string.mission_free_max_title),
+            subtitle = getString(R.string.mission_free_max_desc),
+            sizeLabel = "> 10 MB",
+            itemCount = 0,
+        ),
+        CleanCollectionUiModel(
+            mission = CleanMission.WHATSAPP,
+            title = getString(R.string.whatsapp_cleaner_title),
+            subtitle = getString(R.string.whatsapp_cleaner_subtitle),
+            sizeLabel = "MediaStore",
+            itemCount = 0,
+        ),
+        CleanCollectionUiModel(
+            mission = CleanMission.OLD_SCREENSHOTS,
+            title = getString(R.string.mission_old_screenshots_title),
+            subtitle = getString(R.string.mission_old_screenshots_desc),
+            sizeLabel = "> 30d",
+            itemCount = 0,
+        ),
+    )
+
     private fun isTesterVipProEnabled(): Boolean =
-        getSharedPreferences("midiastore_prefs", MODE_PRIVATE).getBoolean("tester_vip_pro_v25", false)
+        isDevelopmentBuild &&
+            getSharedPreferences("midiastore_prefs", MODE_PRIVATE).getBoolean("tester_vip_pro_v25", false)
 
     private fun setTesterVipProEnabled(enabled: Boolean) {
         getSharedPreferences("midiastore_prefs", MODE_PRIVATE)
@@ -6271,6 +6344,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         val formattedBytes = android.text.format.Formatter.formatFileSize(this, plan.estimatedDeliverableBytes)
+        homeComposeState.value = homeComposeState.value.copy(
+            recoverableBytes = plan.estimatedDeliverableBytes,
+            recoverableLabel = formattedBytes,
+        )
         val resultMessage = when {
             plan.autoSelectedRecords.isEmpty() && progress.coverageComplete -> getString(
                 R.string.oaas_no_candidates_complete,
@@ -6330,9 +6407,6 @@ class MainActivity : AppCompatActivity() {
                     homeCleanupCandidateCount,
                     interactiveFormattedBytes,
                 )
-                if (::homeDirectCleanRow.isInitialized) {
-                    homeDirectCleanRow.visibility = View.VISIBLE
-                }
                 val messageId = if (progress.coverageComplete) {
                     R.string.home_cleanup_candidates_found
                 } else {
@@ -6641,6 +6715,12 @@ class MainActivity : AppCompatActivity() {
             val usedFmt = android.text.format.Formatter.formatFileSize(this, usage.usedBytes)
             val freeFmt = android.text.format.Formatter.formatFileSize(this, usage.availableBytes)
             val totalFmt = android.text.format.Formatter.formatFileSize(this, usage.totalBytes)
+            homeComposeState.value = homeComposeState.value.copy(
+                usedLabel = usedFmt,
+                freeLabel = freeFmt,
+                totalLabel = totalFmt,
+                collections = buildDefaultHomeCollections(),
+            )
             if (::storageText.isInitialized) {
                 storageText.text = getString(R.string.storage_measurement, usedFmt, freeFmt, totalFmt)
             }
@@ -6673,6 +6753,9 @@ class MainActivity : AppCompatActivity() {
                             val mediaSum = breakdown.totalAccessibleMediaBytes
                             val otherBytes = (usage.usedBytes - mediaSum).coerceAtLeast(0L)
                             val oFrac = (otherBytes / totalBytes).toFloat().coerceIn(0f, 1f)
+                            homeComposeState.value = homeComposeState.value.copy(
+                                categoryFractions = listOf(pFrac, vFrac, aFrac, oFrac),
+                            )
                             storageSegmentedBar.segments = listOf(
                                 StorageBarSegment(pFrac, color(R.color.google_blue_primary)),
                                 StorageBarSegment(vFrac, color(R.color.sweep_success)),
@@ -6693,6 +6776,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }.onFailure {
+            homeComposeState.value = HomeUiState()
             if (::storageText.isInitialized) storageText.text = getString(R.string.storage_unavailable)
             if (::storageUsedHeadline.isInitialized) {
                 storageUsedHeadline.text = getString(R.string.storage_unavailable)
