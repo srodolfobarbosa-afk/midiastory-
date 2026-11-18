@@ -123,7 +123,7 @@ tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
 
 dependencies {
     implementation(project(":domain"))
-    val composeBom = platform("androidx.compose:compose-bom:2026.09.00")
+    val composeBom = platform("androidx.compose:compose-bom:2025.10.01")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
