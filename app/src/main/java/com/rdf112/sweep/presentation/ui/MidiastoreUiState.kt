@@ -25,6 +25,7 @@ data class HomeUiState(
     val categoryFractions: List<Float> = emptyList(),
     val collections: List<CleanCollectionUiModel> = emptyList(),
     val isScanning: Boolean = false,
+    val needsMediaPermissionPrompt: Boolean = false,
 )
 
 data class MediaItemUiModel(

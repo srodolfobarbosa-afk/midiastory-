@@ -554,10 +554,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var lastHadFullVisualAccess: Boolean = false
+    private var autoRetriedStaleMission: DesiredOutcomeMission? = null
+
+    private fun hasFullVisualAccess(): Boolean = when {
+        Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2 ->
+            isGranted(Manifest.permission.READ_EXTERNAL_STORAGE)
+        else -> isGranted(Manifest.permission.READ_MEDIA_IMAGES) &&
+            isGranted(Manifest.permission.READ_MEDIA_VIDEO)
+    }
+
     override fun onResume() {
         super.onResume()
+        val nowFullVisual = hasFullVisualAccess()
+        val gainedVisualAccess = !lastHadFullVisualAccess && nowFullVisual
+        lastHadFullVisualAccess = nowFullVisual
+        homeComposeState.value = homeComposeState.value.copy(
+            needsMediaPermissionPrompt = !nowFullVisual,
+        )
         if (::storageText.isInitialized || ::storageUsedHeadline.isInitialized) refreshStorageStats()
-        if (::viewModel.isInitialized) viewModel.checkSessionFreshness()
+        if (::viewModel.isInitialized) {
+            if (gainedVisualAccess) {
+                viewModel.startSession()
+            } else {
+                viewModel.checkSessionFreshness()
+            }
+        }
         if (::billingGateway.isInitialized) billingGateway.startAndReconcile()
         if (::restoreTrashButton.isInitialized) updateRestoreButtonState()
     }
@@ -672,11 +694,13 @@ class MainActivity : AppCompatActivity() {
                     CleanerHomeScreen(
                         state = homeComposeState.value.copy(
                             isScanning = scanState.isLoading || scanState.missionProgress?.isRunning == true,
+                            needsMediaPermissionPrompt = !hasFullVisualAccess(),
                         ),
                         isProActive = isProNow,
                         onAnalyze = { onHomeCleanupButtonClicked() },
                         onMissionClick = ::onCleanMissionClick,
                         onOpenPro = { switchTab(AppTab.PRO) },
+                        onManagePermissions = { requestMediaPermissions(allowSettingsFallback = true) },
                     )
                 }
             }
@@ -2034,6 +2058,12 @@ class MainActivity : AppCompatActivity() {
         oaasSection.visibility = View.GONE
         worldSection.visibility = View.GONE
         proSection.visibility = if (tab == AppTab.PRO) View.VISIBLE else View.GONE
+        if ((tab == AppTab.FILES || tab == AppTab.OAAS) && ::viewModel.isInitialized) {
+            val st = viewModel.state.value
+            if (st.currentPage == null && !st.isLoading && hasAnyMediaPermission()) {
+                viewModel.startSession()
+            }
+        }
         if (::mainScrollView.isInitialized) {
             mainScrollView.post { mainScrollView.scrollTo(0, 0) }
         }
@@ -6387,6 +6417,14 @@ class MainActivity : AppCompatActivity() {
 
         val plan = progress.plan
         if (plan == null) {
+            if (progress.message == "session_stale" && autoRetriedStaleMission != progress.mission) {
+                autoRetriedStaleMission = progress.mission
+                pendingOutcomeMission = progress.mission
+                openInteractiveDialogOnMissionFinish = true
+                viewModel.startSession()
+                return
+            }
+            autoRetriedStaleMission = null
             openInteractiveDialogOnMissionFinish = false
             android.util.Log.e(
                 "MidiastoreMediaScan",
@@ -6403,14 +6441,17 @@ class MainActivity : AppCompatActivity() {
             }
             missionReviewButton.visibility = View.GONE
             missionRetryButton.visibility = if (progress.message in setOf("session_stale", "cancelled")) View.VISIBLE else View.GONE
-            oaasPipelineStatus.text = when (progress.message) {
+            val errMsg = when (progress.message) {
                 "cancelled" -> getString(R.string.oaas_global_scan_cancelled)
                 "safety_limit_reached" -> getString(R.string.oaas_global_scan_limit)
                 "session_stale" -> getString(R.string.session_stale)
                 else -> getString(R.string.oaas_global_scan_failed)
             }
+            oaasPipelineStatus.text = errMsg
+            Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show()
             return
         }
+        autoRetriedStaleMission = null
         missionRetryButton.visibility = View.GONE
 
         if (progress !== lastRecordedMissionProgress) {

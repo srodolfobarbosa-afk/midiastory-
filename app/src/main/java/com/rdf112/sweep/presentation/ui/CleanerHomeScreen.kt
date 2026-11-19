@@ -46,6 +46,7 @@ fun CleanerHomeScreen(
     onAnalyze: () -> Unit,
     onMissionClick: (CleanMission) -> Unit,
     onOpenPro: () -> Unit,
+    onManagePermissions: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -89,6 +90,40 @@ fun CleanerHomeScreen(
             state = state,
             onAnalyze = onAnalyze,
         )
+
+        if (state.needsMediaPermissionPrompt) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MidiastoreColors.AccentBlueSoft,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MidiastoreColors.AccentBlue, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = onManagePermissions),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(R.string.permission_continue),
+                        color = MidiastoreColors.AccentBlue,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = "›",
+                        color = MidiastoreColors.AccentBlue,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
 
         QuickMissionGrid(
             collections = state.collections,
