@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">+30 يومًا</string>
     <string name="cleaner_home_fallback_blur_title">صور ضبابية</string>
     <string name="cleaner_home_fallback_blur_sub">وضوح منخفض</string>
+    <string name="pro_annual_savings_badge">الأكثر اختيارًا • وفّر 56%</string>
+    <string name="post_cleanup_relief_title">تم تحرير المساحة بنجاح!</string>
+    <string name="post_cleanup_relief_body">لقد حرّرت للتو %1$s (%2$d ملف) بأمان.\n\nافتح Midiastore Pro (التطبيقات غير المستخدمة +90 يومًا، التقارير المدققة والدعم ذي الأولوية) ووفّر 56%% مع الخطة السنوية.</string>
+    <string name="post_cleanup_relief_cta">عرض الخطة السنوية · وفّر 56%</string>
+    <string name="post_cleanup_relief_later">ليس الآن</string>
 </resources>

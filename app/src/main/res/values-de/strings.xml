@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">&gt;30 Tage</string>
     <string name="cleaner_home_fallback_blur_title">Unscharfe Fotos</string>
     <string name="cleaner_home_fallback_blur_sub">Wenig Schärfe</string>
+    <string name="pro_annual_savings_badge">AM BELIEBTESTEN • 56% SPAREN</string>
+    <string name="post_cleanup_relief_title">Speicher erfolgreich freigegeben!</string>
+    <string name="post_cleanup_relief_body">Du hast gerade %1$s (%2$d Datei(en)) sicher freigegeben.\n\nSchalte Midiastore Pro frei (ungenutzte Apps 90T+, Prüfberichte &amp; Prioritäts-Support) und spare 56%% im Jahresabo.</string>
+    <string name="post_cleanup_relief_cta">Jahresabo ansehen · 56% sparen</string>
+    <string name="post_cleanup_relief_later">Nicht jetzt</string>
 </resources>

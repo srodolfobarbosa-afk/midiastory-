@@ -302,6 +302,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.clearSelection()
                 viewModel.startSession()
                 Toast.makeText(this@MainActivity, getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt), Toast.LENGTH_LONG).show()
+                showPostCleanupReliefOffer(confirmedBytes, confirmedDeleted)
             }
             statusText.text = getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt)
         }
@@ -1648,6 +1649,27 @@ class MainActivity : AppCompatActivity() {
         addView(wrap(oaasCard), bottom(14))
     }
 
+    private var postCleanupReliefShownThisSession: Boolean = false
+
+    private fun showPostCleanupReliefOffer(confirmedBytes: Long, confirmedCount: Int) {
+        if (confirmedBytes <= 0L || confirmedCount <= 0) return
+        if (hasEffectiveProAccess() || postCleanupReliefShownThisSession) return
+        if (isFinishing || isDestroyed) return
+        postCleanupReliefShownThisSession = true
+        val freedFmt = android.text.format.Formatter.formatFileSize(this, confirmedBytes)
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.post_cleanup_relief_title))
+            .setMessage(getString(R.string.post_cleanup_relief_body, freedFmt, confirmedCount))
+            .setPositiveButton(getString(R.string.post_cleanup_relief_cta)) { _, _ ->
+                switchTab(AppTab.PRO)
+                if (billingGateway.securePurchaseVerificationAvailable()) {
+                    billingGateway.launchPurchaseFlow(this, BillingStatePolicy.PRODUCT_ANNUAL)
+                }
+            }
+            .setNegativeButton(getString(R.string.post_cleanup_relief_later), null)
+            .show()
+    }
+
     private fun buildProPaywallSection(): LinearLayout = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
         setPadding(dp(2), dp(4), dp(2), dp(16))
@@ -1684,6 +1706,26 @@ class MainActivity : AppCompatActivity() {
         }
         addView(wrap(benefitsCard), top(12))
 
+        val annualBadge = TextView(this@MainActivity).apply {
+            text = getString(R.string.pro_annual_savings_badge)
+            textSize = 10.5f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#30D158"))
+            setPadding(dp(12), dp(5), dp(12), dp(5))
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#163322"))
+                cornerRadius = dp(999).toFloat()
+                setStroke(dp(1), Color.parseColor("#30D158"))
+            }
+        }
+        addView(
+            annualBadge,
+            LinearLayout.LayoutParams(-2, -2).apply {
+                topMargin = dp(16)
+                bottomMargin = dp(6)
+            },
+        )
+
         planAnnualButton = button(getString(R.string.plan_annual_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
         }.apply {
@@ -1691,7 +1733,7 @@ class MainActivity : AppCompatActivity() {
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
         stylePlanPurchaseButton(planAnnualButton, isProductAvailable = false)
-        addView(planAnnualButton, top(18))
+        addView(planAnnualButton, top(0))
 
         planMonthlyButton = button(getString(R.string.plan_monthly_default)) {
             requestPlanPurchase(BillingStatePolicy.PRODUCT_MONTHLY)
@@ -6638,6 +6680,7 @@ class MainActivity : AppCompatActivity() {
             }
             viewModel.clearSelection()
             viewModel.startSession()
+            showPostCleanupReliefOffer(confirmedBytes, verifiedUris.size)
         }
         val resultMsg = getString(
             R.string.delete_operation_result,

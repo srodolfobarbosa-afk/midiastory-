@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">+30 días</string>
     <string name="cleaner_home_fallback_blur_title">Fotos borrosas</string>
     <string name="cleaner_home_fallback_blur_sub">Baja nitidez</string>
+    <string name="pro_annual_savings_badge">MÁS ELEGIDO • AHORRA 56%</string>
+    <string name="post_cleanup_relief_title">¡Espacio liberado con éxito!</string>
+    <string name="post_cleanup_relief_body">Acabas de liberar %1$s (%2$d archivo(s)) con seguridad.\n\nDesbloquea Midiastore Pro (apps sin uso +90d, informes auditados y soporte prioritario) ahorrando un 56%% en el Plan Anual.</string>
+    <string name="post_cleanup_relief_cta">Ver Plan Anual · Ahorra 56%</string>
+    <string name="post_cleanup_relief_later">Ahora no</string>
 </resources>

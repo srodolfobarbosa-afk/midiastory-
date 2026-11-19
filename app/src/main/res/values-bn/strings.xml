@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">30+ দিন</string>
     <string name="cleaner_home_fallback_blur_title">ঝাপসা ছবি</string>
     <string name="cleaner_home_fallback_blur_sub">কম স্পষ্টতা</string>
+    <string name="pro_annual_savings_badge">সবচেয়ে জনপ্রিয় • ৫৬% সাশ্রয়</string>
+    <string name="post_cleanup_relief_title">সফলভাবে স্পেস খালি হয়েছে!</string>
+    <string name="post_cleanup_relief_body">আপনি নিরাপদে %1$s (%2$d টি ফাইল) খালি করেছেন।\n\nবার্ষিক প্ল্যানে ৫৬%% সাশ্রয়ে Midiastore Pro (৯০+ দিন অব্যবহৃত অ্যাপ, অডিট রিপোর্ট ও অগ্রাধিকার সহায়তা) আনলক করুন।</string>
+    <string name="post_cleanup_relief_cta">বার্ষিক প্ল্যান দেখুন · ৫৬% সাশ্রয়</string>
+    <string name="post_cleanup_relief_later">এখন নয়</string>
 </resources>

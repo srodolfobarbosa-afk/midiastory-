@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">30일 이상</string>
     <string name="cleaner_home_fallback_blur_title">흐린 사진</string>
     <string name="cleaner_home_fallback_blur_sub">낮은 선명도</string>
+    <string name="pro_annual_savings_badge">가장 인기 • 56% 절약</string>
+    <string name="post_cleanup_relief_title">공간이 안전하게 확보되었습니다!</string>
+    <string name="post_cleanup_relief_body">방금 %1$s(%2$d개 파일)를 안전하게 정리했습니다.\n\n연간 플랜으로 56%% 절약하며 Midiastore Pro(90일 이상 미사용 앱, 감사 보고서, 우선 지원)를 사용해 보세요.</string>
+    <string name="post_cleanup_relief_cta">연간 플랜 보기 · 56% 절약</string>
+    <string name="post_cleanup_relief_later">나중에</string>
 </resources>

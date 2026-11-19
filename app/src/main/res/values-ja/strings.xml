@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">30日以上</string>
     <string name="cleaner_home_fallback_blur_title">ピンボケ写真</string>
     <string name="cleaner_home_fallback_blur_sub">低鮮明度</string>
+    <string name="pro_annual_savings_badge">一番人気 • 56% お得</string>
+    <string name="post_cleanup_relief_title">容量を安全に解放しました！</string>
+    <string name="post_cleanup_relief_body">%1$s（%2$d 件のファイル）を安全に解放しました。\n\n年額プランなら 56%% お得に Midiastore Pro（90日以上未使用のアプリ検出、監査レポート、優先サポート）をご利用いただけます。</string>
+    <string name="post_cleanup_relief_cta">年額プランを見る・56% お得</string>
+    <string name="post_cleanup_relief_later">あとで</string>
 </resources>

@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">30天以上</string>
     <string name="cleaner_home_fallback_blur_title">模糊照片</string>
     <string name="cleaner_home_fallback_blur_sub">清晰度低</string>
+    <string name="pro_annual_savings_badge">最受欢迎 • 省 56%</string>
+    <string name="post_cleanup_relief_title">空间已安全释放！</string>
+    <string name="post_cleanup_relief_body">您刚刚安全释放了 %1$s（%2$d 个文件）。\n\n选择年度方案立省 56%%，解锁 Midiastore Pro（90天以上未使用应用检测、审计报告与优先支持）。</string>
+    <string name="post_cleanup_relief_cta">查看年度方案 · 省 56%</string>
+    <string name="post_cleanup_relief_later">暂不</string>
 </resources>

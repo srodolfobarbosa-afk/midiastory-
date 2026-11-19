@@ -573,4 +573,9 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_screenshots_sub">30+ दिन</string>
     <string name="cleaner_home_fallback_blur_title">धुंधली फ़ोटो</string>
     <string name="cleaner_home_fallback_blur_sub">कम स्पष्टता</string>
+    <string name="pro_annual_savings_badge">सबसे लोकप्रिय • 56% बचाएँ</string>
+    <string name="post_cleanup_relief_title">स्टोरेज सफलतापूर्वक खाली हुआ!</string>
+    <string name="post_cleanup_relief_body">आपने अभी सुरक्षित रूप से %1$s (%2$d फ़ाइलें) खाली की हैं।\n\nवार्षिक प्लान पर 56%% बचत के साथ Midiastore Pro (90+ दिन से अप्रयुक्त ऐप्स, ऑडिट रिपोर्ट और प्राथमिकता सहायता) अनलॉक करें।</string>
+    <string name="post_cleanup_relief_cta">वार्षिक प्लान देखें · 56% बचाएँ</string>
+    <string name="post_cleanup_relief_later">अभी नहीं</string>
 </resources>
