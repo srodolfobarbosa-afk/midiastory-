@@ -441,9 +441,15 @@ private fun MixCarouselCard(
                     fontWeight = FontWeight.ExtraBold,
                 )
                 Text(
-                    text = stringResource(R.string.cleaner_home_items_count, collection.itemCount),
+                    text = if (collection.itemCount > 0) {
+                        stringResource(R.string.cleaner_home_items_count, collection.itemCount)
+                    } else {
+                        collection.subtitle
+                    },
                     color = Color(0xCCFFFFFF),
                     fontSize = 11.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }

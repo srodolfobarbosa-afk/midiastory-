@@ -671,7 +671,7 @@ class MainActivity : AppCompatActivity() {
                 MidiastoreTheme {
                     CleanerHomeScreen(
                         state = homeComposeState.value.copy(
-                            isScanning = scanState.missionProgress?.isRunning == true,
+                            isScanning = scanState.isLoading || scanState.missionProgress?.isRunning == true,
                         ),
                         isProActive = isProNow,
                         onAnalyze = { onHomeCleanupButtonClicked() },
@@ -4213,11 +4213,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onHomeCleanupButtonClicked() {
-        if (!heroOrbButton.isEnabled || viewModel.state.value.missionProgress?.isRunning == true) {
+        val currentState = viewModel.state.value
+        if (currentState.missionProgress?.isRunning == true || currentState.isLoading) {
             Toast.makeText(this, R.string.cleanup_scan_in_progress_toast, Toast.LENGTH_SHORT).show()
             return
         }
-        val selectedNow = viewModel.state.value.selection.records
+        heroOrbButton.isEnabled = true
+        val selectedNow = currentState.selection.records
         val displayRecords = when {
             homeInteractiveRecords.isNotEmpty() -> homeInteractiveRecords
             selectedNow.isNotEmpty() -> selectedNow
@@ -4228,7 +4230,7 @@ class MainActivity : AppCompatActivity() {
                 records = displayRecords,
                 isFallbackList = selectedNow.isEmpty() && homeInteractiveFallback,
                 mission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW,
-                coverageComplete = viewModel.state.value.missionProgress?.coverageComplete ?: true,
+                coverageComplete = currentState.missionProgress?.coverageComplete ?: true,
             )
         } else {
             startOneTapCleanup()
@@ -4294,7 +4296,7 @@ class MainActivity : AppCompatActivity() {
                 .setMessage(R.string.cleanup_dialog_empty_body)
                 .setPositiveButton(R.string.quick_clean_whatsapp) { _, _ -> openWhatsAppCleanerFlow() }
                 .setNeutralButton(R.string.nav_files) { _, _ -> switchTab(AppTab.FILES) }
-                .setNegativeButton(R.string.permission_continue) { _, _ -> requestMediaPermissions() }
+                .setNegativeButton(R.string.permission_continue) { _, _ -> requestMediaPermissions(allowSettingsFallback = true) }
                 .show()
             return
         }
@@ -5879,12 +5881,33 @@ class MainActivity : AppCompatActivity() {
             .onFailure { Toast.makeText(this, R.string.pro_unused_apps_permission_denied, Toast.LENGTH_LONG).show() }
     }
 
-    private fun requestMediaPermissions() {
+    private fun openAppDetailsSettings() {
+        val intent = Intent(
+            android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", packageName, null),
+        )
+        runCatching { startActivity(intent) }
+    }
+
+    private fun requestMediaPermissions(allowSettingsFallback: Boolean = true) {
         val requested = MediaPermissionPolicy.permissionsToRequest(
             apiLevel = Build.VERSION.SDK_INT,
             kinds = setOf(MediaKind.IMAGE, MediaKind.VIDEO, MediaKind.AUDIO),
-        ).toTypedArray()
-        permissionLauncher.launch(requested)
+        )
+        val missing = requested.filter { !isGranted(it) }
+        val prefs = getSharedPreferences("midiastore_prefs", MODE_PRIVATE)
+        val alreadyRequestedBefore = prefs.getBoolean("media_perm_requested_once", false)
+        val permanentlyDenied = missing.isNotEmpty() &&
+            alreadyRequestedBefore &&
+            missing.none { shouldShowRequestPermissionRationale(it) }
+
+        if (allowSettingsFallback && permanentlyDenied) {
+            Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_LONG).show()
+            openAppDetailsSettings()
+            return
+        }
+        prefs.edit().putBoolean("media_perm_requested_once", true).apply()
+        permissionLauncher.launch(requested.toTypedArray())
     }
 
     private fun hasAnyMediaPermission(): Boolean = when {
