@@ -543,22 +543,22 @@ Total: %3$s</string>
     <string name="blur_scan_title">Photos floues</string>
     <string name="blur_scan_progress">Analyse locale de la netteté… %1$d/%2$d</string>
     <string name="blur_scan_empty">Aucune photo floue détectée parmi les images analysées.</string>
-    <string name="blur_sheet_subtitle">Vérifiez les photos peu nettes détectées sur cet appareil. Rien n'est supprimé sans votre confirmation.</string>
-    <string name="cleaner_home_eyebrow">STOCKAGE DE L'APPAREIL</string>
+    <string name="blur_sheet_subtitle">Vérifiez les photos peu nettes détectées sur cet appareil. Rien n\'est supprimé sans votre confirmation.</string>
+    <string name="cleaner_home_eyebrow">STOCKAGE DE L\'APPAREIL</string>
     <string name="cleaner_home_title">Votre espace,\nsous contrôle.</string>
     <string name="cleaner_home_device_storage">Cet appareil</string>
     <string name="cleaner_home_used">utilisés</string>
     <string name="cleaner_home_free_storage">%1$s disponibles</string>
     <string name="cleaner_home_analyze">Analyser mon espace</string>
     <string name="cleaner_home_scanning">Analyse du stockage…</string>
-    <string name="cleaner_home_reassurance">Vérifiez chaque suggestion avant d'agir.</string>
+    <string name="cleaner_home_reassurance">Vérifiez chaque suggestion avant d\'agir.</string>
     <string name="cleaner_home_quick_title">Nettoyage rapide</string>
-    <string name="cleaner_home_manual_review">Rien n'est supprimé automatiquement. Vous choisissez et confirmez chaque action.</string>
+    <string name="cleaner_home_manual_review">Rien n\'est supprimé automatiquement. Vous choisissez et confirmez chaque action.</string>
     <string name="cleaner_home_usage_bar_description">%1$d%% du stockage utilisé</string>
     <string name="cleaner_home_space_title">Votre espace</string>
     <string name="cleaner_home_pro_badge">Midiastore Pro</string>
     <string name="cleaner_home_free_badge">Gratuit • Pro</string>
-    <string name="cleaner_home_mixes_title">À libérer aujourd'hui</string>
+    <string name="cleaner_home_mixes_title">À libérer aujourd\'hui</string>
     <string name="cleaner_home_review">Vérifier</string>
     <string name="cleaner_home_recoverable_eyebrow">ESPACE RÉCUPÉRABLE ESTIMÉ</string>
     <string name="cleaner_home_used_of_total">%1$s utilisés sur %2$s</string>
@@ -575,7 +575,7 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_blur_sub">Peu nettes</string>
     <string name="pro_annual_savings_badge">PLUS POPULAIRE • ÉCONOMISEZ 56%</string>
     <string name="post_cleanup_relief_title">Espace libéré avec succès !</string>
-    <string name="post_cleanup_relief_body">Vous venez de libérer %1$s (%2$d fichier(s)) en toute sécurité.\n\nDébloquez Midiastore Pro (applis inutilisées 90j+, rapports audités et support prioritaire) en économisant 56%% avec l'offre Annuelle.</string>
-    <string name="post_cleanup_relief_cta">Voir l'offre Annuelle · -56%</string>
+    <string name="post_cleanup_relief_body">Vous venez de libérer %1$s (%2$d fichier(s)) en toute sécurité.\n\nDébloquez Midiastore Pro (applis inutilisées 90j+, rapports audités et support prioritaire) en économisant 56%% avec l\'offre Annuelle.</string>
+    <string name="post_cleanup_relief_cta">Voir l\'offre Annuelle · -56%</string>
     <string name="post_cleanup_relief_later">Plus tard</string>
 </resources>
