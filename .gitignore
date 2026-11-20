@@ -20,3 +20,8 @@ play-console-key.json
 *_dump.xml
 fresh_dump.xml
 motorola_*.png
+hs_err_pid*.log
+replay_pid*.log
+.tmp/
+.playwright-mcp/
+release-artifacts/

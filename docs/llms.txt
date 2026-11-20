@@ -28,3 +28,31 @@ Português (pt-BR), Inglês (en-US), Espanhol (es-ES), Árabe RTL (ar), Russo (r
 - Estúdio de Mídia (filtros ao vivo, corte de áudio, limpeza de EXIF/GPS, QR Code Studio, Fotos para PDF).
 - Jogos e Descoberta offline: Cobrinha Retrô, Blocos que Caem, Caça-Palavras Pro (com Desafio Diário por data local), Charadas e Salão Mágico (21 Cartas e Dado Mágico).
 - Relógio Mundial offline para 16 países e Conversor de Moedas com taxas base offline + Modo Fácil para Idosos (`Aa+`).
+
+
+## Guias Long-Tail de Armazenamento Android (pSEO)
+- Hub Global (48 guias em PT-BR, EN-US, ES-419, HI-IN): https://midiastory-df6a0.web.app/guides/
+- https://midiastory-df6a0.web.app/guides/pt-br/whatsapp-storage-full/
+- https://midiastory-df6a0.web.app/guides/pt-br/remove-duplicate-photos-android/
+- https://midiastory-df6a0.web.app/guides/pt-br/android-storage-full-fix/
+- https://midiastory-df6a0.web.app/guides/pt-br/clean-android-phone-fast/
+- https://midiastory-df6a0.web.app/guides/pt-br/samsung-galaxy-storage-full/
+- https://midiastory-df6a0.web.app/guides/pt-br/motorola-storage-full-fix/
+- https://midiastory-df6a0.web.app/guides/pt-br/xiaomi-redmi-storage-full/
+- https://midiastory-df6a0.web.app/guides/pt-br/free-up-space-android-update/
+- https://midiastory-df6a0.web.app/guides/pt-br/find-largest-videos-android/
+- https://midiastory-df6a0.web.app/guides/pt-br/clean-old-screenshots-android/
+- https://midiastory-df6a0.web.app/guides/pt-br/whatsapp-duplicate-videos-fix/
+- https://midiastory-df6a0.web.app/guides/pt-br/lightweight-cleaner-under-10mb/
+- https://midiastory-df6a0.web.app/guides/en-us/whatsapp-storage-full/
+- https://midiastory-df6a0.web.app/guides/en-us/remove-duplicate-photos-android/
+- https://midiastory-df6a0.web.app/guides/en-us/android-storage-full-fix/
+- https://midiastory-df6a0.web.app/guides/en-us/clean-android-phone-fast/
+- https://midiastory-df6a0.web.app/guides/en-us/samsung-galaxy-storage-full/
+- https://midiastory-df6a0.web.app/guides/en-us/motorola-storage-full-fix/
+- https://midiastory-df6a0.web.app/guides/en-us/xiaomi-redmi-storage-full/
+- https://midiastory-df6a0.web.app/guides/en-us/free-up-space-android-update/
+- https://midiastory-df6a0.web.app/guides/en-us/find-largest-videos-android/
+- https://midiastory-df6a0.web.app/guides/en-us/clean-old-screenshots-android/
+- https://midiastory-df6a0.web.app/guides/en-us/whatsapp-duplicate-videos-fix/
+- https://midiastory-df6a0.web.app/guides/en-us/lightweight-cleaner-under-10mb/

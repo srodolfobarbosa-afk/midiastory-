@@ -1,0 +1,72 @@
+{
+  "version": "2026-11-19.1",
+  "updatedAt": "2026-11-20T00:56:00Z",
+  "experiments": {
+    "landing_hero_v1": {
+      "metric": "play_store_click_ctr",
+      "goodhartGuard": { "maxBounceRisk": true, "noMisleadingClaims": true },
+      "variants": {
+        "A": {
+          "weight": 50,
+          "pt-BR": {
+            "headline": "Celular sem espaço? Libere gigabytes em segundos (apenas 5,9 MB)",
+            "subheadline": "Encontre vídeos gigantes e fotos duplicadas exatas (SHA-256) 100% no seu aparelho. Nada é apagado sem sua aprovação.",
+            "cta": "Baixar Midiastore grátis no Google Play"
+          },
+          "en-US": {
+            "headline": "Android Storage Full? Reclaim Gigabytes in Seconds (Only 5.9 MB)",
+            "subheadline": "Find huge videos and exact SHA-256 duplicate photos 100% on-device. Nothing is ever deleted without your approval.",
+            "cta": "Download Midiastore Free on Google Play"
+          }
+        },
+        "B": {
+          "weight": 50,
+          "pt-BR": {
+            "headline": "O limpador de 5,9 MB que nunca apaga suas fotos sem permissão",
+            "subheadline": "Zero anúncios invasivos, zero nuvem, verificação criptográfica SHA-256 e visual preto OLED.",
+            "cta": "Testar grátis na Google Play (5,9 MB)"
+          },
+          "en-US": {
+            "headline": "The 5.9 MB Cleaner That Never Deletes Photos Without Your OK",
+            "subheadline": "Zero bloated ads, 100% offline privacy, exact SHA-256 duplicate check, pure OLED dark UI.",
+            "cta": "Get It Free on Google Play (5.9 MB)"
+          }
+        }
+      }
+    },
+    "app_paywall_v1": {
+      "metric": "paywall_to_purchase_pct",
+      "goodhartGuard": { "maxRefundRatePct": 0.5, "minPlayRating": 4.5 },
+      "variants": {
+        "A": {
+          "weight": 50,
+          "highlightedSku": "sweep_pro_annual",
+          "pt-BR": {
+            "headline": "Desbloqueie limpezas ilimitadas e economize 55% no Anual",
+            "subheadline": "Apenas R$ 6,66/mês no plano anual (R$ 79,99/ano) ou R$ 149,99 Vitalício. Cancele em 1 toque na Google Play.",
+            "cta": "Ativar Pro Anual (55% OFF)"
+          },
+          "en-US": {
+            "headline": "Unlock Unlimited Cleanups & Save 55% With Pro Annual",
+            "subheadline": "Exact SHA-256 duplicate cleanup with zero ads. Cancel anytime in 1 tap via Google Play.",
+            "cta": "Unlock Pro Annual (Save 55%)"
+          }
+        },
+        "B": {
+          "weight": 50,
+          "highlightedSku": "sweep_pro_lifetime",
+          "pt-BR": {
+            "headline": "Pague 1 única vez ou assine por menos de um café por mês",
+            "subheadline": "100% privado no seu celular (5,9 MB). Escolha Anual (R$ 79,99) ou Vitalício (R$ 149,99) sem mensalidades.",
+            "cta": "Escolher Anual ou Vitalício"
+          },
+          "en-US": {
+            "headline": "Pay Once Forever — Or Save 55% With Annual Pro",
+            "subheadline": "5.9 MB, 100% on-device privacy, zero recurring fees on Lifetime.",
+            "cta": "Choose Annual or Lifetime"
+          }
+        }
+      }
+    }
+  }
+}

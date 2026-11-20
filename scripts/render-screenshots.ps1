@@ -59,13 +59,13 @@ $items = @($parsed)
             [System.Windows.Media.TextOptions]::SetTextFormattingMode($root, [System.Windows.Media.TextFormattingMode]::Ideal)
             [System.Windows.Media.TextOptions]::SetTextRenderingMode($root, [System.Windows.Media.TextRenderingMode]::ClearType)
 
-            # Base vertical background gradient
+            # Base vertical background gradient (Pure OLED Dark #000000 -> #0A0F18)
             $bgBrush = New-Object System.Windows.Media.LinearGradientBrush
             $bgBrush.StartPoint = New-Object System.Windows.Point(0.5, 0)
             $bgBrush.EndPoint = New-Object System.Windows.Point(0.5, 1)
-            $bgBrush.GradientStops.Add((New-Object System.Windows.Media.GradientStop (Convert-HexToColor "#07121A"), 0.0))
-            $bgBrush.GradientStops.Add((New-Object System.Windows.Media.GradientStop (Convert-HexToColor "#050B11"), 0.52))
-            $bgBrush.GradientStops.Add((New-Object System.Windows.Media.GradientStop (Convert-HexToColor "#081822"), 1.0))
+            $bgBrush.GradientStops.Add((New-Object System.Windows.Media.GradientStop (Convert-HexToColor "#050810"), 0.0))
+            $bgBrush.GradientStops.Add((New-Object System.Windows.Media.GradientStop (Convert-HexToColor "#000000"), 0.52))
+            $bgBrush.GradientStops.Add((New-Object System.Windows.Media.GradientStop (Convert-HexToColor "#060B14"), 1.0))
             $root.Background = $bgBrush
 
             # Top accent radial glow
