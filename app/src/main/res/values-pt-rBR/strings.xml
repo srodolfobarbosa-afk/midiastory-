@@ -621,4 +621,10 @@ Total: %3$s</string>
     <string name="post_cleanup_relief_body">Você acabou de liberar %1$s (%2$d arquivo(s)) com segurança.\n\nDesbloqueie o Midiastore Pro (Apps sem uso +90d, relatórios auditados e suporte prioritário) economizando 56%% no Plano Anual.</string>
     <string name="post_cleanup_relief_cta">Ver Plano Anual · Economize 56%</string>
     <string name="post_cleanup_relief_later">Agora não</string>
+    <string name="limited_access_banner">Acesso parcial às mídias. Toque para permitir todas as fotos e vídeos</string>
+    <string name="limited_access_sheet_title">O Midiastore só vê as mídias que você selecionou</string>
+    <string name="limited_access_sheet_body">Para encontrar duplicatas, vídeos grandes e capturas antigas em todo o celular, permita o acesso a todas as fotos e vídeos. Nada é excluído sem a sua confirmação.</string>
+    <string name="limited_access_allow_all">Permitir acesso a todas as mídias</string>
+    <string name="limited_access_continue_selected">Continuar com as mídias selecionadas</string>
+    <string name="limited_access_settings_hint">O Android não exibiu o pedido. Abra Permissões › Fotos e vídeos e escolha \"Permitir tudo\".</string>
 </resources>

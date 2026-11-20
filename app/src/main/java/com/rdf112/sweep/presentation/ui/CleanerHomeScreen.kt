@@ -48,6 +48,8 @@ fun CleanerHomeScreen(
     onOpenPro: () -> Unit,
     onManagePermissions: () -> Unit = {},
     modifier: Modifier = Modifier,
+    /** The host Activity already renders a Pro pill in its top bar; only standalone hosts should enable this. */
+    showProBadge: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -66,7 +68,7 @@ fun CleanerHomeScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 color = MidiastoreColors.TextPrimary,
             )
-            if (isProActive) {
+            if (showProBadge && isProActive) {
                 Surface(
                     shape = RoundedCornerShape(999.dp),
                     color = MidiastoreColors.AccentBlueSoft,
@@ -109,10 +111,11 @@ fun CleanerHomeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = stringResource(R.string.permission_continue),
+                        text = stringResource(R.string.limited_access_banner),
                         color = MidiastoreColors.AccentBlue,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
+                        lineHeight = 17.sp,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
@@ -130,7 +133,10 @@ fun CleanerHomeScreen(
             onMissionClick = onMissionClick,
         )
 
-        if (state.collections.isNotEmpty()) {
+        // The carousel only adds value once a scan produced real counts; with placeholder data it just
+        // duplicated the quick grid and showed clipped "0 items" cards below the fold.
+        val scannedCollections = state.collections.filter { it.itemCount > 0 }
+        if (scannedCollections.isNotEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -146,14 +152,14 @@ fun CleanerHomeScreen(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MidiastoreColors.AccentBlue,
-                    modifier = Modifier.clickable { onMissionClick(state.collections.first().mission) },
+                    modifier = Modifier.clickable { onMissionClick(scannedCollections.first().mission) },
                 )
             }
 
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(state.collections, key = { it.mission.name }) { collection ->
+                items(scannedCollections, key = { it.mission.name }) { collection ->
                     MixCarouselCard(
                         collection = collection,
                         onClick = { onMissionClick(collection.mission) },
@@ -178,7 +184,8 @@ private fun QuickMissionGrid(
     onMissionClick: (CleanMission) -> Unit,
 ) {
     val quickItems = if (collections.isNotEmpty()) {
-        collections.take(4)
+        // Show every mission (incl. blur detection, previously reachable only from the carousel).
+        collections.take(6)
     } else {
         listOf(
             CleanCollectionUiModel(
@@ -405,12 +412,27 @@ private fun StorageNowBanner(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = stringResource(
-                        if (state.isScanning) R.string.cleaner_home_scanning else R.string.cleaner_home_analyze,
-                    ),
+                    text = when {
+                        state.isScanning -> stringResource(R.string.cleaner_home_scanning)
+                        !state.primaryActionLabel.isNullOrBlank() -> state.primaryActionLabel
+                        else -> stringResource(R.string.cleaner_home_analyze)
+                    },
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(vertical = 4.dp),
+                )
+            }
+
+            if (!state.statusMessage.isNullOrBlank()) {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = state.statusMessage,
+                    color = MidiastoreColors.TextMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }

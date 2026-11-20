@@ -21,6 +21,7 @@ import android.os.CancellationSignal
 import android.os.Environment
 import android.os.Process
 import android.os.StatFs
+import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
@@ -143,6 +144,10 @@ import com.rdf112.sweep.presentation.studio.WorldNewsItem
  * Hub Mundial Offline (Cobrinha, Relógio, Moedas, Turismo) e Salão Secreto de Mágica & Charadas.
  */
 class MainActivity : AppCompatActivity() {
+    private companion object {
+        /** A permission callback faster than this means Android auto-denied without showing any dialog. */
+        const val SYSTEM_PERMISSION_DIALOG_SKIPPED_MS = 500L
+    }
     private enum class AppTab { HOME, NEWS, FILES, GAMES, STUDIO, OAAS, WORLD, PRO }
     private data class UnusedAppInfo(
         val packageName: String,
@@ -163,18 +168,33 @@ class MainActivity : AppCompatActivity() {
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
+        // Android silently auto-denies (no dialog, ~instant callback) once the user has denied twice or
+        // set USER_FIXED. Detect it and send the user to App settings instead of leaving a dead button.
+        val elapsedMs = SystemClock.elapsedRealtime() - permissionRequestStartedAtMs
+        val accessUnchanged = hasFullVisualAccess() == permissionRequestHadFullAccess &&
+            hasAnyMediaPermission() == permissionRequestHadAnyAccess
+        if (accessUnchanged && !hasFullVisualAccess() && elapsedMs in 0..SYSTEM_PERMISSION_DIALOG_SKIPPED_MS) {
+            awaitingPermissionSettingsReturn = true
+            Toast.makeText(this, R.string.limited_access_settings_hint, Toast.LENGTH_LONG).show()
+            openAppDetailsSettings()
+            return@registerForActivityResult
+        }
         val homeCleanupPending = pendingOutcomeMission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW
         val whatsAppPending = pendingWhatsAppCleanerAfterPermission
         val blurPending = pendingBlurScanAfterPermission
         pendingWhatsAppCleanerAfterPermission = false
         pendingBlurScanAfterPermission = false
+        homeComposeState.value = homeComposeState.value.copy(needsMediaPermissionPrompt = !hasFullVisualAccess())
         if (hasAnyMediaPermission()) {
+            // The user saw the system sheet and decided; never nag again with our own sheet in this session.
+            if (!hasFullVisualAccess()) limitedAccessAcknowledged = true
+            lastHadFullVisualAccess = hasFullVisualAccess()
             viewModel.startSession()
             refreshStorageStats()
+            // Stay on the tab the user is on: the review sheet opens on top of it when the mission ends.
             when {
                 whatsAppPending -> openWhatsAppCleanerFlow()
                 blurPending -> openBlurCleanerFlow()
-                else -> switchTab(if (homeCleanupPending) AppTab.HOME else if (pendingOutcomeMission != null) AppTab.OAAS else AppTab.FILES)
             }
         } else {
             pendingKindAfterPermission = null
@@ -217,9 +237,14 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK && confirmedCount > 0) {
                 homeInteractiveRecords = emptyList()
                 homeInteractiveFallback = false
+                homeInteractiveMission = null
                 homeCleanupCandidateCount = 0
                 heroOrbButton.isEnabled = true
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
+                homeComposeState.value = homeComposeState.value.copy(
+                    primaryActionLabel = null,
+                    collections = buildDefaultHomeCollections(),
+                )
                 if (::homeDirectCleanRow.isInitialized) {
                     homeDirectCleanRow.visibility = View.GONE
                 }
@@ -292,9 +317,16 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK && confirmedDeleted > 0) {
                 homeInteractiveRecords = emptyList()
                 homeInteractiveFallback = false
+                homeInteractiveMission = null
                 homeCleanupCandidateCount = 0
                 heroOrbButton.isEnabled = true
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
+                homeComposeState.value = homeComposeState.value.copy(
+                    recoverableBytes = 0L,
+                    recoverableLabel = "0 MB",
+                    primaryActionLabel = null,
+                    collections = buildDefaultHomeCollections(),
+                )
                 if (::homeDirectCleanRow.isInitialized) {
                     homeDirectCleanRow.visibility = View.GONE
                 }
@@ -431,7 +463,19 @@ class MainActivity : AppCompatActivity() {
     private var homeCleanupCandidateCount = 0
     private var homeInteractiveRecords: List<MediaRecord> = emptyList()
     private var homeInteractiveFallback: Boolean = false
+    /** Mission that produced [homeInteractiveRecords]; the Home CTA must not reopen another mission's list. */
+    private var homeInteractiveMission: DesiredOutcomeMission? = null
+    private var homeInteractiveCoverageComplete: Boolean = true
     private var openInteractiveDialogOnMissionFinish: Boolean = false
+    /**
+     * True once the user explicitly chose to keep Android 14+ "Select photos" (or otherwise limited)
+     * media access. Cleanup then runs on the authorized subset and coverage is reported as partial.
+     */
+    private var limitedAccessAcknowledged: Boolean = false
+    private var permissionRequestStartedAtMs: Long = 0L
+    private var permissionRequestHadFullAccess: Boolean = false
+    private var permissionRequestHadAnyAccess: Boolean = false
+    private var awaitingPermissionSettingsReturn: Boolean = false
     private var lastInteractivePromptProgress: GlobalMissionProgress? = null
     private var testerVipButton: MaterialButton? = null
     private lateinit var selectAllPageButton: MaterialButton
@@ -568,13 +612,16 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         val nowFullVisual = hasFullVisualAccess()
         val gainedVisualAccess = !lastHadFullVisualAccess && nowFullVisual
+        val returnedFromSettingsWithAccess = awaitingPermissionSettingsReturn && hasAnyMediaPermission()
+        awaitingPermissionSettingsReturn = false
         lastHadFullVisualAccess = nowFullVisual
+        if (nowFullVisual) limitedAccessAcknowledged = false
         homeComposeState.value = homeComposeState.value.copy(
             needsMediaPermissionPrompt = !nowFullVisual,
         )
         if (::storageText.isInitialized || ::storageUsedHeadline.isInitialized) refreshStorageStats()
         if (::viewModel.isInitialized) {
-            if (gainedVisualAccess) {
+            if (gainedVisualAccess || returnedFromSettingsWithAccess) {
                 viewModel.startSession()
             } else {
                 viewModel.checkSessionFreshness()
@@ -694,7 +741,6 @@ class MainActivity : AppCompatActivity() {
                     CleanerHomeScreen(
                         state = homeComposeState.value.copy(
                             isScanning = scanState.isLoading || scanState.missionProgress?.isRunning == true,
-                            needsMediaPermissionPrompt = !hasFullVisualAccess(),
                         ),
                         isProActive = isProNow,
                         onAnalyze = { onHomeCleanupButtonClicked() },
@@ -1489,14 +1535,14 @@ class MainActivity : AppCompatActivity() {
         selectedContainer = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
         reviewCard.addView(selectedContainer, top(6))
 
-        moveToTrashButton = button(getString(R.string.move_to_trash_button)) { requestMoveSelectedToTrash() }.apply {
+        permanentDeleteButton = button(getString(R.string.permanent_delete_button)) { requestPermanentDeleteSelected() }.apply {
             setTextColor(Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
         }
-        reviewCard.addView(moveToTrashButton, top(10))
+        reviewCard.addView(permanentDeleteButton, top(10))
 
-        permanentDeleteButton = button(getString(R.string.permanent_delete_button)) { requestPermanentDeleteSelected() }
-        reviewCard.addView(permanentDeleteButton, top(8))
+        moveToTrashButton = button(getString(R.string.move_to_trash_button)) { requestMoveSelectedToTrash() }
+        reviewCard.addView(moveToTrashButton, top(8))
 
         restoreTrashButton = button(getString(R.string.restore_trash_button, 0)) { requestRestoreFromTrash() }
         reviewCard.addView(restoreTrashButton, top(8))
@@ -2048,6 +2094,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchTab(tab: AppTab) {
         activeTab = tab
+        if (::topBarProButton.isInitialized) {
+            topBarProButton.visibility = if (tab == AppTab.PRO) View.GONE else View.VISIBLE
+        }
         statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS)) View.VISIBLE else View.GONE
         homeSection.visibility = View.GONE
         homeComposeView.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
@@ -4195,10 +4244,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startScanOrRequestAccess() {
-        if (hasFullVisualAccess()) {
-            viewModel.startSession()
-        } else {
-            requestMediaPermissions(allowSettingsFallback = true)
+        when {
+            hasFullVisualAccess() || (limitedAccessAcknowledged && hasAnyMediaPermission()) -> viewModel.startSession()
+            hasAnyMediaPermission() -> showLimitedAccessPromptSheet { viewModel.startSession() }
+            else -> requestMediaPermissions(allowSettingsFallback = true)
         }
     }
 
@@ -4220,26 +4269,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startOneTapCleanup() {
-        if (!hasFullVisualAccess()) {
-            pendingOutcomeMission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW
-            openInteractiveDialogOnMissionFinish = true
-            heroOrbButton.isEnabled = true
-            heroOrbButton.text = getString(R.string.home_cleanup_primary)
-            requestMediaPermissions(allowSettingsFallback = true)
-            return
-        }
         homeCleanupCandidateCount = 0
         homeInteractiveRecords = emptyList()
         homeInteractiveFallback = false
+        homeInteractiveMission = null
         openInteractiveDialogOnMissionFinish = true
-        heroOrbButton.isEnabled = false
-        heroOrbButton.text = getString(R.string.home_cleanup_scanning_button)
-        heroOrbSubtitle.text = getString(R.string.home_cleanup_scanning)
-        showHomeCleanupMessage(getString(R.string.home_cleanup_scanning))
+        homeComposeState.value = homeComposeState.value.copy(primaryActionLabel = null)
         runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
     }
 
     private fun showHomeCleanupMessage(message: String) {
+        homeComposeState.value = homeComposeState.value.copy(statusMessage = message)
         if (::homeCleanupResult.isInitialized) {
             homeCleanupResult.text = message
             homeCleanupResult.visibility = View.VISIBLE
@@ -4254,8 +4294,13 @@ class MainActivity : AppCompatActivity() {
         }
         heroOrbButton.isEnabled = true
         val selectedNow = currentState.selection.records
+        val freeSpaceRecords = if (homeInteractiveMission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW) {
+            homeInteractiveRecords
+        } else {
+            emptyList()
+        }
         val displayRecords = when {
-            homeInteractiveRecords.isNotEmpty() -> homeInteractiveRecords
+            freeSpaceRecords.isNotEmpty() -> freeSpaceRecords
             selectedNow.isNotEmpty() -> selectedNow
             else -> emptyList()
         }
@@ -4264,11 +4309,94 @@ class MainActivity : AppCompatActivity() {
                 records = displayRecords,
                 isFallbackList = selectedNow.isEmpty() && homeInteractiveFallback,
                 mission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW,
-                coverageComplete = currentState.missionProgress?.coverageComplete ?: true,
+                coverageComplete = homeInteractiveCoverageComplete,
             )
         } else {
             startOneTapCleanup()
         }
+    }
+
+    /**
+     * Shown when the user granted Android 14+ partial access ("Select photos") or audio-only access.
+     * Lets them either upgrade to full access or clean the subset they already authorized.
+     */
+    private fun showLimitedAccessPromptSheet(
+        onContinueWithSelected: () -> Unit,
+    ) {
+        val (sheet, root) = createAppleBottomSheet(
+            title = getString(R.string.limited_access_sheet_title),
+            subtitle = getString(R.string.limited_access_sheet_body),
+        )
+        val allowAllBtn = button(getString(R.string.limited_access_allow_all)) {
+            sheet.dismiss()
+            requestMediaPermissions(allowSettingsFallback = true)
+        }.apply {
+            minHeight = dp(50)
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        root.addView(allowAllBtn, top(14))
+
+        val continueBtn = button(getString(R.string.limited_access_continue_selected)) {
+            sheet.dismiss()
+            limitedAccessAcknowledged = true
+            onContinueWithSelected()
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+        }
+        root.addView(continueBtn, top(8))
+
+        val cancelBtn = button(getString(android.R.string.cancel)) {
+            pendingOutcomeMission = null
+            pendingWhatsAppCleanerAfterPermission = false
+            pendingBlurScanAfterPermission = false
+            openInteractiveDialogOnMissionFinish = false
+            sheet.dismiss()
+        }.apply {
+            minHeight = dp(46)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        root.addView(cancelBtn, top(4))
+        sheet.show()
+    }
+
+    private fun showEmptyCleanupBottomSheet() {
+        val (sheet, root) = createAppleBottomSheet(
+            title = getString(R.string.cleanup_dialog_empty_title),
+            subtitle = getString(R.string.cleanup_dialog_empty_body),
+        )
+        val waBtn = button(getString(R.string.quick_clean_whatsapp)) {
+            sheet.dismiss()
+            openWhatsAppCleanerFlow()
+        }.apply {
+            minHeight = dp(50)
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        root.addView(waBtn, top(14))
+
+        val filesBtn = button(getString(R.string.nav_files)) {
+            sheet.dismiss()
+            switchTab(AppTab.FILES)
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+        }
+        root.addView(filesBtn, top(8))
+
+        val closeBtn = button(getString(android.R.string.cancel)) {
+            sheet.dismiss()
+        }.apply {
+            minHeight = dp(46)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        root.addView(closeBtn, top(4))
+        sheet.show()
     }
 
     private fun createAppleBottomSheet(
@@ -4326,42 +4454,36 @@ class MainActivity : AppCompatActivity() {
     ) {
         if (records.isEmpty()) {
             if (!hasFullVisualAccess()) {
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.permission_continue)
-                    .setMessage(R.string.home_cleanup_permission_denied)
-                    .setPositiveButton(R.string.permission_continue) { _, _ -> requestMediaPermissions(allowSettingsFallback = true) }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
+                pendingOutcomeMission = mission
+                openInteractiveDialogOnMissionFinish = mission != null
+                showLimitedAccessPromptSheet {
+                    if (mission != null) {
+                        openInteractiveDialogOnMissionFinish = true
+                        runOutcomeMission(mission)
+                    } else {
+                        switchTab(AppTab.FILES)
+                    }
+                }
                 return
             }
-            AlertDialog.Builder(this)
-                .setTitle(R.string.cleanup_dialog_empty_title)
-                .setMessage(R.string.cleanup_dialog_empty_body)
-                .setPositiveButton(R.string.quick_clean_whatsapp) { _, _ -> openWhatsAppCleanerFlow() }
-                .setNeutralButton(R.string.nav_files) { _, _ -> switchTab(AppTab.FILES) }
-                .setNegativeButton(R.string.permission_continue) { _, _ -> requestMediaPermissions(allowSettingsFallback = true) }
-                .show()
+            showEmptyCleanupBottomSheet()
             return
         }
 
         val cappedRecords = records.filter { it.isSelectable && !it.isProtected }.take(200)
         if (cappedRecords.isEmpty()) {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.cleanup_dialog_empty_title)
-                .setMessage(R.string.cleanup_dialog_empty_body)
-                .setPositiveButton(R.string.nav_files) { _, _ -> switchTab(AppTab.FILES) }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
+            showEmptyCleanupBottomSheet()
             return
         }
 
         val currentlySelectedUris = viewModel.state.value.selection.records.map { it.uri }.toSet()
+        val hasOverlapWithSelection = cappedRecords.any { it.uri in currentlySelectedUris }
+        val allowAutoCheck = mission != DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES || coverageComplete
         val initialChecked = BooleanArray(cappedRecords.size) { index ->
             val rec = cappedRecords[index]
             when {
-                rec.uri in currentlySelectedUris -> true
-                !isFallbackList && mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES && coverageComplete -> true
-                !isFallbackList && currentlySelectedUris.isEmpty() -> true
+                hasOverlapWithSelection -> rec.uri in currentlySelectedUris
+                allowAutoCheck -> true
                 else -> false
             }
         }
@@ -4375,10 +4497,28 @@ class MainActivity : AppCompatActivity() {
             subtitle = headerSubtitle,
         )
 
+        if (!hasFullVisualAccess()) {
+            val upgradeAccessBtn = button(getString(R.string.limited_access_allow_all)) {
+                dialog.dismiss()
+                if (mission != null) {
+                    pendingOutcomeMission = mission
+                    openInteractiveDialogOnMissionFinish = true
+                }
+                requestMediaPermissions(allowSettingsFallback = true)
+            }.apply {
+                minHeight = dp(42)
+                textSize = 12f
+                setTextColor(color(R.color.google_blue_primary))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            }
+            root.addView(upgradeAccessBtn, top(8))
+        }
+
         val summaryLabel = label("", 13f, R.color.sweep_primary_glow, true)
         root.addView(summaryLabel, top(10))
 
         lateinit var toggleAllBtn: MaterialButton
+        var deleteActionBtn: MaterialButton? = null
         val itemBoxes = ArrayList<CheckBox>(cappedRecords.size)
 
         fun refreshSummary() {
@@ -4397,6 +4537,11 @@ class MainActivity : AppCompatActivity() {
                 else R.string.cleanup_dialog_select_all,
                 cappedRecords.size,
             )
+            deleteActionBtn?.text = if (count > 0 && totalBytes > 0L) {
+                "${getString(R.string.permanent_delete_button)} ($sizeFmt)"
+            } else {
+                getString(R.string.permanent_delete_button)
+            }
         }
 
         toggleAllBtn = button(getString(R.string.cleanup_dialog_select_all, cappedRecords.size)) {
@@ -4506,7 +4651,7 @@ class MainActivity : AppCompatActivity() {
             cappedRecords.indices.filter { initialChecked[it] }.map { cappedRecords[it] }
 
         val supportsTrash = trashCoordinator.supportsSystemTrash()
-        val deleteActionBtn = button(getString(R.string.permanent_delete_button)) {
+        deleteActionBtn = button(getString(R.string.permanent_delete_button)) {
             val chosen = selectedFromDialog()
             if (chosen.isEmpty()) {
                 Toast.makeText(this@MainActivity, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
@@ -4516,11 +4661,12 @@ class MainActivity : AppCompatActivity() {
             viewModel.prepareExternalReviewSelection(chosen)
             requestPermanentDeleteSelected(chosen)
         }.apply {
-            minHeight = dp(50)
+            minHeight = dp(52)
             setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
         }
         root.addView(deleteActionBtn, top(12))
+        refreshSummary()
 
         val secondaryBtn = button(
             if (supportsTrash) getString(R.string.move_to_trash_button)
@@ -4540,10 +4686,8 @@ class MainActivity : AppCompatActivity() {
             }
         }.apply {
             minHeight = dp(48)
-            setTextColor(Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(
-                color(if (supportsTrash) R.color.google_blue_primary else R.color.sweep_surface_alt),
-            )
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         }
         root.addView(secondaryBtn, top(8))
 
@@ -4614,17 +4758,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openWhatsAppCleanerFlow() {
-        if (!hasFullVisualAccess()) {
+        if (!hasFullVisualAccess() && !limitedAccessAcknowledged) {
             pendingWhatsAppCleanerAfterPermission = true
-            requestMediaPermissions(allowSettingsFallback = true)
+            if (hasAnyMediaPermission()) {
+                showLimitedAccessPromptSheet {
+                    pendingWhatsAppCleanerAfterPermission = false
+                    openWhatsAppCleanerFlow()
+                }
+            } else {
+                requestMediaPermissions(allowSettingsFallback = true)
+            }
             return
         }
         lifecycleScope.launch {
-            val scanDialog = AlertDialog.Builder(this@MainActivity)
-                .setTitle(R.string.whatsapp_cleaner_title)
-                .setMessage(R.string.wa_scanning_message)
-                .setCancelable(true)
-                .create()
+            val (scanDialog, scanRoot) = createAppleBottomSheet(
+                title = getString(R.string.whatsapp_cleaner_title),
+                subtitle = getString(R.string.wa_scanning_message),
+            )
+            val scanBar = ProgressBar(this@MainActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
+                isIndeterminate = true
+                indeterminateTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+            }
+            scanRoot.addView(scanBar, top(12))
             var scanCancelled = false
             scanDialog.setOnCancelListener { scanCancelled = true }
             scanDialog.show()
@@ -4645,19 +4800,55 @@ class MainActivity : AppCompatActivity() {
                 .groupBy({ it.first }, { it.second })
 
             if (mediaRecordsByCategory.isEmpty()) {
-                AlertDialog.Builder(this@MainActivity)
-                    .setTitle(R.string.whatsapp_cleaner_title)
-                    .setMessage(R.string.whatsapp_cleaner_empty)
-                    .setPositiveButton(getString(R.string.quick_find_large)) { _, _ ->
+                if (!hasFullVisualAccess()) {
+                    pendingWhatsAppCleanerAfterPermission = true
+                    showLimitedAccessPromptSheet {
+                        pendingWhatsAppCleanerAfterPermission = false
                         startOneTapCleanup()
                     }
-                    .setNeutralButton(getString(R.string.nav_files)) { _, _ ->
-                        switchTab(AppTab.FILES)
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
+                    return@launch
+                }
+                val (emptySheet, emptyRoot) = createAppleBottomSheet(
+                    title = getString(R.string.whatsapp_cleaner_title),
+                    subtitle = getString(R.string.whatsapp_cleaner_empty),
+                )
+                val findLargeBtn = button(getString(R.string.quick_find_large)) {
+                    emptySheet.dismiss()
+                    startOneTapCleanup()
+                }.apply {
+                    minHeight = dp(50)
+                    setTextColor(Color.WHITE)
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+                }
+                emptyRoot.addView(findLargeBtn, top(14))
+                val openFilesBtn = button(getString(R.string.nav_files)) {
+                    emptySheet.dismiss()
+                    switchTab(AppTab.FILES)
+                }.apply {
+                    minHeight = dp(48)
+                    setTextColor(color(R.color.sweep_text))
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+                }
+                emptyRoot.addView(openFilesBtn, top(8))
+                val closeBtn = button(getString(android.R.string.cancel)) {
+                    emptySheet.dismiss()
+                }.apply {
+                    minHeight = dp(46)
+                    setTextColor(color(R.color.sweep_muted))
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+                }
+                emptyRoot.addView(closeBtn, top(4))
+                emptySheet.show()
                 return@launch
             }
+
+            val totalWaRecords = mediaRecordsByCategory.values.flatten()
+            val totalWaBytes = totalWaRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+            updateHomeMissionCollection(
+                mission = CleanMission.WHATSAPP,
+                itemCount = totalWaRecords.size,
+                sizeLabel = Formatter.formatFileSize(this@MainActivity, totalWaBytes),
+            )
 
             val orderedCategories = listOf(
                 WhatsAppMediaCategory.VIDEO to getString(R.string.whatsapp_cat_videos),
@@ -4676,18 +4867,25 @@ class MainActivity : AppCompatActivity() {
             )
             val waSummary = label("", 13f, R.color.sweep_primary_glow, true)
             waRoot.addView(waSummary, top(8))
+            var waDeleteBtn: MaterialButton? = null
 
             fun refreshWaSummary() {
                 val selectedRecords = orderedCategories.indices
                     .filter { checked[it] }
                     .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
                 val totalBytes = selectedRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+                val sizeFmt = Formatter.formatFileSize(this@MainActivity, totalBytes)
                 waSummary.text = getString(
                     R.string.cleanup_dialog_selected_summary,
                     selectedRecords.size,
                     mediaRecordsByCategory.values.sumOf { it.size },
-                    Formatter.formatFileSize(this@MainActivity, totalBytes),
+                    sizeFmt,
                 )
+                waDeleteBtn?.text = if (selectedRecords.isNotEmpty() && totalBytes > 0L) {
+                    "${getString(R.string.permanent_delete_button)} ($sizeFmt)"
+                } else {
+                    getString(R.string.permanent_delete_button)
+                }
             }
 
             val waList = LinearLayout(this@MainActivity).apply {
@@ -4736,7 +4934,7 @@ class MainActivity : AppCompatActivity() {
                 .flatMap { idx -> mediaRecordsByCategory[orderedCategories[idx].first].orEmpty() }
 
             val supportsTrash = trashCoordinator.supportsSystemTrash()
-            val waDeleteBtn = button(getString(R.string.permanent_delete_button)) {
+            waDeleteBtn = button(getString(R.string.permanent_delete_button)) {
                 val chosenRecords = chosenWaRecords()
                 if (chosenRecords.isEmpty()) {
                     Toast.makeText(this@MainActivity, R.string.wa_select_category_toast, Toast.LENGTH_SHORT).show()
@@ -4746,11 +4944,12 @@ class MainActivity : AppCompatActivity() {
                 viewModel.prepareExternalReviewSelection(chosenRecords)
                 requestPermanentDeleteSelected(chosenRecords)
             }.apply {
-                minHeight = dp(50)
+                minHeight = dp(52)
                 setTextColor(Color.WHITE)
                 backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
             }
             waRoot.addView(waDeleteBtn, top(12))
+            refreshWaSummary()
 
             val waTrashBtn = button(
                 if (supportsTrash) getString(R.string.move_to_trash_button)
@@ -4770,10 +4969,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }.apply {
                 minHeight = dp(48)
-                setTextColor(Color.WHITE)
-                backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    color(if (supportsTrash) R.color.google_blue_primary else R.color.sweep_surface_alt),
-                )
+                setTextColor(color(R.color.sweep_text))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
             }
             waRoot.addView(waTrashBtn, top(8))
 
@@ -4790,9 +4987,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openBlurCleanerFlow() {
-        if (!hasFullVisualAccess()) {
+        if (!hasFullVisualAccess() && !limitedAccessAcknowledged) {
             pendingBlurScanAfterPermission = true
-            requestMediaPermissions(allowSettingsFallback = true)
+            if (hasAnyMediaPermission()) {
+                showLimitedAccessPromptSheet {
+                    pendingBlurScanAfterPermission = false
+                    openBlurCleanerFlow()
+                }
+            } else {
+                requestMediaPermissions(allowSettingsFallback = true)
+            }
             return
         }
         blurScanJob?.cancel()
@@ -4838,6 +5042,14 @@ class MainActivity : AppCompatActivity() {
             }
             if (result == null) return@launch
             if (result.candidates.isEmpty()) {
+                if (!hasFullVisualAccess()) {
+                    pendingBlurScanAfterPermission = true
+                    showLimitedAccessPromptSheet {
+                        pendingBlurScanAfterPermission = false
+                        openBlurCleanerFlow()
+                    }
+                    return@launch
+                }
                 Toast.makeText(
                     this@MainActivity,
                     getString(R.string.blur_scan_empty, result.photosAnalyzed),
@@ -4845,8 +5057,15 @@ class MainActivity : AppCompatActivity() {
                 ).show()
                 return@launch
             }
+            val blurRecords = result.candidates.map { it.record }
+            val blurBytes = blurRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+            updateHomeMissionCollection(
+                mission = CleanMission.BLURRY_PHOTOS,
+                itemCount = blurRecords.size,
+                sizeLabel = Formatter.formatFileSize(this@MainActivity, blurBytes),
+            )
             openInteractiveCleanupReviewDialog(
-                records = result.candidates.map { it.record },
+                records = blurRecords,
                 isFallbackList = false,
                 mission = null,
                 coverageComplete = !result.capReached,
@@ -5940,16 +6159,27 @@ class MainActivity : AppCompatActivity() {
         val missing = requested.filter { !isGranted(it) }
         val prefs = getSharedPreferences("midiastore_prefs", MODE_PRIVATE)
         val alreadyRequestedBefore = prefs.getBoolean("media_perm_requested_once", false)
+        // On Android 14+ with "Select photos" active, re-requesting READ_MEDIA_IMAGES + READ_MEDIA_VIDEO +
+        // READ_MEDIA_VISUAL_USER_SELECTED opens the system's 3-option upgrade sheet ("Allow all" / "Select more")
+        // unless the user/OS has marked the permission USER_FIXED — handled by the <500ms detector in permissionLauncher.
+        val hasPartialVisualGrant = Build.VERSION.SDK_INT >= 34 &&
+            isGranted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) &&
+            !hasFullVisualAccess()
         val permanentlyDenied = missing.isNotEmpty() &&
+            !hasPartialVisualGrant &&
             alreadyRequestedBefore &&
             missing.none { shouldShowRequestPermissionRationale(it) }
 
         if (allowSettingsFallback && permanentlyDenied) {
-            Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_LONG).show()
+            awaitingPermissionSettingsReturn = true
+            Toast.makeText(this, R.string.limited_access_settings_hint, Toast.LENGTH_LONG).show()
             openAppDetailsSettings()
             return
         }
         prefs.edit().putBoolean("media_perm_requested_once", true).apply()
+        permissionRequestStartedAtMs = SystemClock.elapsedRealtime()
+        permissionRequestHadFullAccess = hasFullVisualAccess()
+        permissionRequestHadAnyAccess = hasAnyMediaPermission()
         permissionLauncher.launch(requested.toTypedArray())
     }
 
@@ -6370,6 +6600,11 @@ class MainActivity : AppCompatActivity() {
         }
         moveToTrashButton.isEnabled = hasSelection && trashCoordinator.supportsSystemTrash()
         permanentDeleteButton.isEnabled = hasSelection && trashCoordinator.supportsPermanentDelete()
+        permanentDeleteButton.text = if (hasSelection && totalBytes != null && totalBytes > 0L) {
+            "${getString(R.string.permanent_delete_button)} (${android.text.format.Formatter.formatFileSize(this, totalBytes)})"
+        } else {
+            getString(R.string.permanent_delete_button)
+        }
         exportSelectionButton.isEnabled = hasSelection
         clearSelectionButton.isEnabled = hasSelection
         updateRestoreButtonState()
@@ -6446,10 +6681,12 @@ class MainActivity : AppCompatActivity() {
             if (isFreeHomeCleanup) {
                 homeInteractiveRecords = emptyList()
                 homeInteractiveFallback = false
+                homeInteractiveMission = null
                 homeCleanupCandidateCount = 0
                 heroOrbButton.isEnabled = true
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
                 heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
+                homeComposeState.value = homeComposeState.value.copy(primaryActionLabel = null)
                 showHomeCleanupMessage(getString(R.string.home_cleanup_scan_failed))
             }
             missionReviewButton.visibility = View.GONE
@@ -6521,10 +6758,26 @@ class MainActivity : AppCompatActivity() {
         }
         homeInteractiveRecords = interactiveRecords
         homeInteractiveFallback = useFallback
+        homeInteractiveMission = progress.mission
+        homeInteractiveCoverageComplete = progress.coverageComplete
+        val interactiveBytes = interactiveRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
         val interactiveFormattedBytes = android.text.format.Formatter.formatFileSize(
             this,
-            interactiveRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) },
+            interactiveBytes,
         )
+        val homeCleanMission = when (progress.mission) {
+            DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> CleanMission.DUPLICATES
+            DesiredOutcomeMission.FREE_MAX_SPACE_NOW -> CleanMission.LARGE_VIDEOS
+            DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D -> CleanMission.OLD_SCREENSHOTS
+            else -> null
+        }
+        if (homeCleanMission != null) {
+            updateHomeMissionCollection(
+                mission = homeCleanMission,
+                itemCount = interactiveRecords.size,
+                sizeLabel = interactiveFormattedBytes,
+            )
+        }
         missionReviewButton.text = getString(R.string.oaas_cleanup_continue, interactiveFormattedBytes)
         missionReviewButton.visibility = if (interactiveRecords.isNotEmpty()) View.VISIBLE else View.GONE
         if (isFreeHomeCleanup) {
@@ -6532,10 +6785,16 @@ class MainActivity : AppCompatActivity() {
             heroOrbButton.isEnabled = true
             heroOrbSubtitle.text = getString(R.string.home_cleanup_subtitle)
             if (homeCleanupCandidateCount > 0) {
-                heroOrbButton.text = getString(
+                val reviewLabel = getString(
                     R.string.home_cleanup_review_button,
                     homeCleanupCandidateCount,
                     interactiveFormattedBytes,
+                )
+                heroOrbButton.text = reviewLabel
+                homeComposeState.value = homeComposeState.value.copy(
+                    recoverableBytes = interactiveBytes,
+                    recoverableLabel = interactiveFormattedBytes,
+                    primaryActionLabel = reviewLabel,
                 )
                 val messageId = if (progress.coverageComplete) {
                     R.string.home_cleanup_candidates_found
@@ -6545,6 +6804,7 @@ class MainActivity : AppCompatActivity() {
                 showHomeCleanupMessage(getString(messageId, homeCleanupCandidateCount, interactiveFormattedBytes))
             } else {
                 heroOrbButton.text = getString(R.string.home_cleanup_primary)
+                homeComposeState.value = homeComposeState.value.copy(primaryActionLabel = null)
                 if (::homeDirectCleanRow.isInitialized) {
                     homeDirectCleanRow.visibility = View.GONE
                 }
@@ -6573,10 +6833,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateHomeMissionCollection(
+        mission: CleanMission,
+        itemCount: Int,
+        sizeLabel: String,
+    ) {
+        val current = homeComposeState.value.collections.ifEmpty { buildDefaultHomeCollections() }
+        val updated = current.map { col ->
+            if (col.mission == mission) {
+                col.copy(itemCount = itemCount, sizeLabel = if (itemCount > 0) sizeLabel else col.sizeLabel)
+            } else {
+                col
+            }
+        }
+        homeComposeState.value = homeComposeState.value.copy(collections = updated)
+    }
+
     private fun runOutcomeMission(mission: DesiredOutcomeMission) {
-        if (!hasFullVisualAccess()) {
+        if (!hasFullVisualAccess() && !limitedAccessAcknowledged) {
             pendingOutcomeMission = mission
-            requestMediaPermissions(allowSettingsFallback = true)
+            if (hasAnyMediaPermission()) {
+                showLimitedAccessPromptSheet { runOutcomeMission(mission) }
+            } else {
+                requestMediaPermissions(allowSettingsFallback = true)
+            }
             return
         }
         val currentState = viewModel.state.value
@@ -6585,6 +6865,12 @@ class MainActivity : AppCompatActivity() {
             if (!currentState.isLoading) startScanOrRequestAccess()
             oaasPipelineStatus.text = getString(R.string.oaas_starting_scan_first)
             return
+        }
+        if (mission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW) {
+            heroOrbButton.isEnabled = false
+            heroOrbButton.text = getString(R.string.home_cleanup_scanning_button)
+            heroOrbSubtitle.text = getString(R.string.home_cleanup_scanning)
+            showHomeCleanupMessage(getString(R.string.home_cleanup_scanning))
         }
         pendingOutcomeMission = null
         lastRecordedMissionProgress = null
@@ -6755,11 +7041,26 @@ class MainActivity : AppCompatActivity() {
         if (verifiedUris.isNotEmpty()) {
             homeInteractiveRecords = emptyList()
             homeInteractiveFallback = false
+            homeInteractiveMission = null
             homeCleanupCandidateCount = 0
             heroOrbButton.text = getString(R.string.home_cleanup_primary)
+            homeComposeState.value = homeComposeState.value.copy(
+                recoverableBytes = 0L,
+                recoverableLabel = "0 MB",
+                primaryActionLabel = null,
+                collections = buildDefaultHomeCollections(),
+            )
             if (::homeDirectCleanRow.isInitialized) {
                 homeDirectCleanRow.visibility = View.GONE
             }
+            showHomeCleanupMessage(
+                getString(
+                    R.string.delete_operation_result,
+                    verifiedUris.size,
+                    attempted,
+                    freedFmt,
+                ),
+            )
             viewModel.clearSelection()
             viewModel.startSession()
             showPostCleanupReliefOffer(confirmedBytes, verifiedUris.size)
@@ -6857,7 +7158,7 @@ class MainActivity : AppCompatActivity() {
                 totalLabel = totalFmt,
                 usedPercent = usage.usedPercent,
                 usedFraction = usage.usedFraction.toFloat().coerceIn(0f, 1f),
-                collections = buildDefaultHomeCollections(),
+                collections = homeComposeState.value.collections.ifEmpty { buildDefaultHomeCollections() },
             )
             if (::storageText.isInitialized) {
                 storageText.text = getString(R.string.storage_measurement, usedFmt, freeFmt, totalFmt)

@@ -579,4 +579,10 @@ Total: %3$s</string>
     <string name="post_cleanup_relief_body">You just safely freed %1$s (%2$d file(s)).\n\nUnlock Midiastore Pro (unused apps 90d+, audited reports &amp; priority support) and save 56%% with the Annual Plan.</string>
     <string name="post_cleanup_relief_cta">Unlock Annual Plan · Save 56%</string>
     <string name="post_cleanup_relief_later">Not now</string>
+    <string name="limited_access_banner">Partial media access. Tap to allow all photos and videos</string>
+    <string name="limited_access_sheet_title">Midiastore only sees the media you selected</string>
+    <string name="limited_access_sheet_body">To find duplicates, large videos and old screenshots across your whole phone, allow access to all photos and videos. Nothing is deleted without your confirmation.</string>
+    <string name="limited_access_allow_all">Allow access to all media</string>
+    <string name="limited_access_continue_selected">Continue with selected media</string>
+    <string name="limited_access_settings_hint">Android did not show the prompt. Open Permissions › Photos and videos and choose \"Allow all\".</string>
 </resources>

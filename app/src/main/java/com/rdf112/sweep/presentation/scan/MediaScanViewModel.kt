@@ -266,7 +266,17 @@ class MediaScanViewModel(
 
         missionJob = viewModelScope.launch(missionDispatcher) {
             try {
-                val session = startingState.session ?: repository.createSession()
+                val candidateSession = startingState.session
+                val session = if (candidateSession != null) {
+                    val freshness = repository.assessSession(candidateSession)
+                    if (freshness == SessionFreshness.REVISION_UNCHANGED || freshness == SessionFreshness.UNVERIFIABLE) {
+                        candidateSession
+                    } else {
+                        repository.createSession()
+                    }
+                } else {
+                    repository.createSession()
+                }
                 coroutineContext.ensureActive()
 
                 val allKinds = MediaKind.entries
@@ -358,9 +368,13 @@ class MediaScanViewModel(
 
                         when (page.outcome) {
                             MediaPageOutcome.SESSION_STALE -> {
-                                fatalStaleness = true
                                 coverageComplete = false
                                 warningCount++
+                                if (mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES ||
+                                    (rankedCandidates.isEmpty() && largestAccessibleCandidates.isEmpty())
+                                ) {
+                                    fatalStaleness = true
+                                }
                                 break@sourceLoop
                             }
                             MediaPageOutcome.PAGING_UNSUPPORTED,

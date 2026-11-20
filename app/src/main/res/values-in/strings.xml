@@ -578,4 +578,10 @@ Total: %3$s</string>
     <string name="post_cleanup_relief_body">Anda baru saja mengosongkan %1$s (%2$d file) dengan aman.\n\nBuka Midiastore Pro (aplikasi tidak dipakai 90h+, laporan audit &amp; dukungan prioritas) dan hemat 56%% dengan Paket Tahunan.</string>
     <string name="post_cleanup_relief_cta">Lihat Paket Tahunan · Hemat 56%</string>
     <string name="post_cleanup_relief_later">Nanti saja</string>
+    <string name="limited_access_banner">Akses media sebagian. Ketuk untuk mengizinkan semua foto dan video</string>
+    <string name="limited_access_sheet_title">Midiastore hanya melihat media yang Anda pilih</string>
+    <string name="limited_access_sheet_body">Untuk menemukan duplikat, video besar, dan screenshot lama di seluruh ponsel, izinkan akses ke semua foto dan video. Tidak ada yang dihapus tanpa konfirmasi Anda.</string>
+    <string name="limited_access_allow_all">Izinkan akses ke semua media</string>
+    <string name="limited_access_continue_selected">Lanjutkan dengan media terpilih</string>
+    <string name="limited_access_settings_hint">Android tidak menampilkan permintaan. Buka Izin › Foto dan video lalu pilih \"Izinkan semua\".</string>
 </resources>

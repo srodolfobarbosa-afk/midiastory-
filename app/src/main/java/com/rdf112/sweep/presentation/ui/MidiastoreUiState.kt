@@ -26,6 +26,10 @@ data class HomeUiState(
     val collections: List<CleanCollectionUiModel> = emptyList(),
     val isScanning: Boolean = false,
     val needsMediaPermissionPrompt: Boolean = false,
+    /** Live feedback of the cleanup flow (progress, result, freed bytes) rendered under the primary button. */
+    val statusMessage: String? = null,
+    /** Overrides the primary button label, e.g. "Review 12 files · 1.2 GB" once candidates are ready. */
+    val primaryActionLabel: String? = null,
 )
 
 data class MediaItemUiModel(

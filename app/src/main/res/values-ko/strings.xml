@@ -578,4 +578,10 @@ Total: %3$s</string>
     <string name="post_cleanup_relief_body">방금 %1$s(%2$d개 파일)를 안전하게 정리했습니다.\n\n연간 플랜으로 56%% 절약하며 Midiastore Pro(90일 이상 미사용 앱, 감사 보고서, 우선 지원)를 사용해 보세요.</string>
     <string name="post_cleanup_relief_cta">연간 플랜 보기 · 56% 절약</string>
     <string name="post_cleanup_relief_later">나중에</string>
+    <string name="limited_access_banner">미디어 일부만 접근 가능. 탭하여 모든 사진과 동영상 허용</string>
+    <string name="limited_access_sheet_title">Midiastore는 선택한 미디어만 볼 수 있습니다</string>
+    <string name="limited_access_sheet_body">휴대전화 전체에서 중복 파일, 큰 동영상, 오래된 스크린샷을 찾으려면 모든 사진과 동영상에 대한 접근을 허용하세요. 확인 없이 삭제되는 항목은 없습니다.</string>
+    <string name="limited_access_allow_all">모든 미디어 접근 허용</string>
+    <string name="limited_access_continue_selected">선택한 미디어로 계속</string>
+    <string name="limited_access_settings_hint">Android가 요청 창을 표시하지 않았습니다. 권한 › 사진 및 동영상에서 \"모두 허용\"을 선택하세요.</string>
 </resources>
