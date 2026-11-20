@@ -27,17 +27,17 @@ Toda IA operando neste repositório incorpora as **10 Leis Invioláveis + 5 Dire
 
 ## 1. Escopo & Arquitetura Geral
 
-- **Aplicativo Android:** `com.rdf112.midiastore` (v2.4.0, versionCode 21).
-  - Stack: Kotlin, Android Views (Material Components), AndroidX MediaStore API, Google Play Billing KTX 8.0.0.
-  - Missão: Limpeza e otimização de mídias on-device (detecção de duplicatas SHA-256, arquivos gigantes, antigos e Estúdio de Mídia local).
+- **Norte Estratégico & Memória (Canônico):** [`docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md`](docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md) (4 camadas de memória: norte estável, decisões do proprietário, estado operacional mutável verificado na fonte e evidência/aprendizado).
+- **Aplicativo Android:** `com.rdf112.midiastore` (`v2.7.5`, `versionCode 30`, publicado em `internal`/`alpha` em 2026-11-20 após CI 100% verde com KVM no Run `44822314320`).
+  - Stack: Kotlin, Android Views (Material Components OLED `#000000` / `#1C1C1E` / `#0A84FF`), AndroidX MediaStore API, Google Play Billing `8.3.0` + Edge Function fail-closed `verify-play-purchase`.
+  - Missão (direção aprovada): **100% limpador de armazenamento on-device** com 3 abas (**Limpar, Arquivos, Pro**), limpeza real em até 2 cliques com miniaturas e consentimento oficial Android, duplicatas exatas por SHA-256 streaming, arquivos grandes e mídias antigas. (Não restaurar Studio, jogos ou hubs genéricos.)
 - **Funil Web Internacional:**
-  - Hospedagem: Firebase Hosting (`https://midiastory-df6a0.web.app/`).
-  - Suporte a 8 idiomas: PT, EN, ES, DE, FR, HI, JA, ZH e artigos de SEO.
+  - Hospedagem: Firebase Hosting (`https://midiastory-df6a0.web.app/`), suporte multilíngue e páginas pSEO/guias.
 - **Backend & Orquestração:**
-  - Supabase PostgreSQL (`usmqtnlsaavxqguwrtix`) com extensão `pgvector`.
-  - Tabelas: `public.beta_testers`, `public.memories`, `public.documents`, `public.orchestrator_logs`, `public.orchestrator_tasks`.
-- **Inteligência Artificial & Failover:**
-  - Motor: `scripts/ai-failover-router.mjs` (Gemini 3.8 Flash → Gemini 3.1 Flash-Lite → Gemini 4 Argon → GPT-4o Mini → Llama 3.3 70B → OpenAI Codex CLI local).
+  - Supabase PostgreSQL (`usmqtnlsaavxqguwrtix`) com `pgvector`, busca híbrida (BM25 + vetorial) e RLS ativo em todas as tabelas `public.*`.
+  - Tabelas principais: `public.memories`, `public.play_purchases`, `public.beta_testers`, `public.documents`, `public.orchestrator_logs`, `public.orchestrator_tasks`.
+- **Inteligência Artificial & Failover (Agnóstico de Modelo):**
+  - Motor: `scripts/ai-failover-router.mjs` (`Gemini 4 Neon / Carbon` → `Gemini 4 Hydrogen / 2.5 Flash` → OpenRouter `:free` validados → OpenAI Codex CLI local `codex.exe`).
 
 ---
 

@@ -1,0 +1,19 @@
+{
+  "description": "Load Midiastore project continuity at the start of Codex CLI sessions.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/hooks/codex-session-start.mjs",
+            "statusMessage": "Loading Midiastore project memory and handoff",
+            "timeout": 15,
+            "additionalContextLimit": 3000
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -7,6 +7,7 @@
  */
 
 export const RODOLFO_BRAIN_MODEL_PRIORITY = [
+  "gemini-4-neon",
   "gemini-4-carbon",
   "gemini-4-hydrogen",
   "gemini-4-argon",

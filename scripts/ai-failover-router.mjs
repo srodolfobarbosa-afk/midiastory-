@@ -24,6 +24,9 @@ import {
   buildRodolfoBrainSystemPrompt,
 } from "./lib/rodolfo-brain-persona.mjs";
 import { analyzeAndLearnTurn, learnFromInteraction } from "./lib/cognitive-memory.mjs";
+import { ProviderCircuitBreaker } from "./lib/circuit-breaker.mjs";
+
+const circuitBreaker = new ProviderCircuitBreaker();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -57,7 +60,7 @@ if (fs.existsSync(secretsPath)) {
 
 async function callGoogleAIStudio(modelName, prompt, options = {}) {
   if (!googleStudioKey) throw new Error("Chave GOOGLE_AI_STUDIO_API_KEY não encontrada.");
-  const isGemini4Thinking = modelName.includes("gemini-4-hydrogen") || modelName.includes("gemini-4-carbon") || modelName.includes("gemini-4-argon");
+  const isGemini4Thinking = modelName.includes("gemini-4-neon") || modelName.includes("gemini-4-hydrogen") || modelName.includes("gemini-4-carbon") || modelName.includes("gemini-4-argon");
   const thinkingLevel = options.thinkingLevel || (options.isCode ? "HIGH" : "MEDIUM");
 
   const generationConfig = {
@@ -91,6 +94,7 @@ async function callGoogleAIStudio(modelName, prompt, options = {}) {
 
 const MODEL_CASCADE = [
   // 1. Modelos Frontier com Raciocínio (Tentativa primária com auto-adaptação e BYOK)
+  { id: "google/gemini-4-neon", name: "Gemini 4 Neon (Frontier Reasoning)" },
   { id: "google/gemini-4-carbon", name: "Gemini 4 Carbon (1M Context + High Reasoning)" },
   { id: "google/gemini-4-argon", name: "Gemini 4 Argon" },
   { id: "google/gemini-3.8-flash", name: "Gemini 3.8 Flash" },
@@ -315,6 +319,12 @@ export async function executeWithFailover(prompt, options = {}) {
   if (googleStudioKey && (!forceProvider || forceProvider === "google_ai_studio")) {
     const studioModels = forceModel ? [forceModel] : RODOLFO_BRAIN_MODEL_PRIORITY;
     for (const sm of studioModels) {
+      const cbKey = `google_ai_studio:${sm}`;
+      const gate = circuitBreaker.canRequest(cbKey);
+      if (!gate.allowed && !forceModel) {
+        console.log(`[Circuit Breaker OPEN] Pulando ${sm} (retry em ${gate.retryAfterSec}s)...`);
+        continue;
+      }
       console.log(`[Google AI Studio Direto] Testando modelo nativo: ${sm} (Thinking: ${isCode ? "HIGH" : "MEDIUM"})...`);
       try {
         const response = await callGoogleAIStudio(sm, prompt, {
@@ -325,10 +335,12 @@ export async function executeWithFailover(prompt, options = {}) {
           systemPrompt,
         });
         if (response) {
+          circuitBreaker.recordSuccess(cbKey);
           console.log(`✅ Sucesso no Google AI Studio Direto (${sm})!`);
           return finalizeResult({ source: `google_ai_studio/${sm}`, content: response });
         }
       } catch (err) {
+        circuitBreaker.recordFailure(cbKey, { status: err.status || null, message: err.message });
         console.warn(`⚠️ Google AI Studio (${sm}) falhou: ${err.message.slice(0, 140)}`);
       }
     }
@@ -363,15 +375,23 @@ export async function executeWithFailover(prompt, options = {}) {
         : baseCascade;
     for (let i = 0; i < orCascade.length; i++) {
       const model = orCascade[i];
+      const cbKey = `openrouter:${model.id}`;
+      const gate = circuitBreaker.canRequest(cbKey);
+      if (!gate.allowed && !forceModel) {
+        console.log(`[Circuit Breaker OPEN] Pulando ${model.id} (retry em ${gate.retryAfterSec}s)...`);
+        continue;
+      }
       console.log(`[Rota ${i + 1}/${orCascade.length}] Testando modelo: ${model.name} (${model.id})...`);
       try {
         const reasoningEffort = options.reasoningEffort || (isCode ? "high" : "medium");
         const response = await callOpenRouter(model.id, prompt, maxTokens, reasoningEffort, responseFormatJson, systemPrompt);
         if (response) {
+          circuitBreaker.recordSuccess(cbKey);
           console.log(`✅ Sucesso na Rota ${i + 1} (${model.name})!`);
           return finalizeResult({ source: model.id, content: response });
         }
       } catch (err) {
+        circuitBreaker.recordFailure(cbKey, { status: err.status || null, message: err.message });
         console.warn(`⚠️ Rota ${i + 1} (${model.name}) falhou: ${err.message.slice(0, 140)}`);
         lastError = err;
         continue;

@@ -330,3 +330,7 @@ Antes de usar checkpoints antigos, consulte `docs/CONTINUATION_UPDATE_2026-11-18
 ## Atualização adicional — 2026-11-18: implementação Compose iniciada
 
 A planta/mockup respeitando #313/#315 foi seguido pela primeira tela real `CleanerHomeScreen.kt`, conectada à Activity e aos fluxos MediaStore já existentes. A compilação ainda não foi confirmada: o Gradle inicia o daemon e trava antes de reportar tarefas; a execução foi interrompida. Veja `docs/CONTINUATION_UPDATE_2026-11-18.md`. Próxima etapa: destravar build, instalar o Debug separadamente e revisar visual no Moto; depois migrar Arquivos/Pro e navegação, sem adicionar Studio/extras.
+
+## Strategic objective and memory update - 2026-11-20
+
+Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north star, agent mandate, metrics, evidence rules and four-layer memory protocol. The goal is a competitive, trusted Android storage cleaner with sustainable real Google Play sales; R is a target, not an achieved result. The owner wants agents to work proactively across product, operations and sales as model capabilities improve, within current authorization, account access, budgets, law and platform rules. Product decisions remain governed by AGENTS.md: pure cleaner, Limpar/Arquivos/Pro. For current continuity see docs/CONTINUATION_UPDATE_2026-11-20.md. Preserve shared Antigravity changes; check git status before editing.

@@ -394,27 +394,27 @@ export async function retrieveRelevantContext({
       queryEmbeddingModel = qEmb.model;
 
       relevantSql = `
-        WITH scored AS (
-          SELECT id, content, origem, categoria, confianca, versao, created_at, embedding_model,
-                 (${exactBoostSql}) AS exact_hits,
-                 ts_rank(search_tsv, ${tsQueryExpr}) AS fts_rank,
-                 CASE
-                   WHEN embedding IS NOT NULL AND embedding_model = '${escapeSqlString(qEmb.model)}'
-                   THEN 1 - (embedding <=> '${qEmb.vectorLiteral}'::vector)
-                   ELSE 0
-                 END AS vec_sim
-          FROM public.memories
-          WHERE is_active = true
-            AND content !~ '\\[Ciclo #[0-9]+\\]'
-        )
-        SELECT id, content, origem, categoria, confianca, versao, created_at, embedding_model, fts_rank, vec_sim
-        FROM scored
-        WHERE exact_hits > 0
-           OR fts_rank >= 0.08
-           OR vec_sim >= ${safeMinSim}
-        ORDER BY
-          (exact_hits + fts_rank * 2.0 + vec_sim * 3.0 + (confianca::float * 0.25)) DESC,
-          id DESC
+        SELECT
+          h.id,
+          h.content,
+          h.origem,
+          h.categoria,
+          h.confianca,
+          h.versao,
+          h.created_at,
+          h.embedding_model,
+          h.fts_rank,
+          h.vec_sim,
+          h.rrf_score
+        FROM public.hybrid_memory_search(
+          '${escapeSqlString(cleanQuery)}',
+          '${qEmb.vectorLiteral}'::vector,
+          '${escapeSqlString(qEmb.model)}',
+          ${safeLimit},
+          60
+        ) h
+        WHERE h.fts_rank > 0 OR h.vec_sim >= ${safeMinSim} OR h.rrf_score >= 0.015
+        ORDER BY h.rrf_score DESC, h.id DESC
         LIMIT ${safeLimit}
       `;
     }

@@ -66,13 +66,15 @@ You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_M
 - Play listing / commercial app name: **Midiastore**.
 - Confirmed applicationId supplied by the owner from the Play internal-testing listing: `com.rdf112.midiastore`.
 - Internal Android namespace and Kotlin package are still `com.rdf112.sweep`; this is legacy implementation detail.
-- Current build configuration: versionCode 21, versionName 2.4.0, minSdk 29, targetSdk 36, compileSdk 36, JDK 17, Gradle 8.13.
-- VersionCode 21 is signed with sweep-upload.jks and R8 minified (4.21 MB APK).
+- Current build configuration: versionCode 30, versionName 2.7.5, minSdk 29, targetSdk 36, compileSdk 36, JDK 17, Gradle 8.13.
+- VersionCode 30 (`v2.7.5`, commit `e528c11`, CI Run `44822314320` 100% verde em API 29/35 + KVM) is signed with `sweep-upload.jks`, R8 minified (`5,92 MB` AAB) and published on `internal` + `alpha` (Edit `12450922447673233582`, 2026-11-20).
 - Never change applicationId, signing certificate, versionCode or versionName without explicit owner approval.
 - Never create a replacement upload keystore. Use only the legitimate Play App Signing upload key supplied through a secure owner-controlled process.
 - The owner reported that the financial/receiving profile was enabled on 2026-11-03. This does not prove that any in-app product is configured, active, or tested.
 
 ## Direção de produto já aprovada — não perguntar novamente
+
+- Objetivo estratégico e protocolo de memória para agentes: [`docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md`](docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md). Este brief clarifica a meta de competitividade, produto, gestão, vendas e autonomia; não reabre decisões de produto nem gates de segurança abaixo.
 
 - O Midiastore é **100% limpador de armazenamento**. Três abas: **Limpar, Arquivos, Pro**.
 - Não adicionar nem propor como parte do produto: Studio/editor de mídia, jogos, jornal/notícias, carnaval de cores, emojis nos ícones ou hub de ferramentas genéricas.
@@ -92,17 +94,17 @@ You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_M
 
 | Agente | Modelo / Runtime | Responsabilidade Principal | Gestão de Cotas & Failover |
 | :--- | :--- | :--- | :--- |
-| **Antigravity** | **Gemini 3.8 Flash (High)** / *Argon quando disponível* | **Orquestrador Central & Engenharia Forense**: Loop de decisão 24/7, Supabase MCP, GitHub Actions 24h, Google Play Console API, automação de navegador (Playwright/Chrome DevTools) e engenharia reversa via REA MCP (`morluto/rea`). | Quando a cota semanal do Argon atinge o teto, o **Flash (High)** assume com máxima velocidade e raciocínio profundo. Reseta semanalmente. |
-| **Codex CLI** | **`codex.exe` local** (OpenAI / GPT-4o / o-series) | **Engenheiro de Código & Execução**: Refatoração profunda de Kotlin/Android, UI/Views, compilações pesadas no Windows (`./gradlew`) e testes instrumentados no emulador Android via ADB. | Opera pela assinatura/chaves locais OpenAI do usuário. Invocado sob demanda para não gastar tokens em tarefas triviais. |
-| **IA Nativa Cloud** | **Supabase Edge Function** (`native-orchestrator`) + Gemini Flash / OpenRouter | **Guardiã do Loop 24/7 (Custo Zero)**: Monitoramento autônomo na nuvem mesmo com o PC desligado, acionando GitHub Actions e salvando memórias no Postgres. | Usa rota gratuita (OpenRouter / Gemini 2.0 Flash / Free Tier) com 500k invocações mensais no Supabase. Custo: R$ 0,00. |
-| **Cloud Hands** | **GitHub Actions Runners** (Linux Ubuntu) | **Braço Executor na Nuvem**: Execução de scripts autônomos de crescimento orgânico, checagem de reviews da Play Store, builds e deploy do site. | Minutos gratuitos ilimitados por ser repositório público no GitHub. |
+| **Antigravity** | **Gemini 4 Neon / Carbon** (com fallback automático para modelos frontier disponíveis) | **Orquestrador Central & Engenharia Forense**: Loop de decisão 24/7, Supabase, GitHub Actions (com KVM ativo ~4 min/emulador), Google Play Console API v3, automação web (Playwright headless) e QA real via ADB no Moto G84. | Arquitetura agnóstica de modelo: opera sempre no modelo frontier mais capaz disponível no ambiente e migra sem perder memória ou identidade. |
+| **Codex CLI** | **`codex.exe` local** (OpenAI `gpt-6-luna` / o-series) | **Engenheiro de Código, Auditoria & Estratégia**: Refatoração profunda de Kotlin/Android, auditoria cirúrgica, diretrizes duráveis de memória e validação paralela sem conflito de arquivos. | Opera pela conta local OpenAI do proprietário. Sincronizado com o Antigravity via `public.memories`, `docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md` e `git status`. |
+| **IA Nativa Cloud** | **Supabase Edge Functions** (`verify-play-purchase`, `ingest-product-event`, `get-paywall-variant`, `play-rtdn-webhook`) + roteador `ai-failover-router.mjs` | **Backend de Monetização & Guardiã 24/7 (Custo Zero)**: Validação fail-closed de compras na Play API v3, telemetria e automações autônomas na nuvem. | Custo R$ 0,00 dentro do Free Tier (Supabase 18,7 MB / 500 MB + rotas `:free` validadas no OpenRouter). |
+| **Cloud Hands** | **GitHub Actions Runners** (Linux Ubuntu com `/dev/kvm`) | **Braço Executor na Nuvem**: Testes instrumentados API 29 + API 35, build/assinatura AAB Release R8, checagens de saúde e deploy do site. | Minutos gratuitos em repositório público; KVM habilitado no workflow `android.yml`. |
 
 ### 2. Estratégia de Expansão de Tokens e Poder Computacional
 Para garantir que a equipe nunca fique sem poder de IA:
-1. **Failover Multinível**: Se o modelo principal esgotar sua cota temporária, o orquestrador migra instantaneamente para o próximo nível sem parar o projeto:
-   `Argon (High) ➔ Gemini 3.8 Flash (High) ➔ Codex CLI (o-series/GPT-4o) ➔ DeepSeek-R1 / Qwen 2.5 Coder (OpenRouter)`.
-2. **OpenRouter Multi-Model Pool**: Já configurado com fallback para modelos gratuitos e de alta capacidade (como `deepseek/deepseek-r1:free` e `qwen/qwen-2.5-coder-32b-instruct:free`).
-3. **Iniciativa Ativa de Pesquisa**: A IA pesquisa e propõe ativamente novos MCPs e ferramentas abertas no GitHub (como Playwright MCP, Chrome DevTools MCP e Agentic Skills) para expandir as capacidades do ambiente.
+1. **Failover Multinível (Zero Modelos Mortos):** Se o modelo principal atingir limite ou indisponibilidade, o roteador `scripts/ai-failover-router.mjs` migra automaticamente:
+   `Gemini 4 Neon / Carbon ➔ Gemini 4 Hydrogen / 2.5 Flash (Google AI Studio) ➔ Rotas :free validadas (openrouter/free, nvidia/nemotron-3.5-lightning:free, google/gemma-4-31b-it:free) ➔ Codex CLI local (codex.exe)`.
+2. **Arquitetura Agnóstica & Evolução Contínua:** Cada salto de modelo (ex.: `Gemini 3.8 Flash ➔ Gemini 4 Neon`) é absorvido imediatamente mantendo o mesmo norte (`docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md`), as 4 camadas de memória e a regra de verdade verificada.
+3. **Iniciativa Ativa de Pesquisa:** A IA pesquisa e propõe ativamente novos MCPs, skills e melhorias mensuráveis em produto, retenção e receita.
 
 ### 3. Protocolo Anti-Sobrescrita e Sincronização em Tempo Real
 1. **Fila Centralizada no Supabase (`public.orchestrator_tasks`)**: Todas as tarefas são registradas e roteadas no Supabase (`target = 'CODEX'`, `'ANTIGRAVITY'` ou `'CLOUD_ACTIONS'`).

@@ -1,4 +1,7 @@
 # 🏛️ CONTEXTO MESTRE & DIRETRIZ EXECUTIVA DE AUTONOMIA — MIDIASTORE
+
+> **Atualização de direção (2026-11-20):** para o objetivo vigente, prioridades de mercado, mandato dos agentes e padrão de memória, consulte [`docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md`](docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md). Este arquivo também contém contexto histórico; dados operacionais e propostas antigas não prevalecem sobre `AGENTS.md`, decisões recentes do proprietário ou fontes atuais verificadas. A direção de produto aprovada é limpador puro nas abas Limpar/Arquivos/Pro.
+
 ### (META FUNDAMENTAL: R$ 1.000.000,00 EM VENDAS REAIS NA GOOGLE PLAY)
 ### Pacote Oficial: `com.rdf112.midiastore` | Repositório: `srodolfobarbosa-afk/midiastory-`
 
