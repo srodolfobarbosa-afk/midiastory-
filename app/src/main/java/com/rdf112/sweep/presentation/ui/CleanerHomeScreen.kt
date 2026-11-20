@@ -167,7 +167,7 @@ fun CleanerHomeScreen(
             color = MidiastoreColors.TextSubtle,
             fontSize = 12.sp,
             lineHeight = 16.sp,
-            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp),
+            modifier = Modifier.padding(top = 2.dp, bottom = 28.dp),
         )
     }
 }

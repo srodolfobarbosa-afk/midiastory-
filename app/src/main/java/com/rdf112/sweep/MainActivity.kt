@@ -4195,7 +4195,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startScanOrRequestAccess() {
-        if (hasAnyMediaPermission()) viewModel.startSession() else requestMediaPermissions()
+        if (hasFullVisualAccess()) {
+            viewModel.startSession()
+        } else {
+            requestMediaPermissions(allowSettingsFallback = true)
+        }
     }
 
     private fun checkAndShowFirstRunOnboarding() {
@@ -4216,12 +4220,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startOneTapCleanup() {
-        if (!hasAnyMediaPermission()) {
+        if (!hasFullVisualAccess()) {
             pendingOutcomeMission = DesiredOutcomeMission.FREE_MAX_SPACE_NOW
             openInteractiveDialogOnMissionFinish = true
             heroOrbButton.isEnabled = true
             heroOrbButton.text = getString(R.string.home_cleanup_primary)
-            requestMediaPermissions()
+            requestMediaPermissions(allowSettingsFallback = true)
             return
         }
         homeCleanupCandidateCount = 0
@@ -4321,6 +4325,15 @@ class MainActivity : AppCompatActivity() {
         customSubtitle: String? = null,
     ) {
         if (records.isEmpty()) {
+            if (!hasFullVisualAccess()) {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.permission_continue)
+                    .setMessage(R.string.home_cleanup_permission_denied)
+                    .setPositiveButton(R.string.permission_continue) { _, _ -> requestMediaPermissions(allowSettingsFallback = true) }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                return
+            }
             AlertDialog.Builder(this)
                 .setTitle(R.string.cleanup_dialog_empty_title)
                 .setMessage(R.string.cleanup_dialog_empty_body)
@@ -4601,9 +4614,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openWhatsAppCleanerFlow() {
-        if (!hasAnyMediaPermission()) {
+        if (!hasFullVisualAccess()) {
             pendingWhatsAppCleanerAfterPermission = true
-            requestMediaPermissions()
+            requestMediaPermissions(allowSettingsFallback = true)
             return
         }
         lifecycleScope.launch {
@@ -4777,9 +4790,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openBlurCleanerFlow() {
-        if (!hasAnyMediaPermission()) {
+        if (!hasFullVisualAccess()) {
             pendingBlurScanAfterPermission = true
-            requestMediaPermissions()
+            requestMediaPermissions(allowSettingsFallback = true)
             return
         }
         blurScanJob?.cancel()
@@ -6561,6 +6574,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun runOutcomeMission(mission: DesiredOutcomeMission) {
+        if (!hasFullVisualAccess()) {
+            pendingOutcomeMission = mission
+            requestMediaPermissions(allowSettingsFallback = true)
+            return
+        }
         val currentState = viewModel.state.value
         if (currentState.session == null || currentState.isLoading) {
             pendingOutcomeMission = mission
