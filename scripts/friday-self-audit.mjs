@@ -113,6 +113,12 @@ function main() {
     "scripts/voice-narrator.mjs",
     "scripts/voice-transcribe.mjs",
     "scripts/hooks/cognitive-hook.mjs",
+    "friday-core/cli.mjs",
+    "friday-core/council-adversarial.mjs",
+    "friday-core/skills-registry.mjs",
+    "friday-core/visual-qa.mjs",
+    "friday-core/money-lab.mjs",
+    "friday-core/night-factory.mjs",
   ];
 
   const syntaxResults = coreScripts.map(checkNodeSyntax);

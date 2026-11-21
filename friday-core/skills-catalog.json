@@ -1,0 +1,126 @@
+{
+  "updatedAt": "2026-11-21T23:50:35.787Z",
+  "skills": [
+    {
+      "id": "triage",
+      "name": "Motor de Triagem & Peso por Subagente",
+      "pillar": "FRIDAY",
+      "cmd": "node scripts/friday-triage-engine.mjs --test",
+      "tags": [
+        "subagentes",
+        "peso",
+        "triagem",
+        "hook"
+      ],
+      "verified": true
+    },
+    {
+      "id": "self-audit",
+      "name": "Auto-Auditoria 100% da FRIDAY",
+      "pillar": "FRIDAY",
+      "cmd": "node scripts/friday-self-audit.mjs",
+      "tags": [
+        "saude",
+        "auditoria",
+        "hooks",
+        "ram"
+      ],
+      "verified": true
+    },
+    {
+      "id": "hud",
+      "name": "Mission Control HUD Ao Vivo",
+      "pillar": "HIBRIDO",
+      "cmd": "node scripts/friday-hud.mjs",
+      "tags": [
+        "hud",
+        "telemetria",
+        "supabase",
+        "ci",
+        "quadro"
+      ],
+      "verified": true
+    },
+    {
+      "id": "quota",
+      "name": "Guardião de Cota da Sessão",
+      "pillar": "FRIDAY",
+      "cmd": "node scripts/friday-quota-guard.mjs",
+      "tags": [
+        "cota",
+        "tokens",
+        "compact",
+        "semaforo"
+      ],
+      "verified": true
+    },
+    {
+      "id": "play-radar",
+      "name": "Radar de Concorrentes & Dores 1-Estrela Play Store",
+      "pillar": "MIDIASTORE",
+      "cmd": "node scripts/friday-play-radar.mjs",
+      "tags": [
+        "aso",
+        "play-store",
+        "concorrentes",
+        "mercado"
+      ],
+      "verified": true
+    },
+    {
+      "id": "council",
+      "name": "Conselho Adversarial (Gemini vs Codex/OpenRouter)",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/council-adversarial.mjs",
+      "tags": [
+        "debate",
+        "arquitetura",
+        "codex",
+        "gemini",
+        "decisao"
+      ],
+      "verified": true
+    },
+    {
+      "id": "visual-qa",
+      "name": "Mãos e Olhos Reais (QA Web + Android ADB)",
+      "pillar": "HIBRIDO",
+      "cmd": "node friday-core/visual-qa.mjs",
+      "tags": [
+        "qa",
+        "web",
+        "android",
+        "adb",
+        "visao"
+      ],
+      "verified": true
+    },
+    {
+      "id": "money-lab",
+      "name": "Motor Científico de Dinheiro (Hipóteses & ROI)",
+      "pillar": "MIDIASTORE",
+      "cmd": "node friday-core/money-lab.mjs",
+      "tags": [
+        "dinheiro",
+        "vendas",
+        "experimento",
+        "roi",
+        "supabase"
+      ],
+      "verified": true
+    },
+    {
+      "id": "night-factory",
+      "name": "Fábrica Noturna Autônoma (Sandbox & Relatório)",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/night-factory.mjs",
+      "tags": [
+        "noturno",
+        "autonomo",
+        "branch",
+        "pr"
+      ],
+      "verified": true
+    }
+  ]
+}

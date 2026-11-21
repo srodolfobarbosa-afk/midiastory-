@@ -1,0 +1,36 @@
+name: FRIDAY Autonomous 24h Radar
+
+on:
+  schedule:
+    # Roda todos os dias às 09:00 UTC (06:00 BRT) gratuitamente na nuvem
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  friday-radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install scripts dependencies
+        working-directory: scripts
+        run: npm ci --omit=dev
+
+      - name: Run FRIDAY Visual/Web QA & Money Lab
+        run: |
+          echo "# 🤖 FRIDAY Autonomous 24h Radar" >> $GITHUB_STEP_SUMMARY
+          echo "## 👁️ Web QA" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          node friday-core/visual-qa.mjs --web https://midiastory-df6a0.web.app/ >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "## 🔎 Play Store Radar" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          node scripts/friday-play-radar.mjs "limpar armazenamento celular" >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY

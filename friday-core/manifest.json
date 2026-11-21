@@ -1,0 +1,29 @@
+{
+  "name": "FRIDAY Core — Construtora Autônoma",
+  "version": "2.0.0",
+  "owner": "Rodolfo",
+  "architecture": "model-agnostic-zero-python-zero-extra-cost",
+  "pillars": {
+    "builder": "FRIDAY Core (Sistema Operacional de Criação de Produtos e Negócios)",
+    "products": [
+      {
+        "id": "midiastore",
+        "name": "Midiastore",
+        "type": "android-app",
+        "packageId": "com.rdf112.midiastore",
+        "webUrl": "https://midiastory-df6a0.web.app/",
+        "repoPath": "..",
+        "goalBrl": 1000000,
+        "financialRule": "50/50"
+      }
+    ]
+  },
+  "modules": {
+    "council": "friday-core/council-adversarial.mjs",
+    "skills": "friday-core/skills-registry.mjs",
+    "visualQa": "friday-core/visual-qa.mjs",
+    "moneyLab": "friday-core/money-lab.mjs",
+    "nightFactory": "friday-core/night-factory.mjs",
+    "cli": "friday-core/cli.mjs"
+  }
+}
