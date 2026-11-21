@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "google-play-scraper": "^10.1.4"
+    "google-play-scraper": "^10.1.4",
+    "msedge-tts": "^2.1.1"
   }
 }

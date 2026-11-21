@@ -146,6 +146,37 @@ function pcmToWav(pcmBuffer, sampleRate = 24000, numChannels = 1, bitsPerSample 
   return Buffer.concat([header, pcmBuffer]);
 }
 
+const FFMPEG_PATH = "C:\\Users\\rodolfo\\tools\\ffmpeg\\bin\\ffmpeg.exe";
+
+async function synthesizeEdgeNeuralWav(text) {
+  const { MsEdgeTTS, OUTPUT_FORMAT } = await import("./node_modules/msedge-tts/dist/index.js");
+  const tts = new MsEdgeTTS();
+  await tts.setMetadata("pt-BR-FranciscaNeural", OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+  const { audioStream } = tts.toStream(text);
+  const chunks = [];
+  for await (const chunk of audioStream) {
+    chunks.push(chunk);
+  }
+  const mp3Buf = Buffer.concat(chunks);
+  if (mp3Buf.length < 100) throw new Error("Edge Neural retornou áudio vazio.");
+
+  const tmpMp3 = path.join(os.tmpdir(), `antigravity-edge-${Date.now()}.mp3`);
+  const tmpWav = path.join(os.tmpdir(), `antigravity-edge-${Date.now()}.wav`);
+  fs.writeFileSync(tmpMp3, mp3Buf);
+  const conv = spawnSync(
+    FFMPEG_PATH,
+    ["-y", "-i", tmpMp3, "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", tmpWav, "-loglevel", "error"],
+    { stdio: "ignore", windowsHide: true, timeout: 10000 }
+  );
+  try { fs.unlinkSync(tmpMp3); } catch {}
+  if (conv.status === 0 && fs.existsSync(tmpWav)) {
+    const wavBuf = fs.readFileSync(tmpWav);
+    try { fs.unlinkSync(tmpWav); } catch {}
+    return { buffer: wavBuf, model: "edge-neural-pt-BR-FranciscaNeural" };
+  }
+  throw new Error("Falha ao converter Edge Neural MP3 para WAV.");
+}
+
 function synthesizeLocalWindowsWav(text) {
   const outWav = path.join(os.tmpdir(), `antigravity-local-tts-${Date.now()}.wav`);
   const txtFile = path.join(os.tmpdir(), `antigravity-local-tts-${Date.now()}.txt`);
@@ -230,7 +261,12 @@ async function synthesizeWav(text, voiceName) {
     }
   }
 
-  // Automatic unlimited zero-cost local Windows PT-BR fallback when cloud TTS quota hits 429
+  // 2nd tier: Unlimited free high-craft Neural PT-BR voice (Microsoft Edge Neural Francisca)
+  try {
+    return await synthesizeEdgeNeuralWav(text);
+  } catch {}
+
+  // 3rd tier: Offline emergency fallback only if internet is down
   return synthesizeLocalWindowsWav(text);
 }
 
