@@ -12,20 +12,22 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 const keyPath = path.join(projectRoot, ".secrets", "play-service-account.json");
-const aabPath = path.join(projectRoot, "release-artifacts", "v275-release", "app-release.aab");
+const aabPath = process.argv[2]
+  ? path.resolve(projectRoot, process.argv[2])
+  : path.join(projectRoot, "release-artifacts", "v276-release", "app-release.aab");
 const packageName = "com.rdf112.midiastore";
 
 const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
 
 const RELEASE_NOTES = [
-  { language: "pt-BR", text: "v2.7.5: Limpeza real em 2 cliques! Novo Bottom Sheet OLED com miniaturas reais e exclusão definitiva direta, recuperação automática contra session_stale em aparelhos cheios, correção total de permissão parcial no Android 14/15 e Home mais limpa sem botões duplicados." },
-  { language: "en-US", text: "v2.7.5: Real 2-click cleanup! New OLED review Bottom Sheet with real media thumbnails and direct permanent deletion, automatic session_stale recovery on large libraries, full Android 14/15 partial-permission fix, and cleaner Home UI." },
-  { language: "es-ES", text: "v2.7.5: ¡Limpieza real en 2 clics! Nuevo panel OLED con miniaturas reales y eliminación definitiva directa, recuperación automática de sesión, corrección total de permisos en Android 14/15 y pantalla principal más limpia." },
-  { language: "fr-FR", text: "v2.7.5 : Nettoyage réel en 2 clics ! Nouveau panneau OLED avec miniatures réelles et suppression définitive directe, reprise automatique de session, correction des autorisations Android 14/15 et accueil épuré." },
-  { language: "de-DE", text: "v2.7.5: Echte 2-Klick-Bereinigung! Neues OLED-Prüfpanel mit echten Vorschauen und direktem dauerhaftem Löschen, automatische Sitzungswiederherstellung, Android-14/15-Berechtigungsfix und aufgeräumte Startseite." },
-  { language: "hi-IN", text: "v2.7.5: 2 क्लिक में असली क्लीनअप! असली थंबनेल और सीधे स्थायी डिलीट के साथ नया OLED पैनल, ऑटो सेशन रिकवरी, Android 14/15 अनुमति सुधार और साफ होम स्क्रीन।" },
-  { language: "ja-JP", text: "v2.7.5：2クリックで確実に整理！実サムネイル付きの新しいOLEDレビューパネル、セッション自動復旧、Android 14/15の部分権限修正、より見やすいホーム画面に刷新。" },
-  { language: "zh-CN", text: "v2.7.5：2步完成真实清理！全新OLED审核面板支持真实缩略图与直接永久删除，自动恢复扫描会话，全面修复 Android 14/15 权限问题并优化首页界面。" },
+  { language: "pt-BR", text: "v2.7.6: Limpeza rápida em 1 botão (máximo 2 cliques) com pré-análise automática ao abrir, fim do falso alerta 'Nenhuma mídia encontrada' sob cobertura parcial e novo painel OLED de benefícios Pro." },
+  { language: "en-US", text: "v2.7.6: Fast 1-button cleanup (max 2 taps) with automatic pre-scan on launch, fix for false 'No media found' under partial coverage, and new OLED Pro benefits card." },
+  { language: "es-ES", text: "v2.7.6: Limpieza rápida en 1 botón (máximo 2 toques) con preanálisis automático al abrir, corrección de 'No se encontraron medios' en cobertura parcial y nuevo panel OLED Pro." },
+  { language: "fr-FR", text: "v2.7.6 : Nettoyage rapide en 1 bouton (2 gestes max) avec pré-analyse automatique, correction de l'alerte 'Aucun média trouvé' et nouveau panneau OLED Pro." },
+  { language: "de-DE", text: "v2.7.6: Schnelle 1-Knopf-Bereinigung (max. 2 Tipps) mit automatischer Voranalyse beim Start, Behebung von 'Keine Medien gefunden' und neue OLED-Pro-Übersicht." },
+  { language: "hi-IN", text: "v2.7.6: ऐप खोलते ही ऑटो प्री-स्कैन के साथ 1-बटन तेज़ क्लीनअप (अधिकतम 2 टैप), आंशिक एक्सेस में 'कोई मीडिया नहीं मिला' सुधार और नया OLED Pro कार्ड।" },
+  { language: "ja-JP", text: "v2.7.6：起動時の自動プレスキヤンによる1ボタン高速整理（最大2タップ）、部分権限時の「メディアが見つかりません」修正、新しいOLED Proカード。" },
+  { language: "zh-CN", text: "v2.7.6：启动自动预扫描与一键快速清理（最多2步）、修复部分权限下“未找到媒体”提示，以及全新 OLED Pro 权益卡片。" },
 ];
 
 async function getAccessToken() {
@@ -103,7 +105,7 @@ async function main() {
           track,
           releases: [
             {
-              name: "2.7.5 (30)",
+              name: `2.7.6 (${bundle.versionCode})`,
               versionCodes: [String(bundle.versionCode)],
               status: "completed",
               releaseNotes: RELEASE_NOTES,

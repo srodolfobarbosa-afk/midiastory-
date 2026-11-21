@@ -133,6 +133,10 @@ fun CleanerHomeScreen(
             onMissionClick = onMissionClick,
         )
 
+        if (!isProActive) {
+            SalesPsychologyProCard(onOpenPro = onOpenPro)
+        }
+
         // The carousel only adds value once a scan produced real counts; with placeholder data it just
         // duplicated the quick grid and showed clipped "0 items" cards below the fold.
         val scannedCollections = state.collections.filter { it.itemCount > 0 }
@@ -175,6 +179,73 @@ fun CleanerHomeScreen(
             lineHeight = 16.sp,
             modifier = Modifier.padding(top = 2.dp, bottom = 28.dp),
         )
+    }
+}
+
+@Composable
+private fun SalesPsychologyProCard(
+    onOpenPro: () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MidiastoreColors.CardSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MidiastoreColors.AccentBlue, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onOpenPro),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = Color(0xFF163322),
+                modifier = Modifier.border(1.dp, Color(0xFF30D158), RoundedCornerShape(999.dp)),
+            ) {
+                Text(
+                    text = stringResource(R.string.sales_psych_badge),
+                    color = Color(0xFF30D158),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+            }
+            Text(
+                text = stringResource(R.string.sales_psych_title),
+                color = MidiastoreColors.TextPrimary,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 20.sp,
+            )
+            Text(
+                text = stringResource(R.string.sales_psych_subtitle),
+                color = MidiastoreColors.TextMuted,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.sales_psych_cta),
+                    color = MidiastoreColors.AccentBlue,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+                Text(
+                    text = "›",
+                    color = MidiastoreColors.AccentBlue,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+            }
+        }
     }
 }
 

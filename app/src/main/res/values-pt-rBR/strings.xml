@@ -592,8 +592,12 @@ Total: %3$s</string>
     <string name="cleaner_home_device_storage">Este aparelho</string>
     <string name="cleaner_home_used">usados</string>
     <string name="cleaner_home_free_storage">%1$s disponíveis</string>
-    <string name="cleaner_home_analyze">Analisar meu espaço</string>
-    <string name="cleaner_home_scanning">Analisando armazenamento…</string>
+    <string name="cleaner_home_analyze">Limpar Meu Espaço Agora</string>
+    <string name="cleaner_home_scanning">Preparando limpeza rápida…</string>
+    <string name="sales_psych_badge">MODO PRO • ECONOMIZE 56% NO ANUAL</string>
+    <string name="sales_psych_title">Libere espaço oculto de apps sem uso (+90 dias) e relatórios Pro</string>
+    <string name="sales_psych_subtitle">Menos de R$ 0,22/dia no Plano Anual • Garantia oficial Google Play (cancele em 1 toque).</string>
+    <string name="sales_psych_cta">Desbloquear Modo Pro Agora</string>
     <string name="cleaner_home_reassurance">Revise cada sugestão antes de agir.</string>
     <string name="cleaner_home_quick_title">Limpeza rápida</string>
     <string name="cleaner_home_manual_review">Nada é removido automaticamente. Você escolhe e confirma cada ação.</string>

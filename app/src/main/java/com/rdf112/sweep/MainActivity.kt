@@ -600,6 +600,7 @@ class MainActivity : AppCompatActivity() {
 
     private var lastHadFullVisualAccess: Boolean = false
     private var autoRetriedStaleMission: DesiredOutcomeMission? = null
+    private var autoInitialCleanupScanLaunched: Boolean = false
 
     private fun hasFullVisualAccess(): Boolean = when {
         Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2 ->
@@ -745,7 +746,7 @@ class MainActivity : AppCompatActivity() {
                         isProActive = isProNow,
                         onAnalyze = { onHomeCleanupButtonClicked() },
                         onMissionClick = ::onCleanMissionClick,
-                        onOpenPro = { switchTab(AppTab.PRO) },
+                        onOpenPro = { onHomeProSubscribeClicked() },
                         onManagePermissions = { requestMediaPermissions(allowSettingsFallback = true) },
                     )
                 }
@@ -1727,17 +1728,56 @@ class MainActivity : AppCompatActivity() {
         if (isFinishing || isDestroyed) return
         postCleanupReliefShownThisSession = true
         val freedFmt = android.text.format.Formatter.formatFileSize(this, confirmedBytes)
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.post_cleanup_relief_title))
-            .setMessage(getString(R.string.post_cleanup_relief_body, freedFmt, confirmedCount))
-            .setPositiveButton(getString(R.string.post_cleanup_relief_cta)) { _, _ ->
-                switchTab(AppTab.PRO)
-                if (billingGateway.securePurchaseVerificationAvailable()) {
-                    billingGateway.launchPurchaseFlow(this, BillingStatePolicy.PRODUCT_ANNUAL)
-                }
+        val (sheet, root) = createAppleBottomSheet(
+            title = getString(R.string.post_cleanup_relief_title),
+            subtitle = getString(R.string.post_cleanup_relief_body, freedFmt, confirmedCount),
+        )
+        val badge = TextView(this).apply {
+            text = getString(R.string.pro_annual_savings_badge)
+            textSize = 10.5f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#30D158"))
+            setPadding(dp(12), dp(5), dp(12), dp(5))
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#163322"))
+                cornerRadius = dp(999).toFloat()
+                setStroke(dp(1), Color.parseColor("#30D158"))
             }
-            .setNegativeButton(getString(R.string.post_cleanup_relief_later), null)
-            .show()
+        }
+        root.addView(badge, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(12) })
+
+        val annualBtn = button(latestAnnualOfferText ?: getString(R.string.post_cleanup_relief_cta)) {
+            sheet.dismiss()
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
+        }.apply {
+            minHeight = dp(54)
+            textSize = 14f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        root.addView(annualBtn, top(10))
+
+        val lifetimeBtn = button(latestLifetimeOfferText ?: getString(R.string.plan_lifetime_default)) {
+            sheet.dismiss()
+            requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME)
+        }.apply {
+            minHeight = dp(50)
+            textSize = 13f
+            setTextColor(color(R.color.sweep_text))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+        }
+        root.addView(lifetimeBtn, top(8))
+
+        val laterBtn = button(getString(R.string.post_cleanup_relief_later)) {
+            sheet.dismiss()
+        }.apply {
+            minHeight = dp(46)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        root.addView(laterBtn, top(4))
+        sheet.show()
     }
 
     private fun buildProPaywallSection(): LinearLayout = LinearLayout(this).apply {
@@ -4452,7 +4492,18 @@ class MainActivity : AppCompatActivity() {
         coverageComplete: Boolean,
         customSubtitle: String? = null,
     ) {
-        if (records.isEmpty()) {
+        val currentPageSelectable = viewModel.state.value.currentPage?.records
+            ?.filter { it.isSelectable && !it.isProtected }
+            ?.sortedByDescending { it.sizeBytes }
+            .orEmpty()
+        val effectiveRecords = when {
+            records.isNotEmpty() -> records
+            homeInteractiveRecords.isNotEmpty() -> homeInteractiveRecords
+            currentPageSelectable.isNotEmpty() -> currentPageSelectable
+            else -> emptyList()
+        }
+        val effectiveIsFallback = isFallbackList || (records.isEmpty() && effectiveRecords.isNotEmpty())
+        if (effectiveRecords.isEmpty()) {
             if (!hasFullVisualAccess()) {
                 pendingOutcomeMission = mission
                 openInteractiveDialogOnMissionFinish = mission != null
@@ -4470,7 +4521,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val cappedRecords = records.filter { it.isSelectable && !it.isProtected }.take(200)
+        val cappedRecords = effectiveRecords.filter { it.isSelectable && !it.isProtected }.take(200)
         if (cappedRecords.isEmpty()) {
             showEmptyCleanupBottomSheet()
             return
@@ -4489,7 +4540,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val headerSubtitle = customSubtitle ?: getString(
-            if (isFallbackList) R.string.cleanup_dialog_subtitle_fallback
+            if (effectiveIsFallback) R.string.cleanup_dialog_subtitle_fallback
             else R.string.cleanup_dialog_subtitle_candidates,
         )
         val (dialog, root) = createAppleBottomSheet(
@@ -6299,6 +6350,18 @@ class MainActivity : AppCompatActivity() {
         updateVisibleCheckboxes(state)
         renderMissionProgress(state.missionProgress)
         resumePendingOutcomeMission(state)
+        if (
+            !autoInitialCleanupScanLaunched &&
+            hasFullVisualAccess() &&
+            !state.isLoading &&
+            state.session != null &&
+            state.missionProgress == null &&
+            pendingOutcomeMission == null
+        ) {
+            autoInitialCleanupScanLaunched = true
+            openInteractiveDialogOnMissionFinish = false
+            viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+        }
     }
 
     private fun resumePendingOutcomeMission(state: MediaScanUiState) {
@@ -6749,7 +6812,6 @@ class MainActivity : AppCompatActivity() {
         }
         val primaryRecords = plan.autoSelectedRecords
         val useFallback = primaryRecords.isEmpty() &&
-            progress.mission != DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES &&
             progress.fallbackRecords.isNotEmpty()
         val interactiveRecords = when {
             primaryRecords.isNotEmpty() -> primaryRecords

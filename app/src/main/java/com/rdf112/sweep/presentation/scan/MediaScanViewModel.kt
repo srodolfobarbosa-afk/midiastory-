@@ -405,9 +405,7 @@ class MediaScanViewModel(
                         }
 
                         for (record in page.records) {
-                            if (mission != DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES &&
-                                record.isSelectable && !record.isProtected && record.sizeBytes > 0L
-                            ) {
+                            if (record.isSelectable && !record.isProtected && record.sizeBytes > 0L) {
                                 largestAccessibleCandidates += record
                                 if (largestAccessibleCandidates.size > 150) {
                                     largestAccessibleCandidates.sortByDescending { it.sizeBytes }
@@ -659,7 +657,9 @@ class MediaScanViewModel(
                             else -> null
                         },
                         fallbackRecords = if (mission == DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES) {
-                            emptyList()
+                            generatedPlan.autoSelectedRecords.ifEmpty {
+                                largestAccessibleCandidates.sortedByDescending { it.sizeBytes }.take(100)
+                            }
                         } else {
                             largestAccessibleCandidates.sortedByDescending { it.sizeBytes }.take(100)
                         },

@@ -592,8 +592,12 @@ Total: %3$s</string>
     <string name="cleaner_home_device_storage">This device</string>
     <string name="cleaner_home_used">used</string>
     <string name="cleaner_home_free_storage">%1$s available</string>
-    <string name="cleaner_home_analyze">Analyze my storage</string>
-    <string name="cleaner_home_scanning">Analyzing storage…</string>
+    <string name="cleaner_home_analyze">Clean My Storage Now</string>
+    <string name="cleaner_home_scanning">Preparing quick cleanup…</string>
+    <string name="sales_psych_badge">PRO MODE • SAVE 56% ON ANNUAL</string>
+    <string name="sales_psych_title">Free hidden space from unused apps (90d+) &amp; audited Pro reports</string>
+    <string name="sales_psych_subtitle">Less than $0.05/day on the Annual Plan • Official Google Play protection (cancel anytime).</string>
+    <string name="sales_psych_cta">Unlock Pro Mode Now</string>
     <string name="cleaner_home_reassurance">Review every suggestion before taking action.</string>
     <string name="cleaner_home_quick_title">Quick cleanup</string>
     <string name="cleaner_home_manual_review">Nothing is removed automatically. You choose and confirm every action.</string>
