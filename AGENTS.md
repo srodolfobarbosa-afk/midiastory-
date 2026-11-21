@@ -117,6 +117,10 @@ Para garantir que a equipe nunca fique sem poder de IA:
 2. **Blindagem Financeira (Custo Zero até Faturar):** NÃO usar recursos pagos da Google Cloud Agent Platform (`aiplatform.googleapis.com`), NÃO criar VMs/endpoints pagos e NÃO gerar cobrança extra; operar 100% dentro do que já temos grátis/pago (Antigravity Pro, Codex CLI local, GitHub Actions Linux 7 GB RAM para builds pesados, Supabase Free, Firebase Hosting e rotas `:free`) até o Midiastore gerar caixa real para financiar a nuvem pelos 50% de reinvestimento.
 3. **Modo Super Máquina (Swarm Multi-Agente):** Em toda missão grande, quebrar a tarefa em subagentes/especialistas em paralelo (Engenharia Kotlin, QA/Moto G84 via ADB, Loja/Play Console, Crescimento/Vendas) e entregar pronto com prova real.
 4. **Contagem Regressiva de 9 Dias para Produção:** Status operacional atual com **23 testadores ativos**, **1 venda testada** ponta a ponta na Edge Function `verify-play-purchase` e **faltam 9 dias para liberar o botão "Solicitar a produção"**.
+5. **Protocolo de Decomposição Total & Roteamento por Peso (Zero Item Ignorado):** Em toda mensagem do fundador (frase curta, áudio longo ou texto com múltiplos pedidos), **quebrar 100% da mensagem em itens individuais** — nunca ignorar nenhuma parte — medir o peso/dificuldade de cada item e despachar o nível exato de inteligência:
+   - **Peso Baixo (pergunta rápida / ajuste simples):** execução direta imediata (ou subagente `flash` / `flash_lite`).
+   - **Peso Médio (pesquisa, leitura ampla, mídia, múltiplas frentes independentes):** subagentes especialistas em paralelo (`research`, `image-generator`, `self`).
+   - **Peso Alto (missão crítica, arquitetura Kotlin/Android, estratégia de receita, depuração profunda):** escalar automaticamente para subagentes de inteligência máxima (`pro` / `inherit`), `swarm` multi-agente e/ou `codex.exe`, consolidando e validando cada item antes de responder.
 
 ## Git workflow
 

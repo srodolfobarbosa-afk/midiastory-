@@ -3070,3 +3070,43 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #464
 
 ---
+
+### 📍 [21/11/2026, 06:43:35] Fechamento do Dia 2026-11-21 e Plano de Acao de Amanha
+- **📖 Estudou / Leu:** Status final v2.7.6 vc 31 em alpha, 56 screenshots 14 idiomas, Edge Functions v8/v3, site Firebase Hosting, fabrica Google Ads 14 idiomas e APIs ativas em midiastory-df6a0
+- **⚙️ Tentou / Executou:** Salvar snapshot docs/CONTINUATION_UPDATE_2026-11-21.md, enviar para GitHub e registrar prioridades de amanha na memoria
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Tudo salvo em GitHub, Supabase e Downloads/google-ads-midiastore
+- **🎯 Conclusão:** Prioridades de amanha: 1) Monitorar contagem regressiva de producao Play Console + Data Safety; 2) Validar v2.7.6 no Moto G84; 3) Finalizar faturamento Google Ads 649-729-9513 e importar lote pausado; 4) Enviar sitemap.xml no Search Console
+- *Registro Supabase:* Memory #465
+
+---
+
+### 📍 [21/11/2026, 19:57:18] Ativacao Sistema FRIDAY Completo: Voz Google AI Studio + Avatar Animado 6 Frames + DSP Mic + Visao de Tela + Quadro Professor + Mission HUD + Play Radar ASO + Context7 MCP
+- **📖 Estudou / Leu:** Google AI Studio TTS/STT, WPF lip-sync WAV PCM, ffmpeg Studio DSP, scrcpy USB, google-play-scraper, Context7 remote MCP
+- **⚙️ Tentou / Executou:** Construir interface viva de copiloto por voz bidirecional com avatar animado e ferramentas de engenharia/ASO
+- **⚠️ Erros Encontrados:** Job Object matava processo solto; UIPI bloqueava terminal Admin; timeout 8s em audios longos
+- **🔧 Como Corrigiu:** Companion persistente elevado via schtasks ONLOGON/HIGHEST, WAV queue sem bloqueio, DSP MP3 32kbps + thinkingBudget:0 (2s), 6 frames com lip-sync real 70ms e piscar natural
+- **🎯 Conclusão:** Sistema FRIDAY 100% operacional, salvo no GitHub e integrado ao fluxo de construcao do Midiastore
+- *Registro Supabase:* Memory #467
+
+---
+
+### 📍 [21/11/2026, 20:00:52] Visao de 2 Pilares do Fundador Rodolfo: (1) Midiastore como primeiro motor comercial de R$ 1M e (2) Evolucao da IA Central FRIDAY como fabrica multiproduto
+- **📖 Estudou / Leu:** Diretriz falada do fundador em 21/11/2026 separando produto comercial (Midiastore) e plataforma de IA evolutiva (FRIDAY/Rodolfo Brain)
+- **⚙️ Tentou / Executou:** Consolidar memoria estrategica de longo prazo mantendo foco disciplinado no Midiastore primeiro
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Separacao clara entre Pilar 1 (Midiastore -> caixa R$ 1M -> Regra 50/50) e Pilar 2 (IA Central evolutiva com memoria, voz, visao, quadro e ferramentas para criar novos apps, livros e sistemas)
+- **🎯 Conclusão:** Foco tatico imediato: aprovacao de producao e escala do Midiastore para gerar caixa real que financiara a expansao da IA e novos produtos
+- *Registro Supabase:* Memory #468
+
+---
+
+### 📍 [21/11/2026, 20:22:07] Protocolo de Decomposicao Total e Roteamento de Subagentes por Peso da Demanda (Correcao do Fundador)
+- **📖 Estudou / Leu:** Feedback direto do fundador em 21/11/2026: nunca ignorar partes de uma mensagem longa, medir o peso de cada frase/pedido e despachar subagentes com o nivel de inteligencia adequado
+- **⚙️ Tentou / Executou:** Padronizar decomposicao 100% dos itens e roteamento automatico (Baixo=direto/flash, Medio=subagentes paralelos, Alto=pro/swarm/codex)
+- **⚠️ Erros Encontrados:** Responder apenas parte da mensagem ou tratar pedidos complexos e simples com o mesmo peso
+- **🔧 Como Corrigiu:** Adicionado Protocolo 5 no AGENTS.md e gravado como correcao permanente no Supabase
+- **🎯 Conclusão:** Toda mensagem com multiplos pedidos agora e quebrada item por item com despacho inteligente de subagentes conforme a complexidade real
+- *Registro Supabase:* Memory #470
+
+---
