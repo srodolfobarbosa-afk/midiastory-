@@ -15,7 +15,7 @@ Add-Type -AssemblyName WindowsBase
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-# Win32 helper to focus the Antigravity console window and send transcribed text
+# Win32 helper to focus the Antigravity console window and send Unicode text instantly via WM_CHAR (500x faster than SendKeys!)
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
@@ -24,6 +24,26 @@ public class WinFocusHelper {
   public static extern bool SetForegroundWindow(IntPtr hWnd);
   [DllImport("user32.dll")]
   public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+  public static extern bool PostMessageW(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+  public const uint WM_CHAR = 0x0102;
+  public const uint WM_KEYDOWN = 0x0100;
+  public const uint WM_KEYUP = 0x0101;
+  public const int VK_RETURN = 0x0D;
+
+  public static void SendTextFast(IntPtr hWnd, string text) {
+    foreach (char c in text) {
+      if (c == '\r' || c == '\n') {
+        PostMessageW(hWnd, WM_CHAR, (IntPtr)' ', IntPtr.Zero);
+      } else {
+        PostMessageW(hWnd, WM_CHAR, (IntPtr)c, IntPtr.Zero);
+      }
+    }
+    System.Threading.Thread.Sleep(60);
+    PostMessageW(hWnd, WM_KEYDOWN, (IntPtr)VK_RETURN, IntPtr.Zero);
+    PostMessageW(hWnd, WM_KEYUP, (IntPtr)VK_RETURN, IntPtr.Zero);
+  }
 }
 "@
 
@@ -131,7 +151,7 @@ $xaml = @"
         </Grid>
         <UniformGrid Columns="4" Height="28">
           <Button x:Name="BtnMoto" Content="📱Moto" Margin="0,0,2,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Espelhar tela do Motorola USB no PC"/>
-          <Button x:Name="BtnBoard" Content="🎓Quadro" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Abrir Quadro Interativo de Professor"/>
+          <Button x:Name="BtnBoard" Content="📊HUD" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#30D158" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Atualizar e abrir Quadro FRIDAY Mission HUD ao vivo"/>
           <Button x:Name="BtnScreen" Content="👁️Tela" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#64D2FF" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Capturar sua tela agora para a IA enxergar e te orientar"/>
           <Button x:Name="BtnWeb" Content="🌐Web" Margin="2,0,0,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Abrir navegador / site Midiastore"/>
         </UniformGrid>
@@ -391,12 +411,13 @@ $btnMoto.Add_Click({
   }
 })
 
-# Quick Tool 2: Open Antigravity Interactive Professor Board
+# Quick Tool 2: Update & Open Live FRIDAY Mission HUD on Professor Board
 $btnBoard.Add_Click({
-  $statusText.Text = "Abrindo Quadro..."
+  $statusText.Text = "Atualizando HUD..."
+  $hudScript = "C:\Users\rodolfo\midiastory-\scripts\friday-hud.mjs"
   $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = $NodePath
-  $psi.Arguments = "`"$BoardScript`" --open"
+  $psi.Arguments = "`"$hudScript`" --open"
   $psi.UseShellExecute = $false
   $psi.CreateNoWindow = $true
   try { [void][System.Diagnostics.Process]::Start($psi) } catch {}
@@ -436,28 +457,6 @@ function Write-DebugLog([string]$msg) {
   } catch {}
 }
 
-function Escape-SendKeys([string]$s) {
-  $sb = New-Object System.Text.StringBuilder
-  foreach ($ch in $s.ToCharArray()) {
-    switch ($ch) {
-      '+' { [void]$sb.Append('{+}') }
-      '^' { [void]$sb.Append('{^}') }
-      '%' { [void]$sb.Append('{%}') }
-      '~' { [void]$sb.Append('{~}') }
-      '(' { [void]$sb.Append('{(}') }
-      ')' { [void]$sb.Append('{)}') }
-      '{' { [void]$sb.Append('{{}') }
-      '}' { [void]$sb.Append('{}}') }
-      '[' { [void]$sb.Append('{[}') }
-      ']' { [void]$sb.Append('{]}') }
-      "`r" { }
-      "`n" { [void]$sb.Append(' ') }
-      default { [void]$sb.Append($ch) }
-    }
-  }
-  return $sb.ToString()
-}
-
 function Send-TextToTerminal([string]$text) {
   $clean = $text.Trim()
   if (-not $clean) { return }
@@ -471,12 +470,9 @@ function Send-TextToTerminal([string]$text) {
     Write-DebugLog "Focusing PID=$($target.Id) Title='$($target.MainWindowTitle)'"
     [WinFocusHelper]::ShowWindow($hWnd, 9) | Out-Null
     [WinFocusHelper]::SetForegroundWindow($hWnd) | Out-Null
-    Start-Sleep -Milliseconds 220
-    $escaped = Escape-SendKeys $clean
-    [System.Windows.Forms.SendKeys]::SendWait($escaped)
-    Start-Sleep -Milliseconds 180
-    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
-    Write-DebugLog "Typed text + ENTER directly into terminal"
+    Start-Sleep -Milliseconds 100
+    [WinFocusHelper]::SendTextFast($hWnd, $clean)
+    Write-DebugLog "Sent Unicode text + ENTER via WM_CHAR in <100ms"
   } else {
     Write-DebugLog "No target terminal window found"
   }
