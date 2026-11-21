@@ -3000,3 +3000,33 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #446
 
 ---
+
+### 📍 [20/11/2026, 20:35:01] Sincronizacao geral GitHub + Supabase + Roteador IA (Gemini 4 Neon + Brief Estrategico)
+- **📖 Estudou / Leu:** docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md, AGENTS.md, GEMINI.md, CONTEXTO_MESTRE.md, scripts/ai-failover-router.mjs, scripts/lib/rodolfo-brain-persona.mjs e saude do Supabase (18.72 MB / 500 MB, RLS ativo)
+- **⚙️ Tentou / Executou:** Atualizar identidade do app (v2.7.5 vc 30), matriz multi-LLM (Gemini 4 Neon/Carbon + Codex CLI), prioridade no roteador de failover e commitar + sincronizar no GitHub preservando integralmente o brief do Codex
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Removidas referencias defasadas (v2.4.0/vc21, deepseek-r1:free, Studio no GEMINI.md); adicionada prioridade gemini-4-neon no roteador e persona
+- **🎯 Conclusão:** GitHub (branch codex/midiastore-release-audit), Supabase (memorias #444/#447/#448 + nova memoria), Antigravity e Codex CLI agora compartilham exatamente o mesmo norte estrategico, estado real v2.7.5 e arquitetura agnostica de modelo.
+- *Registro Supabase:* Memory #449
+
+---
+
+### 📍 [20/11/2026, 20:54:54] Fechamento das 3 Frentes: 56 Screenshots OLED (14 idiomas) na Play Console + Auditoria/Deploy das 4 Edge Functions + CRO Site OLED no Firebase
+- **📖 Estudou / Leu:** generate-play-screenshots.mjs, play-upload-screenshots.mjs, render-screenshots.ps1, supabase/functions/* (verify-play-purchase, play-rtdn-webhook, ingest-product-event, get-paywall-variant) e docs/index.html
+- **⚙️ Tentou / Executou:** Auditar e corrigir P0/P1 nas Edge Functions, publicar as 4 funcoes no Supabase, gerar e validar visualmente 56 screenshots 1080x1920 nos 14 idiomas (incluindo ar, ru-RU, id, bn-BD, ko-KR, pt-PT), subir na Play Console, atualizar funil web para Preto OLED Limpador Puro v2.7.5 e publicar no Firebase + GitHub
+- **⚠️ Erros Encontrados:** Primeiro commit da Play Console retornou HTTP 403 porque shortDescription de pt-BR tinha 81 chars (limite 80)
+- **🔧 Como Corrigiu:** Encurtado shortDescription de pt-BR para 76 chars e adicionada assercao matematica title<=30 e shortDescription<=80 para todos os 14 idiomas; re-executado Edit 09123828393703258124 com HTTP 200. Adicionada verificacao criptografica RS256 Google JWKS e fail-closed em play-rtdn-webhook + suporte a SUBSCRIPTION_STATE_CANCELED dentro do ciclo pago
+- **🎯 Conclusão:** 1) Play Console: 14 fichas + 56 phoneScreenshots OLED commitados com HTTP 200 (Edit 09123828393703258124). 2) Supabase Edge: verify-play-purchase v8, play-rtdn-webhook v3, ingest-product-event v3 e get-paywall-variant v2 ACTIVE + 10/10 tabelas blindadas no pentest RLS. 3) Firebase Hosting: release 1795218588890000 publicada com HTTP 200. 4) GitHub: sincronizado na branch codex/midiastore-release-audit.
+- *Registro Supabase:* Memory #453
+
+---
+
+### 📍 [21/11/2026, 01:52:15] Publicacao v2.7.6 (vc 31) na Play Console: Limpeza em 1 Botao (Auto-Prescan), Fim do Falso Alerta Nenhuma Midia Encontrada, Psicologia de Vendas OLED e 630/630 Strings nos 14 Idiomas
+- **📖 Estudou / Leu:** Run 44867001410 (API 29, API 35, Windows, signed-release), MainActivity.kt, MediaScanViewModel.kt, CleanerHomeScreen.kt e values-*/strings.xml
+- **⚙️ Tentou / Executou:** Baixar AAB v2.7.6 (vc 31), auditar SHA-256 e aapt2 badging e publicar nas faixas internal e alpha via play-upload-v275.mjs
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Auto-prescan ao abrir app, fallbackRecords garantido em todas as missoes inclusive duplicatas sob cobertura parcial, SalesPsychologyProCard na Home + Bottom Sheet OLED no pos-limpeza e 630/630 strings nos 14 idiomas
+- **🎯 Conclusão:** Run 44867001410 100% VERDE. AAB v2.7.6 (vc 31) auditado (zero MANAGE_EXTERNAL_STORAGE) e publicado com HTTP 200 nas faixas internal e alpha da Google Play Console.
+- *Registro Supabase:* Memory #458
+
+---
