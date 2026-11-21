@@ -331,8 +331,8 @@ const GLOBAL_ADS_14 = {
     phoneBadge: "✓ +14.8 GB খালি করার জন্য প্রস্তুত",
     headlines30: [
       "ফোনের স্টোরেজ কি বারবার ফুল?",
-      "ছবি না হারিয়ে जगह খালি করুন",
-      "WhatsApp वीडियोতে फोन ভরেছে?",
+      "ছবি না হারিয়ে মেমোরি খালি",
+      "WhatsApp ভিডিওতে ফোন ভরেছে?",
       "শুধু ডুপ্লিকেট ছবি মুছে ফেলুন",
       "ফোন আবার হালকা ও দ্রুত করুন",
     ],
@@ -340,7 +340,7 @@ const GLOBAL_ADS_14 = {
       "কোনো ভয় ছাড়াই ফোনের জায়গা খালি করুন! ডিলিট করার আগে প্রতিটি ছবি নিজে দেখে নিন।",
       "কয়েক সেকেন্ডে ডুপ্লিকেট ছবি এবং বড় WhatsApp ভিডিও খুঁজুন। আজই ফ্রি ডাউনলোড করুন!",
       "অনুমতি ছাড়া কিছুই ডিলিট হয় না। মাত্র 5.9 MB-এর হালকা অ্যাপ, সহজেই ইনস্টল হয়।",
-      "মেমোরি ফুল সমস্যার সহজ সমাধান। আপনার Android ফোনে कई GB জায়গা ফিরিয়ে আনুন!",
+      "মেমোরি ফুল সমস্যার সহজ সমাধান। আপনার Android ফোনে কয়েক GB জায়গা ফিরিয়ে আনুন!",
     ],
   },
   "ko-KR": {
@@ -370,6 +370,23 @@ const GLOBAL_ADS_14 = {
   },
 };
 
+const EDITOR_LANGUAGE_MAP = {
+  "pt-BR": { en: "Portuguese", pt: "Português" },
+  "pt-PT": { en: "Portuguese", pt: "Português" },
+  "en-US": { en: "English", pt: "Inglês" },
+  "es-ES": { en: "Spanish", pt: "Espanhol" },
+  "fr-FR": { en: "French", pt: "Francês" },
+  "de-DE": { en: "German", pt: "Alemão" },
+  "hi-IN": { en: "Hindi", pt: "Hindi" },
+  "ja-JP": { en: "Japanese", pt: "Japonês" },
+  "zh-CN": { en: "Chinese (simplified)", pt: "Chinês (simplificado)" },
+  "ar": { en: "Arabic", pt: "Árabe" },
+  "ru-RU": { en: "Russian", pt: "Russo" },
+  "id": { en: "Indonesian", pt: "Indonésio" },
+  "bn-BD": { en: "Bengali", pt: "Bengali" },
+  "ko-KR": { en: "Korean", pt: "Coreano" },
+};
+
 function validateCopyLimits() {
   for (const [locale, cfg] of Object.entries(GLOBAL_ADS_14)) {
     for (const h of cfg.headlines30) {
@@ -391,41 +408,87 @@ function writeMarkdownAndCsv() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   let md = `# 🌍 KIT GLOBAL GOOGLE ADS — MIDIASTORE (14 IDIOMAS COM PSICOLOGIA DE VENDAS)\n\n`;
-  md += `Todos os títulos foram validados matematicamente com **≤ 30 caracteres** e todas as descrições com **≤ 90 caracteres** (padrão oficial Google Ads).\n\n`;
-  md += `Os banners **Horizontal (1200x628)** e **Quadrado (1200x1200)** de cada idioma estão salvos nas respectivas subpastas dentro de \`C:\\Users\\rodolfo\\Downloads\\google-ads-midiastore\\<idioma>\\\`.\n\n---\n\n`;
+  md += `Todos os títulos foram validados matematicamente com **≤ 30 caracteres** e todas as descrições com **≤ 90 caracteres** (padrão oficial Google Ads).\n`;
+  md += `Todas as 14 campanhas estão configuradas com **Status = Paused** e **Budget = 20.00 BRL/dia**.\n\n`;
+  md += `Os 28 banners **Horizontal (1200x628)** e **Quadrado (1200x1200)** estão organizados tanto na raiz junto ao CSV (\`banner-horizontal-<idioma>-1200x628.png\` e \`banner-quadrado-<idioma>-1200x1200.png\`) quanto nas subpastas \`<idioma>\\\` e no pacote ZIP oficial do Google Ads Editor (\`google-ads-editor-lote-14-idiomas.zip\`).\n\n---\n\n`;
 
-  const csvRows = [
-    [
-      "Campaign",
-      "Ad Group",
-      "Language",
-      "Final URL",
-      "Headline 1",
-      "Headline 2",
-      "Headline 3",
-      "Headline 4",
-      "Headline 5",
-      "Description 1",
-      "Description 2",
-      "Description 3",
-      "Description 4",
-      "Landscape Image Path",
-      "Square Image Path",
-      "Logo Path",
-    ].join(","),
+  // Cabeçalhos oficiais do Google Ads Editor (Inglês universal - auto-mapeado em qualquer idioma de interface)
+  const enHeaders = [
+    "Campaign",
+    "Campaign Status",
+    "Campaign Type",
+    "Budget",
+    "Budget type",
+    "Bid Strategy Type",
+    "Languages",
+    "Ad Group",
+    "Ad Group Status",
+    "Ad type",
+    "Status",
+    "Final URL",
+    "Business name",
+    "Headline 1",
+    "Headline 2",
+    "Headline 3",
+    "Headline 4",
+    "Headline 5",
+    "Long headline",
+    "Description 1",
+    "Description 2",
+    "Description 3",
+    "Description 4",
+    "Marketing image",
+    "Square marketing image",
+    "Logo",
   ];
+
+  // Cabeçalhos oficiais em Português aceitos pelo Google Ads Editor PT-BR
+  const ptHeaders = [
+    "Campanha",
+    "Status da campanha",
+    "Tipo de campanha",
+    "Orçamento",
+    "Tipo de orçamento",
+    "Tipo de estratégia de lances",
+    "Idiomas",
+    "Grupo de anúncios",
+    "Status do grupo de anúncios",
+    "Tipo de anúncio",
+    "Status",
+    "URL final",
+    "Nome da empresa",
+    "Título 1",
+    "Título 2",
+    "Título 3",
+    "Título 4",
+    "Título 5",
+    "Título longo",
+    "Descrição 1",
+    "Descrição 2",
+    "Descrição 3",
+    "Descrição 4",
+    "Imagem de marketing",
+    "Imagem de marketing quadrada",
+    "Logotipo",
+  ];
+
+  const csvRowsEn = [enHeaders.join(",")];
+  const csvRowsPt = [ptHeaders.join(",")];
 
   const csvEscape = (s) => `"${String(s).replace(/"/g, '""')}"`;
 
   for (const [locale, cfg] of Object.entries(GLOBAL_ADS_14)) {
-    const horizPath = path.join(OUT_DIR, locale, "banner-horizontal-1200x628.png");
-    const sqPath = path.join(OUT_DIR, locale, "banner-quadrado-1200x1200.png");
-    const logoPath = path.join(OUT_DIR, "logo-quadrado-512x512.png");
+    const flatHorizName = `banner-horizontal-${locale}-1200x628.png`;
+    const flatSqName = `banner-quadrado-${locale}-1200x1200.png`;
+    const logoName = `logo-quadrado-512x512.png`;
+    const langInfo = EDITOR_LANGUAGE_MAP[locale] || { en: "All", pt: "Todos" };
+    const longHeadline = cfg.descriptions90[0];
 
-    md += `## 🌐 Idioma: \`${locale}\`\n`;
+    md += `## 🌐 Idioma: \`${locale}\` (${langInfo.pt} / ${langInfo.en})\n`;
+    md += `- **Campanha:** \`Midiastore Global - ${locale}\` | **Status:** \`Paused\` | **Budget:** \`20.00\` BRL\n`;
     md += `- **URL Final (com rastreamento Google Ads):** \`${cfg.url}\`\n`;
-    md += `- **Banner Horizontal (1200x628):** \`${horizPath}\`\n`;
-    md += `- **Banner Quadrado (1200x1200):** \`${sqPath}\`\n\n`;
+    md += `- **Banner Horizontal (1200x628):** \`${path.join(OUT_DIR, flatHorizName)}\`\n`;
+    md += `- **Banner Quadrado (1200x1200):** \`${path.join(OUT_DIR, flatSqName)}\`\n\n`;
     md += `### Títulos (máx. 30 caracteres)\n`;
     cfg.headlines30.forEach((h, i) => {
       md += `${i + 1}. \`${h}\` *(${[...h].length} chars)*\n`;
@@ -436,24 +499,109 @@ function writeMarkdownAndCsv() {
     });
     md += `\n---\n\n`;
 
-    csvRows.push(
+    csvRowsEn.push(
       [
         csvEscape(`Midiastore Global - ${locale}`),
+        csvEscape("Paused"),
+        csvEscape("Display"),
+        csvEscape("20.00"),
+        csvEscape("Daily"),
+        csvEscape("Maximize clicks"),
+        csvEscape(langInfo.en),
         csvEscape(`Storage Cleaner - ${locale}`),
-        csvEscape(locale),
+        csvEscape("Enabled"),
+        csvEscape("Responsive display ad"),
+        csvEscape("Enabled"),
         csvEscape(cfg.url),
+        csvEscape("Midiastore"),
         ...cfg.headlines30.map(csvEscape),
+        csvEscape(longHeadline),
         ...cfg.descriptions90.map(csvEscape),
-        csvEscape(horizPath),
-        csvEscape(sqPath),
-        csvEscape(logoPath),
+        csvEscape(flatHorizName),
+        csvEscape(flatSqName),
+        csvEscape(logoName),
+      ].join(",")
+    );
+
+    csvRowsPt.push(
+      [
+        csvEscape(`Midiastore Global - ${locale}`),
+        csvEscape("Paused"),
+        csvEscape("Display"),
+        csvEscape("20.00"),
+        csvEscape("Daily"),
+        csvEscape("Maximize clicks"),
+        csvEscape(langInfo.pt),
+        csvEscape(`Storage Cleaner - ${locale}`),
+        csvEscape("Enabled"),
+        csvEscape("Responsive display ad"),
+        csvEscape("Enabled"),
+        csvEscape(cfg.url),
+        csvEscape("Midiastore"),
+        ...cfg.headlines30.map(csvEscape),
+        csvEscape(longHeadline),
+        ...cfg.descriptions90.map(csvEscape),
+        csvEscape(flatHorizName),
+        csvEscape(flatSqName),
+        csvEscape(logoName),
       ].join(",")
     );
   }
 
   fs.writeFileSync(path.join(OUT_DIR, "GOOGLE_ADS_14_IDIOMAS_COMPLETO.md"), md, "utf8");
-  fs.writeFileSync(path.join(OUT_DIR, "google-ads-import-14-idiomas.csv"), "\uFEFF" + csvRows.join("\r\n"), "utf8");
-  console.log("✅ Salvos GOOGLE_ADS_14_IDIOMAS_COMPLETO.md e google-ads-import-14-idiomas.csv");
+  fs.writeFileSync(path.join(OUT_DIR, "google-ads-import-14-idiomas.csv"), "\uFEFF" + csvRowsEn.join("\r\n"), "utf8");
+  fs.writeFileSync(path.join(OUT_DIR, "google-ads-import-14-idiomas-ptbr.csv"), "\uFEFF" + csvRowsPt.join("\r\n"), "utf8");
+  console.log("✅ Salvos GOOGLE_ADS_14_IDIOMAS_COMPLETO.md, google-ads-import-14-idiomas.csv e google-ads-import-14-idiomas-ptbr.csv");
+}
+
+function organizeBannersAndPackageZip() {
+  const loteDir = path.join(OUT_DIR, "lote-google-ads-editor");
+  fs.mkdirSync(loteDir, { recursive: true });
+
+  const csvContent = fs.readFileSync(path.join(OUT_DIR, "google-ads-import-14-idiomas.csv"));
+  fs.writeFileSync(path.join(loteDir, "data.csv"), csvContent);
+  fs.writeFileSync(path.join(loteDir, "google-ads-import-14-idiomas.csv"), csvContent);
+
+  const logoSrc = path.join(OUT_DIR, "logo-quadrado-512x512.png");
+  if (fs.existsSync(logoSrc)) {
+    fs.copyFileSync(logoSrc, path.join(loteDir, "logo-quadrado-512x512.png"));
+  }
+
+  let copiedBanners = 0;
+  for (const locale of Object.keys(GLOBAL_ADS_14)) {
+    const subHoriz = path.join(OUT_DIR, locale, "banner-horizontal-1200x628.png");
+    const subSq = path.join(OUT_DIR, locale, "banner-quadrado-1200x1200.png");
+    const flatHorizName = `banner-horizontal-${locale}-1200x628.png`;
+    const flatSqName = `banner-quadrado-${locale}-1200x1200.png`;
+
+    if (fs.existsSync(subHoriz)) {
+      fs.copyFileSync(subHoriz, path.join(OUT_DIR, flatHorizName));
+      fs.copyFileSync(subHoriz, path.join(loteDir, flatHorizName));
+      copiedBanners++;
+    }
+    if (fs.existsSync(subSq)) {
+      fs.copyFileSync(subSq, path.join(OUT_DIR, flatSqName));
+      fs.copyFileSync(subSq, path.join(loteDir, flatSqName));
+      copiedBanners++;
+    }
+  }
+
+  const zipPath = path.join(OUT_DIR, "google-ads-editor-lote-14-idiomas.zip");
+  if (fs.existsSync(zipPath)) {
+    fs.unlinkSync(zipPath);
+  }
+  execFileSync(
+    "powershell.exe",
+    [
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-Command",
+      `Compress-Archive -Path "${loteDir}\\*" -DestinationPath "${zipPath}" -Force`,
+    ],
+    { encoding: "utf8" }
+  );
+  console.log(`✅ Organizados ${copiedBanners} banners (1200x628 e 1200x1200) junto ao CSV e gerado pacote ZIP oficial: ${zipPath}`);
 }
 
 function renderAll28Banners() {
@@ -794,7 +942,17 @@ foreach ($item in $items) {
   }
 }
 
+const forceRender = process.argv.includes("--render");
+const allBannersExist = Object.keys(GLOBAL_ADS_14).every(
+  (loc) =>
+    fs.existsSync(path.join(OUT_DIR, loc, "banner-horizontal-1200x628.png")) &&
+    fs.existsSync(path.join(OUT_DIR, loc, "banner-quadrado-1200x1200.png"))
+);
+
 validateCopyLimits();
 writeMarkdownAndCsv();
-renderAll28Banners();
-console.log("🚀 FÁBRICA GLOBAL GOOGLE ADS (14 IDIOMAS / 28 BANNERS + CSV + MD) CONCLUÍDA!");
+if (forceRender || !allBannersExist) {
+  renderAll28Banners();
+}
+organizeBannersAndPackageZip();
+console.log("🚀 FÁBRICA GLOBAL GOOGLE ADS (14 IDIOMAS / 28 BANNERS + CSV + ZIP + MD) CONCLUÍDA!");
