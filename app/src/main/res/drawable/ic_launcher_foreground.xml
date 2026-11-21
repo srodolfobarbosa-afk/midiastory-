@@ -7,22 +7,27 @@
     <group
         android:pivotX="54"
         android:pivotY="54"
-        android:scaleX="0.72"
-        android:scaleY="0.72">
+        android:scaleX="0.76"
+        android:scaleY="0.76">
+        <!-- Dark graphite inner circle -->
+        <path
+            android:fillColor="#0D1526"
+            android:pathData="M54,14 A40,40 0 1,1 53.99,14 Z" />
+        <!-- Outer electric blue storage gauge ring -->
         <path
             android:fillColor="#0A84FF"
-            android:pathData="M40,13 L68,13 Q82,13 82,27 L82,81 Q82,95 68,95 L40,95 Q26,95 26,81 L26,27 Q26,13 40,13 Z" />
-        <path
-            android:fillColor="#111114"
-            android:pathData="M41,22 L67,22 Q73,22 73,28 L73,75 Q73,81 67,81 L41,81 Q35,81 35,75 L35,28 Q35,22 41,22 Z" />
+            android:pathData="M54,11 A43,43 0 1,1 14.5,71 L21.5,67.5 A35,35 0 1,0 54,19 Z" />
+        <!-- Cyan highlight arc at top-left -->
         <path
             android:fillColor="#38BDF8"
-            android:pathData="M42,68 L49,68 L49,73 L42,73 Z M52,60 L59,60 L59,73 L52,73 Z M62,51 L69,51 L69,73 L62,73 Z" />
+            android:pathData="M21.5,67.5 A35,35 0 0,1 54,19 L54,11 A43,43 0 0,0 14.5,71 Z" />
+        <!-- Bold geometric 'M' monogram in pure white -->
         <path
             android:fillColor="#FFFFFF"
-            android:pathData="M43,45 L49,51 L63,37 L68,42 L49,61 L38,50 Z" />
+            android:pathData="M32,68 L32,39 L41,39 L54,54.5 L67,39 L76,39 L76,68 L67.5,68 L67.5,51.5 L54,67 L40.5,51.5 L40.5,68 Z" />
+        <!-- Clean sparkle star top-right -->
         <path
-            android:fillColor="#60A5FA"
-            android:pathData="M79,16 L82,23 L89,26 L82,29 L79,36 L76,29 L69,26 L76,23 Z" />
+            android:fillColor="#30D158"
+            android:pathData="M82,15 L84.8,22.2 L92,25 L84.8,27.8 L82,35 L79.2,27.8 L72,25 L79.2,22.2 Z" />
     </group>
 </vector>

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Sincroniza as 14 fichas da Google Play Store (100% Limpador Puro OLED, <=30 chars título, <=80 chars shortDescription)
  * e envia os 56 phoneScreenshots (4 slides 1080x1920 x 14 idiomas) de docs/campaigns/store-screenshots/<lang>/
@@ -17,7 +17,7 @@ const packageName = "com.rdf112.midiastore";
 
 const STORE_LISTINGS_14 = {
   "pt-BR": {
-    title: "Midiastore: Limpar Memória",
+    title: "Midiastore",
     shortDescription: "Limpador leve (5,9 MB): duplicatas SHA-256, vídeos grandes e revisão segura.",
     fullDescription:
       "Celular avisando 'Armazenamento cheio'? O Midiastore é um limpador de armazenamento puro, leve (apenas 5,9 MB) e 100% privado no seu aparelho.\n\n" +
@@ -29,7 +29,7 @@ const STORE_LISTINGS_14 = {
       "• 100% On-Device (Scoped Storage): suas fotos, vídeos e áudios nunca saem do seu celular e nada é apagado sem sua permissão.",
   },
   "pt-PT": {
-    title: "Midiastore: Limpar Memória",
+    title: "Midiastore",
     shortDescription: "Limpeza leve (5,9 MB): duplicados SHA-256, vídeos grandes e revisão segura.",
     fullDescription:
       "Telemóvel com armazenamento cheio? O Midiastore é um limpador de armazenamento rápido (5,9 MB) e 100% privado no seu equipamento.\n\n" +
@@ -41,7 +41,7 @@ const STORE_LISTINGS_14 = {
       "• 100% Local (Scoped Storage): os seus ficheiros nunca são enviados para a nuvem.",
   },
   "en-US": {
-    title: "Midiastore: Storage Cleaner",
+    title: "Midiastore",
     shortDescription: "Fast 5.9 MB cleaner: exact SHA-256 duplicates & large videos. 100% on-device.",
     fullDescription:
       "Seeing 'Storage space running out'? Midiastore is a focused, ultra-lightweight (5.9 MB) Android storage cleaner built for speed, transparency, and privacy.\n\n" +
@@ -53,7 +53,7 @@ const STORE_LISTINGS_14 = {
       "• 100% On-Device Privacy: built on Android Scoped Storage — your media never leaves your device.",
   },
   "es-ES": {
-    title: "Midiastore: Limpiar Memoria",
+    title: "Midiastore",
     shortDescription: "Limpiador ligero (5,9 MB): duplicados SHA-256 y videos grandes. 100% local.",
     fullDescription:
       "¿Tu Android dice 'Almacenamiento lleno'? Midiastore es un limpiador de almacenamiento puro, ligero (5,9 MB) y 100% privado.\n\n" +
@@ -65,7 +65,7 @@ const STORE_LISTINGS_14 = {
       "• 100% En tu Dispositivo: tus fotos y videos nunca se suben a la nube.",
   },
   "fr-FR": {
-    title: "Midiastore: Nettoyeur Stockage",
+    title: "Midiastore",
     shortDescription: "Léger (5,9 Mo) : doublons SHA-256 et grosses vidéos. 100 % privé sur mobile.",
     fullDescription:
       "Stockage Android saturé ? Midiastore est un nettoyeur de stockage léger (5,9 Mo), rapide et 100 % local.\n\n" +
@@ -77,7 +77,7 @@ const STORE_LISTINGS_14 = {
       "• 100 % Hors Ligne : vos fichiers ne quittent jamais votre téléphone.",
   },
   "de-DE": {
-    title: "Midiastore: Speicher Reiniger",
+    title: "Midiastore",
     shortDescription: "Nur 5,9 MB: Exakte SHA-256 Duplikate & große Videos sicher prüfen. 100% lokal.",
     fullDescription:
       "Android-Speicher voll? Midiastore ist ein schlanker (5,9 MB), transparenter Speicherreiniger ohne Bloatware.\n\n" +
@@ -89,7 +89,7 @@ const STORE_LISTINGS_14 = {
       "• 100 % Lokal auf Ihrem Gerät: kein Cloud-Upload, kein automatisches Löschen.",
   },
   "hi-IN": {
-    title: "Midiastore: स्टोरेज क्लीनर",
+    title: "Midiastore",
     shortDescription: "5.9 MB हल्का क्लीनर: सटीक SHA-256 डुप्लीकेट और बड़े वीडियो सुरक्षित हटाएं।",
     fullDescription:
       "क्या आपका Android फ़ोन 'Storage Full' दिखा रहा है? Midiastore सिर्फ 5.9 MB का तेज़ और 100% प्राइवेट स्टोरेज क्लीनर है।\n\n" +
@@ -101,7 +101,7 @@ const STORE_LISTINGS_14 = {
       "• 100% ऑन-डिवाइस: आपकी फ़ोटो या वीडियो कभी क्लाउड पर अपलोड नहीं होते।",
   },
   "ja-JP": {
-    title: "Midiastore: ストレージ整理",
+    title: "Midiastore",
     shortDescription: "軽量5.9MBクリーナー：SHA-256重複検出と大容量動画を安全に整理。",
     fullDescription:
       "「空き容量が不足しています」と表示されたら。Midiastoreはわずか5.9MBの軽量・高プライバシーなAndroidストレージ整理アプリです。\n\n" +
@@ -113,7 +113,7 @@ const STORE_LISTINGS_14 = {
       "• 100%端末内処理：クラウドへのアップロードや自動削除は一切ありません。",
   },
   "zh-CN": {
-    title: "Midiastore：手机空间清理",
+    title: "Midiastore",
     shortDescription: "5.9MB轻量清理：SHA-256精准查重与大视频清理，100%本地隐私安全。",
     fullDescription:
       "手机提示“存储空间不足”？Midiastore 是一款仅 5.9 MB 的纯粹 Android 存储空间清理工具，100% 在本机运行。\n\n" +
@@ -125,7 +125,7 @@ const STORE_LISTINGS_14 = {
       "• 100% 本地处理（Scoped Storage）：绝不上传云端，绝不静默删除。",
   },
   "ar": {
-    title: "Midiastore: منظف المساحة",
+    title: "Midiastore",
     shortDescription: "منظف خفيف (5.9 MB): كشف التكرار SHA-256 والفيديوهات الكبيرة بأمان تام.",
     fullDescription:
       "هل تعاني من امتلاء ذاكرة الهاتف؟ Midiastore هو منظف تخزين أندرويد خفيف (5.9 ميجابايت فقط) ويعمل 100% محلياً على جهازك.\n\n" +
@@ -137,7 +137,7 @@ const STORE_LISTINGS_14 = {
       "• خصوصية 100% على الجهاز: لا يتم رفع أي صور أو ملفات إلى السحابة أبداً.",
   },
   "ru-RU": {
-    title: "Midiastore: Очистка Памяти",
+    title: "Midiastore",
     shortDescription: "Легкий клинер (5,9 МБ): точные дубликаты SHA-256 и большие видео. Локально.",
     fullDescription:
       "Не хватает памяти на Android? Midiastore — это легкий (всего 5,9 МБ) и прозрачный очиститель хранилища, работающий 100% локально.\n\n" +
@@ -149,7 +149,7 @@ const STORE_LISTINGS_14 = {
       "• 100% на устройстве (Scoped Storage): без отправки файлов в облако и без автоудаления.",
   },
   "id": {
-    title: "Midiastore: Pembersih Memori",
+    title: "Midiastore",
     shortDescription: "Pembersih ringan 5,9 MB: duplikat SHA-256 akurat & video besar. 100% lokal.",
     fullDescription:
       "Memori Android penuh? Midiastore adalah pembersih penyimpanan yang ringan (hanya 5,9 MB), cepat, dan 100% privat di perangkat Anda.\n\n" +
@@ -161,7 +161,7 @@ const STORE_LISTINGS_14 = {
       "• 100% Di Perangkat: foto dan video Anda tidak pernah diunggah ke cloud.",
   },
   "bn-BD": {
-    title: "Midiastore: স্টোরেজ ক্লিনার",
+    title: "Midiastore",
     shortDescription: "5.9 MB হালকা ক্লিনার: সঠিক SHA-256 ডুপ্লিকেট ও বড় ভিডিও নিরাপদে পরিষ্কার।",
     fullDescription:
       "ফোনের স্টোরেজ কি ফুল দেখাচ্ছে? Midiastore মাত্র 5.9 MB আকারের দ্রুত এবং 100% প্রাইভেট Android স্টোরেজ ক্লিনার।\n\n" +
@@ -173,7 +173,7 @@ const STORE_LISTINGS_14 = {
       "• 100% অন-ডিভাইস: আপনার ছবি বা ভিডিও কখনোই ক্লাউডে আপলোড হয় না।",
   },
   "ko-KR": {
-    title: "Midiastore: 저장공간 정리 및 중복 파일",
+    title: "Midiastore",
     shortDescription: "5.9MB 초경량 클리너: 정확한 SHA-256 중복 파일 및 대용량 동영상 안전 정리.",
     fullDescription:
       "저장공간 부족 알림이 뜨나요? Midiastore는 5.9MB 초경량으로 기기 내부에서 100% 안전하게 작동하는 Android 저장공간 정리 앱입니다.\n\n" +
@@ -255,6 +255,28 @@ async function main() {
       console.warn(`Aviso listing ${lang}: HTTP ${listRes.status} ${await listRes.text()}`);
     }
 
+    // 1b. Update 512x512 app icon if docs/icon-512.png exists
+    const iconPath = path.join(projectRoot, "docs", "icon-512.png");
+    if (fs.existsSync(iconPath)) {
+      await fetch(
+        `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/listings/${lang}/icon`,
+        { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
+      );
+      await fetch(
+        `https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/${packageName}/edits/${edit.id}/listings/${lang}/icon?uploadType=media`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "image/png" },
+          body: fs.readFileSync(iconPath),
+        }
+      );
+    }
+
+    if (process.argv.includes("--skip-screenshots")) {
+      console.log(`${lang}: title='${listing.title}' + icon 512x512 atualizados`);
+      continue;
+    }
+
     // 2. Upload 4 phoneScreenshots (1080x1920)
     const dir = path.join(projectRoot, "docs", "campaigns", "store-screenshots", lang);
     if (!fs.existsSync(dir)) {
@@ -310,3 +332,4 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
