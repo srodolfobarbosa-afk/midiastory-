@@ -55,6 +55,7 @@ if (-not $createdNew) {
 }
 
 $queueDir = Join-Path $env:TEMP "antigravity-voice-queue"
+$lastSpokenWav = Join-Path $env:TEMP "antigravity-last-spoken.wav"
 $heartbeatPath = Join-Path $env:TEMP "antigravity-companion-heartbeat.txt"
 $configPath = Join-Path $env:TEMP "midiastory-voice-config.json"
 New-Item -ItemType Directory -Force -Path $queueDir | Out-Null
@@ -140,12 +141,16 @@ $xaml = @"
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
           </Grid.ColumnDefinitions>
-          <Button x:Name="BtnMic" Grid.Column="0" Content="🎤 Falar" Height="34" Margin="0,0,6,0"
+          <Button x:Name="BtnMic" Grid.Column="0" Content="🎤 Falar" Height="34" Margin="0,0,5,0"
                   Background="#0A84FF" Foreground="#FFFFFF" BorderThickness="0"
                   FontFamily="Segoe UI" FontSize="12.5" FontWeight="SemiBold" Cursor="Hand"
                   ToolTip="Clique para falar; clique novamente para enviar no chat"/>
-          <Button x:Name="BtnMute" Grid.Column="1" Content="🔊" Width="38" Height="34"
+          <Button x:Name="BtnReplay" Grid.Column="1" Content="🔁" Width="34" Height="34" Margin="0,0,5,0"
+                  Background="#1C1C1E" Foreground="#64D2FF" BorderThickness="0"
+                  FontSize="14" Cursor="Hand" ToolTip="Repetir a última fala da IA (custo zero)"/>
+          <Button x:Name="BtnMute" Grid.Column="2" Content="🔊" Width="34" Height="34"
                   Background="#1C1C1E" Foreground="#F2F2F7" BorderThickness="0"
                   FontSize="14" Cursor="Hand" ToolTip="Ligar/Desligar voz da IA"/>
         </Grid>
@@ -176,6 +181,7 @@ $btnMin = $window.FindName("BtnMin")
 $btnMax = $window.FindName("BtnMax")
 $btnClose = $window.FindName("BtnClose")
 $btnMic = $window.FindName("BtnMic")
+$btnReplay = $window.FindName("BtnReplay")
 $btnMute = $window.FindName("BtnMute")
 $btnMoto = $window.FindName("BtnMoto")
 $btnBoard = $window.FindName("BtnBoard")
@@ -299,10 +305,28 @@ function Stop-Playback {
     }
   } catch {}
   $script:playProc = $null
-  if ($script:currentWav -and (Test-Path -LiteralPath $script:currentWav)) {
+  if ($script:currentWav -and ($script:currentWav -ne $lastSpokenWav) -and (Test-Path -LiteralPath $script:currentWav)) {
     try { Remove-Item -LiteralPath $script:currentWav -Force -ErrorAction SilentlyContinue } catch {}
   }
   $script:currentWav = $null
+}
+
+function Start-WavPlayback([string]$wavFile, [bool]$saveAsLast = $true) {
+  if (-not (Test-Path -LiteralPath $wavFile) -or -not (Test-Path -LiteralPath $FfplayPath)) { return }
+  Stop-Playback
+  if ($saveAsLast -and ($wavFile -ne $lastSpokenWav)) {
+    try { Copy-Item -LiteralPath $wavFile -Destination $lastSpokenWav -Force -ErrorAction SilentlyContinue } catch {}
+  }
+  $script:currentWav = $wavFile
+  $script:lipSyncFrames = Get-WavLipSyncEnvelope $wavFile 70
+  $psi = New-Object System.Diagnostics.ProcessStartInfo
+  $psi.FileName = $FfplayPath
+  $psi.Arguments = "-nodisp -autoexit -loglevel quiet `"$wavFile`""
+  $psi.UseShellExecute = $false
+  $psi.CreateNoWindow = $true
+  $script:playProc = [System.Diagnostics.Process]::Start($psi)
+  $script:playWatch.Restart()
+  $statusText.Text = "Falando..."
 }
 
 function Apply-ViewMode([string]$mode) {
@@ -370,6 +394,14 @@ $btnClose.Add_Click({
   try { if (Test-Path -LiteralPath $heartbeatPath) { Remove-Item -LiteralPath $heartbeatPath -Force -ErrorAction SilentlyContinue } } catch {}
   $window.Close()
 })
+$btnReplay.Add_Click({
+  if (Test-Path -LiteralPath $lastSpokenWav) {
+    Start-WavPlayback $lastSpokenWav $false
+  } else {
+    $statusText.Text = "Sem áudio salvo"
+  }
+})
+
 $btnMute.Add_Click({
   if ($script:voiceEnabled) {
     Stop-Playback
@@ -606,16 +638,7 @@ $timer.Add_Tick({
       Sort-Object CreationTime | Select-Object -First 1
     if ($nextFile) {
       if ($script:voiceEnabled -and (Test-Path -LiteralPath $FfplayPath)) {
-        $script:currentWav = $nextFile.FullName
-        $script:lipSyncFrames = Get-WavLipSyncEnvelope $script:currentWav 70
-        $psi = New-Object System.Diagnostics.ProcessStartInfo
-        $psi.FileName = $FfplayPath
-        $psi.Arguments = "-nodisp -autoexit -loglevel quiet `"$($script:currentWav)`""
-        $psi.UseShellExecute = $false
-        $psi.CreateNoWindow = $true
-        $script:playProc = [System.Diagnostics.Process]::Start($psi)
-        $script:playWatch.Restart()
-        $statusText.Text = "Falando..."
+        Start-WavPlayback $nextFile.FullName $true
       } else {
         try { Remove-Item -LiteralPath $nextFile.FullName -Force -ErrorAction SilentlyContinue } catch {}
       }

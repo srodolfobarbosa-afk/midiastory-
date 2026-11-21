@@ -146,63 +146,92 @@ function pcmToWav(pcmBuffer, sampleRate = 24000, numChannels = 1, bitsPerSample 
   return Buffer.concat([header, pcmBuffer]);
 }
 
+function synthesizeLocalWindowsWav(text) {
+  const outWav = path.join(os.tmpdir(), `antigravity-local-tts-${Date.now()}.wav`);
+  const txtFile = path.join(os.tmpdir(), `antigravity-local-tts-${Date.now()}.txt`);
+  fs.writeFileSync(txtFile, text, "utf8");
+  const psScript = `
+    Add-Type -AssemblyName System.Speech;
+    $s = New-Object System.Speech.Synthesis.SpeechSynthesizer;
+    $v = $s.GetInstalledVoices() | Where-Object { $_.Enabled -and $_.VoiceInfo.Culture.Name -like 'pt*' } | Select-Object -First 1;
+    if ($v) { $s.SelectVoice($v.VoiceInfo.Name) };
+    $s.Rate = 1;
+    $s.SetOutputToWaveFile('${outWav.replace(/'/g, "''")}');
+    $txt = Get-Content -LiteralPath '${txtFile.replace(/'/g, "''")}' -Raw -Encoding UTF8;
+    $s.Speak($txt);
+    $s.Dispose();
+  `;
+  const r = spawnSync("powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", psScript], {
+    stdio: "ignore",
+    windowsHide: true,
+    timeout: 20000,
+  });
+  try { fs.unlinkSync(txtFile); } catch {}
+  if (r.status === 0 && fs.existsSync(outWav)) {
+    const buf = fs.readFileSync(outWav);
+    try { fs.unlinkSync(outWav); } catch {}
+    return { buffer: buf, model: "windows-local-ptbr-fallback" };
+  }
+  throw new Error("Falha no fallback local Windows TTS.");
+}
+
 async function synthesizeWav(text, voiceName) {
   const key = loadGoogleApiKey();
-  if (!key) throw new Error("Chave GOOGLE_AI_STUDIO_API_KEY não encontrada.");
-
   const prompt = `Leia em português do Brasil de forma natural, calorosa, clara e objetiva (sem ler pontuação ou símbolos):\n\n${text}`;
   let lastError = null;
 
-  for (const model of TTS_MODELS) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: AbortSignal.timeout(18000),
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              responseModalities: ["AUDIO"],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: { voiceName },
+  if (key) {
+    for (const model of TTS_MODELS) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: AbortSignal.timeout(18000),
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: {
+                  voiceConfig: {
+                    prebuiltVoiceConfig: { voiceName },
+                  },
                 },
               },
-            },
-          }),
+            }),
+          }
+        );
+
+        if (!res.ok) {
+          const errBody = await res.text();
+          lastError = new Error(`${model} HTTP ${res.status}: ${errBody.slice(0, 180)}`);
+          continue;
         }
-      );
 
-      if (!res.ok) {
-        const errBody = await res.text();
-        lastError = new Error(`${model} HTTP ${res.status}: ${errBody.slice(0, 180)}`);
-        continue;
-      }
+        const data = await res.json();
+        const inline = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+        if (!inline?.data) {
+          lastError = new Error(`${model}: resposta sem áudio`);
+          continue;
+        }
 
-      const data = await res.json();
-      const inline = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-      if (!inline?.data) {
-        lastError = new Error(`${model}: resposta sem áudio`);
-        continue;
+        const audioBuf = Buffer.from(inline.data, "base64");
+        const mime = String(inline.mimeType || "").toLowerCase();
+        if (mime.includes("wav")) {
+          return { buffer: audioBuf, model };
+        }
+        const rateMatch = mime.match(/rate=(\d+)/);
+        const rate = rateMatch ? Number(rateMatch[1]) : 24000;
+        return { buffer: pcmToWav(audioBuf, rate), model };
+      } catch (err) {
+        lastError = err;
       }
-
-      const audioBuf = Buffer.from(inline.data, "base64");
-      const mime = String(inline.mimeType || "").toLowerCase();
-      if (mime.includes("wav")) {
-        return { buffer: audioBuf, model };
-      }
-      // Fallback: raw PCM L16 -> wrap in WAV header
-      const rateMatch = mime.match(/rate=(\d+)/);
-      const rate = rateMatch ? Number(rateMatch[1]) : 24000;
-      return { buffer: pcmToWav(audioBuf, rate), model };
-    } catch (err) {
-      lastError = err;
     }
   }
 
-  throw lastError || new Error("Falha em todos os modelos TTS.");
+  // Automatic unlimited zero-cost local Windows PT-BR fallback when cloud TTS quota hits 429
+  return synthesizeLocalWindowsWav(text);
 }
 
 async function speakText(rawText, opts = {}) {
