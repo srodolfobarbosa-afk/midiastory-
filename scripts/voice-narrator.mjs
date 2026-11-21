@@ -30,6 +30,7 @@ const PID_PATH = path.join(os.tmpdir(), "midiastory-voice-overlay.pid");
 const LAST_SPOKEN_PATH = path.join(os.tmpdir(), "midiastory-voice-last-step.json");
 const COMPANION_HEARTBEAT = path.join(os.tmpdir(), "antigravity-companion-heartbeat.txt");
 const COMPANION_QUEUE_DIR = path.join(os.tmpdir(), "antigravity-voice-queue");
+const TTS_COOLDOWN_FILE = path.join(os.tmpdir(), "antigravity-tts-429-until.txt");
 
 function isCompanionAlive() {
   try {
@@ -210,8 +211,18 @@ async function synthesizeWav(text, voiceName) {
   const key = loadGoogleApiKey();
   const prompt = `Leia em português do Brasil de forma natural, calorosa, clara e objetiva (sem ler pontuação ou símbolos):\n\n${text}`;
   let lastError = null;
+  let hitRateLimit = false;
 
-  if (key) {
+  // Circuit-breaker: if Google TTS recently hit 429, jump straight to fast unlimited Francisca Neural (0ms wasted!)
+  let inCooldown = false;
+  try {
+    if (fs.existsSync(TTS_COOLDOWN_FILE)) {
+      const until = Number(fs.readFileSync(TTS_COOLDOWN_FILE, "utf8").trim());
+      if (until > Date.now()) inCooldown = true;
+    }
+  } catch {}
+
+  if (key && !inCooldown) {
     for (const model of TTS_MODELS) {
       try {
         const res = await fetch(
@@ -219,7 +230,7 @@ async function synthesizeWav(text, voiceName) {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            signal: AbortSignal.timeout(18000),
+            signal: AbortSignal.timeout(15000),
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
@@ -235,6 +246,7 @@ async function synthesizeWav(text, voiceName) {
         );
 
         if (!res.ok) {
+          if (res.status === 429) hitRateLimit = true;
           const errBody = await res.text();
           lastError = new Error(`${model} HTTP ${res.status}: ${errBody.slice(0, 180)}`);
           continue;
@@ -258,6 +270,10 @@ async function synthesizeWav(text, voiceName) {
       } catch (err) {
         lastError = err;
       }
+    }
+    if (hitRateLimit) {
+      // 30-minute fast-path cooldown so we never waste 4s retrying 429s
+      try { fs.writeFileSync(TTS_COOLDOWN_FILE, String(Date.now() + 30 * 60 * 1000), "utf8"); } catch {}
     }
   }
 

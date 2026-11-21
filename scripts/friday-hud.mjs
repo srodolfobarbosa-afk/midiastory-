@@ -21,6 +21,7 @@ import path from "node:path";
 import { execSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { getSupabaseToken, SUPABASE_PROJECT_REF } from "./lib/supabase-auth.mjs";
+import { getActiveSessionMetrics } from "./friday-quota-guard.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "..");
@@ -101,6 +102,7 @@ async function main() {
   const supa = await getSupabaseLive();
   const gitBranch = safeExec("git rev-parse --abbrev-ref HEAD", 3000) || "desconhecido";
   const gitHead = safeExec("git log -1 --oneline", 3000) || "";
+  const session = getActiveSessionMetrics();
 
   const body = [
     "## 🚀 Telemetria Ao Vivo do Ecossistema Midiastore",
@@ -109,6 +111,11 @@ async function main() {
     `- **Supabase Ao Vivo:** ${supa.testers} registros em beta_testers | ${supa.purchases} compras verificadas em play_purchases`,
     `- **Hardware Motorola USB:** ${moto}`,
     `- **Saúde do PC Local:** ${pc.freeGb} GB livres de ${pc.totalGb} GB (${pc.freePct}% livre)`,
+    "",
+    "## 🧠 Guardião de Cota & Sessão Antigravity (Tempo Real)",
+    `- **Peso da Conversa Atual:** ${session.userTurns ?? 0} falas suas | ${session.sizeKb ?? 0} KB (~${session.estTokens ?? 0} tokens no log)`,
+    `- **Semáforo de Cota:** ${session.level || "N/D"}`,
+    `- **Motor de Voz Ativo:** ${session.ttsMode || "Francisca Neural"}`,
     "",
     "## 🎯 Meta Suprema: R$ 1.000.000,00 na Google Play",
     "- **Regra 50/50:** 50% Lucro/Retirada + 50% Reinvestimento em Tráfego, IA e Escala.",
