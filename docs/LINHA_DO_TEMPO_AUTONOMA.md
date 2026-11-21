@@ -3030,3 +3030,43 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #458
 
 ---
+
+### 📍 [21/11/2026, 02:23:31] Upgrade Completo do Site/Funil nos 13 Idiomas para Trafego Pago (Google Ads / Meta Ads / TikTok Ads) + SEO Top 1 Google + IndexNow 139 URLs
+- **📖 Estudou / Leu:** docs/index.html, docs/*/index.html (13 idiomas), docs/telemetry.js, docs/llms.txt, docs/sitemap.xml e politicas de destino Google Ads
+- **⚙️ Tentou / Executou:** Atualizar as 13 paginas para Preto OLED v2.7.6 (100% Limpador Puro sem jogos/estudio), adicionar captura automatica gclid/fbclid/ttclid + Play Store Install Referrer em telemetry.js, inserir comparativo visual + planos com ancoragem diaria + FAQ Schema.org, publicar no Firebase Hosting e submeter 139 URLs no IndexNow
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Removidas todas as mencoes antigas a jogos/estudio nas 13 linguas (evitando reprovacao por Destination Mismatch no Google Ads) e ativado repasse automatico de referrer para a Google Play Store
+- **🎯 Conclusão:** Firebase Hosting Release 1795238531364000 publicada com HTTP 200 (Version 6c9fd6d0b62b113c) e IndexNow HTTP 200 para todas as 139 URLs.
+- *Registro Supabase:* Memory #460
+
+---
+
+### 📍 [21/11/2026, 03:27:43] Fabrica Global Google Ads 14 Idiomas + Banners Comerciais Psicologia de Vendas
+- **📖 Estudou / Leu:** Limites de caracteres Google Ads (30/90), zonas seguras anti-corte 1200x628 e 1200x1200, psicologia de vendas (Celular Cheio / WhatsApp Lotado) nos 14 idiomas do app
+- **⚙️ Tentou / Executou:** Gerar 28 banners comerciais 1200x628 e 1200x1200 nos 14 idiomas, CSV de importacao em massa Google Ads Editor, guia de copy e videos MP4 promocionais
+- **⚠️ Erros Encontrados:** Corte na preview do Google Ads com margens curtas e CornerRadius(999) em WPF
+- **🔧 Como Corrigiu:** Aumentada safe-zone, coluna esquerda 1.55*, FontSize 40-42 com TextWrapping=Wrap e CornerRadius(12-14) para pilulas perfeitas
+- **🎯 Conclusão:** 28 banners comerciais nos 14 idiomas, CSV Google Ads Editor e videos MP4 prontos em C:\Users\rodolfo\Downloads\google-ads-midiastore
+- *Registro Supabase:* Memory #461
+
+---
+
+### 📍 [21/11/2026, 04:28:41] Validacao Google Ads Editor CSV/ZIP 14 Idiomas + Script Google Ads REST API OAuth midiastory-df6a0
+- **📖 Estudou / Leu:** Padrao oficial de cabecalhos do Google Ads Editor (26 colunas EN/PT, Campaign Status=Paused, Budget=20.00 BRL), empacotamento ZIP com data.csv + 28 banners + logo e autenticacao OAuth/Google Cloud midiastory-df6a0
+- **⚙️ Tentou / Executou:** Atualizar generate-global-google-ads-factory.mjs, organizar 28 banners na raiz e no ZIP junto ao CSV e criar scripts/google-ads-api-upload.mjs
+- **⚠️ Erros Encontrados:** Headline bn-BD tinha 31 code points devido a nukta combinante
+- **🔧 Como Corrigiu:** Ajustado headline bn-BD para 26 chars em Bengali puro e validados todos os 14 payloads REST com --dry-run (0 erros)
+- **🎯 Conclusão:** Pacote Google Ads Editor (CSV EN/PT + 28 banners + ZIP) e script scripts/google-ads-api-upload.mjs prontos e validados
+- *Registro Supabase:* Memory #Local
+
+---
+
+### 📍 [21/11/2026, 06:27:57] Ativacao de APIs no Google Cloud Project midiastory-df6a0 (Google Ads, YouTube, Search Console, Drive, Sheets, Gmail)
+- **📖 Estudou / Leu:** Estado das APIs ativadas no Google Cloud Console (projeto midiastory-df6a0) e conta de servico em .secrets/play-service-account.json
+- **⚙️ Tentou / Executou:** Extrair client_email de .secrets/play-service-account.json e registrar na memoria cognitiva as APIs ativadas sem criar integracoes extras agora
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Registrado inventario de APIs ativas em midiastory-df6a0 para uso futuro conforme demanda
+- **🎯 Conclusão:** APIs googleads.googleapis.com, youtube.googleapis.com, searchconsole.googleapis.com, drive.googleapis.com, sheets.googleapis.com, gmail.googleapis.com, people.googleapis.com, gmailpostmastertools.googleapis.com, admin.googleapis.com e licensing.googleapis.com ativas em midiastory-df6a0
+- *Registro Supabase:* Memory #464
+
+---
