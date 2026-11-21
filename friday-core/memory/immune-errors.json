@@ -1,0 +1,41 @@
+{
+  "updatedAt": "2026-11-21T23:54:23.898Z",
+  "items": [
+    {
+      "id": "ERR-001",
+      "signature": "MANAGE_EXTERNAL_STORAGE",
+      "cause": "Permissão proibida pela política da Google Play para apps de limpeza comum.",
+      "fix": "Usar exclusivamente MediaStore Scoped Storage + MediaStore.createDeleteRequest (API 30+) e RecoverableSecurityException (API 29)."
+    },
+    {
+      "id": "ERR-002",
+      "signature": "npm.ps1 cannot be loaded",
+      "cause": "Windows PowerShell 5.1 ExecutionPolicy bloqueia scripts .ps1 do npm.",
+      "fix": "Sempre executar npm.cmd em vez de npm no PowerShell 5.1, e usar ';' em vez de '&&'."
+    },
+    {
+      "id": "ERR-003",
+      "signature": "dp(52)",
+      "cause": "Altura fixa dp(52) em botão de 2 linhas corta o texto no Moto G84.",
+      "fix": "Usar minHeight/wrapContent com padding vertical adequado para textos multilíngues."
+    },
+    {
+      "id": "ERR-004",
+      "signature": "package=.*AndroidManifest",
+      "cause": "AGP 8+ proíbe atributo package= no AndroidManifest.xml.",
+      "fix": "Definir namespace exclusivamente no app/build.gradle.kts."
+    },
+    {
+      "id": "ERR-005",
+      "signature": "429.*generateContent.*tts",
+      "cause": "Cota diária do Google AI Studio TTS atingida.",
+      "fix": "Ativar cooldown de 30 min e migrar automaticamente para Tier 2 Microsoft Edge Neural (pt-BR-FranciscaNeural) ilimitado."
+    },
+    {
+      "id": "ERR-006",
+      "signature": "deepseek-r1:free",
+      "cause": "Modelo removido no OpenRouter (HTTP 404).",
+      "fix": "Usar rotas :free validadas: openrouter/free, nvidia/nemotron-3.5-lightning:free, google/gemma-4-31b-it:free."
+    }
+  ]
+}

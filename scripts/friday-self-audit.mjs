@@ -119,6 +119,8 @@ function main() {
     "friday-core/visual-qa.mjs",
     "friday-core/money-lab.mjs",
     "friday-core/night-factory.mjs",
+    "friday-core/immune-memory.mjs",
+    "friday-core/specialists-factory.mjs",
   ];
 
   const syntaxResults = coreScripts.map(checkNodeSyntax);

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-21T23:50:35.787Z",
+  "updatedAt": "2026-11-21T23:54:24.580Z",
   "skills": [
     {
       "id": "triage",
@@ -121,6 +121,32 @@
         "pr"
       ],
       "verified": true
+    },
+    {
+      "id": "immune",
+      "name": "Memória de Erros Imunes (Anti-Regressão)",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/immune-memory.mjs",
+      "tags": [
+        "erro",
+        "vacina",
+        "anti-regressao"
+      ],
+      "verified": true,
+      "addedAt": "2026-11-21T23:54:24.346Z"
+    },
+    {
+      "id": "team",
+      "name": "Time Fixo de 4 Especialistas Permanentes",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/specialists-factory.mjs",
+      "tags": [
+        "subagentes",
+        "time",
+        "especialistas"
+      ],
+      "verified": true,
+      "addedAt": "2026-11-21T23:54:24.580Z"
     }
   ]
 }
