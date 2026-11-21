@@ -51,7 +51,7 @@ const TTS_MODELS = [
 const DEFAULT_CONFIG = {
   enabled: true,
   voiceName: "Kore", // Natural female voice
-  maxChars: 750,
+  maxChars: 3500,
   showAvatar: true,
 };
 
