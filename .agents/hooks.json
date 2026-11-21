@@ -17,6 +17,11 @@
     "Stop": [
       {
         "type": "command",
+        "command": "node ../scripts/voice-narrator.mjs --hook-stop",
+        "timeout": 120
+      },
+      {
+        "type": "command",
         "command": "node ../scripts/hooks/cognitive-hook.mjs Stop",
         "timeout": 35
       }
