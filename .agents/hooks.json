@@ -10,6 +10,11 @@
     "PreInvocation": [
       {
         "type": "command",
+        "command": "node ../scripts/friday-triage-engine.mjs --hook-pre",
+        "timeout": 5
+      },
+      {
+        "type": "command",
         "command": "node ../scripts/hooks/cognitive-hook.mjs PreInvocation",
         "timeout": 10
       }

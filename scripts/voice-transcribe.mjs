@@ -59,7 +59,7 @@ async function main() {
     try {
       const generationConfig = {
         temperature: 0.0,
-        maxOutputTokens: 256,
+        maxOutputTokens: 512,
         ...(model.thinkingZero ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
       };
 
@@ -74,7 +74,7 @@ async function main() {
               {
                 parts: [
                   {
-                    text: "Transcreva exatamente a fala em português do Brasil. Retorne SOMENTE o texto falado, sem aspas nem comentários. Ignore ruído de fundo/ventilador. Se não houver voz humana clara, retorne exatamente: [SEM_FALA]",
+                    text: "Transcreva exatamente a fala em português do Brasil. Retorne SOMENTE o texto falado, sem aspas nem comentários. Ignore ruído de fundo/ventilador. Glossário técnico do falante (use a grafia correta quando soar parecido): Midiastore (nunca MIDStory), Supabase (nunca super base), AGI (nunca GI), 100% (quando disser cem por cento, nunca 10%), Gemini 4, HUD (nunca UG), Antigravity, Play Console, Kotlin, ADB, MCP, subagentes. Se não houver voz humana clara, retorne exatamente: [SEM_FALA]",
                   },
                   {
                     inlineData: { mimeType, data: b64 },
