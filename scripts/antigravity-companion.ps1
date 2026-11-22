@@ -191,7 +191,7 @@ $xaml = @"
           <Button x:Name="BtnMoto" Content="📱Moto" Margin="0,0,2,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Espelhar tela do Motorola USB no PC"/>
           <Button x:Name="BtnBoard" Content="📊HUD" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#30D158" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Atualizar e abrir Quadro FRIDAY Mission HUD ao vivo"/>
           <Button x:Name="BtnScreen" Content="👁️Tela" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#64D2FF" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Capturar sua tela agora para a IA enxergar e te orientar"/>
-          <Button x:Name="BtnWeb" Content="✨Gesto" Margin="2,0,0,0" Background="#1C1C1E" Foreground="#FF375F" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Acionar roteiro humano: Sorriso -> Tchau -> Beijo -> Piscada"/>
+          <Button x:Name="BtnWeb" Content="🌐Web" Margin="2,0,0,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Abrir site oficial Midiastore"/>
         </UniformGrid>
       </StackPanel>
     </Grid>
@@ -255,7 +255,43 @@ $script:brushListenTilt = Load-AvatarBrush (Join-Path $avatarDir "avatar-listen-
 $script:brushWave = Load-AvatarBrush (Join-Path $avatarDir "avatar-wave.png") $script:brushGestureExplain
 $script:brushKiss = Load-AvatarBrush (Join-Path $avatarDir "avatar-kiss.png") $script:brushIdle
 $script:brushSmile = Load-AvatarBrush (Join-Path $avatarDir "avatar-smile.png") $script:brushIdle
+
+# Real MP4 Video Engine inside the circular avatar (WPF MediaPlayer + VideoDrawing + DrawingBrush)
+$script:idleMp4Path = Join-Path $avatarDir "avatar-idle.mp4"
+$script:talkMp4Path = Join-Path $avatarDir "avatar-talk.mp4"
+$script:videoMode = $null # "idle" | "talk" | $null
+$script:mediaPlayer = New-Object System.Windows.Media.MediaPlayer
+$script:mediaPlayer.IsMuted = $true
+$script:mediaPlayer.add_MediaEnded({
+  try {
+    $script:mediaPlayer.Position = [TimeSpan]::Zero
+    $script:mediaPlayer.Play()
+  } catch {}
+})
+$script:videoDrawing = New-Object System.Windows.Media.VideoDrawing
+$script:videoDrawing.Rect = New-Object System.Windows.Rect(0, 0, 512, 512)
+$script:videoDrawing.Player = $script:mediaPlayer
+$script:videoBrush = New-Object System.Windows.Media.DrawingBrush($script:videoDrawing)
+$script:videoBrush.Stretch = [System.Windows.Media.Stretch]::UniformToFill
+
+function Switch-AvatarVideo([string]$mode) {
+  if ($script:videoMode -eq $mode) { return }
+  $targetMp4 = if ($mode -eq "talk") { $script:talkMp4Path } else { $script:idleMp4Path }
+  if (Test-Path -LiteralPath $targetMp4) {
+    try {
+      $script:videoMode = $mode
+      $script:mediaPlayer.Open((New-Object System.Uri($targetMp4)))
+      $script:mediaPlayer.Play()
+      $avatarOverlayEllipse.Opacity = 0.0
+      $avatarEllipse.Fill = $script:videoBrush
+      return
+    } catch {}
+  }
+  $script:videoMode = $null
+}
+
 $avatarEllipse.Fill = $script:brushIdle
+Switch-AvatarVideo "idle"
 $script:activeBrush = $script:brushIdle
 $script:targetBrush = $script:brushIdle
 $script:blendAlpha = 1.0
@@ -543,10 +579,10 @@ $btnScreen.Add_Click({
   }
 })
 
-# Quick Tool 4: Trigger Live Human Gesture Routine (Smile -> Wave -> Blink -> Kiss -> Smile)
+# Quick Tool 4: Open Midiastore Official Web Funnel
 $btnWeb.Add_Click({
-  $script:gestureShowStartMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-  $statusText.Text = "👋 Acenando & mandando beijo..."
+  $statusText.Text = "Abrindo navegador..."
+  try { Start-Process "https://midiastory-df6a0.web.app/" } catch {}
 })
 
 $debugLogPath = Join-Path $env:TEMP "antigravity-companion-debug.log"
@@ -748,56 +784,25 @@ $timer.Add_Tick({
     $avatarScale.ScaleY = $avatarScale.ScaleX
     $avatarTranslate.Y = -2.0 * [Math]::Sin($tSec * 2.3)
 
-    # Dynamic speaking choreography: mix wave, explain gesture, smile and lip-sync frames with smooth crossfade
-    $phase = $elapsedMs % 7500
-    if ($phase -lt 900 -and $elapsedMs -lt 1200) {
-      Set-AvatarPoseSmooth $script:brushWave 0.35
-      $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(3.4)
-    } elseif ($phase -gt 2400 -and $phase -lt 3800 -and $amp -ge 0.22) {
-      Set-AvatarPoseSmooth $script:brushGestureExplain 0.35
-      $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(3.6)
-    } elseif ($amp -ge 0.34) {
-      Set-AvatarPoseSmooth $script:brushTalkOpen 0.50
-      $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(3.5)
-    } elseif ($amp -ge 0.13) {
-      Set-AvatarPoseSmooth $script:brushTalkMid 0.50
-      $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.7)
-    } else {
-      $pausePose = if ($isBlinking) { $script:brushBlink } elseif (($phase % 2500) -lt 700) { $script:brushSmile } else { $script:brushIdle }
-      Set-AvatarPoseSmooth $pausePose 0.35
-      $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
+    # Use real MP4 talking video loop inside the circle when available, with lip-sync border pulse
+    Switch-AvatarVideo "talk"
+    $borderW = 2.2 + [Math]::Min(1.8, $amp * 3.2)
+    $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
+    if (-not $script:videoMode) {
+      if ($amp -ge 0.34) { Set-AvatarPoseSmooth $script:brushTalkOpen 0.50 }
+      elseif ($amp -ge 0.13) { Set-AvatarPoseSmooth $script:brushTalkMid 0.50 }
+      else { Set-AvatarPoseSmooth $script:brushIdle 0.35 }
     }
   } else {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#30D158")
     $statusDot.Opacity = 1.0
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
 
-    # Check if manual ✨Gesto routine is running or run natural human idle choreography every 14s
-    $nowMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    $showElapsed = $nowMs - $script:gestureShowStartMs
-    $idlePose = $script:brushIdle
-
-    if ($showElapsed -ge 0 -and $showElapsed -lt 6500) {
-      if ($showElapsed -lt 1300) { $idlePose = $script:brushSmile }
-      elseif ($showElapsed -lt 2900) { $idlePose = $script:brushWave }
-      elseif ($showElapsed -lt 3400) { $idlePose = $script:brushBlink }
-      elseif ($showElapsed -lt 5100) { $idlePose = $script:brushKiss }
-      else { $idlePose = $script:brushSmile }
-    } else {
-      if ($showElapsed -ge 6500 -and $showElapsed -lt 6700) {
-        $statusText.Text = "Pronta para ouvir"
-      }
-      # Alive autonomous choreography cycle (16 seconds loop: Idle -> Smile -> Wave -> Idle -> ListenTilt -> Kiss -> Idle)
-      $cycleMs = $nowMs % 16000
-      if ($isBlinking) { $idlePose = $script:brushBlink }
-      elseif ($cycleMs -gt 2200 -and $cycleMs -lt 3700) { $idlePose = $script:brushSmile }
-      elseif ($cycleMs -gt 3700 -and $cycleMs -lt 5300) { $idlePose = $script:brushWave }
-      elseif ($cycleMs -gt 8500 -and $cycleMs -lt 10000) { $idlePose = $script:brushListenTilt }
-      elseif ($cycleMs -gt 12000 -and $cycleMs -lt 13700) { $idlePose = $script:brushKiss }
-      else { $idlePose = $script:brushIdle }
+    # Use real MP4 continuous video loop inside the circle
+    Switch-AvatarVideo "idle"
+    if (-not $script:videoMode) {
+      Set-AvatarPoseSmooth $script:brushIdle 0.25
     }
-
-    Set-AvatarPoseSmooth $idlePose 0.25
     # Gentle alive idle breathing & micro head movement
     $avatarRotate.Angle = 1.4 * [Math]::Sin($tSec * 0.85)
     $avatarScale.ScaleX = 1.0 + 0.010 * [Math]::Sin($tSec * 1.25)
