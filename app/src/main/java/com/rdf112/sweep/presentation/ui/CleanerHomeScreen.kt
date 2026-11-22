@@ -191,10 +191,8 @@ fun CleanerHomeScreen(
             }
         }
 
-        // Modelo Pro / IA Nativa posicionado lá no final da aba conforme solicitado pelo Rodolfo!
-        if (!isProActive) {
-            SalesPsychologyProCard(onOpenPro = onOpenPro)
-        }
+        // Modelo Pro / IA Nativa sempre disponível lá no final da aba conforme solicitado pelo Rodolfo!
+        SalesPsychologyProCard(onOpenPro = onOpenPro)
 
         Text(
             text = stringResource(R.string.cleaner_home_manual_review),

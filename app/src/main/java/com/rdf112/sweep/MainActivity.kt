@@ -498,7 +498,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var missionPermissionButton: MaterialButton
     private lateinit var missionReviewButton: MaterialButton
     private lateinit var missionRetryButton: MaterialButton
-    private var debugProPreviewEnabled = false
+    private var debugProPreviewEnabled = true
     private var debugProPreviewButton: MaterialButton? = null
     private lateinit var oaasFlywheelMetrics: TextView
     private lateinit var recordsContainer: LinearLayout
@@ -703,6 +703,8 @@ class MainActivity : AppCompatActivity() {
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
         }
         topBar.addView(topBarProButton, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(10) })
+        // O nome Midiastore agora fica integrado dentro do quadro da Maria no topo das 3 abas!
+        topBar.visibility = View.GONE
         root.addView(topBar, LinearLayout.LayoutParams(-1, -2))
 
         // Barra de progresso fina e moderna
@@ -1831,6 +1833,13 @@ class MainActivity : AppCompatActivity() {
                     ProMariaHeaderSection(
                         isActive = activeTabComposeState.value == AppTab.PRO,
                         isProActive = isProNow,
+                        onRunSmartDiagnosis = {
+                            openInteractiveDialogOnMissionFinish = true
+                            runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+                        },
+                        onRunBlurScan = { openBlurCleanerFlow() },
+                        onRunWhatsAppClean = { openWhatsAppCleanerFlow() },
+                        onRunUnusedApps = { requestUnusedAppSuggestions() },
                     )
                 }
             }
@@ -1917,13 +1926,21 @@ class MainActivity : AppCompatActivity() {
         }
         addView(unusedAppsButton, top(12))
 
-        // Card do Modelo IA Nativa (Gemini Nano Android — 0 MB) posicionado lá no final da aba Pro conforme pedido pelo Rodolfo
+        // Console Interativo do Modelo IA Nativa (Gemini Nano Android — LIBERADO PARA USO) posicionado lá no final da aba Pro
         val proGeminiNanoBottomView = ComposeView(this@MainActivity).apply {
             id = View.generateViewId()
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MidiastoreTheme {
-                    ProGeminiNanoBottomCard()
+                    ProGeminiNanoBottomCard(
+                        onRunSmartDiagnosis = {
+                            openInteractiveDialogOnMissionFinish = true
+                            runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+                        },
+                        onRunBlurScan = { openBlurCleanerFlow() },
+                        onRunWhatsAppClean = { openWhatsAppCleanerFlow() },
+                        onRunUnusedApps = { requestUnusedAppSuggestions() },
+                    )
                 }
             }
         }
