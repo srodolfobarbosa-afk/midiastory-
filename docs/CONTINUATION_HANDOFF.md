@@ -1,5 +1,22 @@
 # Midiastore â€” CONTINUIDADE DO PROJETO
 
+## Checkpoint Oficial Verificado Ao Vivo â€” 2026-11-22 (Parede Ãšnica Ativa)
+
+- **Fonte Ãšnica de Prioridades (Parede Ãšnica):** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md). **Regra da Parede Ãšnica:** nunca iniciar nova arquitetura paralela sem concluir o tijolo atual; cada sessÃ£o e cada mensagem continua diretamente do estado verificado abaixo.
+- **Estado Real na Google Play Console (verificado via `google-auth-library` / Play API v3 em `2026-11-22`):**
+  - `internal` e `alpha` (Teste Fechado): **`v2.7.6` (`versionCode 31`) `[completed]`**.
+  - `production`: aguardando tÃ©rmino do relÃ³gio obrigatÃ³rio de 14 dias do Teste Fechado para clicar em **"Solicitar a produÃ§Ã£o"** (respostas de 300 caracteres e Data Safety jÃ¡ prontas e auditadas contra `AndroidManifest.xml` â€” zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`).
+  - **Produtos Billing Ativos (`ACTIVE`):** `sweep_pro_monthly` (`monthly-base:ACTIVE`), `sweep_pro_annual` (`annual-base:ACTIVE`) e `sweep_pro_lifetime` (`oneTimeProducts` `lifetime-buy:ACTIVE` em 170+ paÃ­ses).
+- **Estado do CI/CD, Supabase e Funil Web (`2026-11-22`):**
+  - GitHub Actions (`Midiastore CI/CD & Security Pipeline`): **`success`** (verde).
+  - Supabase (`@supabase/supabase-js` direto, zero HTTP 429): `play_purchases = 1` venda testada validada na Edge Function `verify-play-purchase`, `beta_testers = 2`, `memories = 453+`, Grafo de Conhecimento enriquecido (`kg_nodes = 264`, `kg_edges = 60`).
+  - Funil Web (`https://midiastory-df6a0.web.app/`): `HTTP 200`, `14` idiomas (`hreflang`), `145` pÃ¡ginas HTML auditadas com `cheerio` (**0 links quebrados**).
+- **Plataforma FRIDAY Core v2.0 (`friday-core/`):**
+  - `20/20` motores JS 100% vÃ¡lidos (`node scripts/friday-self-audit.mjs`), suÃ­te nativa `node --test friday-core/friday.test.mjs` (`4/4` verdes), SDKs `@google/genai` (`v1beta`), `valibot`, `google-auth-library`, `@supabase/supabase-js` e `cheerio` instalados em `scripts/`.
+  - Painel de Voz & Avatar (`scripts/antigravity-companion.ps1`): `Win32 AttachThreadInput ForceFocus`, microfone DSP + `gemini-3.5-transcribe` com GlossÃ¡rio FonÃ©tico do Fundador, voz neural (`Kore` / `FranciscaNeural`) sempre iniciando ligada e Avatar 85mm com **16 nÃ­veis contÃ­nuos de boca e 6 nÃ­veis de piscada por Fluxo Ã“ptico a 28,5 FPS**.
+
+---
+
 ## Checkpoint mais recente â€” 2026-11-07
 
 - Rodolfo pediu que o app seja concluÃ­do e as atualizaÃ§Ãµes sejam salvas no GitHub. NÃ£o mesclar em `main`; manter a PR em Draft.
@@ -315,13 +332,13 @@ This section is the durable continuity checkpoint for future conversations. Cont
 - `:app:connectedDebugAndroidTest` continua sem resultado Gradle/UTP (`Failed to receive the UTP test results`); o runner Android direto foi necessÃ¡rio e Ã© evidÃªncia limitada ao que os testes cobrem.
 - NÃ£o declarar o app pronto para publicar, nÃ£o promover a produÃ§Ã£o e nÃ£o usar aprovaÃ§Ã£o de testes como resposta Ã  avaliaÃ§Ã£o negativa. PrÃ³xima etapa de produto: reproduzir no telefone os fluxos relatados, inspecionar a tela e cada aÃ§Ã£o da navegaÃ§Ã£o, corrigir interaÃ§Ã£o e feedback visual, verificar permissÃµes MediaStore e pÃ³s-estado real da limpeza, e validar a tela/estados de Billing com produtos de teste da Play. Manter cada comportamento nÃ£o executado como nÃ£o verificado.
 
-## Estado retomado no Motorola — 2026-11-07 (atualização)
+## Estado retomado no Motorola ï¿½ 2026-11-07 (atualizaï¿½ï¿½o)
 
-- A versão em teste é com.rdf112.midiastore.debug (APK Debug usa applicationIdSuffix .debug); não confundir com o app Release instalado no telefone.
-- O logo do cabeçalho agora agrupa o símbolo e o nome Midiastore; a ilustração vetorial anterior da mulher com celular foi preservada, com o nome Midiastore abaixo. Nada foi apagado durante esta validação.
-- No moto g84 5G/API35, a ação Home encontrou 5 itens grandes (84,30 MB), atualizou a CTA para revisão e abriu a lista. A revisão mostra consentimento antes de qualquer operação. A exclusão foi deixada intocada.
-- Navegar para Planos Pro funcionou. Mensal/anual/vitalício continuam indicados como sugeridos e inativos; o app não pode concluir compra enquanto Play Console não tiver catálogo ativo e falta backend de purchaseToken.
-- Build :app:assembleDebug pós-ajustes passou. Testes JVM/Lint estão em execução; o AAB assinado não foi gerado. Bloqueios Play Console, versionCode/certificado e validação release/API29/CI permanecem.
+- A versï¿½o em teste ï¿½ com.rdf112.midiastore.debug (APK Debug usa applicationIdSuffix .debug); nï¿½o confundir com o app Release instalado no telefone.
+- O logo do cabeï¿½alho agora agrupa o sï¿½mbolo e o nome Midiastore; a ilustraï¿½ï¿½o vetorial anterior da mulher com celular foi preservada, com o nome Midiastore abaixo. Nada foi apagado durante esta validaï¿½ï¿½o.
+- No moto g84 5G/API35, a aï¿½ï¿½o Home encontrou 5 itens grandes (84,30 MB), atualizou a CTA para revisï¿½o e abriu a lista. A revisï¿½o mostra consentimento antes de qualquer operaï¿½ï¿½o. A exclusï¿½o foi deixada intocada.
+- Navegar para Planos Pro funcionou. Mensal/anual/vitalï¿½cio continuam indicados como sugeridos e inativos; o app nï¿½o pode concluir compra enquanto Play Console nï¿½o tiver catï¿½logo ativo e falta backend de purchaseToken.
+- Build :app:assembleDebug pï¿½s-ajustes passou. Testes JVM/Lint estï¿½o em execuï¿½ï¿½o; o AAB assinado nï¿½o foi gerado. Bloqueios Play Console, versionCode/certificado e validaï¿½ï¿½o release/API29/CI permanecem.
 
 ## Checkpoint prioritÃ¡rio â€” 2026-11-18
 

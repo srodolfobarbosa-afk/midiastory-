@@ -33,13 +33,20 @@ export function getActiveSessionMetrics() {
 
     if (!dirs.length) return { status: "N/D" };
     const latest = dirs[0];
-    const lines = fs.readFileSync(latest.tPath, "utf8").split(/\r?\n/).filter(Boolean);
-    let userTurns = 0;
-    let plannerTurns = 0;
-    for (const line of lines) {
-      if (line.includes('"type":"USER_INPUT"')) userTurns++;
-      else if (line.includes('"type":"PLANNER_RESPONSE"')) plannerTurns++;
+    // RAM-safe tail scan (caps buffer at 192 KB on 3.93 GB RAM PC and scales turn count if file is larger)
+    const maxSample = 196608;
+    const readLen = Math.min(latest.sizeBytes, maxSample);
+    const buf = Buffer.alloc(readLen);
+    const fd = fs.openSync(latest.tPath, "r");
+    try {
+      fs.readSync(fd, buf, 0, readLen, Math.max(0, latest.sizeBytes - readLen));
+    } finally {
+      fs.closeSync(fd);
     }
+    const sampleText = buf.toString("utf8");
+    const scale = readLen > 0 ? latest.sizeBytes / readLen : 1;
+    const userTurns = Math.round(((sampleText.match(/"type":"USER_INPUT"/g) || []).length) * scale);
+    const plannerTurns = Math.round(((sampleText.match(/"type":"PLANNER_RESPONSE"/g) || []).length) * scale);
 
     const sizeKb = Math.round(latest.sizeBytes / 1024);
     const estTokens = Math.round(latest.sizeBytes / 4);

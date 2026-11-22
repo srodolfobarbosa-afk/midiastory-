@@ -42,7 +42,9 @@ function loadState() {
 function saveState(state) {
   try {
     const trimmed = Object.fromEntries(Object.entries(state.byConv || {}).slice(-30));
-    fs.writeFileSync(STATE_FILE, JSON.stringify({ byConv: trimmed }), "utf8");
+    const tmp = `${STATE_FILE}.${process.pid}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify({ byConv: trimmed }), "utf8");
+    fs.renameSync(tmp, STATE_FILE);
   } catch {}
 }
 
@@ -164,7 +166,10 @@ function scoreItem(itemText) {
 
 export function analyzePrompt(rawText) {
   const clean = stripUserRequestTags(rawText);
-  const items = splitIntoAtomicItems(clean).map(scoreItem);
+  const rawItems = splitIntoAtomicItems(clean).map(scoreItem);
+  // Argon-High noise filter: if actionable items (score >= 3 or questions) exist, drop pure conversational filler (score === 1 without '?')
+  const actionable = rawItems.filter((i) => i.score >= 3 || i.text.includes("?"));
+  const items = actionable.length > 0 ? actionable : rawItems.slice(0, 3);
   const pillar = detectPillar(clean);
 
   const highCount = items.filter((i) => i.weight === "ALTO" || i.weight === "CRÍTICO").length;
