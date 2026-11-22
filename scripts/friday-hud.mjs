@@ -117,9 +117,10 @@ async function main() {
     `- **Semáforo de Cota:** ${session.level || "N/D"}`,
     `- **Motor de Voz Ativo:** ${session.ttsMode || "Francisca Neural"}`,
     "",
-    "## 🎯 Meta Suprema: R$ 1.000.000,00 na Google Play",
+    "## 🎯 Meta Suprema: R$ 1.000.000,00 na Google Play (Parede Única)",
+    "- **Google Play Console:** v2.7.6 (vc 31) [completed] em internal + alpha | 3 Planos ATIVOS (Mensal, Anual, Vitalício 170+ países).",
+    "- **Próxima Versão v2.8.0 (Pós-Produção):** Assistente Maria Hero (14 idiomas, voz de estúdio) + Gemini Nano nativo no Modo Pro.",
     "- **Regra 50/50:** 50% Lucro/Retirada + 50% Reinvestimento em Tráfego, IA e Escala.",
-    "- **Comandos de Voz FRIDAY:** diga \"relatório geral\", \"espiona os concorrentes na Play Store\", \"me ensina no quadro\" ou clique em **👁️Tela**.",
   ].join("\n");
 
   const boardArgs = [
