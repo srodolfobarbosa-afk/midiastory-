@@ -25,6 +25,8 @@
 - [x] **Auditoria completa de 145 páginas HTML do funil (`cheerio`):** **0 links locais quebrados**, 138/145 páginas públicas 100% válidas em SEO e `meta description` corrigida em `docs/privacidade.html`.
 - [ ] **Manter 0 crashes / 0 ANRs no Android Vitals** acompanhando os testadores no Teste Fechado (`v2.7.6 vc 31`).
 
-### PRIORIDADE #3 — Primeiras Vendas Reais & Escala (Pós-Aprovação de Produção)
+### PRIORIDADE #3 — Primeiras Vendas Reais, Marketing FRIDAY & Escala (Pós-Aprovação de Produção)
+- [x] **Upgrade da Apresentadora FRIDAY (Realismo Humano):** 6 frames fotorrealistas de estúdio 85mm instalados em `.agents/avatar/` (base, piscada, fala média, fala aberta, gesto explicando e escuta inclinada) ativos no Companion ao vivo.
+- [ ] **Fábrica de Vídeos de Anúncio da FRIDAY (14 Idiomas):** gravar vídeos curtos (`9:16` Shorts/Reels/TikTok + `16:9` Google Ads App Campaigns) com 3 ganchos psicológicos de conversão por idioma + legendas grandes + telas reais do Midiastore.
 - [ ] **Testar 1 compra real em Produção** (Mensal / Anual / Vitalício) e validar crédito em `public.play_purchases`.
-- [ ] **Acionar aquisição orgânica + anúncios (Regra 50/50)** nos 14 idiomas e medir ROI real por país.
+- [ ] **Acionar tração orgânica custo zero + Google Ads (Regra 50/50):** usar os 50% de reinvestimento do primeiro caixa (`R$ 5.000+`) para VPS Linux 24/7 + API `Gemini 4 Carbon` + escala de anúncios.
