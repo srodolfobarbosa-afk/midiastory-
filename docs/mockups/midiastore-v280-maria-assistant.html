@@ -65,7 +65,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 22%;
+      object-position: center 8%;
       transition: transform 0.35s ease;
     }
     .hero-maria.speaking img { transform: scale(1.03); }
@@ -476,33 +476,34 @@
       }
     }, 35);
 
+    const AUDIO_BASE = "file:///C:/Users/rodolfo/midiastory-/docs/mockups/maria-audio/";
+    let currentAudio = null;
+
     const TAB_META = {
-      clean: { title: "Midiastore", compact: false, line: "Olá! Sou a Maria. Encontrei 4,8 gigabytes prontos para liberar com segurança." },
-      files: { title: "Arquivos", compact: false, line: "Escolha uma categoria para ver suas fotos e vídeos maiores." },
-      pro:   { title: "Midiastore Pro", compact: false, line: "No Midiastore Pro você desbloqueia a limpeza completa e a inteligência artificial nativa do Android." }
+      clean: { title: "Midiastore", audio: "clean.mp3", line: "Olá! Encontrei arquivos prontos para liberar com segurança." },
+      files: { title: "Arquivos", audio: "files.mp3", line: "Suas fotos, vídeos e mídias organizados por tamanho." },
+      pro:   { title: "Midiastore Pro", audio: "pro.mp3", line: "Libere a limpeza completa + IA Nativa do Android no Pro." }
     };
 
-    function speakLine(text) {
+    function speakLine(text, audioFile = null) {
       mariaLine.textContent = text;
       clearTimeout(speakTimer);
+      if (currentAudio) { try { currentAudio.pause(); } catch {} currentAudio = null; }
       isSpeaking = true;
       hero.classList.add("speaking");
 
-      if (!muted && "speechSynthesis" in window) {
+      if (!muted && audioFile) {
         try {
-          window.speechSynthesis.cancel();
-          const u = new SpeechSynthesisUtterance(text);
-          u.lang = "pt-BR";
-          u.rate = 1.05;
-          u.onend = () => { isSpeaking = false; hero.classList.remove("speaking"); };
-          u.onerror = () => { isSpeaking = false; hero.classList.remove("speaking"); };
-          window.speechSynthesis.speak(u);
-          // Safety fallback in case browser speechSynthesis doesn't fire onend
-          speakTimer = setTimeout(() => { isSpeaking = false; hero.classList.remove("speaking"); }, Math.max(3000, text.length * 75));
+          currentAudio = new Audio(AUDIO_BASE + audioFile);
+          currentAudio.onended = () => { isSpeaking = false; hero.classList.remove("speaking"); };
+          currentAudio.onerror = () => { isSpeaking = false; hero.classList.remove("speaking"); };
+          currentAudio.play().catch(() => {
+            speakTimer = setTimeout(() => { isSpeaking = false; hero.classList.remove("speaking"); }, 2600);
+          });
           return;
         } catch {}
       }
-      speakTimer = setTimeout(() => { isSpeaking = false; hero.classList.remove("speaking"); }, Math.max(2600, text.length * 65));
+      speakTimer = setTimeout(() => { isSpeaking = false; hero.classList.remove("speaking"); }, Math.max(2400, text.length * 55));
     }
 
     function openTab(tab) {
@@ -512,22 +513,23 @@
       document.getElementById("tabPro").classList.toggle("hidden", tab !== "pro");
       const meta = TAB_META[tab];
       topBrand.textContent = meta.title;
-      hero.classList.toggle("compact", meta.compact);
-      speakLine(meta.line);
+      speakLine(meta.line, meta.audio);
     }
 
     document.querySelectorAll(".nav-btn").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
     document.getElementById("goProBanner").addEventListener("click", () => openTab("pro"));
-    document.getElementById("btnCleanNow").addEventListener("click", () => speakLine("Perfeito! Revise as miniaturas e confirme a limpeza com segurança."));
-    document.querySelectorAll("[data-line]").forEach((el) => el.addEventListener("click", () => speakLine(el.dataset.line)));
+    document.getElementById("btnCleanNow").addEventListener("click", () => speakLine("Perfeito! Revise as miniaturas e confirme a limpeza com segurança.", "clean.mp3"));
+    document.querySelectorAll("[data-line]").forEach((el) => el.addEventListener("click", () => speakLine(el.dataset.line, "files.mp3")));
     btnAudio.addEventListener("click", () => {
       muted = !muted;
       btnAudio.textContent = muted ? "🔇" : "🔊";
-      if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
-      else speakLine(mariaLine.textContent);
+      if (muted && currentAudio) { try { currentAudio.pause(); } catch {} isSpeaking = false; }
+      else {
+        const activeTab = document.querySelector(".nav-btn.active")?.dataset.tab || "clean";
+        speakLine(TAB_META[activeTab].line, TAB_META[activeTab].audio);
+      }
     });
-    // Start talking briefly on load so Rodolfo sees the live 30 FPS mouth movement right away!
-    setTimeout(() => speakLine(TAB_META.clean.line), 500);
+    setTimeout(() => speakLine(TAB_META.clean.line, TAB_META.clean.audio), 450);
   </script>
 </body>
 </html>
