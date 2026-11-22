@@ -1,19 +1,21 @@
 # Midiastore — CONTINUIDADE DO PROJETO
 
-## Checkpoint Oficial Verificado Ao Vivo — 2026-11-22 (Parede Única Ativa)
+## Checkpoint Oficial Verificado Ao Vivo — 2026-11-22 (Parede Única Ativa — Fechamento do Dia v2.8.0 vc 32)
 
-- **Fonte Única de Prioridades (Parede Única):** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md). **Regra da Parede Única:** nunca iniciar nova arquitetura paralela sem concluir o tijolo atual; cada sessão e cada mensagem continua diretamente do estado verificado abaixo.
-- **Estado Real na Google Play Console (verificado via `google-auth-library` / Play API v3 em `2026-11-22`):**
-  - `internal` e `alpha` (Teste Fechado): **`v2.7.6` (`versionCode 31`) `[completed]`**.
+- **Fonte Única de Prioridades (Parede Única):** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-22.md`](CONTINUATION_UPDATE_2026-11-22.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md). **Regra da Parede Única:** nunca iniciar nova arquitetura paralela sem concluir o tijolo atual; cada sessão e cada mensagem continua diretamente do estado verificado abaixo.
+- **Estado Real na Google Play Console (verificado via `google-auth-library` / Play API v3 em `2026-11-22T08:50:28Z`):**
+  - `internal` e `alpha` (Teste Fechado): **`v2.8.0` (`versionCode 32`) `[completed]`** (`Edit 14212325279113978395`, SHA-256 `97035252009b5cf95a7f75892f9d5ab7eeb236d6fc764ca6ea8b804d730a5227`, `7,36 MB` AAB R8 assinado com `sweep-upload.jks`). Lista dos 23 testadores fechados 100% preservada.
   - `production`: aguardando término do relógio obrigatório de 14 dias do Teste Fechado para clicar em **"Solicitar a produção"** (respostas de 300 caracteres e Data Safety já prontas e auditadas contra `AndroidManifest.xml` — zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`).
   - **Produtos Billing Ativos (`ACTIVE`):** `sweep_pro_monthly` (`monthly-base:ACTIVE`), `sweep_pro_annual` (`annual-base:ACTIVE`) e `sweep_pro_lifetime` (`oneTimeProducts` `lifetime-buy:ACTIVE` em 170+ países).
-- **Estado do CI/CD, Supabase e Funil Web (`2026-11-22`):**
-  - GitHub Actions (`Midiastore CI/CD & Security Pipeline`): **`success`** (verde).
-  - Supabase (`@supabase/supabase-js` direto, zero HTTP 429): `play_purchases = 1` venda testada validada na Edge Function `verify-play-purchase`, `beta_testers = 2`, `memories = 453+`, Grafo de Conhecimento enriquecido (`kg_nodes = 264`, `kg_edges = 60`).
+- **Novidades Entregues e Validadas no Moto G84 (`0085353748`) na `v2.8.0 (vc 32)`:**
+  - **Assistente Pessoal Maria (`MariaAssistantBanner.kt` + `MariaLipSyncEnvelopes.kt`):** retratos widescreen `720x512` sem corte (`maria_lip_0..7`, `maria_blink_0..2`, `maria_talk_blink`, `maria_smile`), marca `Midiastore` integrada no topo esquerdo do card da Maria, badge limpa `● MARIA • ASSISTENTE IA` sem legenda poluindo a blusa, botão `▲ Recolher` + retorno via `BackHandler`, 8 áudios neurais de estúdio (`pt-BR-FranciscaNeural`, 8,4s a 28,9s) e **dublagem silábica ZCR com detecção de vales consonantais + compensação de `-85ms` do `AudioTrack` a 35,7 FPS**.
+  - **Chat Midiastore IA (White Sheet estilo ChatGPT/Gemini):** modal limpo em fundo branco `#FFFFFF` acionado ao tocar nos quadradinhos da aba Pro, sem caixa inline poluindo o rodapé.
+  - **14 Idiomas (`MariaI18n`) + Limpador Global de Mensageiros (`WhatsAppCleanerDataSource.kt`):** suporte a WhatsApp, Telegram, WeChat/WeiXin, LINE, KakaoTalk, Messenger, Instagram, TikTok e `Download/` com tamanhos reais em `MB / GB` ao vivo em todas as abas e fim do erro `"Não foi possível analisar os arquivos"` sob mudança concorrente do `MediaStore`.
+- **Estado do CI/CD, Supabase, Funil Web e Auto-Start Desktop (`2026-11-22`):**
+  - GitHub Actions (`Run 45003986718` + `Run 45003986707`): **`success`** (100% verde).
+  - Supabase (`@supabase/supabase-js` direto, zero HTTP 429): `play_purchases = 1` venda testada validada na Edge Function `verify-play-purchase`, `beta_testers = 2`, `memories = 497+`, Grafo de Conhecimento enriquecido (`kg_nodes = 264`, `kg_edges = 60`).
   - Funil Web (`https://midiastory-df6a0.web.app/`): `HTTP 200`, `14` idiomas (`hreflang`), `145` páginas HTML auditadas com `cheerio` (**0 links quebrados**).
-- **Plataforma FRIDAY Core v2.0 (`friday-core/`):**
-  - `20/20` motores JS 100% válidos (`node scripts/friday-self-audit.mjs`), suíte nativa `node --test friday-core/friday.test.mjs` (`4/4` verdes), SDKs `@google/genai` (`v1beta`), `valibot`, `google-auth-library`, `@supabase/supabase-js` e `cheerio` instalados em `scripts/`.
-  - Painel de Voz & Avatar (`scripts/antigravity-companion.ps1`): `Win32 AttachThreadInput ForceFocus`, microfone DSP + `gemini-3.5-transcribe` com Glossário Fonético do Fundador, voz neural (`Kore` / `FranciscaNeural`) sempre iniciando ligada e Avatar 85mm com **16 níveis contínuos de boca e 6 níveis de piscada por Fluxo Óptico a 28,5 FPS**.
+  - **Auto-Start da Maria/FRIDAY no PC Windows:** script `Maria-FRIDAY-AutoStart.vbs` configurado na pasta `Startup` do Windows (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`) para abrir automaticamente o painel `scripts/antigravity-companion.ps1` ao ligar o PC amanhã.
 
 ---
 

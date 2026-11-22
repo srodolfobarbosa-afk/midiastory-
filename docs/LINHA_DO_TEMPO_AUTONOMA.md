@@ -3110,3 +3110,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #470
 
 ---
+
+### 📍 [22/11/2026, 05:50:56] Publicacao oficial do Midiastore v2.8.0 (versionCode 32) na Google Play Store (internal e alpha) com Assistente Pessoal Maria, dublagem silabica ZCR com compensacao de -85ms de AudioTrack, Chat Midiastore White Sheet e limpador global de mensageiros em 14 idiomas
+- **📖 Estudou / Leu:** Latencia do buffer AudioTrack/AudioFlinger no Android (~85-95ms), deteccao de vales consonantais e taxa de cruzamento por zero (ZCR) para sincronia labial silaba a silaba sem plato aberto em MariaLipSyncEnvelopes.kt e MariaAssistantBanner.kt
+- **⚙️ Tentou / Executou:** Compilacao do AAB Release v2.8.0 (vc 32) assinado com sweep-upload.jks via GitHub Actions Run 45003986718, upload para internal e alpha na Play Console API v3 (Edit 14212325279113978395) e instalacao no Moto G84 (0085353748)
+- **⚠️ Erros Encontrados:** Em MediaScanViewModelTest, a missao CLEAN_OLD_SCREENSHOTS_30D exigia smartFilter = SCREENSHOTS_30D; na dublagem anterior, o filtro de inercia 0.25/0.75 mantinha a boca entreaberta durante consoantes sonoras continuas
+- **🔧 Como Corrigiu:** Restaurado mapeamento when(mission) em MediaScanViewModel.kt com reset automatico para ALL_ITEMS ao abrir a aba Arquivos em MainActivity.kt; gerado envelope silabico de alto contraste com fechamento labial em vales consonantais, compensacao de -85ms no MediaPlayer.currentPosition e piscada curta de 56ms na fala
+- **🎯 Conclusão:** Midiastore v2.8.0 (versionCode 32, SHA-256 97035252009b5cf95a7f75892f9d5ab7eeb236d6fc764ca6ea8b804d730a5227) publicado com status completed nas faixas internal e alpha sem alterar a lista dos 23 testadores fechados e instalado no Moto G84
+- *Registro Supabase:* Memory #497
+
+---
+
+### 📍 [22/11/2026, 06:06:33] Fechamento do Dia 2026-11-22: Midiastore v2.8.0 (vc 32) publicado na Google Play (internal/alpha), Moto G84 atualizado e Auto-Start da Maria/FRIDAY configurado no Windows Startup para retorno automatico amanha
+- **📖 Estudou / Leu:** Continuidade de sessao entre Supabase public.memories, docs/CONTINUATION_HANDOFF.md, docs/CONTINUATION_UPDATE_2026-11-22.md e Windows Startup folder
+- **⚙️ Tentou / Executou:** Gravacao do snapshot completo do dia no Supabase, criacao do Maria-FRIDAY-AutoStart.vbs no Windows Startup e push final para o GitHub
+- **⚠️ Erros Encontrados:** Nenhum erro: CI Run 45003986718 e Run 45003986707 100% verdes e Edit 14212325279113978395 commitado HTTP 200 na Play Store
+- **🔧 Como Corrigiu:** Criado Maria-FRIDAY-AutoStart.vbs em Startup para abrir scripts/antigravity-companion.ps1 automaticamente ao ligar o PC e sincronizados todos os handoffs locais e remotos
+- **🎯 Conclusão:** Ambiente 100% salvo no Supabase, GitHub e Windows Startup. Ao ligar o PC amanha, a Maria/FRIDAY no desktop e o contexto completo da v2.8.0 (vc 32) carregam automaticamente
+- *Registro Supabase:* Memory #498
+
+---
