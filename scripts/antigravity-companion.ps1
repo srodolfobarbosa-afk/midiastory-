@@ -763,6 +763,7 @@ $timer.Add_Tick({
     $avatarTranslate.Y = -1.0 * [Math]::Sin($tSec * 0.9)
   }
 })
+Update-VoiceConfig $true
 $timer.Start()
 
 $null = $window.ShowDialog()
