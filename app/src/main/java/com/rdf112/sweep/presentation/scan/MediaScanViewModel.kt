@@ -646,8 +646,12 @@ class MediaScanViewModel(
                     status = if (coverageComplete) ScanUiStatus.READY else ScanUiStatus.PARTIAL,
                     session = session,
                     currentPage = ensuredFirstPage ?: latest.currentPage,
-                    // Mantém ALL_ITEMS na aba Arquivos para que as 100 fotos/vídeos da página apareçam imediatamente com miniaturas!
-                    smartFilter = SmartFilterMode.ALL_ITEMS,
+                    smartFilter = when (mission) {
+                        DesiredOutcomeMission.FREE_MAX_SPACE_NOW -> SmartFilterMode.LARGE_FILES_10MB
+                        DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> SmartFilterMode.SAME_SIZE_CANDIDATES
+                        DesiredOutcomeMission.ARCHIVE_OLD_MEDIA_30D -> SmartFilterMode.OLDER_THAN_30_DAYS
+                        DesiredOutcomeMission.CLEAN_OLD_SCREENSHOTS_30D -> SmartFilterMode.SCREENSHOTS_30D
+                    },
                     selection = nextLedger,
                     message = null,
                     isLoading = false,

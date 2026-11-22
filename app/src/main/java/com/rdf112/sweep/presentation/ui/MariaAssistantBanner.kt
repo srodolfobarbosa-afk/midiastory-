@@ -87,9 +87,6 @@ private val MARIA_IDLE_BLINK_SEQUENCE = intArrayOf(
 )
 
 private val MARIA_TALK_BLINK_SEQUENCE = intArrayOf(
-    R.drawable.maria_blink_1,
-    R.drawable.maria_talk_blink,
-    R.drawable.maria_blink_2,
     R.drawable.maria_talk_blink,
     R.drawable.maria_blink_1,
 )
@@ -639,8 +636,11 @@ fun MariaHeroBanner(
             }
 
             if (isSpeaking) {
+                // Compensa ~85ms de latência do buffer de saída AudioTrack/AudioFlinger do Android
                 val posMs = runCatching {
-                    mediaPlayerRef?.takeIf { it.isPlaying }?.currentPosition
+                    mediaPlayerRef?.takeIf { it.isPlaying }?.let { mp ->
+                        (mp.currentPosition - 85).coerceAtLeast(0)
+                    }
                 }.getOrNull()
 
                 val envCode = if (posMs != null && envelope.isNotEmpty()) {
@@ -649,8 +649,8 @@ fun MariaHeroBanner(
                 } else {
                     val cycle = now % 1400L
                     if (cycle > 1180L) 8 else {
-                        val w = (sin(now / 52.0) * 0.6 + sin(now / 88.0) * 0.4).toFloat()
-                        if (w > 0.08f) ((w - 0.08f) / 0.92f * 7f).roundToInt().coerceIn(1, 7) else 0
+                        val w = (sin(now / 42.0) * 0.55 + sin(now / 68.0) * 0.45).toFloat()
+                        if (w > 0.04f) ((w - 0.04f) / 0.96f * 7f).roundToInt().coerceIn(1, 7) else 0
                     }
                 }
 
@@ -664,12 +664,12 @@ fun MariaHeroBanner(
                     mouthLevel = 0f
                     currentFrameRes = R.drawable.maria_smile
                 } else if (envCode <= 0) {
-                    mouthLevel *= 0.22f
-                    val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
-                    currentFrameRes = MARIA_LIP_FRAMES[idx]
+                    mouthLevel = 0f
+                    currentFrameRes = MARIA_LIP_FRAMES[0]
                 } else {
-                    mouthLevel = mouthLevel * 0.25f + envCode.toFloat() * 0.75f
-                    val idx = mouthLevel.roundToInt().coerceIn(1, MARIA_LIP_FRAMES.lastIndex)
+                    // Articulação silábica direta sem arrasto que travava a boca aberta entre consoantes
+                    mouthLevel = envCode.toFloat()
+                    val idx = envCode.coerceIn(1, MARIA_LIP_FRAMES.lastIndex)
                     currentFrameRes = MARIA_LIP_FRAMES[idx]
                 }
             } else {
@@ -684,7 +684,7 @@ fun MariaHeroBanner(
                     currentFrameRes = R.drawable.maria_smile
                 }
             }
-            delay(35L)
+            delay(28L)
         }
     }
 

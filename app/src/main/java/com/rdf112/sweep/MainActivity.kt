@@ -501,7 +501,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var missionPermissionButton: MaterialButton
     private lateinit var missionReviewButton: MaterialButton
     private lateinit var missionRetryButton: MaterialButton
-    private var debugProPreviewEnabled = true
+    private var debugProPreviewEnabled = false
     private var debugProPreviewButton: MaterialButton? = null
     private lateinit var oaasFlywheelMetrics: TextView
     private lateinit var recordsContainer: LinearLayout
@@ -2239,6 +2239,8 @@ class MainActivity : AppCompatActivity() {
             val st = viewModel.state.value
             if (st.currentPage == null && !st.isLoading && hasAnyMediaPermission()) {
                 viewModel.startSession()
+            } else if (st.selectedKind == MediaKind.IMAGE && st.smartFilter == SmartFilterMode.LARGE_FILES_10MB) {
+                viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS)
             }
         }
         if (::mainScrollView.isInitialized) {

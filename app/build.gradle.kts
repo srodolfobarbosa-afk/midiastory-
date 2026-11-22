@@ -55,8 +55,8 @@ android {
         applicationId = "com.rdf112.midiastore"
         minSdk = 29
         targetSdk = 36
-        versionCode = 31
-        versionName = "2.7.6"
+        versionCode = 32
+        versionName = "2.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

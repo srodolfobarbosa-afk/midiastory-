@@ -14,20 +14,20 @@ const projectRoot = path.resolve(__dirname, "..");
 const keyPath = path.join(projectRoot, ".secrets", "play-service-account.json");
 const aabPath = process.argv[2]
   ? path.resolve(projectRoot, process.argv[2])
-  : path.join(projectRoot, "release-artifacts", "v276-release", "app-release.aab");
+  : path.join(projectRoot, "release-artifacts", "v280-release", "app-release.aab");
 const packageName = "com.rdf112.midiastore";
 
 const key = JSON.parse(fs.readFileSync(keyPath, "utf8"));
 
 const RELEASE_NOTES = [
-  { language: "pt-BR", text: "v2.7.6: Limpeza rápida em 1 botão (máximo 2 cliques) com pré-análise automática ao abrir, fim do falso alerta 'Nenhuma mídia encontrada' sob cobertura parcial e novo painel OLED de benefícios Pro." },
-  { language: "en-US", text: "v2.7.6: Fast 1-button cleanup (max 2 taps) with automatic pre-scan on launch, fix for false 'No media found' under partial coverage, and new OLED Pro benefits card." },
-  { language: "es-ES", text: "v2.7.6: Limpieza rápida en 1 botón (máximo 2 toques) con preanálisis automático al abrir, corrección de 'No se encontraron medios' en cobertura parcial y nuevo panel OLED Pro." },
-  { language: "fr-FR", text: "v2.7.6 : Nettoyage rapide en 1 bouton (2 gestes max) avec pré-analyse automatique, correction de l'alerte 'Aucun média trouvé' et nouveau panneau OLED Pro." },
-  { language: "de-DE", text: "v2.7.6: Schnelle 1-Knopf-Bereinigung (max. 2 Tipps) mit automatischer Voranalyse beim Start, Behebung von 'Keine Medien gefunden' und neue OLED-Pro-Übersicht." },
-  { language: "hi-IN", text: "v2.7.6: ऐप खोलते ही ऑटो प्री-स्कैन के साथ 1-बटन तेज़ क्लीनअप (अधिकतम 2 टैप), आंशिक एक्सेस में 'कोई मीडिया नहीं मिला' सुधार और नया OLED Pro कार्ड।" },
-  { language: "ja-JP", text: "v2.7.6：起動時の自動プレスキヤンによる1ボタン高速整理（最大2タップ）、部分権限時の「メディアが見つかりません」修正、新しいOLED Proカード。" },
-  { language: "zh-CN", text: "v2.7.6：启动自动预扫描与一键快速清理（最多2步）、修复部分权限下“未找到媒体”提示，以及全新 OLED Pro 权益卡片。" },
+  { language: "pt-BR", text: "v2.8.0: Nova Assistente Pessoal Maria com orientação por voz e sincronia labial, Chat Midiastore IA no padrão moderno, limpeza global de mensageiros e cálculo ao vivo em MB/GB em todas as abas." },
+  { language: "en-US", text: "v2.8.0: New Maria Personal Assistant with voice guidance and lip-sync, modern Chat Midiastore AI modal, global messenger media cleanup, and live MB/GB sizes across all tabs." },
+  { language: "es-ES", text: "v2.8.0: Nueva Asistente Personal Maria con guía por voz, Chat Midiastore IA moderno, limpieza global de mensajería y tamaños en vivo en MB/GB en todas las pestañas." },
+  { language: "fr-FR", text: "v2.8.0 : Nouvelle Assistante Personnelle Maria, Chat Midiastore IA moderne, nettoyage des messageries et tailles MB/GB en direct sur tous les onglets." },
+  { language: "de-DE", text: "v2.8.0: Neue persönliche Assistentin Maria, moderner Chat Midiastore KI-Dialog, Messenger-Bereinigung und Live-MB/GB-Größen in allen Tabs." },
+  { language: "hi-IN", text: "v2.8.0: नई मारिया पर्सनल असिस्टेंट, आधुनिक Chat Midiastore AI, चैट मीडिया क्लीनअप और सभी टैब में लाइव MB/GB आकार।" },
+  { language: "ja-JP", text: "v2.8.0：新しいパーソナルアシスタントMaria、モダンなChat Midiastore AI、SNS・チャット整理、全タブでのリアルタイムMB/GB表示。" },
+  { language: "zh-CN", text: "v2.8.0：全新 Maria 智能语音助手、现代风格 Chat Midiastore AI 对话框、聊天与下载缓存清理及全标签页实时 MB/GB 大小显示。" },
 ];
 
 async function getAccessToken() {
@@ -105,7 +105,7 @@ async function main() {
           track,
           releases: [
             {
-              name: `2.7.6 (${bundle.versionCode})`,
+              name: `2.8.0 (${bundle.versionCode})`,
               versionCodes: [String(bundle.versionCode)],
               status: "completed",
               releaseNotes: RELEASE_NOTES,
