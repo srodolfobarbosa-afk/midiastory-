@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-21T23:54:24.580Z",
+  "updatedAt": "2026-11-22T00:15:56.158Z",
   "skills": [
     {
       "id": "triage",
@@ -147,6 +147,21 @@
       ],
       "verified": true,
       "addedAt": "2026-11-21T23:54:24.580Z"
+    },
+    {
+      "id": "probe",
+      "name": "Sonda Viva de Modelos Google + Memória Supabase",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/capabilities-probe.mjs",
+      "tags": [
+        "google",
+        "carbon",
+        "hydrogen",
+        "supabase",
+        "modelos"
+      ],
+      "verified": true,
+      "addedAt": "2026-11-22T00:15:56.151Z"
     }
   ]
 }

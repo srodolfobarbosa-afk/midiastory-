@@ -16,6 +16,7 @@ const PROJECT_ROOT = path.resolve(__dirname, "..");
 const SECRETS_PATH = path.join(PROJECT_ROOT, ".secrets", "ai-media-keys.json");
 
 const STT_MODELS = [
+  { name: "gemini-3.5-transcribe", thinkingZero: false },
   { name: "gemini-2.5-flash", thinkingZero: true },
   { name: "gemini-flash-lite-latest", thinkingZero: true },
   { name: "gemini-3.5-flash-lite", thinkingZero: false },

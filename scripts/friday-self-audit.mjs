@@ -121,6 +121,7 @@ function main() {
     "friday-core/night-factory.mjs",
     "friday-core/immune-memory.mjs",
     "friday-core/specialists-factory.mjs",
+    "friday-core/capabilities-probe.mjs",
   ];
 
   const syntaxResults = coreScripts.map(checkNodeSyntax);

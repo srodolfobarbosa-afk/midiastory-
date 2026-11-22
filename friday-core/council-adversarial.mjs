@@ -44,7 +44,8 @@ function loadSecrets() {
 
 async function callGemini(prompt, googleKey) {
   if (!googleKey) return { ok: false, engine: "gemini", error: "GOOGLE_API_KEY ausente" };
-  const models = ["gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-3.8-flash"];
+  // Prioridade: Carbon (quando billing ativo) -> Hydrogen (1M ctx GRÁTIS verificado) -> 2.5-flash -> 3.8-flash
+  const models = ["gemini-4-carbon", "gemini-4-hydrogen", "gemini-2.5-flash", "gemini-3.8-flash"];
   let lastErr = "";
 
   for (const model of models) {

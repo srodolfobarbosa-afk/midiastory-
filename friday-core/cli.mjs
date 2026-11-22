@@ -21,6 +21,7 @@ const ROUTES = {
   night: "friday-core/night-factory.mjs",
   immune: "friday-core/immune-memory.mjs",
   team: "friday-core/specialists-factory.mjs",
+  probe: "friday-core/capabilities-probe.mjs",
   audit: "scripts/friday-self-audit.mjs",
   hud: "scripts/friday-hud.mjs",
   quota: "scripts/friday-quota-guard.mjs",
