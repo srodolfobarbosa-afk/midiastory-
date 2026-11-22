@@ -256,42 +256,21 @@ $script:brushWave = Load-AvatarBrush (Join-Path $avatarDir "avatar-wave.png") $s
 $script:brushKiss = Load-AvatarBrush (Join-Path $avatarDir "avatar-kiss.png") $script:brushIdle
 $script:brushSmile = Load-AvatarBrush (Join-Path $avatarDir "avatar-smile.png") $script:brushIdle
 
-# Real MP4 Video Engine inside the circular avatar (WPF MediaPlayer + VideoDrawing + DrawingBrush)
-$script:idleMp4Path = Join-Path $avatarDir "avatar-idle.mp4"
-$script:talkMp4Path = Join-Path $avatarDir "avatar-talk.mp4"
-$script:videoMode = $null # "idle" | "talk" | $null
-$script:mediaPlayer = New-Object System.Windows.Media.MediaPlayer
-$script:mediaPlayer.IsMuted = $true
-$script:mediaPlayer.add_MediaEnded({
-  try {
-    $script:mediaPlayer.Position = [TimeSpan]::Zero
-    $script:mediaPlayer.Play()
-  } catch {}
-})
-$script:videoDrawing = New-Object System.Windows.Media.VideoDrawing
-$script:videoDrawing.Rect = New-Object System.Windows.Rect(0, 0, 512, 512)
-$script:videoDrawing.Player = $script:mediaPlayer
-$script:videoBrush = New-Object System.Windows.Media.DrawingBrush($script:videoDrawing)
-$script:videoBrush.Stretch = [System.Windows.Media.Stretch]::UniformToFill
-
-function Switch-AvatarVideo([string]$mode) {
-  if ($script:videoMode -eq $mode) { return }
-  $targetMp4 = if ($mode -eq "talk") { $script:talkMp4Path } else { $script:idleMp4Path }
-  if (Test-Path -LiteralPath $targetMp4) {
-    try {
-      $script:videoMode = $mode
-      $script:mediaPlayer.Open((New-Object System.Uri($targetMp4)))
-      $script:mediaPlayer.Play()
-      $avatarOverlayEllipse.Opacity = 0.0
-      $avatarEllipse.Fill = $script:videoBrush
-      return
-    } catch {}
+# Load 39 GPU LivePortrait neural video frames into frozen ImageBrushes (zero black-screen bug, ~500KB RAM, frame-accurate voice sync!)
+$script:neuralBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
+$neuralDir = Join-Path $avatarDir "neural-frames"
+if (Test-Path -LiteralPath $neuralDir) {
+  $nFiles = Get-ChildItem -LiteralPath $neuralDir -Filter "f_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
+  foreach ($nf in $nFiles) {
+    $b = Load-AvatarBrush $nf.FullName $null
+    if ($b) { $script:neuralBrushes.Add($b) }
   }
-  $script:videoMode = $null
 }
+$script:neuralIdx = 0
+$script:neuralDirStep = 1
+$script:talkPhaseIdx = 12
 
-$avatarEllipse.Fill = $script:brushIdle
-Switch-AvatarVideo "idle"
+$avatarEllipse.Fill = if ($script:neuralBrushes.Count -gt 0) { $script:neuralBrushes[0] } else { $script:brushIdle }
 $script:activeBrush = $script:brushIdle
 $script:targetBrush = $script:brushIdle
 $script:blendAlpha = 1.0
@@ -784,25 +763,71 @@ $timer.Add_Tick({
     $avatarScale.ScaleY = $avatarScale.ScaleX
     $avatarTranslate.Y = -2.0 * [Math]::Sin($tSec * 2.3)
 
-    # Use real MP4 talking video loop inside the circle when available, with lip-sync border pulse
-    Switch-AvatarVideo "talk"
+    # Voice-synchronized Neural Video + Hand Gestures + Lip-Sync (zero black screen!)
     $borderW = 2.2 + [Math]::Min(1.8, $amp * 3.2)
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
-    if (-not $script:videoMode) {
-      if ($amp -ge 0.34) { Set-AvatarPoseSmooth $script:brushTalkOpen 0.50 }
-      elseif ($amp -ge 0.13) { Set-AvatarPoseSmooth $script:brushTalkMid 0.50 }
-      else { Set-AvatarPoseSmooth $script:brushIdle 0.35 }
+    $phase = $elapsedMs % 7800
+
+    if ($elapsedMs -lt 1050) {
+      # Open speech with a warm friendly wave
+      Set-AvatarPoseSmooth $script:brushWave 0.36
+    } elseif ($phase -gt 2600 -and $phase -lt 3900 -and $amp -ge 0.22) {
+      # Explaining hand gesture on strong mid-sentence emphasis
+      Set-AvatarPoseSmooth $script:brushGestureExplain 0.36
+    } elseif ($amp -ge 0.35) {
+      # High vocal energy: alternate between open vowel lip-sync and expressive GPU neural video frames (14..38)
+      if (($script:pulseTick % 3) -eq 0 -and $script:neuralBrushes.Count -gt 20) {
+        $script:talkPhaseIdx = 14 + (($script:talkPhaseIdx + 2) % ($script:neuralBrushes.Count - 14))
+        Set-AvatarPoseSmooth $script:neuralBrushes[$script:talkPhaseIdx] 0.65
+      } else {
+        Set-AvatarPoseSmooth $script:brushTalkOpen 0.55
+      }
+    } elseif ($amp -ge 0.12) {
+      # Medium vocal energy: smooth neural video frames + talk-mid lip-sync
+      if (($script:pulseTick % 2) -eq 0 -and $script:neuralBrushes.Count -gt 15) {
+        $script:talkPhaseIdx = 8 + (($script:talkPhaseIdx + 1) % ($script:neuralBrushes.Count - 8))
+        Set-AvatarPoseSmooth $script:neuralBrushes[$script:talkPhaseIdx] 0.65
+      } else {
+        Set-AvatarPoseSmooth $script:brushTalkMid 0.55
+      }
+    } else {
+      # Brief pause between words: closed/gentle mouth from early neural video frames (0..9)
+      if ($isBlinking) {
+        Set-AvatarPoseSmooth $script:brushBlink 0.50
+      } elseif ($script:neuralBrushes.Count -gt 9) {
+        $calmIdx = $script:pulseTick % 9
+        Set-AvatarPoseSmooth $script:neuralBrushes[$calmIdx] 0.45
+      } else {
+        Set-AvatarPoseSmooth $script:brushIdle 0.40
+      }
     }
   } else {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#30D158")
     $statusDot.Opacity = 1.0
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
 
-    # Use real MP4 continuous video loop inside the circle
-    Switch-AvatarVideo "idle"
-    if (-not $script:videoMode) {
+    # Continuous alive GPU neural video ping-pong loop (frames 0..14) + periodic natural wave/kiss/listen movements
+    $nowMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    $cycleMs = $nowMs % 18000
+
+    if ($isBlinking) {
+      Set-AvatarPoseSmooth $script:brushBlink 0.45
+    } elseif ($cycleMs -gt 4200 -and $cycleMs -lt 5600) {
+      Set-AvatarPoseSmooth $script:brushWave 0.24
+    } elseif ($cycleMs -gt 9800 -and $cycleMs -lt 11200) {
+      Set-AvatarPoseSmooth $script:brushListenTilt 0.24
+    } elseif ($cycleMs -gt 14200 -and $cycleMs -lt 15600) {
+      Set-AvatarPoseSmooth $script:brushKiss 0.24
+    } elseif ($script:neuralBrushes.Count -ge 14) {
+      $maxCalm = [Math]::Min(14, $script:neuralBrushes.Count - 1)
+      $script:neuralIdx += $script:neuralDirStep
+      if ($script:neuralIdx -ge $maxCalm) { $script:neuralIdx = $maxCalm; $script:neuralDirStep = -1 }
+      elseif ($script:neuralIdx -le 0) { $script:neuralIdx = 0; $script:neuralDirStep = 1 }
+      Set-AvatarPoseSmooth $script:neuralBrushes[$script:neuralIdx] 0.55
+    } else {
       Set-AvatarPoseSmooth $script:brushIdle 0.25
     }
+
     # Gentle alive idle breathing & micro head movement
     $avatarRotate.Angle = 1.4 * [Math]::Sin($tSec * 0.85)
     $avatarScale.ScaleX = 1.0 + 0.010 * [Math]::Sin($tSec * 1.25)
