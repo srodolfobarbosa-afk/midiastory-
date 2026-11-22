@@ -23,6 +23,16 @@ public class WinFocusHelper {
   [DllImport("user32.dll")]
   public static extern bool SetForegroundWindow(IntPtr hWnd);
   [DllImport("user32.dll")]
+  public static extern bool BringWindowToTop(IntPtr hWnd);
+  [DllImport("user32.dll")]
+  public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll")]
+  public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+  [DllImport("user32.dll")]
+  public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+  [DllImport("kernel32.dll")]
+  public static extern uint GetCurrentThreadId();
+  [DllImport("user32.dll")]
   public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
   [DllImport("user32.dll", CharSet = CharSet.Unicode)]
   public static extern bool PostMessageW(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
@@ -32,15 +42,35 @@ public class WinFocusHelper {
   public const uint WM_KEYUP = 0x0101;
   public const int VK_RETURN = 0x0D;
 
+  public static void ForceFocus(IntPtr hWnd) {
+    IntPtr fg = GetForegroundWindow();
+    uint pidDummy = 0;
+    uint fgThread = fg != IntPtr.Zero ? GetWindowThreadProcessId(fg, out pidDummy) : 0;
+    uint myThread = GetCurrentThreadId();
+    bool attached = false;
+    if (fgThread != 0 && fgThread != myThread) {
+      attached = AttachThreadInput(myThread, fgThread, true);
+    }
+    ShowWindow(hWnd, 9);
+    BringWindowToTop(hWnd);
+    SetForegroundWindow(hWnd);
+    if (attached) {
+      AttachThreadInput(myThread, fgThread, false);
+    }
+  }
+
   public static void SendTextFast(IntPtr hWnd, string text) {
+    int i = 0;
     foreach (char c in text) {
       if (c == '\r' || c == '\n') {
         PostMessageW(hWnd, WM_CHAR, (IntPtr)' ', IntPtr.Zero);
       } else {
         PostMessageW(hWnd, WM_CHAR, (IntPtr)c, IntPtr.Zero);
       }
+      i++;
+      if ((i % 25) == 0) System.Threading.Thread.Sleep(4);
     }
-    System.Threading.Thread.Sleep(60);
+    System.Threading.Thread.Sleep(200);
     PostMessageW(hWnd, WM_KEYDOWN, (IntPtr)VK_RETURN, IntPtr.Zero);
     PostMessageW(hWnd, WM_KEYUP, (IntPtr)VK_RETURN, IntPtr.Zero);
   }
@@ -526,9 +556,8 @@ function Send-TextToTerminal([string]$text) {
     $target = $targets[0]
     $hWnd = $target.MainWindowHandle
     Write-DebugLog "Focusing PID=$($target.Id) Title='$($target.MainWindowTitle)'"
-    [WinFocusHelper]::ShowWindow($hWnd, 9) | Out-Null
-    [WinFocusHelper]::SetForegroundWindow($hWnd) | Out-Null
-    Start-Sleep -Milliseconds 100
+    [WinFocusHelper]::ForceFocus($hWnd)
+    Start-Sleep -Milliseconds 140
     [WinFocusHelper]::SendTextFast($hWnd, $clean)
     Write-DebugLog "Sent Unicode text + ENTER via WM_CHAR in <100ms"
   } else {
