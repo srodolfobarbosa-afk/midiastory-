@@ -416,6 +416,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeSection: LinearLayout
     private lateinit var homeComposeView: ComposeView
     private val homeComposeState = mutableStateOf(HomeUiState())
+    private val livePhotosSizeState = mutableStateOf<String?>(null)
+    private val liveVideosSizeState = mutableStateOf<String?>(null)
+    private val liveChatsSizeState = mutableStateOf<String?>(null)
     private lateinit var newsSection: LinearLayout
     private lateinit var filesSection: LinearLayout
     private lateinit var studioSection: LinearLayout
@@ -1396,7 +1399,7 @@ class MainActivity : AppCompatActivity() {
                         },
                         onSelectLargeVideos = {
                             viewModel.selectKind(MediaKind.VIDEO)
-                            viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB)
+                            viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS)
                         },
                         onSelectWhatsApp = {
                             openWhatsAppCleanerFlow()
@@ -1405,6 +1408,9 @@ class MainActivity : AppCompatActivity() {
                             viewModel.selectKind(MediaKind.IMAGE)
                             viewModel.selectSmartFilter(SmartFilterMode.SCREENSHOTS_30D)
                         },
+                        photosSizeLabel = livePhotosSizeState.value,
+                        videosSizeLabel = liveVideosSizeState.value,
+                        chatsSizeLabel = liveChatsSizeState.value,
                     )
                 }
             }
@@ -4271,7 +4277,7 @@ class MainActivity : AppCompatActivity() {
             planLifetimeButton to lifetime,
             homePlanLifetimeButton to lifetime,
         ).forEach { (button, product) ->
-            stylePlanPurchaseButton(button, product?.isAvailable == true)
+            stylePlanPurchaseButton(button, (product?.isAvailable == true) || isDevelopmentBuild)
         }
 
         val annualLabel = if (annual != null && annual.formattedPrice.isNotBlank()) {
@@ -4286,6 +4292,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 getString(R.string.plan_annual_with_price, annual.formattedPrice)
             }
+        } else if (isDevelopmentBuild) {
+            getString(R.string.plan_annual_with_price_and_discount, "R$ 79,99", 56)
         } else if (annual != null && !annual.isAvailable) {
             getString(R.string.plan_annual_unavailable)
         } else {
@@ -4297,6 +4305,8 @@ class MainActivity : AppCompatActivity() {
         }
         val monthlyLabel = if (monthly != null && monthly.formattedPrice.isNotBlank()) {
             getString(R.string.plan_monthly_with_price, monthly.formattedPrice)
+        } else if (isDevelopmentBuild) {
+            getString(R.string.plan_monthly_with_price, "R$ 14,99")
         } else if (monthly != null && !monthly.isAvailable) {
             getString(R.string.plan_monthly_unavailable)
         } else {
@@ -4308,6 +4318,8 @@ class MainActivity : AppCompatActivity() {
         }
         val lifetimeLabel = if (lifetime != null && lifetime.formattedPrice.isNotBlank()) {
             getString(R.string.plan_lifetime_with_price, lifetime.formattedPrice)
+        } else if (isDevelopmentBuild) {
+            getString(R.string.plan_lifetime_with_price, "R$ 149,99")
         } else if (lifetime != null && !lifetime.isAvailable) {
             getString(R.string.plan_lifetime_unavailable)
         } else {
@@ -7354,8 +7366,24 @@ class MainActivity : AppCompatActivity() {
                                 val pFmt = if (breakdown.photosAccessible) Formatter.formatShortFileSize(this@MainActivity, breakdown.photosBytes) else "—"
                                 val vFmt = if (breakdown.videosAccessible) Formatter.formatShortFileSize(this@MainActivity, breakdown.videosBytes) else "—"
                                 val aFmt = if (breakdown.audioAccessible) Formatter.formatShortFileSize(this@MainActivity, breakdown.audioBytes) else "—"
+                                livePhotosSizeState.value = pFmt
+                                liveVideosSizeState.value = vFmt
                                 storageBreakdownLegend.text = getString(R.string.storage_legend_summary, pFmt, vFmt, aFmt)
                                 storageBreakdownLegend.visibility = View.VISIBLE
+                            }
+                            // Calcula em segundo plano o tamanho real das mídias de WhatsApp & Chats para exibir nos Quadradinhos
+                            val waItems = runCatching {
+                                whatsAppCleaner.scanViaMediaStore(this@MainActivity)
+                            }.getOrDefault(emptyList())
+                            if (waItems.isNotEmpty()) {
+                                val waBytes = waItems.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+                                val waFmt = Formatter.formatShortFileSize(this@MainActivity, waBytes)
+                                liveChatsSizeState.value = waFmt
+                                updateHomeMissionCollection(
+                                    mission = CleanMission.WHATSAPP,
+                                    itemCount = waItems.size,
+                                    sizeLabel = waFmt,
+                                )
                             }
                         }
                     } else if (::storageBreakdownLegend.isInitialized) {

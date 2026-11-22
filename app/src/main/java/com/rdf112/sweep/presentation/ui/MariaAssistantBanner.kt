@@ -141,20 +141,20 @@ object MariaI18n {
     }
 
     fun socialChatTileSub(): String = when (lang()) {
-        "pt" -> "Mídias, áudios e downloads"
-        "es" -> "Videos, audios y descargas"
-        "fr" -> "Médias et téléchargements"
+        "pt" -> "Mídias e downloads"
+        "es" -> "Videos y descargas"
+        "fr" -> "Médias & fichiers"
         "de" -> "Medien & Downloads"
         "it" -> "Media e download"
         "ru" -> "Медиа и загрузки"
-        "zh" -> "聊天视频、图片与下载"
-        "ja" -> "動画・画像・ダウンロード"
-        "ko" -> "동영상, 사진 및 다운로드"
+        "zh" -> "视频、图片与下载"
+        "ja" -> "動画・ダウンロード"
+        "ko" -> "동영상 및 다운로드"
         "ar" -> "الوسائط والتنزيلات"
         "hi" -> "मीडिया और डाउनलोड"
         "bn" -> "মিডিয়া ও ডাউনলোড"
         "in", "id" -> "Media & unduhan"
-        else -> "Social media & downloads"
+        else -> "Media & downloads"
     }
 
     fun tapToBringMariaBack(): String = when (lang()) {
@@ -321,19 +321,19 @@ object MariaI18n {
     }
 
     fun sortedBySizeSub(): String = when (lang()) {
-        "pt" -> "Ordenadas por tamanho"
-        "es" -> "Ordenadas por tamaño"
+        "pt" -> "Maiores primeiro"
+        "es" -> "Mayores primero"
         "fr" -> "Triées par taille"
-        "de" -> "Nach Größe sortiert"
+        "de" -> "Nach Größe"
         "zh" -> "按大小排序"
         "ja" -> "サイズ順"
         "ko" -> "크기순 정렬"
         "ru" -> "По размеру"
-        "ar" -> "مرتبة حسب الحجم"
+        "ar" -> "حسب الحجم"
         "hi" -> "आकार के अनुसार"
         "bn" -> "আকার অনুযায়ী"
         "in", "id" -> "Urut ukuran"
-        else -> "Sorted by size"
+        else -> "Largest first"
     }
 
     fun largeVideosTitle(): String = when (lang()) {
@@ -922,6 +922,9 @@ fun FilesMariaHeaderSection(
     onSelectLargeVideos: () -> Unit,
     onSelectWhatsApp: () -> Unit,
     onSelectScreenshots: () -> Unit,
+    photosSizeLabel: String? = null,
+    videosSizeLabel: String? = null,
+    chatsSizeLabel: String? = null,
     modifier: Modifier = Modifier,
 ) {
     var caption by remember {
@@ -951,7 +954,7 @@ fun FilesMariaHeaderSection(
             ) {
                 MariaSquareTile(
                     label = MariaI18n.cameraPhotosTitle(),
-                    highlight = MariaI18n.galleryHighlight(),
+                    highlight = photosSizeLabel?.takeIf { it.isNotBlank() && it != "—" } ?: MariaI18n.galleryHighlight(),
                     highlightColor = Color(0xFF64D2FF),
                     subtitle = MariaI18n.sortedBySizeSub(),
                     onClick = {
@@ -964,7 +967,7 @@ fun FilesMariaHeaderSection(
                 )
                 MariaSquareTile(
                     label = MariaI18n.largeVideosTitle(),
-                    highlight = "> 10 MB",
+                    highlight = videosSizeLabel?.takeIf { it.isNotBlank() && it != "—" } ?: "> 10 MB",
                     highlightColor = Color(0xFFBF5AF2),
                     subtitle = MariaI18n.quickReviewSub(),
                     onClick = {
@@ -982,7 +985,7 @@ fun FilesMariaHeaderSection(
             ) {
                 MariaSquareTile(
                     label = MariaI18n.socialChatTileTitle(),
-                    highlight = "MediaStore",
+                    highlight = chatsSizeLabel?.takeIf { it.isNotBlank() && it != "—" } ?: "MediaStore",
                     highlightColor = Color(0xFF30D158),
                     subtitle = MariaI18n.socialChatTileSub(),
                     onClick = {
