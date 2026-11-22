@@ -248,27 +248,21 @@ fun MariaHeroBanner(
                     val syllableRaw = (sin(now / 54.0) * 0.58 + sin(now / 89.0) * 0.42).toFloat()
                     val cyclePhase = now % 1380L
                     val isBreathPause = cyclePhase > 1160L
-                    val isGestureAccent = (now % 5200L) in 2400L..2720L
 
-                    if (isGestureAccent && isBreathPause) {
-                        currentFrameRes = R.drawable.maria_gesture
-                        mouthLevel = 0f
+                    val target = if (!isBreathPause && syllableRaw > 0.05f) {
+                        ((syllableRaw - 0.05f) / 0.95f * (MARIA_LIP_FRAMES.size - 1))
+                            .coerceIn(0f, (MARIA_LIP_FRAMES.size - 1).toFloat())
                     } else {
-                        val target = if (!isBreathPause && syllableRaw > 0.05f) {
-                            ((syllableRaw - 0.05f) / 0.95f * (MARIA_LIP_FRAMES.size - 1))
-                                .coerceIn(0f, (MARIA_LIP_FRAMES.size - 1).toFloat())
-                        } else {
-                            0f
-                        }
-                        // Fechamento rápido nas consoantes para nunca ficar de boca aberta parada
-                        mouthLevel = if (target == 0f) {
-                            mouthLevel * 0.28f
-                        } else {
-                            mouthLevel * 0.35f + target * 0.65f
-                        }
-                        val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
-                        currentFrameRes = MARIA_LIP_FRAMES[idx]
+                        0f
                     }
+                    // Fechamento rápido nas consoantes para nunca ficar de boca aberta parada
+                    mouthLevel = if (target == 0f) {
+                        mouthLevel * 0.28f
+                    } else {
+                        mouthLevel * 0.35f + target * 0.65f
+                    }
+                    val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
+                    currentFrameRes = MARIA_LIP_FRAMES[idx]
                 }
             } else if (mouthLevel > 0.25f) {
                 mouthLevel *= 0.35f
@@ -308,12 +302,12 @@ fun MariaHeroBanner(
                 replayTrigger++
             },
     ) {
-        // Composição corporal de estúdio (ContentScale.Crop + BiasAlignment idêntico ao Mockup v6: preenche toda a largura sem barras laterais)
+        // Composição corporal widescreen 720x512 (rosto + ombros + blusa/blazer completos, zero costura lateral e zero corte)
         Image(
             painter = painterResource(id = currentFrameRes),
             contentDescription = "Maria Assistente Pessoal",
             contentScale = ContentScale.Crop,
-            alignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.78f),
+            alignment = Alignment.TopCenter,
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
