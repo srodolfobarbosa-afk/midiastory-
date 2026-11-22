@@ -169,6 +169,10 @@ fun ProScreen(
         }
 
         item {
+            ProGeminiNanoBottomCard()
+        }
+
+        item {
             Text(
                 text = "Assinaturas renovam automaticamente até serem canceladas na Google Play Store. Nenhuma mídia é apagada sem sua confirmação no diálogo oficial do Android.",
                 color = MidiastoreColors.TextSubtle,

@@ -105,6 +105,7 @@ import com.rdf112.sweep.presentation.ui.CleanMission
 import com.rdf112.sweep.presentation.ui.CleanerHomeScreen
 import com.rdf112.sweep.presentation.ui.FilesMariaHeaderSection
 import com.rdf112.sweep.presentation.ui.HomeUiState
+import com.rdf112.sweep.presentation.ui.ProGeminiNanoBottomCard
 import com.rdf112.sweep.presentation.ui.ProMariaHeaderSection
 import com.rdf112.sweep.presentation.ui.StorageBarSegment
 import com.rdf112.sweep.presentation.ui.StorageRingGaugeView
@@ -1836,17 +1837,16 @@ class MainActivity : AppCompatActivity() {
         }
         addView(proMariaView)
 
-        addView(label(getString(R.string.pro_card_title), 22f, R.color.sweep_text, true), top(4))
+        addView(label(getString(R.string.pro_card_title), 20f, R.color.sweep_text, true), top(2))
         proStatusBadge = label(getString(R.string.pro_status_free), 12f, R.color.google_blue_primary, true)
-        addView(proStatusBadge, top(4))
-        addView(label(getString(R.string.pro_card_subtitle), 13.5f, R.color.sweep_muted, false), top(6))
+        addView(proStatusBadge, top(2))
+        addView(label(getString(R.string.pro_card_subtitle), 12.5f, R.color.sweep_muted, false), top(4))
 
-        // Cartão 1: Plano Grátis Completo (Muitos benefícios liberados para todos)
+        // Cartões antigos ocultos para que os 3 Planos Google Play fiquem visíveis logo acima e o Modelo IA fique no final
         val freeIncludedCard = card()
         freeIncludedCard.addView(label(getString(R.string.pro_free_included), 13f, R.color.sweep_text, false))
-        addView(wrap(freeIncludedCard), top(12))
+        addView(wrap(freeIncludedCard).apply { visibility = View.GONE }, top(8))
 
-        // Cartão 2: Benefícios Extras dos 3 Planos Pro
         val benefitsCard = card()
         val benefits = listOf(
             getString(R.string.pro_unused_apps_button),
@@ -1866,7 +1866,7 @@ class MainActivity : AppCompatActivity() {
             row.addView(label(lineText, 13.5f, R.color.sweep_text, false), LinearLayout.LayoutParams(0, -2, 1f))
             benefitsCard.addView(row, top(if (idx == 0) 0 else 10))
         }
-        addView(wrap(benefitsCard), top(12))
+        addView(wrap(benefitsCard).apply { visibility = View.GONE }, top(8))
 
         val annualBadge = TextView(this@MainActivity).apply {
             text = getString(R.string.pro_annual_savings_badge)
@@ -1915,7 +1915,19 @@ class MainActivity : AppCompatActivity() {
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
             setTextColor(color(R.color.sweep_text))
         }
-        addView(unusedAppsButton, top(16))
+        addView(unusedAppsButton, top(12))
+
+        // Card do Modelo IA Nativa (Gemini Nano Android — 0 MB) posicionado lá no final da aba Pro conforme pedido pelo Rodolfo
+        val proGeminiNanoBottomView = ComposeView(this@MainActivity).apply {
+            id = View.generateViewId()
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MidiastoreTheme {
+                    ProGeminiNanoBottomCard()
+                }
+            }
+        }
+        addView(proGeminiNanoBottomView, top(8))
 
         val linksRow = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -2190,7 +2202,7 @@ class MainActivity : AppCompatActivity() {
         if (::topBarProButton.isInitialized) {
             topBarProButton.visibility = if (tab == AppTab.PRO) View.GONE else View.VISIBLE
         }
-        statusText.visibility = if (statusText.text.isNotBlank() && (tab == AppTab.FILES || tab == AppTab.OAAS)) View.VISIBLE else View.GONE
+        statusText.visibility = if (statusText.text.isNotBlank() && tab == AppTab.OAAS) View.VISIBLE else View.GONE
         homeSection.visibility = View.GONE
         homeComposeView.visibility = if (tab == AppTab.HOME) View.VISIBLE else View.GONE
         newsSection.visibility = if (tab == AppTab.NEWS) View.VISIBLE else View.GONE

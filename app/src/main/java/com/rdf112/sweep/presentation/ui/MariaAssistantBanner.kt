@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -79,9 +78,9 @@ private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
 
 /**
  * Hero Banner oficial da Assistente Pessoal "Maria" (Midiastore v2.8.0).
- * - Altura ampla e padronizada (264.dp) nas 3 abas (Limpar, Arquivos, Pro) exibindo rosto, ombros e blazer sem sobreposição de texto na boca.
- * - Lip-Sync Optical-Flow a ~28.5 FPS (35ms) + piscadas naturais dos olhos quando em repouso.
- * - Voz neural humana de estúdio embutida em `res/raw` (zero TTS robótico do sistema).
+ * - Altura padronizada (240.dp) nas 3 abas (Limpar, Arquivos, Pro) exibindo rosto, ombros e blazer sem sobreposição de texto na boca
+ *   e permitindo que os cartões com os valores em MB apareçam mais acima na tela inicial.
+ * - Lip-Sync Optical-Flow a ~28.5 FPS (35ms) sincronizado pela duração completa das falas longas de estúdio (12s a 21s).
  */
 @Composable
 fun MariaHeroBanner(
@@ -134,17 +133,16 @@ fun MariaHeroBanner(
         }
     }
 
-    // Dispara a fala de estúdio + animação labial sempre que a aba fica ativa ou o usuário interage
+    // Dispara a fala longa de estúdio + animação labial completa até o último segundo do áudio
     LaunchedEffect(isActive, tabKey, rawAudioResId, speechNonce, replayTrigger) {
         stopAndReleaseAudio()
         if (!isActive) return@LaunchedEffect
 
-        // Pequeno respiro para transição suave de aba
-        delay(160L)
+        delay(140L)
         isSpeaking = true
 
         if (!isMuted) {
-            val started = runCatching {
+            val mpInstance = runCatching {
                 val mp = MediaPlayer.create(context, rawAudioResId)
                 if (mp != null) {
                     mediaPlayerRef = mp
@@ -160,22 +158,28 @@ fun MariaHeroBanner(
                         true
                     }
                     mp.start()
-                    true
+                    mp
                 } else {
-                    false
+                    null
                 }
-            }.getOrDefault(false)
+            }.getOrNull()
 
-            if (started) {
-                // Guarda de segurança caso o callback de completion demore
-                delay(5500L)
+            if (mpInstance != null) {
+                // Mantém a animação labial ativa durante toda a reprodução (até 35 segundos) sem cortar a fala
+                var elapsedMs = 0L
+                while (isSpeaking && elapsedMs < 35000L) {
+                    val stillPlaying = runCatching { mpInstance.isPlaying }.getOrDefault(false)
+                    if (!stillPlaying && elapsedMs > 600L) break
+                    delay(180L)
+                    elapsedMs += 180L
+                }
                 if (isSpeaking) stopAndReleaseAudio()
                 return@LaunchedEffect
             }
         }
 
-        // Caso esteja silenciado (🔇) ou em emulador sem saída de áudio, anima os lábios naturalmente pela duração da frase
-        val simulatedMs = (captionText.length * 52L).coerceIn(2400L, 4200L)
+        // Caso esteja silenciado (🔇) ou sem dispositivo de áudio, anima os lábios por tempo proporcional
+        val simulatedMs = (captionText.length * 68L).coerceIn(4500L, 12000L)
         delay(simulatedMs)
         isSpeaking = false
     }
@@ -225,8 +229,8 @@ fun MariaHeroBanner(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(264.dp)
-            .clip(RoundedCornerShape(22.dp))
+            .height(240.dp)
+            .clip(RoundedCornerShape(20.dp))
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
@@ -239,7 +243,7 @@ fun MariaHeroBanner(
             .border(
                 width = 1.dp,
                 color = if (isSpeaking) Color(0x660A84FF) else Color(0xFF1F2430),
-                shape = RoundedCornerShape(22.dp),
+                shape = RoundedCornerShape(20.dp),
             )
             .clickable {
                 replayTrigger++
@@ -262,9 +266,9 @@ fun MariaHeroBanner(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        0.0f to Color(0x2E000000),
-                        0.38f to Color.Transparent,
-                        0.74f to Color(0xB8000000),
+                        0.0f to Color(0x2A000000),
+                        0.40f to Color.Transparent,
+                        0.75f to Color(0xB8000000),
                         1.0f to Color(0xF5000000),
                     ),
                 ),
@@ -274,8 +278,8 @@ fun MariaHeroBanner(
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(12.dp)
-                .size(36.dp)
+                .padding(10.dp)
+                .size(34.dp)
                 .clip(CircleShape)
                 .background(Color(0xCC1C1C1E))
                 .border(
@@ -297,7 +301,7 @@ fun MariaHeroBanner(
         ) {
             Text(
                 text = if (isMuted) "🔇" else "🔊",
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 color = Color.White,
             )
         }
@@ -307,7 +311,7 @@ fun MariaHeroBanner(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -322,18 +326,18 @@ fun MariaHeroBanner(
                 Text(
                     text = "MARIA • ASSISTENTE",
                     color = Color(0xFF64D2FF),
-                    fontSize = 10.5.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 0.5.sp,
                 )
             }
-            Spacer(Modifier.height(3.dp))
+            Spacer(Modifier.height(2.dp))
             Text(
                 text = captionText,
                 color = Color.White,
-                fontSize = 14.sp,
+                fontSize = 13.5.sp,
                 fontWeight = FontWeight.SemiBold,
-                lineHeight = 18.sp,
+                lineHeight = 17.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -342,7 +346,7 @@ fun MariaHeroBanner(
 }
 
 /**
- * Cabeçalho da 2ª Aba (Arquivos): Maria Hero Banner + Grid 2x2 de Quadradinhos Visuais.
+ * Cabeçalho da 2ª Aba (Arquivos): Maria Hero Banner + Grid 2x2 de Quadradinhos Visuais com falas dedicadas.
  */
 @Composable
 fun FilesMariaHeaderSection(
@@ -354,29 +358,29 @@ fun FilesMariaHeaderSection(
     modifier: Modifier = Modifier,
 ) {
     var caption by remember {
-        mutableStateOf("Suas fotos, vídeos e mídias organizados por tamanho.")
+        mutableStateOf("Suas fotos, vídeos, áudios e mídias organizados dos maiores para os menores.")
     }
+    var activeAudioRes by remember { mutableIntStateOf(R.raw.maria_files) }
     var speechNonce by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(bottom = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         MariaHeroBanner(
             tabKey = "files",
             captionText = caption,
-            rawAudioResId = R.raw.maria_files,
+            rawAudioResId = activeAudioRes,
             isActive = isActive,
             speechNonce = speechNonce,
         )
 
-        // Grid 2x2 de Quadradinhos na aba Arquivos (conforme aprovado na Planta v6)
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MariaSquareTile(
                     label = "Fotos da Câmera",
@@ -385,6 +389,7 @@ fun FilesMariaHeaderSection(
                     subtitle = "Ordenadas por tamanho",
                     onClick = {
                         caption = "Suas fotos da câmera organizadas das maiores para as menores."
+                        activeAudioRes = R.raw.maria_files
                         speechNonce++
                         onSelectPhotos()
                     },
@@ -396,7 +401,8 @@ fun FilesMariaHeaderSection(
                     highlightColor = Color(0xFFBF5AF2),
                     subtitle = "Revisão rápida",
                     onClick = {
-                        caption = "Todos os vídeos pesados do aparelho prontos para revisão."
+                        caption = "Estes são os vídeos grandes com mais de 10 MB que mais ocupam espaço."
+                        activeAudioRes = R.raw.maria_videos
                         speechNonce++
                         onSelectLargeVideos()
                     },
@@ -405,7 +411,7 @@ fun FilesMariaHeaderSection(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MariaSquareTile(
                     label = "WhatsApp",
@@ -413,7 +419,8 @@ fun FilesMariaHeaderSection(
                     highlightColor = Color(0xFF30D158),
                     subtitle = "Fotos, vídeos e áudios",
                     onClick = {
-                        caption = "Fotos e vídeos recebidos no WhatsApp em um só lugar."
+                        caption = "Fotos, vídeos e áudios acumulados nas conversas do WhatsApp."
+                        activeAudioRes = R.raw.maria_whatsapp
                         speechNonce++
                         onSelectWhatsApp()
                     },
@@ -425,7 +432,8 @@ fun FilesMariaHeaderSection(
                     highlightColor = Color(0xFFFF9F0A),
                     subtitle = "Prints acumulados",
                     onClick = {
-                        caption = "Capturas de tela antigas acumuladas no aparelho."
+                        caption = "Capturas de tela e comprovantes antigos com mais de 30 dias."
+                        activeAudioRes = R.raw.maria_screenshots
                         speechNonce++
                         onSelectScreenshots()
                     },
@@ -437,7 +445,7 @@ fun FilesMariaHeaderSection(
 }
 
 /**
- * Cabeçalho da 3ª Aba (Pro): Maria Hero Banner + Card Gemini Nano Nativo do Android (0 MB) + Grid 2x2 Pro.
+ * Cabeçalho da 3ª Aba (Pro): Maria Hero Banner + Grid 2x2 Pro logo no topo (deixando os planos logo acima e o Modelo IA no final).
  */
 @Composable
 fun ProMariaHeaderSection(
@@ -446,102 +454,46 @@ fun ProMariaHeaderSection(
     modifier: Modifier = Modifier,
 ) {
     val defaultLine = if (isProActive) {
-        "Seu Midiastore Pro com IA Nativa do Android está ativo!"
+        "Seu Midiastore Pro com limpeza completa e IA Nativa está ativo!"
     } else {
-        "Libere a limpeza completa + IA Nativa do Android no Pro."
+        "Desbloqueie a limpeza completa sem limites + Inteligência Artificial Nativa no Pro."
     }
     var caption by remember(isProActive) { mutableStateOf(defaultLine) }
+    var activeAudioRes by remember { mutableIntStateOf(R.raw.maria_pro) }
     var speechNonce by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(bottom = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         MariaHeroBanner(
             tabKey = "pro",
             captionText = caption,
-            rawAudioResId = R.raw.maria_pro,
+            rawAudioResId = activeAudioRes,
             isActive = isActive,
             speechNonce = speechNonce,
         )
 
-        // Card Exclusivo Gemini Nano (AICore Nativo do Android — 0 MB extra no APK)
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = Color(0xFF131B2E),
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, Color(0x6664D2FF), RoundedCornerShape(16.dp))
-                .clip(RoundedCornerShape(16.dp))
-                .clickable {
-                    caption = "A IA Nativa Gemini Nano roda direto no seu Android, offline e com 0 MB extra."
-                    speechNonce++
-                },
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color(0x2E0A84FF),
-                                Color(0x295E5CE6),
-                            ),
-                        ),
-                    )
-                    .padding(horizontal = 15.dp, vertical = 14.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    text = "✨ Assistente IA Nativa (Gemini Nano Android)",
-                    color = Color(0xFF64D2FF),
-                    fontSize = 13.5.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-                Text(
-                    text = "Roda direto no Android (0 MB extra no app), offline e com privacidade total para assinantes Pro.",
-                    color = Color(0xFFD6DEEB),
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp,
-                )
-            }
-        }
-
-        // Grid 2x2 de Quadradinhos de Destaques Pro
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        // Grid 2x2 de Quadradinhos de Destaques Pro bem visível no topo
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                MariaSquareTile(
-                    label = "IA Gemini Nano",
-                    highlight = "0 MB",
-                    highlightColor = Color(0xFF64D2FF),
-                    subtitle = "Nativo do Android",
-                    onClick = {
-                        caption = "Inteligência nativa do Android sem pesar nada no seu celular."
-                        speechNonce++
-                    },
-                    modifier = Modifier.weight(1f),
-                )
                 MariaSquareTile(
                     label = "Duplicatas SHA-256",
                     highlight = "100%",
                     highlightColor = Color(0xFFFF9F0A),
                     subtitle = "Lote ilimitado",
                     onClick = {
-                        caption = "Varredura global SHA-256 que protege sempre a foto original."
+                        caption = "Varredura global SHA-256 que protege sempre a sua foto original."
+                        activeAudioRes = R.raw.maria_dup
                         speechNonce++
                     },
                     modifier = Modifier.weight(1f),
                 )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
                 MariaSquareTile(
                     label = "Apps sem Uso",
                     highlight = "+90 dias",
@@ -549,6 +501,24 @@ fun ProMariaHeaderSection(
                     subtitle = "Espaço oculto",
                     onClick = {
                         caption = "Descubra aplicativos esquecidos há mais de 90 dias ocupando gigabytes."
+                        activeAudioRes = R.raw.maria_pro
+                        speechNonce++
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                MariaSquareTile(
+                    label = "Vídeos Pesados",
+                    highlight = "> 10 MB",
+                    highlightColor = Color(0xFF64D2FF),
+                    subtitle = "Limpeza rápida",
+                    onClick = {
+                        caption = "Localize e revise todos os vídeos pesados em poucos segundos."
+                        activeAudioRes = R.raw.maria_videos
                         speechNonce++
                     },
                     modifier = Modifier.weight(1f),
@@ -559,12 +529,77 @@ fun ProMariaHeaderSection(
                     highlightColor = Color(0xFF30D158),
                     subtitle = "Zero nuvem externa",
                     onClick = {
-                        caption = "Suas fotos e vídeos nunca saem do aparelho."
+                        caption = "Suas fotos e vídeos são analisados no aparelho e nunca vão para servidores."
+                        activeAudioRes = R.raw.maria_nano
                         speechNonce++
                     },
                     modifier = Modifier.weight(1f),
                 )
             }
+        }
+    }
+}
+
+/**
+ * Card do Modelo IA Nativa (Gemini Nano Android — 0 MB) posicionado no final da aba Pro conforme solicitado.
+ */
+@Composable
+fun ProGeminiNanoBottomCard(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = Color(0xFF131B2E),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 12.dp)
+            .border(1.dp, Color(0x6664D2FF), RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp)),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0x2E0A84FF),
+                            Color(0x295E5CE6),
+                        ),
+                    ),
+                )
+                .padding(horizontal = 15.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "✨ Modelo IA Nativa (Gemini Nano Android)",
+                    color = Color(0xFF64D2FF),
+                    fontSize = 13.5.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = Color(0x330A84FF),
+                ) {
+                    Text(
+                        text = "0 MB EXTRA",
+                        color = Color(0xFF64D2FF),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                    )
+                }
+            }
+            Text(
+                text = "Roda direto no próprio sistema Android (0 MB extra no aplicativo), 100% offline e com privacidade total para assinantes Pro.",
+                color = Color(0xFFD6DEEB),
+                fontSize = 12.sp,
+                lineHeight = 17.sp,
+            )
         }
     }
 }
@@ -579,40 +614,40 @@ fun MariaSquareTile(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(15.dp),
         color = MidiastoreColors.CardSurface,
         modifier = modifier
-            .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp))
+            .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(15.dp))
+            .clip(RoundedCornerShape(15.dp))
             .clickable(onClick = onClick),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 13.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
         ) {
             Text(
                 text = label,
                 color = Color(0xFFE5E5EA),
-                fontSize = 12.5.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = highlight,
-                color = highlightColor,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(2.dp))
             Text(
+                text = highlight,
+                color = highlightColor,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(Modifier.height(1.dp))
+            Text(
                 text = subtitle,
                 color = MidiastoreColors.TextMuted,
-                fontSize = 11.sp,
+                fontSize = 10.5.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

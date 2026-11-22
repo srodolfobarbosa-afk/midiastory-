@@ -24,6 +24,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,30 +57,39 @@ fun CleanerHomeScreen(
     showProBadge: Boolean = false,
     isTabActive: Boolean = true,
 ) {
-    val mariaCaption = when {
+    val defaultCaption = when {
         state.isScanning -> stringResource(R.string.cleaner_home_scanning)
-        state.recoverableBytes > 0L -> "Olá! Encontrei ${state.recoverableLabel} prontos para liberar com segurança."
+        state.recoverableBytes > 0L -> "Olá! Encontrei ${state.recoverableLabel} prontos para liberar. Toque abaixo para revisar com calma."
         !state.statusMessage.isNullOrBlank() -> state.statusMessage
-        else -> "Olá! Encontrei arquivos prontos para liberar espaço com segurança."
+        else -> "Olá! Já analisei seu celular e separei arquivos prontos para liberar espaço com segurança."
     }
+    var customCaption by remember { mutableStateOf<String?>(null) }
+    var activeAudioRes by remember { mutableIntStateOf(R.raw.maria_clean) }
+    var speechNonce by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(MidiastoreColors.OledBlack)
-            .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         MariaHeroBanner(
             tabKey = "clean",
-            captionText = mariaCaption,
-            rawAudioResId = R.raw.maria_clean,
+            captionText = customCaption ?: defaultCaption,
+            rawAudioResId = activeAudioRes,
             isActive = isTabActive,
+            speechNonce = speechNonce,
         )
 
         StorageNowBanner(
             state = state,
-            onAnalyze = onAnalyze,
+            onAnalyze = {
+                customCaption = null
+                activeAudioRes = R.raw.maria_clean
+                speechNonce++
+                onAnalyze()
+            },
         )
 
         if (state.needsMediaPermissionPrompt) {
@@ -91,16 +105,16 @@ fun CleanerHomeScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         text = stringResource(R.string.limited_access_banner),
                         color = MidiastoreColors.AccentBlue,
-                        fontSize = 13.sp,
+                        fontSize = 12.5.sp,
                         fontWeight = FontWeight.Bold,
-                        lineHeight = 17.sp,
+                        lineHeight = 16.sp,
                         modifier = Modifier.weight(1f),
                     )
                     Text(
@@ -113,17 +127,37 @@ fun CleanerHomeScreen(
             }
         }
 
+        // Quadradinhos 2x2 com valores em MB logo acima para aparecerem inteiros na tela inicial!
         QuickMissionGrid(
             collections = state.collections,
-            onMissionClick = onMissionClick,
+            onMissionClick = { mission ->
+                when (mission) {
+                    CleanMission.DUPLICATES -> {
+                        customCaption = "Separei fotos e vídeos duplicados protegendo sempre o arquivo original."
+                        activeAudioRes = R.raw.maria_dup
+                    }
+                    CleanMission.LARGE_VIDEOS -> {
+                        customCaption = "Estes são os vídeos grandes com mais de 10 MB que mais ocupam espaço."
+                        activeAudioRes = R.raw.maria_videos
+                    }
+                    CleanMission.WHATSAPP -> {
+                        customCaption = "Fotos, vídeos e áudios acumulados nas conversas do WhatsApp."
+                        activeAudioRes = R.raw.maria_whatsapp
+                    }
+                    CleanMission.OLD_SCREENSHOTS -> {
+                        customCaption = "Capturas de tela antigas com mais de 30 dias prontas para revisar."
+                        activeAudioRes = R.raw.maria_screenshots
+                    }
+                    CleanMission.BLURRY_PHOTOS -> {
+                        customCaption = "Verificando fotos borradas ou com baixa nitidez no seu aparelho."
+                        activeAudioRes = R.raw.maria_clean
+                    }
+                }
+                speechNonce++
+                onMissionClick(mission)
+            },
         )
 
-        if (!isProActive) {
-            SalesPsychologyProCard(onOpenPro = onOpenPro)
-        }
-
-        // The carousel only adds value once a scan produced real counts; with placeholder data it just
-        // duplicated the quick grid and showed clipped "0 items" cards below the fold.
         val scannedCollections = state.collections.filter { it.itemCount > 0 }
         if (scannedCollections.isNotEmpty()) {
             Row(
@@ -157,12 +191,17 @@ fun CleanerHomeScreen(
             }
         }
 
+        // Modelo Pro / IA Nativa posicionado lá no final da aba conforme solicitado pelo Rodolfo!
+        if (!isProActive) {
+            SalesPsychologyProCard(onOpenPro = onOpenPro)
+        }
+
         Text(
             text = stringResource(R.string.cleaner_home_manual_review),
             color = MidiastoreColors.TextSubtle,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            modifier = Modifier.padding(top = 2.dp, bottom = 28.dp),
+            fontSize = 11.5.sp,
+            lineHeight = 15.sp,
+            modifier = Modifier.padding(top = 2.dp, bottom = 24.dp),
         )
     }
 }
@@ -377,7 +416,7 @@ private fun StorageNowBanner(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 14.dp, vertical = 12.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -394,11 +433,11 @@ private fun StorageNowBanner(
                             },
                         ),
                         color = MidiastoreColors.TextMuted,
-                        fontSize = 11.sp,
+                        fontSize = 10.5.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.6.sp,
+                        letterSpacing = 0.5.sp,
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(2.dp))
                     Text(
                         text = if (hasRecoverable) {
                             state.recoverableLabel
@@ -406,7 +445,7 @@ private fun StorageNowBanner(
                             stringResource(R.string.storage_used_headline, state.usedLabel)
                         },
                         color = MidiastoreColors.TextPrimary,
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
                     )
                     Text(
@@ -417,26 +456,26 @@ private fun StorageNowBanner(
                             stringResource(R.string.cleaner_home_used_of_total, state.usedLabel, state.totalLabel)
                         },
                         color = MidiastoreColors.TextMuted,
-                        fontSize = 12.sp,
+                        fontSize = 11.5.sp,
                     )
                 }
 
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(10.dp))
 
                 Box(
-                    modifier = Modifier.size(60.dp),
+                    modifier = Modifier.size(52.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (state.isScanning) {
                         CircularProgressIndicator(
                             color = MidiastoreColors.AccentBlue,
                             strokeWidth = 4.dp,
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(44.dp),
                         )
                     } else {
                         val sweepAngle = (state.usedFraction.coerceIn(0f, 1f)) * 360f
-                        Canvas(modifier = Modifier.size(58.dp)) {
-                            val strokePx = 6.dp.toPx()
+                        Canvas(modifier = Modifier.size(50.dp)) {
+                            val strokePx = 5.5.dp.toPx()
                             drawArc(
                                 color = MidiastoreColors.CardSurfaceAlt,
                                 startAngle = 0f,
@@ -455,16 +494,16 @@ private fun StorageNowBanner(
                         Text(
                             text = if (state.usedPercent > 0) "${state.usedPercent}%" else "—",
                             color = MidiastoreColors.TextPrimary,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold,
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
             SegmentedBar(fractions = state.categoryFractions)
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
 
             Button(
                 onClick = onAnalyze,
@@ -488,18 +527,7 @@ private fun StorageNowBanner(
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(vertical = 4.dp),
-                )
-            }
-
-            if (!state.statusMessage.isNullOrBlank()) {
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    text = state.statusMessage,
-                    color = MidiastoreColors.TextMuted,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.padding(vertical = 2.dp),
                 )
             }
         }
