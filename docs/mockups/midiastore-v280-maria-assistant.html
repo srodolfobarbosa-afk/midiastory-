@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Planta v2 (Hero Clean) — Midiastore v2.8.0 com Maria</title>
+  <title>Planta v3 Definitiva — Midiastore v2.8.0 (Maria + Quadradinhos + Gemini Nano Pro)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -20,7 +20,7 @@
     }
     .phone {
       width: 360px;
-      height: 750px;
+      height: 760px;
       background: #000000;
       border-radius: 44px;
       border: 3px solid #2c2c2e;
@@ -38,7 +38,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 11px;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.78);
       z-index: 10;
       pointer-events: none;
     }
@@ -49,40 +49,40 @@
     }
     .scroll-area::-webkit-scrollbar { width: 0; }
 
-    /* HERO MARIA GRANDE CINEMATOGRÁFICO (APENAS NA ABA LIMPAR) */
+    /* HERO MARIA EM TODAS AS ABAS — MOSTRANDO ROSTO + BLUSA/OMBROS */
     .hero-maria {
       position: relative;
-      height: 248px;
+      height: 276px;
       width: 100%;
       overflow: hidden;
       background: #080b12;
+      transition: height 0.25s ease;
+    }
+    .hero-maria.compact {
+      height: 210px;
     }
     .hero-maria img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 18%;
+      object-position: center 22%;
       transition: transform 0.35s ease;
     }
-    .hero-maria.speaking img {
-      transform: scale(1.03);
-    }
+    .hero-maria.speaking img { transform: scale(1.03); }
     .hero-fade {
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(0,0,0,0.45) 0%,
-        rgba(0,0,0,0.05) 36%,
-        rgba(0,0,0,0.72) 78%,
+        rgba(0,0,0,0.42) 0%,
+        rgba(0,0,0,0.02) 32%,
+        rgba(0,0,0,0.68) 78%,
         #000000 100%
       );
     }
     .hero-top-bar {
       position: absolute;
-      top: 34px;
-      left: 18px;
-      right: 18px;
+      top: 34px; left: 18px; right: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -92,49 +92,43 @@
       font-size: 19px;
       font-weight: 700;
       letter-spacing: -0.4px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.75);
     }
     .audio-btn {
-      width: 34px;
-      height: 34px;
+      width: 34px; height: 34px;
       border-radius: 50%;
-      background: rgba(28,28,30,0.72);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(28,28,30,0.74);
+      border: 1px solid rgba(255,255,255,0.2);
       color: #fff;
       font-size: 14px;
       cursor: pointer;
       backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
     }
     .audio-btn:hover { border-color: #0a84ff; background: rgba(10,132,255,0.35); }
     .hero-caption {
       position: absolute;
-      bottom: 12px;
-      left: 18px;
-      right: 18px;
+      bottom: 12px; left: 18px; right: 18px;
       z-index: 5;
     }
     .hero-tag {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 10.5px;
+      font-weight: 700;
       color: #64d2ff;
       margin-bottom: 4px;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
     }
     .dot-live {
-      width: 7px;
-      height: 7px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: #0a84ff;
       box-shadow: 0 0 8px #0a84ff;
     }
     .hero-line {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 600;
       line-height: 1.3;
       color: #ffffff;
@@ -156,11 +150,7 @@
       justify-content: space-between;
       align-items: baseline;
     }
-    .storage-num {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
+    .storage-num { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
     .muted { color: #8e8e93; font-size: 12px; }
     .bar {
       height: 8px;
@@ -184,43 +174,43 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 8px;
-      transition: background 0.15s ease;
     }
     .cta-btn:hover { background: #2994ff; }
 
-    .row-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #2c2c2e;
-      font-size: 13.5px;
+    /* GRID DE QUADRADINHOS (ESTILO SPOTIFY / APPLE CLEAN) */
+    .tile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tile {
+      background: #1c1c1e;
+      border: 1px solid #2c2c2e;
+      border-radius: 16px;
+      padding: 13px;
       cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.12s ease;
     }
-    .row-item:last-child { border-bottom: none; padding-bottom: 2px; }
-    .row-item:first-child { padding-top: 2px; }
-    .pill-val {
-      background: #2c2c2e;
-      color: #e5e5ea;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 999px;
-    }
+    .tile:hover { border-color: #0a84ff; transform: translateY(-1px); }
+    .tile-label { font-size: 12.5px; font-weight: 600; color: #e5e5ea; margin-bottom: 6px; }
+    .tile-size { font-size: 18px; font-weight: 700; color: #ffffff; }
+    .tile-sub { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+    .accent-blue { color: #64d2ff; }
+    .accent-amber { color: #ff9f0a; }
+    .accent-purple { color: #bf5af2; }
+    .accent-green { color: #30d158; }
 
-    /* BANNER PRO ELEGANTE NA PRIMEIRA ABA */
+    /* BANNER PRO ELEGANTE NA 1ª ABA */
     .pro-banner {
-      background: linear-gradient(135deg, rgba(10,132,255,0.20) 0%, #1c1c1e 65%);
-      border: 1px solid rgba(10,132,255,0.45);
+      background: linear-gradient(135deg, rgba(10,132,255,0.22) 0%, #1c1c1e 68%);
+      border: 1px solid rgba(10,132,255,0.48);
       border-radius: 16px;
       padding: 13px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: border-color 0.15s ease;
     }
-    .pro-banner:hover { border-color: #0a84ff; }
     .pro-badge {
       display: inline-block;
       background: #0a84ff;
@@ -230,25 +220,25 @@
       padding: 2px 7px;
       border-radius: 6px;
       margin-bottom: 4px;
-      letter-spacing: 0.4px;
     }
     .pro-title { font-size: 13.5px; font-weight: 700; color: #fff; }
-    .pro-arrow { font-size: 18px; color: #0a84ff; font-weight: 700; }
+    .pro-arrow { font-size: 20px; color: #0a84ff; font-weight: 700; }
 
-    /* CABEÇALHO LIMPO PARA ABAS ARQUIVOS E PRO (SEM MARIA PERSISTENTE) */
-    .clean-header {
-      padding: 44px 18px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* CARD GEMINI NANO NATIVO NO MODO PRO */
+    .nano-card {
+      background: linear-gradient(135deg, rgba(10,132,255,0.18), rgba(94,92,230,0.16));
+      border: 1px solid rgba(100,210,255,0.4);
+      border-radius: 16px;
+      padding: 13px 14px;
     }
-    .clean-header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    .nano-title { font-size: 13px; font-weight: 700; color: #64d2ff; margin-bottom: 3px; }
+    .nano-desc { font-size: 12px; color: #d6deeb; line-height: 1.4; }
 
     .plan-card {
       background: #1c1c1e;
       border: 1px solid #2c2c2e;
       border-radius: 16px;
-      padding: 15px;
+      padding: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -297,112 +287,130 @@
 <body>
   <div class="phone">
     <div class="status-bar">
-      <span>02:58</span>
+      <span>03:08</span>
       <span>5G • 94%</span>
     </div>
 
     <div class="scroll-area">
-      <!-- ABA 1: LIMPAR (COM HERO MARIA GRANDE + FRASE CURTA + BANNER PRO) -->
-      <div id="tabClean">
-        <div class="hero-maria" id="heroMaria">
-          <img id="mariaImg" src="file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png" alt="Maria" />
-          <div class="hero-fade"></div>
-          <div class="hero-top-bar">
-            <div class="brand">Midiastore</div>
-            <button class="audio-btn" id="btnAudio" title="Ouvir / Silenciar Maria">🔊</button>
+      <!-- HERO MARIA PRESENTE NAS 3 ABAS (MOSTRANDO ROSTO + BLUSA/OMBROS) -->
+      <div class="hero-maria" id="heroMaria">
+        <img id="mariaImg" src="file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png" alt="Maria" />
+        <div class="hero-fade"></div>
+        <div class="hero-top-bar">
+          <div class="brand" id="topBrand">Midiastore</div>
+          <button class="audio-btn" id="btnAudio" title="Ouvir / Silenciar Maria">🔊</button>
+        </div>
+        <div class="hero-caption">
+          <div class="hero-tag"><span class="dot-live"></span> MARIA • ASSISTENTE</div>
+          <div class="hero-line" id="mariaLine">Olá! Encontrei 4,8 GB prontos para liberar.</div>
+        </div>
+      </div>
+
+      <!-- ABA 1: LIMPAR -->
+      <div id="tabClean" class="body-pad">
+        <div class="card">
+          <div class="storage-row">
+            <div class="storage-num">98,4 GB</div>
+            <div class="muted">de 128 GB usados</div>
           </div>
-          <div class="hero-caption">
-            <div class="hero-tag"><span class="dot-live"></span> MARIA • ASSISTENTE</div>
-            <div class="hero-line" id="mariaLine">Olá! Encontrei 4,8 GB prontos para liberar.</div>
+          <div class="bar">
+            <div class="seg-photos"></div>
+            <div class="seg-videos"></div>
+            <div class="seg-dup"></div>
+          </div>
+          <button class="cta-btn" id="btnCleanNow">Limpar meu espaço agora</button>
+        </div>
+
+        <!-- QUADRADINHOS DE LIMPEZA -->
+        <div class="tile-grid">
+          <div class="tile" data-line="Separei fotos e vídeos duplicados protegendo o original.">
+            <div class="tile-label">Duplicatas</div>
+            <div class="tile-size accent-amber">1,9 GB</div>
+            <div class="tile-sub">WhatsApp & Galeria</div>
+          </div>
+          <div class="tile" data-line="Estes vídeos grandes ocupam mais espaço no aparelho.">
+            <div class="tile-label">Vídeos grandes</div>
+            <div class="tile-size accent-purple">2,1 GB</div>
+            <div class="tile-sub">Revisão rápida</div>
+          </div>
+          <div class="tile" data-line="Capturas antigas com mais de 30 dias prontas para revisar.">
+            <div class="tile-label">Capturas antigas</div>
+            <div class="tile-size accent-blue">820 MB</div>
+            <div class="tile-sub">Mais de 30 dias</div>
+          </div>
+          <div class="tile" data-line="Fotos pesadas em alta resolução para você escolher.">
+            <div class="tile-label">Fotos pesadas</div>
+            <div class="tile-size accent-green">1,4 GB</div>
+            <div class="tile-sub">Galeria completa</div>
           </div>
         </div>
 
-        <div class="body-pad">
-          <div class="card">
-            <div class="storage-row">
-              <div class="storage-num">98,4 GB</div>
-              <div class="muted">de 128 GB usados</div>
-            </div>
-            <div class="bar">
-              <div class="seg-photos"></div>
-              <div class="seg-videos"></div>
-              <div class="seg-dup"></div>
-            </div>
-            <button class="cta-btn" id="btnCleanNow">Limpar meu espaço agora</button>
+        <!-- CARD PRO NA 1ª ABA -->
+        <div class="pro-banner" id="goProBanner">
+          <div>
+            <div class="pro-badge">PRO + IA NATIVA</div>
+            <div class="pro-title">Libere limpeza completa + Gemini Nano</div>
+            <div class="muted">A partir de R$ 14,99 • Anual e Vitalício</div>
           </div>
+          <div class="pro-arrow">›</div>
+        </div>
+      </div>
 
-          <div class="card">
-            <div class="row-item" data-line="Separei fotos e vídeos duplicados protegendo o original.">
-              <span>Duplicatas do WhatsApp e Galeria</span>
-              <span class="pill-val">1,9 GB</span>
-            </div>
-            <div class="row-item" data-line="Estes vídeos grandes ocupam mais espaço no aparelho.">
-              <span>Vídeos grandes</span>
-              <span class="pill-val">2,1 GB</span>
-            </div>
-            <div class="row-item" data-line="Capturas antigas com mais de 30 dias para revisar.">
-              <span>Capturas antigas</span>
-              <span class="pill-val">820 MB</span>
-            </div>
+      <!-- ABA 2: ARQUIVOS (COM QUADRADINHOS VISUAIS) -->
+      <div id="tabFiles" class="body-pad hidden">
+        <div class="tile-grid">
+          <div class="tile" data-line="Suas fotos da câmera organizadas das maiores para as menores.">
+            <div class="tile-label">Fotos da Câmera</div>
+            <div class="tile-size accent-blue">18,4 GB</div>
+            <div class="tile-sub">2.410 itens</div>
           </div>
-
-          <!-- CARD PRO ELEGANTE NA PRIMEIRA ABA -->
-          <div class="pro-banner" id="goProBanner">
-            <div>
-              <div class="pro-badge">PRO</div>
-              <div class="pro-title">Libere limpeza completa sem limites</div>
-              <div class="muted">A partir de R$ 14,99 • Anual e Vitalício</div>
-            </div>
-            <div class="pro-arrow">›</div>
+          <div class="tile" data-line="Todos os vídeos do aparelho prontos para revisão.">
+            <div class="tile-label">Vídeos</div>
+            <div class="tile-size accent-purple">26,2 GB</div>
+            <div class="tile-sub">184 vídeos</div>
+          </div>
+          <div class="tile" data-line="Fotos e vídeos recebidos no WhatsApp em um só lugar.">
+            <div class="tile-label">WhatsApp</div>
+            <div class="tile-size accent-green">6,7 GB</div>
+            <div class="tile-sub">Mídia recebida</div>
+          </div>
+          <div class="tile" data-line="Capturas de tela e áudios acumulados no aparelho.">
+            <div class="tile-label">Capturas & Áudios</div>
+            <div class="tile-size accent-amber">2,0 GB</div>
+            <div class="tile-sub">690 arquivos</div>
           </div>
         </div>
       </div>
 
-      <!-- ABA 2: ARQUIVOS (100% LIMPA, SEM MARIA PERSISTENTE) -->
-      <div id="tabFiles" class="hidden">
-        <div class="clean-header">
-          <h1>Arquivos</h1>
+      <!-- ABA 3: PRO (COM MARIA + GEMINI NANO NATIVO DO ANDROID) -->
+      <div id="tabPro" class="body-pad hidden">
+        <div class="nano-card">
+          <div class="nano-title">✨ Assistente IA Nativa (Gemini Nano Android)</div>
+          <div class="nano-desc">Roda direto no Android (0 MB extra no app), offline e com privacidade total para assinantes Pro.</div>
         </div>
-        <div class="body-pad">
-          <div class="card">
-            <div class="row-item"><span>Fotos da Câmera</span><span class="pill-val">18,4 GB</span></div>
-            <div class="row-item"><span>Vídeos</span><span class="pill-val">26,2 GB</span></div>
-            <div class="row-item"><span>WhatsApp</span><span class="pill-val">6,7 GB</span></div>
-            <div class="row-item"><span>Capturas de tela</span><span class="pill-val">1,4 GB</span></div>
-            <div class="row-item"><span>Áudios</span><span class="pill-val">640 MB</span></div>
-          </div>
-        </div>
-      </div>
 
-      <!-- ABA 3: PRO (100% LIMPA E FOCADA EM CONVERSÃO) -->
-      <div id="tabPro" class="hidden">
-        <div class="clean-header">
-          <h1>Midiastore Pro</h1>
+        <div class="plan-card">
+          <div>
+            <div style="font-weight:700;">Pro Mensal</div>
+            <div class="muted">Cancele quando quiser no Google Play</div>
+          </div>
+          <div style="font-weight:700; color:#64d2ff;">R$ 14,99</div>
         </div>
-        <div class="body-pad">
-          <div class="plan-card">
-            <div>
-              <div style="font-weight:700;">Pro Mensal</div>
-              <div class="muted">Cancele quando quiser no Google Play</div>
-            </div>
-            <div style="font-weight:700; color:#64d2ff;">R$ 14,99</div>
+        <div class="plan-card best">
+          <div>
+            <div style="font-weight:700;">Pro Anual • Mais Popular</div>
+            <div class="muted">Economize 55% no ano inteiro</div>
           </div>
-          <div class="plan-card best">
-            <div>
-              <div style="font-weight:700;">Pro Anual • Mais Popular</div>
-              <div class="muted">Economize 55% no ano inteiro</div>
-            </div>
-            <div style="font-weight:700; color:#0a84ff;">R$ 79,99</div>
-          </div>
-          <div class="plan-card">
-            <div>
-              <div style="font-weight:700;">Pro Vitalício</div>
-              <div class="muted">Pagamento único, acesso para sempre</div>
-            </div>
-            <div style="font-weight:700; color:#30d158;">R$ 149,99</div>
-          </div>
-          <button class="cta-btn">Continuar com Google Play</button>
+          <div style="font-weight:700; color:#0a84ff;">R$ 79,99</div>
         </div>
+        <div class="plan-card">
+          <div>
+            <div style="font-weight:700;">Pro Vitalício</div>
+            <div class="muted">Pagamento único, seu para sempre</div>
+          </div>
+          <div style="font-weight:700; color:#30d158;">R$ 149,99</div>
+        </div>
+        <button class="cta-btn">Continuar com Google Play</button>
       </div>
     </div>
 
@@ -414,12 +422,12 @@
   </div>
 
   <div class="spec-panel">
-    <h2>✨ Planta v2 (Padrão Apple Hero Clean)</h2>
+    <h2>✅ Planta v3 Definitiva — Midiastore v2.8.0</h2>
     <ul>
-      <li><b>Maria GRANDE em destaque Hero:</b> retrato cinematográfico no topo da Home fundindo suavemente no preto OLED <code>#000000</code>.</li>
-      <li><b>Frase curta e limpa (1 linha):</b> sem textão e <b>zero chips de perguntas</b> poluindo o visual.</li>
-      <li><b>Banner Pro elegante na 1ª aba:</b> aumenta a conversão logo na abertura sem atrapalhar a limpeza.</li>
-      <li><b>Abas Arquivos e Pro 100% limpas:</b> Maria não fica invadindo nem repetindo em todas as telas.</li>
+      <li><b>Maria mais aberta (rosto + ombros/blusa):</b> enquadramento cinematográfico de estúdio em <code>276px</code> na Home e <code>210px</code> nas abas Arquivos e Pro.</li>
+      <li><b>Presente nas 3 abas:</b> cada aba adapta a fala curta da Maria sem poluir a tela.</li>
+      <li><b>Quadradinhos visuais (grid 2x2):</b> Duplicatas, Vídeos grandes, Capturas antigas e Fotos pesadas na Home e na aba Arquivos.</li>
+      <li><b>Gemini Nano (IA Nativa do Android) no Modo Pro:</b> destaque exclusivo na aba Pro — usa a IA embutida no próprio Android (<code>0 MB</code> no APK, offline e custo zero de servidor).</li>
     </ul>
   </div>
 
@@ -427,8 +435,15 @@
     const hero = document.getElementById("heroMaria");
     const mariaImg = document.getElementById("mariaImg");
     const mariaLine = document.getElementById("mariaLine");
+    const topBrand = document.getElementById("topBrand");
     const btnAudio = document.getElementById("btnAudio");
     let muted = false;
+
+    const TAB_META = {
+      clean: { title: "Midiastore", compact: false, line: "Olá! Encontrei 4,8 GB prontos para liberar." },
+      files: { title: "Arquivos", compact: true, line: "Escolha uma categoria para ver os arquivos maiores." },
+      pro:   { title: "Midiastore Pro", compact: true, line: "Desbloqueie a limpeza completa e a IA Nativa Pro." }
+    };
 
     function speakLine(text) {
       mariaLine.textContent = text;
@@ -437,7 +452,7 @@
       setTimeout(() => {
         mariaImg.src = "file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png";
         hero.classList.remove("speaking");
-      }, 2200);
+      }, 2000);
     }
 
     function openTab(tab) {
@@ -445,6 +460,10 @@
       document.getElementById("tabClean").classList.toggle("hidden", tab !== "clean");
       document.getElementById("tabFiles").classList.toggle("hidden", tab !== "files");
       document.getElementById("tabPro").classList.toggle("hidden", tab !== "pro");
+      const meta = TAB_META[tab];
+      topBrand.textContent = meta.title;
+      hero.classList.toggle("compact", meta.compact);
+      speakLine(meta.line);
     }
 
     document.querySelectorAll(".nav-btn").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
