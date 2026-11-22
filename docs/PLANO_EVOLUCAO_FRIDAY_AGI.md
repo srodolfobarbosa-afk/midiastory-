@@ -28,9 +28,11 @@
 ### ✅ FASE 2 — Salto de Memória, Bibliotecas & Código (CONCLUÍDA HOJE — Custo R$ 0)
 *(Baseado na auditoria cirúrgica do subagente `research` em `2026-11-21`)*
 1. **SDK Oficial `@google/genai` + `valibot` instalados em `scripts/`** + `AbortSignal.timeout(20000)` aplicado no `callOpenRouter` (`scripts/ai-failover-router.mjs:166`).
-2. **Turbo na Memória Supabase (`scripts/lib/cognitive-memory.mjs`):**
+2. **Turbo na Memória Supabase (`scripts/lib/cognitive-memory.mjs` + `friday-core/memory-gardener.mjs`):**
    - **Cache LRU persistente de embeddings** (`%TEMP%/friday-embedding-cache.json`, 200 hashes -> `<2ms` em hits) + remoção do código morto (`linhas 369-391`).
-   - *(Próximo passo contínuo: enriquecer `kg_nodes` 14 → 300+ via Jardineiro de Memória).*
+   - **Jardineiro do Grafo de Conhecimento executado ao vivo:** `kg_nodes` subiu de `14` → `264` nós reais + arestas `RELATED_TO` rastreadas em `public.kg_edges`.
+   - **Roteador Central (`scripts/ai-failover-router.mjs`) migrado para `@google/genai` (`v1beta`) + `valibot`** e validado ao vivo em `google_ai_studio/gemini-4-hydrogen`.
+   - **Memória de Erros Imunes sincronizada com o Supabase** (`6/6` vacinas na nuvem em `public.memories`).
 3. **Proteção Extrema de RAM (3,93 GB) nos Hooks (`scripts/hooks/cognitive-hook.mjs`):** trocado `readFileSync` integral do `transcript.jsonl` por **Tail-Reader de buffer fixo (`96 KB`)** + escrita atômica de estado (`tmp` + `renameSync`).
 4. **Paralelização & Testes Nativos:** `scripts/friday-self-audit.mjs` paralelizado com `Promise.all` + suíte nativa `node --test friday-core/friday.test.mjs` (`4/4` testes verdes).
 
