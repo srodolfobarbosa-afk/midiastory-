@@ -57,8 +57,8 @@ Conferido diretamente contra o código da **`v2.7.6` (`vc 31`)**:
   - **Compartilhado com terceiros:** Não.
   - **Finalidade:** Funcionalidade do app e prevenção contra fraudes/conformidade.
   - **Criptografado em trânsito:** Sim (HTTPS/TLS).
-- **ID de publicidade (`Advertising ID`):** Se o app não exibe anúncios (AdMob removido/inativo), declarar **"Não"** para uso de Advertising ID na declaração da Play Console (ou confirmar que o manifesto não inclui `AD_ID` caso não haja SDK de anúncios).
-- **Política de Privacidade (URL ativa HTTP 200):** `https://midiastory-df6a0.web.app/privacy.html`
+- **ID de publicidade (`Advertising ID`):** **NÃO** — confirmado diretamente em `app/src/main/AndroidManifest.xml` (zero permissão `AD_ID`, zero SDK de anúncios).
+- **Política de Privacidade (URL ativa HTTP 200):** `https://midiastory-df6a0.web.app/privacidade.html` (e `https://midiastory-df6a0.web.app/privacy.html`).
 
 ---
 

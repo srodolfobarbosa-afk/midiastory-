@@ -18,11 +18,11 @@
 ## 🔴 FILA DE PRIORIDADES REAIS (EM ORDEM EXATA DE EXECUÇÃO)
 
 ### PRIORIDADE #1 — Destravar a Aprovação de Produção na Google Play (PORTÃO DE CAIXA)
-- [ ] **Acompanhar contagem do Teste Fechado (14 dias contínuos com 12+ testadores):** não derrubar nem substituir testadores; monitorar novos cadastros em `public.beta_testers` para adicionar manualmente na Lista de E-mails da Play Console.
-- [ ] **Deixar 100% prontas as Respostas do Formulário de Produção + Data Safety** para clicar em **"Solicitar a produção"** no minuto em que o relógio liberar.
+- [x] **Respostas do Formulário de Produção + Data Safety 100% auditadas contra `AndroidManifest.xml` real (`v2.7.6 vc 31`):** zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, prontas para copiar e colar em `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`.
+- [ ] **Acompanhar contagem do Teste Fechado (14 dias contínuos com 12+ testadores):** aguardar liberação do botão **"Solicitar a produção"** na Play Console sem derrubar testadores.
 
 ### PRIORIDADE #2 — Acabamento de Conversão Antes da Abertura Pública
-- [ ] **Corrigir micro-detalhe no H1 da Home web** (detectado pelo `cheerio`: `"Descubra o que ocupa espaço.Você decide o que fazer."` — garantir espaçamento perfeito e auditar as 120+ páginas pSEO com `cheerio`).
+- [x] **Auditoria completa de 145 páginas HTML do funil (`cheerio`):** **0 links locais quebrados**, 138/145 páginas públicas 100% válidas em SEO e `meta description` corrigida em `docs/privacidade.html`.
 - [ ] **Manter 0 crashes / 0 ANRs no Android Vitals** acompanhando os testadores no Teste Fechado (`v2.7.6 vc 31`).
 
 ### PRIORIDADE #3 — Primeiras Vendas Reais & Escala (Pós-Aprovação de Produção)
