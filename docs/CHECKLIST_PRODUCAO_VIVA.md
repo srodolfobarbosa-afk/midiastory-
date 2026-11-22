@@ -26,7 +26,8 @@
 - [ ] **Manter 0 crashes / 0 ANRs no Android Vitals** acompanhando os testadores no Teste Fechado (`v2.7.6 vc 31`).
 
 ### PRIORIDADE #3 — Primeiras Vendas Reais, Marketing FRIDAY & Escala (Pós-Aprovação de Produção)
-- [x] **Upgrade da Apresentadora FRIDAY (Realismo Humano):** 6 frames fotorrealistas de estúdio 85mm instalados em `.agents/avatar/` (base, piscada, fala média, fala aberta, gesto explicando e escuta inclinada) ativos no Companion ao vivo.
+- [x] **Upgrade da Apresentadora FRIDAY (Realismo Humano):** 6 frames fotorrealistas de estúdio 85mm + 16 níveis de boca Optical-Flow a 28,5 FPS ativos no Companion ao vivo.
+- [ ] **Midiastore `v2.8.0` (Apenas após aprovar Produção da `v2.7.6`):** Assistente **Maria** em destaque Hero Clean na Home (14 idiomas offline, ~150 KB) + **IA Nativa `Gemini Nano` (Android `AICore`, 0 MB no APK)** como benefício exclusivo do **Midiastore Pro** (decisão do fundador em `2026-11-22`).
 - [ ] **Fábrica de Vídeos de Anúncio da FRIDAY (14 Idiomas):** gravar vídeos curtos (`9:16` Shorts/Reels/TikTok + `16:9` Google Ads App Campaigns) com 3 ganchos psicológicos de conversão por idioma + legendas grandes + telas reais do Midiastore.
 - [ ] **Testar 1 compra real em Produção** (Mensal / Anual / Vitalício) e validar crédito em `public.play_purchases`.
 - [ ] **Acionar tração orgânica custo zero + Google Ads (Regra 50/50):** usar os 50% de reinvestimento do primeiro caixa (`R$ 5.000+`) para VPS Linux 24/7 + API `Gemini 4 Carbon` + escala de anúncios.
