@@ -23,6 +23,7 @@ const ROUTES = {
   team: "friday-core/specialists-factory.mjs",
   probe: "friday-core/capabilities-probe.mjs",
   evolve: "friday-core/evolution-loop.mjs",
+  gardener: "friday-core/memory-gardener.mjs",
   audit: "scripts/friday-self-audit.mjs",
   hud: "scripts/friday-hud.mjs",
   quota: "scripts/friday-quota-guard.mjs",

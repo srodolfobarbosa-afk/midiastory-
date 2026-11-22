@@ -14,9 +14,29 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { getSupabaseToken, SUPABASE_PROJECT_REF } from "../scripts/lib/supabase-auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, "memory", "immune-errors.json");
+
+function escSql(s) {
+  return String(s ?? "").replace(/'/g, "''");
+}
+
+async function runSupabaseSql(sql) {
+  const token = getSupabaseToken();
+  const res = await fetch(
+    `https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(15000),
+      body: JSON.stringify({ query: sql }),
+    }
+  );
+  if (!res.ok) throw new Error(`Supabase HTTP ${res.status}`);
+  return await res.json();
+}
 
 const SEED_ERRORS = [
   {
@@ -72,9 +92,36 @@ function saveDb(db) {
   fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), "utf8");
 }
 
-function main() {
+async function syncWithSupabase(db) {
+  let pushed = 0;
+  for (const item of db.items) {
+    const tag = `[VACINA_IMUNE ${item.id}] Assinatura: ${item.signature} | Causa: ${item.cause} | Correção: ${item.fix}`;
+    const existing = await runSupabaseSql(
+      `SELECT id FROM public.memories WHERE origem = 'friday_immune_memory' AND content LIKE '[VACINA_IMUNE ${escSql(item.id)}]%' LIMIT 1;`
+    );
+    if (!Array.isArray(existing) || existing.length === 0) {
+      await runSupabaseSql(`
+        INSERT INTO public.memories (content, origem, categoria, confianca, versao)
+        VALUES ('${escSql(tag)}', 'friday_immune_memory', 'correction', 0.99, 1);
+      `);
+      pushed++;
+    }
+  }
+  const remoteRows = await runSupabaseSql(
+    `SELECT count(*)::int AS total FROM public.memories WHERE origem = 'friday_immune_memory';`
+  );
+  const totalRemote = remoteRows?.[0]?.total ?? 0;
+  console.log(`☁️ Sincronização Supabase concluída: ${pushed} nova(s) vacina(s) enviada(s) | Total na nuvem: ${totalRemote}`);
+}
+
+async function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   const db = loadDb();
+
+  if (cmd === "sync") {
+    await syncWithSupabase(db);
+    return;
+  }
 
   if (!cmd || cmd === "list") {
     console.log(`\n🛡️ MEMÓRIA DE ERROS IMUNES FRIDAY (${db.items.length} vacinas ativas):\n`);

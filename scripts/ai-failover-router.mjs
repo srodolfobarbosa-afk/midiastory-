@@ -25,6 +25,17 @@ import {
 } from "./lib/rodolfo-brain-persona.mjs";
 import { analyzeAndLearnTurn, learnFromInteraction } from "./lib/cognitive-memory.mjs";
 import { ProviderCircuitBreaker } from "./lib/circuit-breaker.mjs";
+import { GoogleGenAI } from "@google/genai";
+import * as v from "valibot";
+
+const GoogleCallOptionsSchema = v.object({
+  maxTokens: v.optional(v.number()),
+  responseFormatJson: v.optional(v.boolean()),
+  thinkingLevel: v.optional(v.string()),
+  isCode: v.optional(v.boolean()),
+  systemPrompt: v.optional(v.string()),
+  timeoutMs: v.optional(v.number()),
+});
 
 const circuitBreaker = new ProviderCircuitBreaker();
 
@@ -58,37 +69,45 @@ if (fs.existsSync(secretsPath)) {
   }
 }
 
-async function callGoogleAIStudio(modelName, prompt, options = {}) {
+let googleGenAiClient = null;
+function getGoogleGenAiClient() {
+  if (!googleGenAiClient && googleStudioKey) {
+    googleGenAiClient = new GoogleGenAI({
+      apiKey: googleStudioKey,
+      httpOptions: { apiVersion: "v1beta" },
+    });
+  }
+  return googleGenAiClient;
+}
+
+async function callGoogleAIStudio(modelName, prompt, rawOptions = {}) {
   if (!googleStudioKey) throw new Error("Chave GOOGLE_AI_STUDIO_API_KEY não encontrada.");
-  const isGemini4Thinking = modelName.includes("gemini-4-neon") || modelName.includes("gemini-4-hydrogen") || modelName.includes("gemini-4-carbon") || modelName.includes("gemini-4-argon");
+  const options = v.parse(GoogleCallOptionsSchema, rawOptions || {});
+  const isGemini4Thinking =
+    modelName.includes("gemini-4-neon") ||
+    modelName.includes("gemini-4-hydrogen") ||
+    modelName.includes("gemini-4-carbon") ||
+    modelName.includes("gemini-4-argon");
   const thinkingLevel = options.thinkingLevel || (options.isCode ? "HIGH" : "MEDIUM");
 
-  const generationConfig = {
+  const config = {
+    systemInstruction: options.systemPrompt || RODOLFO_BRAIN_SYSTEM_PROMPT,
     ...(options.maxTokens ? { maxOutputTokens: options.maxTokens } : {}),
     ...(options.responseFormatJson ? { responseMimeType: "application/json" } : {}),
     ...(isGemini4Thinking ? { thinkingConfig: { thinkingLevel } } : {}),
+    abortSignal: AbortSignal.timeout(options.timeoutMs || 25000),
   };
 
-  const bodyPayload = {
-    systemInstruction: { parts: [{ text: options.systemPrompt || RODOLFO_BRAIN_SYSTEM_PROMPT }] },
-    contents: [{ parts: [{ text: prompt }] }],
-    ...(Object.keys(generationConfig).length > 0 ? { generationConfig } : {}),
-  };
-
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${googleStudioKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(options.timeoutMs || 25000),
-    body: JSON.stringify(bodyPayload),
+  const ai = getGoogleGenAiClient();
+  const response = await ai.models.generateContent({
+    model: modelName,
+    contents: prompt,
+    config,
   });
-  if (!res.ok) {
-    const errText = await res.text();
-    const error = new Error(`HTTP ${res.status}: ${errText}`);
-    error.status = res.status;
-    throw error;
-  }
-  const data = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
+
+  const text = String(response?.text || "").trim();
+  if (text) return text;
+  const parts = response?.candidates?.[0]?.content?.parts || [];
   return parts.map((p) => p.text || "").join("").trim();
 }
 

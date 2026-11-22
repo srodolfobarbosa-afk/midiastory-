@@ -1,39 +1,17 @@
 {
-  "evaluatedAt": "2026-11-22T02:05:23.063Z",
+  "evaluatedAt": "2026-11-22T02:15:11.904Z",
   "healthOk": true,
   "testsOk": true,
   "supabaseStats": {
-    "memoriesCount": 447,
-    "kgNodes": 14
+    "memoriesCount": 453,
+    "kgNodes": 264
   },
   "nextMission": {
-    "priority": 92,
-    "id": "EVO-KG-GARDENER",
-    "title": "Construir Jardineiro do Grafo de Conhecimento (kg_nodes=14 para 447 memórias)",
-    "reason": "Apenas 14 nós no grafo para 447 memórias; enriquecer relações multiplica precisão de contexto.",
-    "impact": "ALTO"
+    "priority": 50,
+    "id": "EVO-MIDI-REVENUE",
+    "title": "FRIDAY 100% calibrada — direcionar força total para caixa do Midiastore (Teste Fechado / Produção)",
+    "reason": "Todos os indicadores técnicos da Construtora estão verdes.",
+    "impact": "ESTRATÉGICO"
   },
-  "backlog": [
-    {
-      "priority": 92,
-      "id": "EVO-KG-GARDENER",
-      "title": "Construir Jardineiro do Grafo de Conhecimento (kg_nodes=14 para 447 memórias)",
-      "reason": "Apenas 14 nós no grafo para 447 memórias; enriquecer relações multiplica precisão de contexto.",
-      "impact": "ALTO"
-    },
-    {
-      "priority": 85,
-      "id": "EVO-GENAI-SDK",
-      "title": "Migrar chamadas Google do roteador central para o SDK oficial @google/genai + valibot",
-      "reason": "SDK já instalado em scripts/package.json mas ainda não conectado ao motor central.",
-      "impact": "ALTO"
-    },
-    {
-      "priority": 80,
-      "id": "EVO-IMMUNE-SYNC",
-      "title": "Sincronizar Memória de Erros Imunes com public.memories no Supabase",
-      "reason": "Hoje as 6 vacinas vivem só em JSON local; sincronizar protege qualquer agente em qualquer máquina.",
-      "impact": "MÉDIO-ALTO"
-    }
-  ]
+  "backlog": []
 }

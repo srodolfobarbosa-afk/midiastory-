@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-22T02:05:23.306Z",
+  "updatedAt": "2026-11-22T02:13:13.244Z",
   "skills": [
     {
       "id": "triage",
@@ -176,6 +176,20 @@
       ],
       "verified": true,
       "addedAt": "2026-11-22T02:05:23.306Z"
+    },
+    {
+      "id": "gardener",
+      "name": "Jardineiro do Grafo de Conhecimento Supabase",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/memory-gardener.mjs",
+      "tags": [
+        "grafo",
+        "kg",
+        "supabase",
+        "memoria"
+      ],
+      "verified": true,
+      "addedAt": "2026-11-22T02:13:13.235Z"
     }
   ]
 }

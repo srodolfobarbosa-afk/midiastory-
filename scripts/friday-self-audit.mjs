@@ -129,6 +129,7 @@ async function main() {
     "friday-core/specialists-factory.mjs",
     "friday-core/capabilities-probe.mjs",
     "friday-core/evolution-loop.mjs",
+    "friday-core/memory-gardener.mjs",
   ];
 
   const syntaxResults = await Promise.all(coreScripts.map(checkNodeSyntax));
