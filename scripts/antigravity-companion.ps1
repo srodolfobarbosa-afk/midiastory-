@@ -158,7 +158,7 @@ $xaml = @"
           <Button x:Name="BtnMoto" Content="📱Moto" Margin="0,0,2,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Espelhar tela do Motorola USB no PC"/>
           <Button x:Name="BtnBoard" Content="📊HUD" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#30D158" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Atualizar e abrir Quadro FRIDAY Mission HUD ao vivo"/>
           <Button x:Name="BtnScreen" Content="👁️Tela" Margin="1,0,1,0" Background="#1C1C1E" Foreground="#64D2FF" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Capturar sua tela agora para a IA enxergar e te orientar"/>
-          <Button x:Name="BtnWeb" Content="🌐Web" Margin="2,0,0,0" Background="#1C1C1E" Foreground="#E5E5EA" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Abrir navegador / site Midiastore"/>
+          <Button x:Name="BtnWeb" Content="🎭3D" Margin="2,0,0,0" Background="#1C1C1E" Foreground="#BF5AF2" BorderThickness="0" FontFamily="Segoe UI" FontSize="10.5" Cursor="Hand" ToolTip="Abrir Apresentadora FRIDAY 3D (60 FPS + Braços)"/>
         </UniformGrid>
       </StackPanel>
     </Grid>
@@ -476,10 +476,36 @@ $btnScreen.Add_Click({
   }
 })
 
-# Quick Tool 4: Open Browser / Midiastore Web
+# Quick Tool 4: Launch / Open FRIDAY 3D Presenter (60 FPS WebGL + Arms)
 $btnWeb.Add_Click({
-  $statusText.Text = "Abrindo navegador..."
-  try { Start-Process "https://midiastory-df6a0.web.app/" } catch {}
+  $statusText.Text = "Abrindo FRIDAY 3D..."
+  try {
+    $alive = $false
+    try {
+      $ping = Invoke-WebRequest -Uri "http://127.0.0.1:4789/" -TimeoutSec 1 -UseBasicParsing -ErrorAction Stop
+      if ($ping.StatusCode -eq 200) { $alive = $true }
+    } catch {}
+    if (-not $alive) {
+      $srv = "C:\Users\rodolfo\midiastory-\friday-core\avatar-3d\server.mjs"
+      $psi = New-Object System.Diagnostics.ProcessStartInfo
+      $psi.FileName = $NodePath
+      $psi.Arguments = "`"$srv`""
+      $psi.UseShellExecute = $false
+      $psi.CreateNoWindow = $true
+      [void][System.Diagnostics.Process]::Start($psi)
+      Start-Sleep -Milliseconds 900
+    }
+    $edge = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    $chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+    $bin = if (Test-Path $edge) { $edge } elseif (Test-Path $chrome) { $chrome } else { $null }
+    if ($bin) {
+      Start-Process -FilePath $bin -ArgumentList "--app=http://127.0.0.1:4789 --window-size=440,680"
+    } else {
+      Start-Process "http://127.0.0.1:4789"
+    }
+  } catch {
+    $statusText.Text = "Erro ao abrir 3D"
+  }
 })
 
 $debugLogPath = Join-Path $env:TEMP "antigravity-companion-debug.log"
