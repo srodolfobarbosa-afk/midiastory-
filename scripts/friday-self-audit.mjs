@@ -15,26 +15,32 @@
  *   node scripts/friday-self-audit.mjs --board   (projeta relatório visual no Quadro OLED)
  */
 
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
+const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 
-function checkNodeSyntax(relPath) {
+async function checkNodeSyntax(relPath) {
   const abs = path.join(PROJECT_ROOT, relPath);
   if (!fs.existsSync(abs)) {
     return { name: relPath, ok: false, detail: "ARQUIVO AUSENTE" };
   }
-  const res = spawnSync(process.execPath, ["--check", abs], { encoding: "utf8", timeout: 5000 });
-  return {
-    name: relPath,
-    ok: res.status === 0,
-    detail: res.status === 0 ? "OK" : (res.stderr || "ERRO DE SINTAXE").trim().slice(0, 120),
-  };
+  try {
+    await execFileAsync(process.execPath, ["--check", abs], { timeout: 5000 });
+    return { name: relPath, ok: true, detail: "OK" };
+  } catch (e) {
+    return {
+      name: relPath,
+      ok: false,
+      detail: String(e.stderr || e.message || "ERRO DE SINTAXE").trim().slice(0, 120),
+    };
+  }
 }
 
 function checkHooks() {
@@ -102,7 +108,7 @@ function checkMcps() {
   }
 }
 
-function main() {
+async function main() {
   const coreScripts = [
     "scripts/friday-triage-engine.mjs",
     "scripts/friday-hud.mjs",
@@ -124,7 +130,7 @@ function main() {
     "friday-core/capabilities-probe.mjs",
   ];
 
-  const syntaxResults = coreScripts.map(checkNodeSyntax);
+  const syntaxResults = await Promise.all(coreScripts.map(checkNodeSyntax));
   const syntaxOk = syntaxResults.filter((r) => r.ok).length;
   const hooks = checkHooks();
   const companion = checkCompanion();

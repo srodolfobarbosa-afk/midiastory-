@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getSupabaseToken, SUPABASE_PROJECT_REF } from "./supabase-auth.mjs";
@@ -104,12 +105,50 @@ export function computeDeterministicEmbedding(text, dims = EMBEDDING_DIMS) {
   return `[${normalized.join(",")}]`;
 }
 
+const EMB_CACHE_FILE = path.join(os.tmpdir(), "friday-embedding-cache.json");
+const EMB_CACHE_MAX = 200;
+
+function readEmbCache(hash) {
+  try {
+    if (!fs.existsSync(EMB_CACHE_FILE)) return null;
+    const data = JSON.parse(fs.readFileSync(EMB_CACHE_FILE, "utf8"));
+    return data?.[hash] || null;
+  } catch {
+    return null;
+  }
+}
+
+function writeEmbCache(hash, entry) {
+  try {
+    let data = {};
+    if (fs.existsSync(EMB_CACHE_FILE)) {
+      data = JSON.parse(fs.readFileSync(EMB_CACHE_FILE, "utf8")) || {};
+    }
+    data[hash] = entry;
+    const keys = Object.keys(data);
+    if (keys.length > EMB_CACHE_MAX) {
+      const trimmed = {};
+      for (const k of keys.slice(-EMB_CACHE_MAX)) trimmed[k] = data[k];
+      data = trimmed;
+    }
+    const tmp = `${EMB_CACHE_FILE}.${process.pid}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(data), "utf8");
+    fs.renameSync(tmp, EMB_CACHE_FILE);
+  } catch {}
+}
+
 /**
  * Computes a real 384-d semantic embedding via Google AI Studio (gemini-embedding-001),
- * falling back cleanly to deterministic n-gram vectors when offline or rate-limited.
+ * with persistent LRU cache (200 entries) and deterministic n-gram fallback when offline.
  */
 export async function computeEmbedding(text, timeoutMs = 6000) {
   const clean = String(text || "").trim().slice(0, 6000);
+  const hash = clean ? crypto.createHash("sha256").update(clean).digest("hex").slice(0, 20) : "";
+  if (hash) {
+    const cached = readEmbCache(hash);
+    if (cached?.vectorLiteral) return cached;
+  }
+
   const { googleStudioKey } = loadAiKeys();
   if (googleStudioKey && clean) {
     try {
@@ -130,10 +169,12 @@ export async function computeEmbedding(text, timeoutMs = 6000) {
         const data = await res.json();
         const vals = data?.embedding?.values;
         if (Array.isArray(vals) && vals.length === EMBEDDING_DIMS) {
-          return {
+          const result = {
             vectorLiteral: formatVectorLiteral(vals),
             model: NEURAL_EMBEDDING_MODEL,
           };
+          if (hash) writeEmbCache(hash, result);
+          return result;
         }
       }
     } catch {}
@@ -366,30 +407,6 @@ export async function retrieveRelevantContext({
     `;
 
     if (cleanQuery) {
-      const stopWords = new Set([
-        "qual", "quais", "como", "para", "com", "que", "uma", "uns", "das", "dos",
-        "nos", "nas", "responda", "frase", "curta", "atual", "sobre", "voce", "você",
-        "ontem", "hoje", "agora", "isso", "este", "esta", "aqui", "onde", "quando",
-      ]);
-      const keywords = cleanQuery
-        .replace(/[^a-zA-Z0-9áéíóúâêôãõç_\- ]/g, " ")
-        .split(/\s+/)
-        .map((w) => w.trim())
-        .filter((w) => w.length >= 3 && !stopWords.has(w.toLowerCase()))
-        .slice(0, 12);
-
-      const tsQueryExpr =
-        keywords.length > 0
-          ? `websearch_to_tsquery('portuguese', '${escapeSqlString(keywords.join(" OR "))}')`
-          : `plainto_tsquery('portuguese', '${escapeSqlString(cleanQuery)}')`;
-      const exactTokens = keywords.filter((k) => /[A-Z0-9_]{4,}/.test(k)).slice(0, 3);
-      const exactBoostSql =
-        exactTokens.length > 0
-          ? exactTokens
-              .map((t) => `CASE WHEN content ILIKE '%${escapeSqlString(t)}%' THEN 5.0 ELSE 0.0 END`)
-              .join(" + ")
-          : "0.0";
-
       const qEmb = await computeEmbedding(cleanQuery);
       queryEmbeddingModel = qEmb.model;
 

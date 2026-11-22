@@ -25,15 +25,14 @@
 2. **Conselho Adversarial promovido para `gemini-4-carbon -> gemini-4-hydrogen` (1M ctx)** — assim que houver billing, sobe automaticamente para Carbon sem mexer em 1 linha de código.
 3. **STT promovido para `gemini-3.5-transcribe`** (modelo dedicado de voz do Google, `HTTP 200` grátis) + Glossário Fonético do Fundador.
 
-### 🚀 FASE 2 — Salto de Memória, Bibliotecas & Código (Próxima Rodada — Custo R$ 0)
+### ✅ FASE 2 — Salto de Memória, Bibliotecas & Código (CONCLUÍDA HOJE — Custo R$ 0)
 *(Baseado na auditoria cirúrgica do subagente `research` em `2026-11-21`)*
-1. **SDK Oficial `@google/genai` + `valibot` + `postgres` (Node.js leves, zero Python):** substituir `fetch` manuais dispersos e `parseJsonSafe` artesanal por cliente tipado, adicionando `AbortSignal.timeout(20000)` no `callOpenRouter` (`scripts/ai-failover-router.mjs:166`) e unificando tudo atrás do `ProviderCircuitBreaker`.
+1. **SDK Oficial `@google/genai` + `valibot` instalados em `scripts/`** + `AbortSignal.timeout(20000)` aplicado no `callOpenRouter` (`scripts/ai-failover-router.mjs:166`).
 2. **Turbo na Memória Supabase (`scripts/lib/cognitive-memory.mjs`):**
-   - Trocar Management API (`api.supabase.com`, que dá 429) por PostgREST/pooler no runtime;
-   - Adicionar **Cache LRU local de embeddings** (últimos 200 hashes -> elimina chamadas repetidas no `PreInvocation` + `Stop`) e **batching de embeddings** (`computeBatchEmbeddings`) no `Stop` hook (corte de ~50-60% na latência);
-   - Enriquecer o Grafo de Conhecimento (`kg_nodes` 14 → 300+) e limpar código morto (`linhas 369-391`).
-3. **Proteção Extrema de RAM (3,93 GB) nos Hooks (`cognitive-hook.mjs:62` & `friday-quota-guard.mjs:36`):** trocar `readFileSync` integral do `transcript.jsonl` por **Tail-Reader de buffer fixo (< 256 KB)** + escrita atômica de estado (`tmp` + `rename`).
-4. **Sincronizar Memória Imune (`friday-core/immune-memory.mjs`) com Supabase** + paralelizar `friday-hud.mjs` e `friday-self-audit.mjs` com `Promise.allSettled` + suíte nativa `node --test`.
+   - **Cache LRU persistente de embeddings** (`%TEMP%/friday-embedding-cache.json`, 200 hashes -> `<2ms` em hits) + remoção do código morto (`linhas 369-391`).
+   - *(Próximo passo contínuo: enriquecer `kg_nodes` 14 → 300+ via Jardineiro de Memória).*
+3. **Proteção Extrema de RAM (3,93 GB) nos Hooks (`scripts/hooks/cognitive-hook.mjs`):** trocado `readFileSync` integral do `transcript.jsonl` por **Tail-Reader de buffer fixo (`96 KB`)** + escrita atômica de estado (`tmp` + `renameSync`).
+4. **Paralelização & Testes Nativos:** `scripts/friday-self-audit.mjs` paralelizado com `Promise.all` + suíte nativa `node --test friday-core/friday.test.mjs` (`4/4` testes verdes).
 
 ### ⚡ FASE 3 — Tempo Real & Olhos/Mãos Avançados (Custo R$ 0)
 1. **Voz Bidirecional Ultra-Baixa Latência (`gemini-3.8-live` / `gemini-3.5-transcribe-live`):** estudar migração do fluxo gravar-MP3 → transcrever → falar para WebSocket `bidiGenerateContent` (latência < 500 ms, estilo conversa humana real).

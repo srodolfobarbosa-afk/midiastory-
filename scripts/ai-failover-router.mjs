@@ -165,6 +165,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
 
   let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
+    signal: AbortSignal.timeout(20000),
     headers: {
       Authorization: `Bearer ${openRouterKey}`,
       "Content-Type": "application/json",
@@ -197,6 +198,7 @@ async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort
     console.warn(`[Auto-Adaptação 402] Ajustando tokens dinamicamente para ${affordableTokens} para ${modelId}...`);
     res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(20000),
       headers: {
         Authorization: `Bearer ${openRouterKey}`,
         "Content-Type": "application/json",

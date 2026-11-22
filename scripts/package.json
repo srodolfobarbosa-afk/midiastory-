@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@google/genai": "^3.6.1",
     "google-play-scraper": "^10.1.4",
-    "msedge-tts": "^2.1.1"
+    "msedge-tts": "^2.1.1",
+    "valibot": "^1.5.0"
   }
 }

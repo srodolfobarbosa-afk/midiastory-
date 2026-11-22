@@ -47,8 +47,26 @@ function saveState(state) {
       preByConv: trimObj(state.preByConv),
       stopByConv: trimObj(state.stopByConv),
     };
-    fs.writeFileSync(STATE_FILE, JSON.stringify(next), "utf8");
+    const tmp = `${STATE_FILE}.${process.pid}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(next), "utf8");
+    fs.renameSync(tmp, STATE_FILE);
   } catch {}
+}
+
+function readTailLines(filePath, maxBytes = 98304) {
+  const stat = fs.statSync(filePath);
+  const start = Math.max(0, stat.size - maxBytes);
+  const len = stat.size - start;
+  const buf = Buffer.alloc(len);
+  const fd = fs.openSync(filePath, "r");
+  try {
+    fs.readSync(fd, buf, 0, len, start);
+  } finally {
+    fs.closeSync(fd);
+  }
+  const text = buf.toString("utf8");
+  const lines = text.split(/\r?\n/).filter(Boolean);
+  return start > 0 && lines.length > 1 ? lines.slice(1) : lines;
 }
 
 function stripUserRequestTags(text) {
@@ -59,29 +77,28 @@ function stripUserRequestTags(text) {
 
 function readTranscriptTailExchange(transcriptPath) {
   if (!transcriptPath || !fs.existsSync(transcriptPath)) return null;
-  const rawLines = fs.readFileSync(transcriptPath, "utf8").split(/\r?\n/).filter(Boolean);
+  const rawLines = readTailLines(transcriptPath, 98304);
   if (rawLines.length === 0) return null;
 
   const fullPath = transcriptPath.replace(/transcript\.jsonl$/i, "transcript_full.jsonl");
-  let fullLines = null;
+  let fullByStep = null;
 
-  const getUnTruncatedContent = (entry, idxFromEndOffset, totalLen) => {
+  const getUnTruncatedContent = (entry) => {
     if (
       Array.isArray(entry.truncated_fields) &&
       entry.truncated_fields.includes("content") &&
       fs.existsSync(fullPath)
     ) {
-      if (!fullLines) {
-        fullLines = fs.readFileSync(fullPath, "utf8").split(/\r?\n/).filter(Boolean);
+      if (!fullByStep) {
+        fullByStep = new Map();
+        for (const fl of readTailLines(fullPath, 196608)) {
+          try {
+            const o = JSON.parse(fl);
+            if (o?.step_index != null && o?.content) fullByStep.set(o.step_index, o.content);
+          } catch {}
+        }
       }
-      const lineIdx = totalLen - 1 - idxFromEndOffset;
-      const fullRaw = fullLines[lineIdx];
-      if (fullRaw) {
-        try {
-          const fullObj = JSON.parse(fullRaw);
-          if (fullObj?.content) return fullObj.content;
-        } catch {}
-      }
+      if (fullByStep.has(entry.step_index)) return fullByStep.get(entry.step_index);
     }
     return entry.content || "";
   };
@@ -97,10 +114,10 @@ function readTranscriptTailExchange(transcriptPath) {
       if (!lastPlanner && obj.type === "PLANNER_RESPONSE" && obj.content && obj.content.trim()) {
         lastPlanner = {
           stepIndex: obj.step_index,
-          content: getUnTruncatedContent(obj, offset, rawLines.length),
+          content: getUnTruncatedContent(obj),
         };
       } else if (lastPlanner && !lastUser && obj.type === "USER_INPUT" && obj.content) {
-        const cleaned = stripUserRequestTags(getUnTruncatedContent(obj, offset, rawLines.length));
+        const cleaned = stripUserRequestTags(getUnTruncatedContent(obj));
         if (cleaned) {
           lastUser = { stepIndex: obj.step_index, content: cleaned };
           break;
