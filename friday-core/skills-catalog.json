@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-22T00:15:56.158Z",
+  "updatedAt": "2026-11-22T02:05:23.306Z",
   "skills": [
     {
       "id": "triage",
@@ -162,6 +162,20 @@
       ],
       "verified": true,
       "addedAt": "2026-11-22T00:15:56.151Z"
+    },
+    {
+      "id": "evolve",
+      "name": "Motor de Auto-Evolução (Heartbeat Decisório)",
+      "pillar": "FRIDAY",
+      "cmd": "node friday-core/evolution-loop.mjs",
+      "tags": [
+        "evolucao",
+        "autonomia",
+        "gargalos",
+        "backlog"
+      ],
+      "verified": true,
+      "addedAt": "2026-11-22T02:05:23.306Z"
     }
   ]
 }

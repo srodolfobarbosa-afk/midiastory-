@@ -128,6 +128,7 @@ async function main() {
     "friday-core/immune-memory.mjs",
     "friday-core/specialists-factory.mjs",
     "friday-core/capabilities-probe.mjs",
+    "friday-core/evolution-loop.mjs",
   ];
 
   const syntaxResults = await Promise.all(coreScripts.map(checkNodeSyntax));
