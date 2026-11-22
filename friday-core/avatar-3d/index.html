@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FRIDAY 3D — Apresentadora Interativa (60 FPS WebGL)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 25%, #111b2e 0%, #05070c 68%, #000000 100%);
+      color: #f2f5fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #stage {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    #avatar {
+      width: 100%;
+      height: 100%;
+    }
+    .hud-top {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+    .badge {
+      background: rgba(10, 132, 255, 0.18);
+      border: 1px solid rgba(10, 132, 255, 0.55);
+      color: #7cc0ff;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+    #status {
+      background: rgba(28, 28, 30, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #d6deeb;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .controls {
+      background: rgba(12, 14, 20, 0.94);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button {
+      background: #1c1c1e;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    button:hover { background: #2c2c30; border-color: #0a84ff; }
+    button.primary {
+      background: #0a84ff;
+      border-color: #0a84ff;
+      color: #ffffff;
+    }
+    button.primary:hover { background: #2994ff; }
+    input[type="text"] {
+      flex: 1;
+      min-width: 220px;
+      background: #14161d;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: #0a84ff; }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js/+esm",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+      "talkinghead": "/assets/talkinghead.mjs"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="stage">
+    <div id="avatar"></div>
+    <div class="hud-top">
+      <div class="badge">✨ FRIDAY 3D • 60 FPS • 52 Músculos ARKit + Braços</div>
+      <div id="status">Carregando modelo 3D...</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="row">
+      <button class="primary" id="btnPitch">🎬 Apresentar Midiastore (Voz + Braços + Lip-Sync)</button>
+      <button id="btnWave">👋 Acenar</button>
+      <button id="btnExplain">✋ Explicar</button>
+      <button id="btnThumb">👍 Aprovar</button>
+      <button id="btnShrug">🤷 Dúvida</button>
+      <button id="btnHappy">😊 Sorrir</button>
+    </div>
+    <div class="row">
+      <input id="txtSay" type="text" placeholder="Digite qualquer fala em português para testar a Apresentadora 3D..." />
+      <button class="primary" id="btnSay">🗣️ Falar Agora</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { TalkingHead } from "talkinghead";
+
+    const statusEl = document.getElementById("status");
+    const nodeAvatar = document.getElementById("avatar");
+
+    const head = new TalkingHead(nodeAvatar, {
+      ttsEndpoint: null,
+      lipsyncModules: ["en"],
+      lipsyncLang: "en",
+      cameraView: "upper",
+      cameraDistance: 0.35,
+      cameraY: 0.04,
+      lightAmbientIntensity: 2.2,
+      lightDirectIntensity: 26,
+      lightSpotIntensity: 2.5,
+      avatarMood: "happy",
+      avatarIdleEyeContact: 0.85,
+      avatarIdleHeadMove: 0.55,
+      avatarSpeakingEyeContact: 0.92,
+      avatarSpeakingHeadMove: 0.65,
+    });
+
+    async function init() {
+      try {
+        statusEl.textContent = "Carregando apresentadora 3D (4,7 MB)...";
+        await head.showAvatar(
+          {
+            url: "/assets/brunette.glb",
+            body: "F",
+            avatarMood: "happy",
+            lipsyncLang: "en",
+          },
+          (ev) => {
+            if (ev.lengthComputable) {
+              const pct = Math.round((ev.loaded / ev.total) * 100);
+              statusEl.textContent = `Carregando 3D: ${pct}%`;
+            }
+          }
+        );
+        statusEl.textContent = "Pronta! 60 FPS ativos — clique em Apresentar Midiastore";
+        setTimeout(() => head.playGesture("handup", 2.5), 600);
+      } catch (err) {
+        statusEl.textContent = "Erro ao carregar 3D: " + err.message;
+        console.error(err);
+      }
+    }
+
+    async function speakWithGestures(text) {
+      statusEl.textContent = "Gerando voz neural + sincronizando 3D...";
+      try {
+        const res = await fetch("/api/speak", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const arrayBuf = await res.arrayBuffer();
+        const audioCtx = head.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") await audioCtx.resume();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuf.slice(0));
+
+        // Gera marcações de palavras proporcionais para lip-sync real no TalkingHead
+        const words = text.split(/\s+/).filter(Boolean);
+        const totalMs = Math.round(audioBuffer.duration * 1000);
+        const totalChars = words.reduce((a, w) => a + w.length, 0) || 1;
+        let cursor = 80;
+        const wtimes = [];
+        const wdurations = [];
+        for (const w of words) {
+          const dur = Math.max(90, Math.round(((w.length / totalChars) * (totalMs - 160))));
+          wtimes.push(cursor);
+          wdurations.push(dur);
+          cursor += dur;
+        }
+
+        statusEl.textContent = "Apresentando ao vivo (60 FPS + Braços)...";
+        head.setMood("happy");
+        head.playGesture("side", 3.0);
+        setTimeout(() => head.playGesture("index", 2.5), Math.min(3200, totalMs * 0.35));
+        setTimeout(() => head.playGesture("thumbup", 2.8), Math.min(6800, totalMs * 0.72));
+
+        head.speakAudio({
+          audio: audioBuffer,
+          words,
+          wtimes,
+          wdurations,
+        });
+
+        setTimeout(() => {
+          statusEl.textContent = "Pronta! 60 FPS ativos";
+        }, totalMs + 400);
+      } catch (e) {
+        statusEl.textContent = "Erro na fala: " + e.message;
+      }
+    }
+
+    document.getElementById("btnPitch").addEventListener("click", () => {
+      speakWithGestures(
+        "Olá! Eu sou a apresentadora do Midiastore. Seu celular está sem espaço de novo? Toque em Limpar Agora, revise suas fotos duplicadas e libere gigabytes em dois cliques, com segurança total e sem apagar nada sem a sua permissão!"
+      );
+    });
+    document.getElementById("btnWave").addEventListener("click", () => head.playGesture("handup", 2.5));
+    document.getElementById("btnExplain").addEventListener("click", () => head.playGesture("side", 3.0));
+    document.getElementById("btnThumb").addEventListener("click", () => head.playGesture("thumbup", 2.5));
+    document.getElementById("btnShrug").addEventListener("click", () => head.playGesture("shrug", 2.5));
+    document.getElementById("btnHappy").addEventListener("click", () => head.setMood("happy"));
+    document.getElementById("btnSay").addEventListener("click", () => {
+      const t = document.getElementById("txtSay").value.trim();
+      if (t) speakWithGestures(t);
+    });
+    document.getElementById("txtSay").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") document.getElementById("btnSay").click();
+    });
+
+    init();
+  </script>
+</body>
+</html>

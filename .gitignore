@@ -29,3 +29,4 @@ release-artifacts/
 # Node dependencies
 node_modules/
 scripts/node_modules/
+friday-core/avatar-3d/assets/*.glb
