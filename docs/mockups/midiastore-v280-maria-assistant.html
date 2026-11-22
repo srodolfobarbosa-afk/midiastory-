@@ -294,7 +294,7 @@
     <div class="scroll-area">
       <!-- HERO MARIA PRESENTE NAS 3 ABAS (MOSTRANDO ROSTO + BLUSA/OMBROS) -->
       <div class="hero-maria" id="heroMaria">
-        <img id="mariaImg" src="file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png" alt="Maria" />
+        <img id="mariaImg" src="file:///C:/Users/rodolfo/midiastory-/.agents/avatar/lip-flow/lip_01.jpg" alt="Maria" />
         <div class="hero-fade"></div>
         <div class="hero-top-bar">
           <div class="brand" id="topBrand">Midiastore</div>
@@ -439,20 +439,70 @@
     const btnAudio = document.getElementById("btnAudio");
     let muted = false;
 
+    const BASE = "file:///C:/Users/rodolfo/midiastory-/.agents/avatar/lip-flow/";
+    const LIP_FRAMES = Array.from({ length: 16 }, (_, i) => `${BASE}lip_${String(i + 1).padStart(2, "0")}.jpg`);
+    const BLINK_FRAMES = Array.from({ length: 6 }, (_, i) => `${BASE}blink_${String(i + 1).padStart(2, "0")}.jpg`);
+    // Preload all 22 Optical-Flow frames so animation runs at silky 30 FPS
+    [...LIP_FRAMES, ...BLINK_FRAMES].forEach((src) => { const im = new Image(); im.src = src; });
+
+    let isSpeaking = false;
+    let mouthLevel = 0;
+    let speakTimer = null;
+    let blinkSeq = [0, 2, 4, 5, 4, 2, 0];
+    let blinkIdx = -1;
+    let nextBlinkAt = Date.now() + 2600;
+
+    // 30 FPS continuous animation loop (same Optical-Flow mouth + natural eye blinks as Desktop Companion!)
+    setInterval(() => {
+      const now = Date.now();
+      if (!isSpeaking && now >= nextBlinkAt && blinkIdx < 0) {
+        blinkIdx = 0;
+        nextBlinkAt = now + 2800 + Math.random() * 2600;
+      }
+      if (isSpeaking) {
+        const wave = Math.abs(Math.sin(now / 95)) * 0.65 + Math.abs(Math.cos(now / 155)) * 0.35;
+        const target = Math.min(15, Math.round(wave * 15));
+        mouthLevel = mouthLevel * 0.42 + target * 0.58;
+        mariaImg.src = LIP_FRAMES[Math.max(0, Math.min(15, Math.round(mouthLevel)))];
+      } else if (mouthLevel > 0.4) {
+        mouthLevel *= 0.55;
+        mariaImg.src = LIP_FRAMES[Math.max(0, Math.round(mouthLevel))];
+      } else if (blinkIdx >= 0) {
+        mariaImg.src = BLINK_FRAMES[blinkSeq[blinkIdx]];
+        blinkIdx++;
+        if (blinkIdx >= blinkSeq.length) blinkIdx = -1;
+      } else {
+        mariaImg.src = LIP_FRAMES[0];
+      }
+    }, 35);
+
     const TAB_META = {
-      clean: { title: "Midiastore", compact: false, line: "Olá! Encontrei 4,8 GB prontos para liberar." },
-      files: { title: "Arquivos", compact: true, line: "Escolha uma categoria para ver os arquivos maiores." },
-      pro:   { title: "Midiastore Pro", compact: true, line: "Desbloqueie a limpeza completa e a IA Nativa Pro." }
+      clean: { title: "Midiastore", compact: false, line: "Olá! Sou a Maria. Encontrei 4,8 gigabytes prontos para liberar com segurança." },
+      files: { title: "Arquivos", compact: true, line: "Escolha uma categoria para ver suas fotos e vídeos maiores." },
+      pro:   { title: "Midiastore Pro", compact: true, line: "No Midiastore Pro você desbloqueia a limpeza completa e a inteligência artificial nativa do Android." }
     };
 
     function speakLine(text) {
       mariaLine.textContent = text;
-      mariaImg.src = "file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-talk-mid.png";
+      clearTimeout(speakTimer);
+      isSpeaking = true;
       hero.classList.add("speaking");
-      setTimeout(() => {
-        mariaImg.src = "file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png";
-        hero.classList.remove("speaking");
-      }, 2000);
+
+      if (!muted && "speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = "pt-BR";
+          u.rate = 1.05;
+          u.onend = () => { isSpeaking = false; hero.classList.remove("speaking"); };
+          u.onerror = () => { isSpeaking = false; hero.classList.remove("speaking"); };
+          window.speechSynthesis.speak(u);
+          // Safety fallback in case browser speechSynthesis doesn't fire onend
+          speakTimer = setTimeout(() => { isSpeaking = false; hero.classList.remove("speaking"); }, Math.max(3000, text.length * 75));
+          return;
+        } catch {}
+      }
+      speakTimer = setTimeout(() => { isSpeaking = false; hero.classList.remove("speaking"); }, Math.max(2600, text.length * 65));
     }
 
     function openTab(tab) {
@@ -468,12 +518,16 @@
 
     document.querySelectorAll(".nav-btn").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
     document.getElementById("goProBanner").addEventListener("click", () => openTab("pro"));
-    document.getElementById("btnCleanNow").addEventListener("click", () => speakLine("Perfeito! Revise as miniaturas e confirme a limpeza."));
+    document.getElementById("btnCleanNow").addEventListener("click", () => speakLine("Perfeito! Revise as miniaturas e confirme a limpeza com segurança."));
     document.querySelectorAll("[data-line]").forEach((el) => el.addEventListener("click", () => speakLine(el.dataset.line)));
     btnAudio.addEventListener("click", () => {
       muted = !muted;
       btnAudio.textContent = muted ? "🔇" : "🔊";
+      if (muted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+      else speakLine(mariaLine.textContent);
     });
+    // Start talking briefly on load so Rodolfo sees the live 30 FPS mouth movement right away!
+    setTimeout(() => speakLine(TAB_META.clean.line), 500);
   </script>
 </body>
 </html>
