@@ -31,10 +31,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,7 +50,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rdf112.sweep.R
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -65,12 +66,22 @@ private val MARIA_LIP_FRAMES = intArrayOf(
     R.drawable.maria_lip_7,
 )
 
-private val MARIA_BLINK_SEQUENCE = intArrayOf(
+private val MARIA_IDLE_BLINK_SEQUENCE = intArrayOf(
     R.drawable.maria_blink_0,
     R.drawable.maria_blink_1,
     R.drawable.maria_blink_2,
+    R.drawable.maria_blink_2,
+    R.drawable.maria_blink_2,
     R.drawable.maria_blink_1,
     R.drawable.maria_blink_0,
+)
+
+private val MARIA_TALK_BLINK_SEQUENCE = intArrayOf(
+    R.drawable.maria_blink_1,
+    R.drawable.maria_talk_blink,
+    R.drawable.maria_blink_2,
+    R.drawable.maria_talk_blink,
+    R.drawable.maria_blink_1,
 )
 
 private const val PREFS_NAME = "midiastore_prefs"
@@ -78,9 +89,11 @@ private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
 
 /**
  * Hero Banner oficial da Assistente Pessoal "Maria" (Midiastore v2.8.0).
- * - Altura padronizada (240.dp) nas 3 abas (Limpar, Arquivos, Pro) exibindo rosto, ombros e blazer sem sobreposição de texto na boca
- *   e permitindo que os cartões com os valores em MB apareçam mais acima na tela inicial.
- * - Lip-Sync Optical-Flow a ~28.5 FPS (35ms) sincronizado pela duração completa das falas longas de estúdio (12s a 21s).
+ * - Enquadramento cinematográfico `ContentScale.Crop` + `BiasAlignment(0f, -0.76f)` idêntico ao Mockup v6 aprovado
+ *   (sem barras laterais e sem corte flutuante na base; ombros e blazer preenchem o quadro naturalmente).
+ * - Movimento labial silábico realista (abre nas vogais e fecha completamente `maria_lip_0` nas consoantes e pausas).
+ * - Piscadas naturais dos olhos (`maria_talk_blink` / `maria_blink_2`) a cada 2,1s–3,2s TANTO falando quanto em repouso.
+ * - Composição corporal viva com respiração suave, micro-inclinação natural e gesto apresentadora (`maria_gesture` / `maria_smile`).
  */
 @Composable
 fun MariaHeroBanner(
@@ -104,6 +117,9 @@ fun MariaHeroBanner(
     var replayTrigger by remember { mutableIntStateOf(0) }
     var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_lip_0) }
     var mouthLevel by remember { mutableFloatStateOf(0f) }
+    var breathScale by remember { mutableFloatStateOf(1.01f) }
+    var bodyOffsetY by remember { mutableFloatStateOf(0f) }
+    var headTiltDeg by remember { mutableFloatStateOf(0f) }
     var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
 
     fun stopAndReleaseAudio() {
@@ -165,7 +181,6 @@ fun MariaHeroBanner(
             }.getOrNull()
 
             if (mpInstance != null) {
-                // Mantém a animação labial ativa durante toda a reprodução (até 35 segundos) sem cortar a fala
                 var elapsedMs = 0L
                 while (isSpeaking && elapsedMs < 35000L) {
                     val stillPlaying = runCatching { mpInstance.isPlaying }.getOrDefault(false)
@@ -178,46 +193,98 @@ fun MariaHeroBanner(
             }
         }
 
-        // Caso esteja silenciado (🔇) ou sem dispositivo de áudio, anima os lábios por tempo proporcional
         val simulatedMs = (captionText.length * 68L).coerceIn(4500L, 12000L)
         delay(simulatedMs)
         isSpeaking = false
     }
 
-    // Motor Optical-Flow 28.5 FPS (35ms): inércia física da mandíbula ao falar + piscadas naturais em repouso
+    // Motor Optical-Flow 28.5 FPS (35ms): sílabas com fechamento labial real + piscadas durante a fala + movimento corporal vivo
     LaunchedEffect(isActive) {
         if (!isActive) {
             currentFrameRes = R.drawable.maria_lip_0
             return@LaunchedEffect
         }
         var blinkStep = -1
-        var nextBlinkAtMs = System.currentTimeMillis() + 2400L
+        var nextBlinkAtMs = System.currentTimeMillis() + 1800L
+        var postSpeechSmileTicks = 0
+        var wasSpeakingLastTick = false
+
         while (true) {
             val now = System.currentTimeMillis()
+
+            // Movimento corporal orgânico (respiração + postura natural de apresentadora)
             if (isSpeaking) {
-                blinkStep = -1
-                val wave = abs(sin(now / 92.0)).toFloat() * 0.64f +
-                    abs(cos(now / 148.0)).toFloat() * 0.36f
-                val target = (wave * (MARIA_LIP_FRAMES.size - 1)).coerceIn(0f, (MARIA_LIP_FRAMES.size - 1).toFloat())
-                mouthLevel = mouthLevel * 0.40f + target * 0.60f
-                val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
-                currentFrameRes = MARIA_LIP_FRAMES[idx]
-            } else if (mouthLevel > 0.35f) {
-                mouthLevel *= 0.52f
+                breathScale = 1.022f + (sin(now / 420.0).toFloat() * 0.012f)
+                bodyOffsetY = sin(now / 310.0).toFloat() * 2.2f
+                headTiltDeg = cos(now / 520.0).toFloat() * 0.65f
+            } else {
+                breathScale = 1.008f + (sin(now / 950.0).toFloat() * 0.006f)
+                bodyOffsetY = sin(now / 950.0).toFloat() * 0.9f
+                headTiltDeg = 0f
+            }
+
+            if (wasSpeakingLastTick && !isSpeaking) {
+                // Ao terminar uma frase, exibe um sorriso acolhedor antes de repousar
+                postSpeechSmileTicks = 18
+            }
+            wasSpeakingLastTick = isSpeaking
+
+            // Dispara piscada natural dos olhos a cada 2,1s a 3,2s (TANTO falando quanto em silêncio!)
+            if (now >= nextBlinkAtMs && blinkStep < 0) {
+                blinkStep = 0
+                nextBlinkAtMs = now + Random.nextLong(2100L, 3200L)
+            }
+
+            if (isSpeaking) {
+                // Se estiver no meio de uma piscada enquanto fala, fecha as pálpebras suavemente sem travar a fala
+                if (blinkStep >= 0) {
+                    currentFrameRes = MARIA_TALK_BLINK_SEQUENCE[blinkStep.coerceAtMost(MARIA_TALK_BLINK_SEQUENCE.lastIndex)]
+                    blinkStep++
+                    if (blinkStep >= MARIA_TALK_BLINK_SEQUENCE.size) {
+                        blinkStep = -1
+                    }
+                } else {
+                    // Envelope silábico real: valores negativos fecham a boca completamente (maria_lip_0) entre sílabas e pausas!
+                    val syllableRaw = (sin(now / 54.0) * 0.58 + sin(now / 89.0) * 0.42).toFloat()
+                    val cyclePhase = now % 1380L
+                    val isBreathPause = cyclePhase > 1160L
+                    val isGestureAccent = (now % 5200L) in 2400L..2720L
+
+                    if (isGestureAccent && isBreathPause) {
+                        currentFrameRes = R.drawable.maria_gesture
+                        mouthLevel = 0f
+                    } else {
+                        val target = if (!isBreathPause && syllableRaw > 0.05f) {
+                            ((syllableRaw - 0.05f) / 0.95f * (MARIA_LIP_FRAMES.size - 1))
+                                .coerceIn(0f, (MARIA_LIP_FRAMES.size - 1).toFloat())
+                        } else {
+                            0f
+                        }
+                        // Fechamento rápido nas consoantes para nunca ficar de boca aberta parada
+                        mouthLevel = if (target == 0f) {
+                            mouthLevel * 0.28f
+                        } else {
+                            mouthLevel * 0.35f + target * 0.65f
+                        }
+                        val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
+                        currentFrameRes = MARIA_LIP_FRAMES[idx]
+                    }
+                }
+            } else if (mouthLevel > 0.25f) {
+                mouthLevel *= 0.35f
                 val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
                 currentFrameRes = MARIA_LIP_FRAMES[idx]
             } else {
                 mouthLevel = 0f
-                if (now >= nextBlinkAtMs && blinkStep < 0) {
-                    blinkStep = 0
-                    nextBlinkAtMs = now + Random.nextLong(2600L, 5200L)
-                }
                 if (blinkStep >= 0) {
-                    currentFrameRes = MARIA_BLINK_SEQUENCE[blinkStep]
+                    currentFrameRes = MARIA_IDLE_BLINK_SEQUENCE[blinkStep.coerceAtMost(MARIA_IDLE_BLINK_SEQUENCE.lastIndex)]
                     blinkStep++
-                    if (blinkStep >= MARIA_BLINK_SEQUENCE.size) {
+                    if (blinkStep >= MARIA_IDLE_BLINK_SEQUENCE.size) {
                         blinkStep = -1
                     }
+                } else if (postSpeechSmileTicks > 0) {
+                    postSpeechSmileTicks--
+                    currentFrameRes = R.drawable.maria_smile
                 } else {
                     currentFrameRes = R.drawable.maria_lip_0
                 }
@@ -229,17 +296,9 @@ fun MariaHeroBanner(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(240.dp)
+            .height(248.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF01060C),
-                        Color(0xFF030A10),
-                        Color(0xFF01060C),
-                    ),
-                ),
-            )
+            .background(Color(0xFF040B14))
             .border(
                 width = 1.dp,
                 color = if (isSpeaking) Color(0x660A84FF) else Color(0xFF1F2430),
@@ -249,15 +308,20 @@ fun MariaHeroBanner(
                 replayTrigger++
             },
     ) {
-        // Retrato 85mm da Maria alinhado ao topo com folga inferior para exibir rosto + ombros/blusa sem texto na boca
+        // Composição corporal de estúdio (ContentScale.Crop + BiasAlignment idêntico ao Mockup v6: preenche toda a largura sem barras laterais)
         Image(
             painter = painterResource(id = currentFrameRes),
             contentDescription = "Maria Assistente Pessoal",
-            contentScale = ContentScale.Fit,
-            alignment = Alignment.TopCenter,
+            contentScale = ContentScale.Crop,
+            alignment = BiasAlignment(horizontalBias = 0f, verticalBias = -0.78f),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 14.dp),
+                .graphicsLayer {
+                    scaleX = breathScale
+                    scaleY = breathScale
+                    translationY = bodyOffsetY
+                    rotationZ = headTiltDeg
+                },
         )
 
         // Gradiente cinematográfico suave na base para leitura cristalina da legenda abaixo do queixo/gola
@@ -266,9 +330,9 @@ fun MariaHeroBanner(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        0.0f to Color(0x2A000000),
-                        0.40f to Color.Transparent,
-                        0.75f to Color(0xB8000000),
+                        0.0f to Color(0x33000000),
+                        0.36f to Color.Transparent,
+                        0.76f to Color(0xB2000000),
                         1.0f to Color(0xF5000000),
                     ),
                 ),
@@ -476,7 +540,6 @@ fun ProMariaHeaderSection(
             speechNonce = speechNonce,
         )
 
-        // Grid 2x2 de Quadradinhos de Destaques Pro bem visível no topo
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
