@@ -1,0 +1,41 @@
+name: Fast Debug APK (Cloud Builder for Physical Moto G84 QA)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/midiastore-release-audit
+    paths:
+      - 'app/**'
+      - 'domain/**'
+      - '.github/workflows/fast-debug-apk.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fast-debug-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+      - name: Assemble Debug APK (7 GB Cloud Runner)
+        run: ./gradlew --no-daemon :app:assembleDebug
+      - name: Upload Fast Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: midiastore-fast-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

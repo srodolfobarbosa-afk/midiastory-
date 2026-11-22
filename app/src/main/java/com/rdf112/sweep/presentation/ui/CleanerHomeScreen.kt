@@ -50,43 +50,28 @@ fun CleanerHomeScreen(
     modifier: Modifier = Modifier,
     /** The host Activity already renders a Pro pill in its top bar; only standalone hosts should enable this. */
     showProBadge: Boolean = false,
+    isTabActive: Boolean = true,
 ) {
+    val mariaCaption = when {
+        state.isScanning -> stringResource(R.string.cleaner_home_scanning)
+        state.recoverableBytes > 0L -> "Olá! Encontrei ${state.recoverableLabel} prontos para liberar com segurança."
+        !state.statusMessage.isNullOrBlank() -> state.statusMessage
+        else -> "Olá! Encontrei arquivos prontos para liberar espaço com segurança."
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(MidiastoreColors.OledBlack)
             .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(R.string.cleaner_home_space_title),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MidiastoreColors.TextPrimary,
-            )
-            if (showProBadge && isProActive) {
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = MidiastoreColors.AccentBlueSoft,
-                    modifier = Modifier
-                        .border(1.dp, MidiastoreColors.AccentBlue, RoundedCornerShape(999.dp))
-                        .clip(RoundedCornerShape(999.dp))
-                        .clickable(onClick = onOpenPro),
-                ) {
-                    Text(
-                        text = stringResource(R.string.cleaner_home_pro_badge),
-                        color = MidiastoreColors.AccentBlue,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    )
-                }
-            }
-        }
+        MariaHeroBanner(
+            tabKey = "clean",
+            captionText = mariaCaption,
+            rawAudioResId = R.raw.maria_clean,
+            isActive = isTabActive,
+        )
 
         StorageNowBanner(
             state = state,
@@ -191,60 +176,62 @@ private fun SalesPsychologyProCard(
         color = MidiastoreColors.CardSurface,
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, MidiastoreColors.AccentBlue, RoundedCornerShape(16.dp))
+            .border(1.dp, Color(0x7A0A84FF), RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onOpenPro),
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0x380A84FF),
+                            MidiastoreColors.CardSurface,
+                        ),
+                    ),
+                )
+                .padding(horizontal = 15.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
-                shape = RoundedCornerShape(999.dp),
-                color = Color(0xFF163322),
-                modifier = Modifier.border(1.dp, Color(0xFF30D158), RoundedCornerShape(999.dp)),
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = MidiastoreColors.AccentBlue,
+                ) {
+                    Text(
+                        text = "PRO + IA NATIVA",
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                    )
+                }
                 Text(
-                    text = stringResource(R.string.sales_psych_badge),
-                    color = Color(0xFF30D158),
-                    fontSize = 10.sp,
+                    text = "Libere limpeza completa + Gemini Nano",
+                    color = MidiastoreColors.TextPrimary,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    lineHeight = 19.sp,
+                )
+                Text(
+                    text = "A partir de R$ 14,99 • Anual e Vitalício",
+                    color = MidiastoreColors.TextMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
                 )
             }
+            Spacer(Modifier.width(10.dp))
             Text(
-                text = stringResource(R.string.sales_psych_title),
-                color = MidiastoreColors.TextPrimary,
-                fontSize = 15.sp,
+                text = "›",
+                color = MidiastoreColors.AccentBlue,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold,
-                lineHeight = 20.sp,
             )
-            Text(
-                text = stringResource(R.string.sales_psych_subtitle),
-                color = MidiastoreColors.TextMuted,
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.sales_psych_cta),
-                    color = MidiastoreColors.AccentBlue,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-                Text(
-                    text = "›",
-                    color = MidiastoreColors.AccentBlue,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-            }
         }
     }
 }
@@ -255,50 +242,59 @@ private fun QuickMissionGrid(
     onMissionClick: (CleanMission) -> Unit,
 ) {
     val quickItems = if (collections.isNotEmpty()) {
-        // Show every mission (incl. blur detection, previously reachable only from the carousel).
-        collections.take(6)
+        collections.take(4)
     } else {
         listOf(
             CleanCollectionUiModel(
                 CleanMission.DUPLICATES,
                 stringResource(R.string.cleaner_home_fallback_duplicates_title),
-                stringResource(R.string.cleaner_home_fallback_duplicates_sub),
-                "—",
+                "WhatsApp & Galeria",
+                "SHA-256",
                 0,
             ),
             CleanCollectionUiModel(
                 CleanMission.LARGE_VIDEOS,
-                stringResource(R.string.cleaner_home_fallback_large_videos_title),
-                stringResource(R.string.cleaner_home_fallback_large_videos_sub),
-                "—",
+                "Vídeos grandes",
+                "Revisão rápida",
+                "> 10 MB",
+                0,
+            ),
+            CleanCollectionUiModel(
+                CleanMission.OLD_SCREENSHOTS,
+                "Capturas antigas",
+                "Mais de 30 dias",
+                "+30 dias",
                 0,
             ),
             CleanCollectionUiModel(
                 CleanMission.WHATSAPP,
                 stringResource(R.string.cleaner_home_fallback_whatsapp_title),
-                stringResource(R.string.cleaner_home_fallback_whatsapp_sub),
-                "—",
-                0,
-            ),
-            CleanCollectionUiModel(
-                CleanMission.OLD_SCREENSHOTS,
-                stringResource(R.string.cleaner_home_fallback_screenshots_title),
-                stringResource(R.string.cleaner_home_fallback_screenshots_sub),
-                "—",
+                "Fotos, vídeos e áudios",
+                "Mídias",
                 0,
             ),
         )
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         quickItems.chunked(2).forEach { rowItems ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 rowItems.forEach { item ->
-                    QuickTile(
-                        item = item,
+                    val accentColor = when (item.mission) {
+                        CleanMission.DUPLICATES -> Color(0xFFFF9F0A)
+                        CleanMission.LARGE_VIDEOS -> Color(0xFFBF5AF2)
+                        CleanMission.OLD_SCREENSHOTS -> Color(0xFF64D2FF)
+                        CleanMission.WHATSAPP -> Color(0xFF30D158)
+                        CleanMission.BLURRY_PHOTOS -> Color(0xFFFF375F)
+                    }
+                    MariaSquareTile(
+                        label = item.title,
+                        highlight = item.sizeLabel,
+                        highlightColor = accentColor,
+                        subtitle = if (item.itemCount > 0) "${item.itemCount} itens" else item.subtitle,
                         onClick = { onMissionClick(item.mission) },
                         modifier = Modifier.weight(1f),
                     )

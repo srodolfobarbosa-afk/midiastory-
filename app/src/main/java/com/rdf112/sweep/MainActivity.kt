@@ -103,7 +103,9 @@ import com.rdf112.sweep.presentation.scan.ScanUiStatus
 import com.rdf112.sweep.presentation.ui.CleanCollectionUiModel
 import com.rdf112.sweep.presentation.ui.CleanMission
 import com.rdf112.sweep.presentation.ui.CleanerHomeScreen
+import com.rdf112.sweep.presentation.ui.FilesMariaHeaderSection
 import com.rdf112.sweep.presentation.ui.HomeUiState
+import com.rdf112.sweep.presentation.ui.ProMariaHeaderSection
 import com.rdf112.sweep.presentation.ui.StorageBarSegment
 import com.rdf112.sweep.presentation.ui.StorageRingGaugeView
 import com.rdf112.sweep.presentation.ui.StorageSegmentedBarView
@@ -405,6 +407,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var spaceMetricsText: TextView
     private lateinit var radarConsentCheckBox: CheckBox
     private var activeTab: AppTab = AppTab.HOME
+    private val activeTabComposeState = mutableStateOf(AppTab.HOME)
     private var pendingOutcomeMission: DesiredOutcomeMission? = null
     private var lastRecordedMissionProgress: com.rdf112.sweep.presentation.scan.GlobalMissionProgress? = null
 
@@ -748,6 +751,7 @@ class MainActivity : AppCompatActivity() {
                         onMissionClick = ::onCleanMissionClick,
                         onOpenPro = { onHomeProSubscribeClicked() },
                         onManagePermissions = { requestMediaPermissions(allowSettingsFallback = true) },
+                        isTabActive = activeTabComposeState.value == AppTab.HOME,
                     )
                 }
             }
@@ -1375,6 +1379,35 @@ class MainActivity : AppCompatActivity() {
     private fun buildFilesExplorerSection(): LinearLayout = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
 
+        // 0. Hero Banner da Maria + Grid 2x2 de Quadradinhos na 2ª Aba (Arquivos)
+        val filesMariaView = ComposeView(this@MainActivity).apply {
+            id = View.generateViewId()
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MidiastoreTheme {
+                    FilesMariaHeaderSection(
+                        isActive = activeTabComposeState.value == AppTab.FILES || activeTabComposeState.value == AppTab.OAAS,
+                        onSelectPhotos = {
+                            viewModel.selectKind(MediaKind.IMAGE)
+                            viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS)
+                        },
+                        onSelectLargeVideos = {
+                            viewModel.selectKind(MediaKind.VIDEO)
+                            viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB)
+                        },
+                        onSelectWhatsApp = {
+                            openWhatsAppCleanerFlow()
+                        },
+                        onSelectScreenshots = {
+                            viewModel.selectKind(MediaKind.IMAGE)
+                            viewModel.selectSmartFilter(SmartFilterMode.SCREENSHOTS_30D)
+                        },
+                    )
+                }
+            }
+        }
+        addView(filesMariaView)
+
         // 1. Controle Segmentado Limpo (Fotos | Vídeos | Áudios)
         val segmentedBar = LinearLayout(this@MainActivity).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -1784,7 +1817,26 @@ class MainActivity : AppCompatActivity() {
         orientation = LinearLayout.VERTICAL
         setPadding(dp(2), dp(4), dp(2), dp(16))
 
-        addView(label(getString(R.string.pro_card_title), 24f, R.color.sweep_text, true))
+        // 0. Hero Banner da Maria + Card Gemini Nano Nativo do Android (0 MB) + Grid 2x2 Pro na 3ª Aba
+        val proMariaView = ComposeView(this@MainActivity).apply {
+            id = View.generateViewId()
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val billingAccessState by billingGateway.accessState.collectAsStateWithLifecycle()
+                val isProNow = billingAccessState == ProAccessSummaryState.PRO_GRANTED ||
+                    isTesterVipProEnabled() ||
+                    (isDevelopmentBuild && debugProPreviewEnabled)
+                MidiastoreTheme {
+                    ProMariaHeaderSection(
+                        isActive = activeTabComposeState.value == AppTab.PRO,
+                        isProActive = isProNow,
+                    )
+                }
+            }
+        }
+        addView(proMariaView)
+
+        addView(label(getString(R.string.pro_card_title), 22f, R.color.sweep_text, true), top(4))
         proStatusBadge = label(getString(R.string.pro_status_free), 12f, R.color.google_blue_primary, true)
         addView(proStatusBadge, top(4))
         addView(label(getString(R.string.pro_card_subtitle), 13.5f, R.color.sweep_muted, false), top(6))
@@ -2134,6 +2186,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchTab(tab: AppTab) {
         activeTab = tab
+        activeTabComposeState.value = tab
         if (::topBarProButton.isInitialized) {
             topBarProButton.visibility = if (tab == AppTab.PRO) View.GONE else View.VISIBLE
         }
