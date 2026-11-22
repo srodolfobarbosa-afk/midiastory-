@@ -851,39 +851,26 @@ fun MariaHeroBanner(
                 }
             }
 
-            Column(
+            // Apenas o selo limpo "● MARIA • ASSISTENTE IA" na base do quadro (sem texto sobre a blusa da Maria!)
+            Row(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(7.dp)
-                            .clip(CircleShape)
-                            .background(if (isSpeaking) Color(0xFF30D158) else MidiastoreColors.AccentBlue),
-                    )
-                    Text(
-                        text = MariaI18n.assistantBadge(),
-                        color = Color(0xFF64D2FF),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 0.5.sp,
-                    )
-                }
-                Spacer(Modifier.height(2.dp))
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(if (isSpeaking) Color(0xFF30D158) else MidiastoreColors.AccentBlue),
+                )
                 Text(
-                    text = captionText,
-                    color = Color.White,
-                    fontSize = 13.5.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    lineHeight = 17.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    text = MariaI18n.assistantBadge(),
+                    color = Color(0xFF64D2FF),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 0.6.sp,
                 )
             }
         } else {
