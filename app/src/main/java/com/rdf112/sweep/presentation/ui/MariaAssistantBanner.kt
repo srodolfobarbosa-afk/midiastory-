@@ -601,10 +601,6 @@ fun MariaHeroBanner(
                 }
                 if (isSpeaking) stopAndReleaseAudio()
                 currentFrameRes = R.drawable.maria_smile
-                delay(1800L)
-                if (!isSpeaking) {
-                    isExpanded = false
-                }
                 return@LaunchedEffect
             }
         }
@@ -613,10 +609,6 @@ fun MariaHeroBanner(
         delay(simulatedMs)
         isSpeaking = false
         currentFrameRes = R.drawable.maria_smile
-        delay(1600L)
-        if (!isSpeaking) {
-            isExpanded = false
-        }
     }
 
     LaunchedEffect(isActive, rawAudioResId) {
@@ -892,26 +884,16 @@ fun MariaHeroBanner(
                         .border(1.5.dp, MidiastoreColors.AccentBlue, CircleShape),
                 )
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        Text(
-                            text = brandAnnotated,
-                            fontSize = 15.sp,
-                        )
-                        Text(
-                            text = "• " + MariaI18n.assistantBadge(),
-                            color = Color(0xFF64D2FF),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
                     Text(
-                        text = MariaI18n.tapToBringMariaBack(),
-                        color = Color(0xFFD1D5DB),
-                        fontSize = 11.5.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        text = brandAnnotated,
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                    )
+                    Text(
+                        text = "● " + MariaI18n.assistantBadge(),
+                        color = Color(0xFF64D2FF),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -1125,16 +1107,8 @@ fun ProMariaHeaderSection(
     }
 }
 
-data class ChatMidiastoreMessage(
-    val isUser: Boolean,
-    val text: String,
-    val actionLabel: String? = null,
-    val actionType: String? = null,
-)
-
 /**
- * Chat Midiastore no padrão clássico ChatGPT / Google Gemini Modelo Branco ("caixinha quadradinha no modelo branco, sem inventar"):
- * - Cartão Branco Puro (#FFFFFF) com tipografia preta (#111827) de alto contraste e 4 caixinhas quadradinhas (#F3F4F6) idênticas ao ChatGPT/Gemini!
+ * Selo limpo de Inteligência Artificial On-Device no final da aba Pro (chat retirado conforme decisão do fundador para manter 100% foco em conversão e limpeza em 1 clique).
  */
 @Composable
 fun ProGeminiNanoBottomCard(
@@ -1144,346 +1118,44 @@ fun ProGeminiNanoBottomCard(
     onRunUnusedApps: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val statInfo = remember {
-        runCatching {
-            val stat = StatFs(Environment.getDataDirectory().path)
-            val totalGb = stat.totalBytes / (1024.0 * 1024.0 * 1024.0)
-            val freeGb = stat.availableBytes / (1024.0 * 1024.0 * 1024.0)
-            val usedGb = (totalGb - freeGb).coerceAtLeast(0.0)
-            val pct = ((usedGb / totalGb.coerceAtLeast(1.0)) * 100.0).roundToInt()
-            Triple(String.format(Locale.US, "%.1f GB", usedGb), String.format(Locale.US, "%.1f GB", freeGb), pct)
-        }.getOrDefault(Triple("117 GB", "129 GB", 48))
-    }
-
-    var userPrompt by remember { mutableStateOf("") }
-    var messages by remember {
-        mutableStateOf(
-            listOf(
-                ChatMidiastoreMessage(
-                    isUser = false,
-                    text = if (MariaI18n.isPt()) {
-                        "Olá! Como posso ajudar a limpar seu celular hoje? (${statInfo.first} usados • ${statInfo.second} livres)"
-                    } else {
-                        "Hi! How can I help clean your phone today? (${statInfo.first} used • ${statInfo.second} free)"
-                    },
-                    actionLabel = if (MariaI18n.isPt()) "Analisar arquivos pesados" else "Scan large files",
-                    actionType = "DIAGNOSIS",
-                ),
-            ),
-        )
-    }
-
-    fun handleSendQuestion(rawQuestion: String) {
-        val q = rawQuestion.trim()
-        if (q.isEmpty()) return
-        val userMsg = ChatMidiastoreMessage(isUser = true, text = q)
-        val replyMsg = when {
-            q.contains("whatsapp", ignoreCase = true) || q.contains("chat", ignoreCase = true) || q.contains("áudio", ignoreCase = true) -> ChatMidiastoreMessage(
-                isUser = false,
-                text = if (MariaI18n.isPt()) {
-                    "Separei as mídias recebidas em conversas e downloads para você revisar sem apagar suas mensagens:"
-                } else {
-                    "I separated chat media and downloads so you can review them safely:"
-                },
-                actionLabel = MariaI18n.socialChatTileTitle(),
-                actionType = "WHATSAPP",
-            )
-            q.contains("borrad", ignoreCase = true) || q.contains("blur", ignoreCase = true) || q.contains("foto", ignoreCase = true) -> ChatMidiastoreMessage(
-                isUser = false,
-                text = if (MariaI18n.isPt()) {
-                    "Verificando nitidez das fotos direto no aparelho (100% offline):"
-                } else {
-                    "Checking photo sharpness on-device (100% offline):"
-                },
-                actionLabel = MariaI18n.blurryPhotosTitle(),
-                actionType = "BLUR",
-            )
-            q.contains("app", ignoreCase = true) || q.contains("90", ignoreCase = true) -> ChatMidiastoreMessage(
-                isUser = false,
-                text = if (MariaI18n.isPt()) {
-                    "Listando aplicativos sem uso há mais de 90 dias que ocupam espaço:"
-                } else {
-                    "Listing apps unused for 90+ days taking up storage:"
-                },
-                actionLabel = MariaI18n.unusedAppsTitle(),
-                actionType = "APPS",
-            )
-            else -> ChatMidiastoreMessage(
-                isUser = false,
-                text = if (MariaI18n.isPt()) {
-                    "Seu aparelho tem ${statInfo.first} ocupados e ${statInfo.second} livres. Vamos revisar os vídeos grandes (>10 MB) e duplicatas:"
-                } else {
-                    "Your phone has ${statInfo.first} used and ${statInfo.second} free. Let's review large videos (>10 MB) and duplicates:"
-                },
-                actionLabel = MariaI18n.largeVideosTitle(),
-                actionType = "DIAGNOSIS",
-            )
-        }
-        messages = (messages + userMsg + replyMsg).takeLast(4)
-    }
-
-    // MODELO BRANCO CLÁSSICO CHATGPT / GEMINI (#FFFFFF com borda #E5E7EB e caixinhas quadradinhas #F3F4F6)
     Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = Color(0xFFFFFFFF),
+        shape = RoundedCornerShape(16.dp),
+        color = MidiastoreColors.CardSurface,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 14.dp)
-            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(20.dp))
-            .clip(RoundedCornerShape(20.dp)),
+            .padding(top = 6.dp, bottom = 10.dp)
+            .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onRunBlurScan() },
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = 15.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Topo limpo ChatGPT / Gemini em uma linha única (sem bolinha quebrando texto!)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Text(
-                        text = "✦",
-                        color = Color(0xFF111827),
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                    Text(
-                        text = "Chat Midiastore",
-                        color = Color(0xFF111827),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = Color(0xFFF3F4F6),
-                    modifier = Modifier.border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(999.dp)),
-                ) {
-                    Text(
-                        text = "Gemini Nano • 0 MB",
-                        color = Color(0xFF374151),
-                        fontSize = 10.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    )
-                }
-            }
-
-            // 4 Caixinhas Quadradinhas padrão ChatGPT / Gemini (#F3F4F6 no fundo branco #FFFFFF)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    ChatGptWhiteSquareBox(
-                        title = MariaI18n.largeVideosTitle(),
-                        subtitle = MariaI18n.quickReviewSub(),
-                        onClick = {
-                            handleSendQuestion(MariaI18n.largeVideosTitle())
-                            onRunSmartDiagnosis()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    ChatGptWhiteSquareBox(
-                        title = MariaI18n.socialChatTileTitle(),
-                        subtitle = MariaI18n.socialChatTileSub(),
-                        onClick = {
-                            handleSendQuestion(MariaI18n.socialChatTileTitle())
-                            onRunWhatsAppClean()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    ChatGptWhiteSquareBox(
-                        title = MariaI18n.blurryPhotosTitle(),
-                        subtitle = "On-Device",
-                        onClick = {
-                            handleSendQuestion(MariaI18n.blurryPhotosTitle())
-                            onRunBlurScan()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    ChatGptWhiteSquareBox(
-                        title = MariaI18n.unusedAppsTitle(),
-                        subtitle = "+90d",
-                        onClick = {
-                            handleSendQuestion(MariaI18n.unusedAppsTitle())
-                            onRunUnusedApps()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-
-            // Mensagens do Chat (Fundo claro estilo ChatGPT)
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                messages.forEach { msg ->
-                    if (msg.isUser) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(16.dp),
-                                color = Color(0xFFF3F4F6),
-                            ) {
-                                Text(
-                                    text = msg.text,
-                                    color = Color(0xFF111827),
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(horizontal = 13.dp, vertical = 9.dp),
-                                )
-                            }
-                        }
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFFF9FAFB))
-                                .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(14.dp))
-                                .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Text(
-                                text = msg.text,
-                                color = Color(0xFF111827),
-                                fontSize = 13.sp,
-                                lineHeight = 18.sp,
-                            )
-                            if (msg.actionLabel != null && msg.actionType != null) {
-                                Surface(
-                                    shape = RoundedCornerShape(10.dp),
-                                    color = Color(0xFF111827),
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .clickable {
-                                            when (msg.actionType) {
-                                                "DIAGNOSIS" -> onRunSmartDiagnosis()
-                                                "BLUR" -> onRunBlurScan()
-                                                "WHATSAPP" -> onRunWhatsAppClean()
-                                                "APPS" -> onRunUnusedApps()
-                                            }
-                                        },
-                                ) {
-                                    Text(
-                                        text = "✦ " + msg.actionLabel,
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Caixinha de entrada branca/cinza-clara estilo ChatGPT / Gemini com botão preto ↑ à direita
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF3F4F6))
-                    .border(1.dp, Color(0xFFD1D5DB), RoundedCornerShape(16.dp))
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                OutlinedTextField(
-                    value = userPrompt,
-                    onValueChange = { userPrompt = it },
-                    placeholder = {
-                        Text(MariaI18n.chatPlaceholder(), fontSize = 13.sp, color = Color(0xFF6B7280))
-                    },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF111827),
-                        unfocusedTextColor = Color(0xFF111827),
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                    ),
-                    modifier = Modifier.weight(1f),
+                Text(
+                    text = "✦ " + MariaI18n.assistantBadge() + " • ON-DEVICE (0 MB)",
+                    color = Color(0xFF64D2FF),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
                 )
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF111827))
-                        .clickable {
-                            val q = userPrompt.trim().ifEmpty { MariaI18n.largeVideosTitle() }
-                            userPrompt = ""
-                            handleSendQuestion(q)
-                        },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "↑",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
+                Text(
+                    text = if (MariaI18n.isPt()) {
+                        "Análise inteligente de fotos borradas, duplicatas SHA-256 e voz neural 100% privada no seu aparelho."
+                    } else {
+                        "Smart on-device blurry photo check, SHA-256 duplicates, and 100% private neural voice assistant."
+                    },
+                    color = MidiastoreColors.TextMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                )
             }
-        }
-    }
-}
-
-@Composable
-private fun ChatGptWhiteSquareBox(
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = Color(0xFFF3F4F6),
-        modifier = modifier
-            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(14.dp))
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(onClick = onClick),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-        ) {
-            Text(
-                text = title,
-                color = Color(0xFF111827),
-                fontSize = 12.5.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                color = Color(0xFF6B7280),
-                fontSize = 11.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
         }
     }
 }

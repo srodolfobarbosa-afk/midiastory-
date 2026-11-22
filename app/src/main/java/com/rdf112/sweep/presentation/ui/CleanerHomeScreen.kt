@@ -158,39 +158,6 @@ fun CleanerHomeScreen(
             },
         )
 
-        val scannedCollections = state.collections.filter { it.itemCount > 0 }
-        if (scannedCollections.isNotEmpty()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.cleaner_home_mixes_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MidiastoreColors.TextPrimary,
-                )
-                Text(
-                    text = stringResource(R.string.cleaner_home_review),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MidiastoreColors.AccentBlue,
-                    modifier = Modifier.clickable { onMissionClick(scannedCollections.first().mission) },
-                )
-            }
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(scannedCollections, key = { it.mission.name }) { collection ->
-                    MixCarouselCard(
-                        collection = collection,
-                        onClick = { onMissionClick(collection.mission) },
-                    )
-                }
-            }
-        }
-
         // Modelo Pro / IA Nativa sempre disponível lá no final da aba conforme solicitado pelo Rodolfo!
         SalesPsychologyProCard(onOpenPro = onOpenPro)
 
