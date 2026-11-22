@@ -822,8 +822,15 @@ fun ProMariaHeaderSection(
     }
 }
 
+data class ChatMidiastoreMessage(
+    val isUser: Boolean,
+    val text: String,
+    val actionLabel: String? = null,
+    val actionType: String? = null,
+)
+
 /**
- * Console Interativo do Modelo IA Nativa (Gemini Nano Android — LIBERADO PARA USO) posicionado no final da aba Pro!
+ * Chat Midiastore (Estilo Google Gemini Dark OLED #1C1C1E — sem caixa azul, idêntico aos outros cartões do app!).
  */
 @Composable
 fun ProGeminiNanoBottomCard(
@@ -845,184 +852,325 @@ fun ProGeminiNanoBottomCard(
     }
 
     var userPrompt by remember { mutableStateOf("") }
-    var aiReply by remember {
+    var messages by remember {
         mutableStateOf(
-            "Olá Rodolfo! Minha IA Nativa (Gemini Nano On-Device • 0 MB) já está LIBERADA no seu Motorola: você está usando ${statInfo.first} (${statInfo.third}%) e tem ${statInfo.second} livres. Toque em um comando abaixo ou faça uma pergunta:",
+            listOf(
+                ChatMidiastoreMessage(
+                    isUser = false,
+                    text = "Olá! Eu sou a Maria no Chat Midiastore (IA Nativa • 0 MB). Seu aparelho está com ${statInfo.first} usados (${statInfo.third}%) e ${statInfo.second} livres. Como posso ajudar você agora?",
+                    actionLabel = "✦ Fazer Diagnóstico Completo",
+                    actionType = "DIAGNOSIS",
+                ),
+            ),
         )
     }
 
+    fun handleSendQuestion(rawQuestion: String) {
+        val q = rawQuestion.trim()
+        if (q.isEmpty()) return
+        val userMsg = ChatMidiastoreMessage(isUser = true, text = q)
+        val replyMsg = when {
+            q.contains("whatsapp", ignoreCase = true) || q.contains("áudio", ignoreCase = true) -> ChatMidiastoreMessage(
+                isUser = false,
+                text = "Analisei suas pastas de mídia: o WhatsApp acumula vídeos, fotos e áudios repetidos que podem ser limpos sem apagar suas conversas. Toque abaixo para revisar:",
+                actionLabel = "✦ Abrir Limpador do WhatsApp",
+                actionType = "WHATSAPP",
+            )
+            q.contains("borrad", ignoreCase = true) || q.contains("nitidez", ignoreCase = true) || q.contains("foto", ignoreCase = true) -> ChatMidiastoreMessage(
+                isUser = false,
+                text = "Posso verificar a nitidez das suas fotos localmente no processador do seu Motorola (100% offline, sem enviar nada para a nuvem) e separar apenas as fotos tremidas ou borradas:",
+                actionLabel = "✦ Escanear Fotos Borradas",
+                actionType = "BLUR",
+            )
+            q.contains("app", ignoreCase = true) || q.contains("90", ignoreCase = true) || q.contains("esquecid", ignoreCase = true) -> ChatMidiastoreMessage(
+                isUser = false,
+                text = "Aplicativos que você não abre há mais de 90 dias costumam esconder vários gigabytes no celular. Vamos listar quais estão sem uso?",
+                actionLabel = "✦ Ver Apps sem Uso (+90 dias)",
+                actionType = "APPS",
+            )
+            else -> ChatMidiastoreMessage(
+                isUser = false,
+                text = "Verifiquei seu armazenamento (${statInfo.first} usados • ${statInfo.second} disponíveis). A forma mais rápida de liberar espaço hoje é revisar os vídeos grandes (>10 MB) e duplicatas SHA-256 protegendo o original:",
+                actionLabel = "✦ Liberar Espaço Agora",
+                actionType = "DIAGNOSIS",
+            )
+        }
+        messages = (messages + userMsg + replyMsg).takeLast(6)
+    }
+
+    // Superfície Grafite Escuro (#1C1C1E) com borda #2C2C2E idêntica aos outros cartões do Midiastore (ZERO caixa azul!)
     Surface(
         shape = RoundedCornerShape(18.dp),
-        color = Color(0xFF101829),
+        color = MidiastoreColors.CardSurface,
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 10.dp, bottom = 14.dp)
-            .border(1.5.dp, Color(0xFF0A84FF), RoundedCornerShape(18.dp))
+            .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(18.dp))
             .clip(RoundedCornerShape(18.dp)),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0x330A84FF),
-                            Color(0x265E5CE6),
-                        ),
-                    ),
-                )
                 .padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // Cabeçalho Estilo Google Gemini
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = "✨ Maria IA Nativa (Gemini Nano Pro)",
-                    color = Color(0xFF64D2FF),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                )
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = Color(0xFF163322),
-                    modifier = Modifier.border(1.dp, Color(0xFF30D158), RoundedCornerShape(6.dp)),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = "LIBERADA • 0 MB",
+                        text = "✦",
+                        color = Color(0xFF64D2FF),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                    Column {
+                        Text(
+                            text = "Chat Midiastore",
+                            color = Color.White,
+                            fontSize = 15.5.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                        Text(
+                            text = "Maria • Gemini Nano On-Device",
+                            color = MidiastoreColors.TextMuted,
+                            fontSize = 11.sp,
+                        )
+                    }
+                }
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = MidiastoreColors.CardSurfaceAlt,
+                    modifier = Modifier.border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(999.dp)),
+                ) {
+                    Text(
+                        text = "● Online • 0 MB",
                         color = Color(0xFF30D158),
                         fontSize = 10.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                     )
                 }
             }
 
-            // Resposta ao vivo da Maria IA Pro
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xCC080D16),
+            // Histórico de Mensagens estilo Google Gemini (Bolhas escuras #2C2C2E para usuário e resposta limpa com avatar para a IA)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                messages.forEach { msg ->
+                    if (msg.isUser) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(18.dp, 4.dp, 18.dp, 18.dp),
+                                color = Color(0xFF2C2C2E),
+                            ) {
+                                Text(
+                                    text = msg.text,
+                                    color = Color.White,
+                                    fontSize = 13.sp,
+                                    lineHeight = 18.sp,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                )
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(Color(0xFF141416))
+                                .border(1.dp, Color(0xFF262629), RoundedCornerShape(14.dp))
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.maria_smile),
+                                    contentDescription = "Maria IA",
+                                    contentScale = ContentScale.Crop,
+                                    alignment = Alignment.TopCenter,
+                                    modifier = Modifier
+                                        .size(26.dp)
+                                        .clip(CircleShape)
+                                        .border(1.dp, Color(0xFF64D2FF), CircleShape),
+                                )
+                                Text(
+                                    text = "✦ Chat Midiastore",
+                                    color = Color(0xFFE5E5EA),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            Text(
+                                text = msg.text,
+                                color = Color(0xFFE5E7EB),
+                                fontSize = 13.sp,
+                                lineHeight = 18.5.sp,
+                            )
+                            if (msg.actionLabel != null && msg.actionType != null) {
+                                Surface(
+                                    shape = RoundedCornerShape(999.dp),
+                                    color = Color(0xFF262629),
+                                    modifier = Modifier
+                                        .border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(999.dp))
+                                        .clip(RoundedCornerShape(999.dp))
+                                        .clickable {
+                                            when (msg.actionType) {
+                                                "DIAGNOSIS" -> onRunSmartDiagnosis()
+                                                "BLUR" -> onRunBlurScan()
+                                                "WHATSAPP" -> onRunWhatsAppClean()
+                                                "APPS" -> onRunUnusedApps()
+                                            }
+                                        },
+                                ) {
+                                    Text(
+                                        text = msg.actionLabel,
+                                        color = Color(0xFF64D2FF),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Pílulas de sugestão rápida estilo Google Gemini (Grafite escuro #262629)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    GeminiSuggestionChip(
+                        label = "✦ Analisar celular",
+                        onClick = {
+                            handleSendQuestion("Analisar meu celular e vídeos pesados")
+                            onRunSmartDiagnosis()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    GeminiSuggestionChip(
+                        label = "✦ Fotos borradas",
+                        onClick = {
+                            handleSendQuestion("Encontrar fotos borradas com IA")
+                            onRunBlurScan()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    GeminiSuggestionChip(
+                        label = "✦ Limpar WhatsApp",
+                        onClick = {
+                            handleSendQuestion("O que posso limpar no WhatsApp?")
+                            onRunWhatsAppClean()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    GeminiSuggestionChip(
+                        label = "✦ Apps +90 dias",
+                        onClick = {
+                            handleSendQuestion("Quais aplicativos estão sem uso há 90 dias?")
+                            onRunUnusedApps()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            // Barra de entrada inferior em pílula estilo Google Gemini (#262629, sem caixa azul!)
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, Color(0x3364D2FF), RoundedCornerShape(12.dp)),
-            ) {
-                Text(
-                    text = aiReply,
-                    color = Color(0xFFE5E7EB),
-                    fontSize = 12.5.sp,
-                    lineHeight = 18.sp,
-                    modifier = Modifier.padding(12.dp),
-                )
-            }
-
-            // Botões de ação real da IA no dispositivo
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Button(
-                    onClick = {
-                        aiReply = "🧠 Diagnóstico IA: Analisando arquivos pesados e duplicatas SHA-256 nos seus ${statInfo.first} ocupados. Abrindo painel de revisão segura..."
-                        onRunSmartDiagnosis()
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF)),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("🧠 Diagnóstico IA", fontSize = 11.5.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                }
-                Button(
-                    onClick = {
-                        aiReply = "🔍 Scanner Neural Local: Verificando nitidez das fotos na galeria (100% offline) para separar fotos borradas..."
-                        onRunBlurScan()
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5E5CE6)),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("🔍 Fotos Borradas", fontSize = 11.5.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Button(
-                    onClick = {
-                        aiReply = "💬 IA WhatsApp: Localizando vídeos, áudios e imagens repetidas das conversas do WhatsApp..."
-                        onRunWhatsAppClean()
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F2937)),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("💬 Limpar WhatsApp", fontSize = 11.5.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                }
-                Button(
-                    onClick = {
-                        aiReply = "📦 Detector +90 Dias: Verificando aplicativos instalados que você não abre há mais de 3 meses..."
-                        onRunUnusedApps()
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F2937)),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("📦 Apps +90 Dias", fontSize = 11.5.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                }
-            }
-
-            // Caixa de pergunta direta para a Maria IA Pro
-            Row(
-                modifier = Modifier.fillMaxWidth(),
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(Color(0xFF262629))
+                    .border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(28.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 OutlinedTextField(
                     value = userPrompt,
                     onValueChange = { userPrompt = it },
                     placeholder = {
-                        Text("Pergunte à Maria IA Pro...", fontSize = 12.sp, color = Color(0xFF9CA3AF))
+                        Text("Peça ao Chat Midiastore...", fontSize = 13.sp, color = Color(0xFF8E8E93))
                     },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFF0A84FF),
-                        unfocusedBorderColor = Color(0xFF374151),
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
                     ),
                     modifier = Modifier.weight(1f),
                 )
-                Button(
-                    onClick = {
-                        val q = userPrompt.trim()
-                        aiReply = when {
-                            q.isEmpty() -> "💡 Dica da Maria IA: Seu Motorola tem ${statInfo.second} livres (${statInfo.third}% usado). Recomendo começar pelos Vídeos Grandes (>10 MB) e Duplicatas SHA-256!"
-                            q.contains("whatsapp", ignoreCase = true) -> {
-                                onRunWhatsAppClean()
-                                "💬 Maria IA: Abri a limpeza inteligente do WhatsApp para você revisar vídeos e áudios pesados sem apagar suas conversas!"
-                            }
-                            q.contains("borrad", ignoreCase = true) || q.contains("foto", ignoreCase = true) -> {
-                                onRunBlurScan()
-                                "🔍 Maria IA: Iniciei o detector on-device de fotos borradas! Ele analisa a nitidez direto no processador do seu Motorola."
-                            }
-                            q.contains("app", ignoreCase = true) -> {
-                                onRunUnusedApps()
-                                "📦 Maria IA: Verificando aplicativos sem uso há mais de 90 dias que ocupam espaço oculto no sistema."
-                            }
-                            else -> "✨ Maria IA (Gemini Nano Local): Analisei seu pedido (\"$q\"). Seu aparelho está com ${statInfo.first} ocupados e ${statInfo.second} disponíveis. Toque em 'Diagnóstico IA' acima para liberar espaço agora com 100% de segurança!"
-                        }
-                        userPrompt = ""
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0A84FF)),
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(if (userPrompt.isNotBlank()) MidiastoreColors.AccentBlue else Color(0xFF3A3A3C))
+                        .clickable {
+                            val q = userPrompt.trim().ifEmpty { "Analisar meu celular agora" }
+                            userPrompt = ""
+                            handleSendQuestion(q)
+                        },
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Text("Enviar", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(
+                        text = "↑",
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun GeminiSuggestionChip(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        shape = RoundedCornerShape(999.dp),
+        color = Color(0xFF262629),
+        modifier = modifier
+            .border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(999.dp))
+            .clip(RoundedCornerShape(999.dp))
+            .clickable(onClick = onClick),
+    ) {
+        Text(
+            text = label,
+            color = Color(0xFFE5E5EA),
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+        )
     }
 }
 

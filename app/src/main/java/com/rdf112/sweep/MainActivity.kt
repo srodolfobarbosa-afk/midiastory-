@@ -4411,6 +4411,8 @@ class MainActivity : AppCompatActivity() {
     private fun onHomeCleanupButtonClicked() {
         val currentState = viewModel.state.value
         if (currentState.missionProgress?.isRunning == true || currentState.isLoading) {
+            // Se a varredura já está rodando, agenda a abertura automática da folha de revisão assim que terminar!
+            openInteractiveDialogOnMissionFinish = true
             Toast.makeText(this, R.string.cleanup_scan_in_progress_toast, Toast.LENGTH_SHORT).show()
             return
         }
@@ -6430,8 +6432,8 @@ class MainActivity : AppCompatActivity() {
         updatePage(state)
         updateReview(state)
         updateVisibleCheckboxes(state)
-        renderMissionProgress(state.missionProgress)
         resumePendingOutcomeMission(state)
+        renderMissionProgress(state.missionProgress)
         if (
             !autoInitialCleanupScanLaunched &&
             hasFullVisualAccess() &&
@@ -6457,11 +6459,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (state.status in setOf(
+                ScanUiStatus.SESSION_STALE,
+                ScanUiStatus.CANCELLED,
+                ScanUiStatus.IDLE,
+            ) && hasAnyMediaPermission()
+        ) {
+            pendingOutcomeMission = null
+            runOutcomeMission(mission)
+            return
+        }
+
+        if (state.status in setOf(
                 ScanUiStatus.FAILED,
                 ScanUiStatus.PAGING_UNSUPPORTED,
                 ScanUiStatus.NO_ACCESS,
-                ScanUiStatus.SESSION_STALE,
-                ScanUiStatus.CANCELLED,
             )
         ) {
             pendingOutcomeMission = null
@@ -7003,13 +7014,6 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
-        val currentState = viewModel.state.value
-        if (currentState.session == null || currentState.isLoading) {
-            pendingOutcomeMission = mission
-            if (!currentState.isLoading) startScanOrRequestAccess()
-            oaasPipelineStatus.text = getString(R.string.oaas_starting_scan_first)
-            return
-        }
         if (mission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW) {
             heroOrbButton.isEnabled = false
             heroOrbButton.text = getString(R.string.home_cleanup_scanning_button)
@@ -7018,6 +7022,7 @@ class MainActivity : AppCompatActivity() {
         }
         pendingOutcomeMission = null
         lastRecordedMissionProgress = null
+        // Executa a missão diretamente (executeGlobalOutcomeMission já cria/revalida a sessão e cancela varreduras anteriores sem travar em estado stale)
         viewModel.executeGlobalOutcomeMission(mission)
     }
 

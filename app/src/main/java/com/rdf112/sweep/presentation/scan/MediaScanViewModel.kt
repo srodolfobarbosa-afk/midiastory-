@@ -130,7 +130,12 @@ class MediaScanViewModel(
             try {
                 val session = repository.createSession()
                 coroutineContext.ensureActive()
-                val allowedKind = listOf(MediaKind.IMAGE, MediaKind.VIDEO, MediaKind.AUDIO).firstOrNull { kind ->
+                val desiredKind = pendingKindSelection?.takeIf { kind ->
+                    val access = session.accessByKind[kind]
+                    access == AccessLevel.FULL || access == AccessLevel.PARTIAL
+                }
+                pendingKindSelection = null
+                val allowedKind = desiredKind ?: listOf(MediaKind.IMAGE, MediaKind.VIDEO, MediaKind.AUDIO).firstOrNull { kind ->
                     val access = session.accessByKind[kind]
                     access == AccessLevel.FULL || access == AccessLevel.PARTIAL
                 } ?: run {
@@ -185,28 +190,43 @@ class MediaScanViewModel(
 
     fun selectKind(kind: MediaKind) {
         val current = mutableState.value
-        val session = current.session ?: return
+        val session = current.session
+        if (session == null) {
+            pendingKindSelection = kind
+            startSession()
+            return
+        }
         val access = session.accessByKind[kind]
         if (access != AccessLevel.FULL && access != AccessLevel.PARTIAL) {
             mutableState.value = current.copy(message = null)
             return
         }
-        if (current.selectedKind == kind) return
+        if (current.selectedKind == kind && current.currentPage != null && !current.isLoading) return
+        missionJob?.cancel()
         mutableState.value = current.copy(selectedKind = kind, currentPage = null, pageHistory = emptyList(), message = null)
         loadPageAt(0, emptyList())
     }
 
+    private var pendingKindSelection: MediaKind? = null
+
     fun selectVolume(volumeName: String) {
         val current = mutableState.value
         if (volumeName !in current.availableVolumes || current.selectedVolume == volumeName) return
+        missionJob?.cancel()
         mutableState.value = current.copy(selectedVolume = volumeName, currentPage = null, pageHistory = emptyList(), message = null)
         loadPageAt(0, emptyList())
     }
 
     fun selectSmartFilter(filter: SmartFilterMode) {
         val current = mutableState.value
-        if (current.smartFilter == filter) return
         mutableState.value = current.copy(smartFilter = filter, message = null)
+        if (current.currentPage == null && !current.isLoading) {
+            if (current.session != null) {
+                loadPageAt(0, emptyList())
+            } else {
+                startSession()
+            }
+        }
     }
 
     /**
@@ -496,22 +516,10 @@ class MediaScanViewModel(
                 }
 
                 if (fatalStaleness) {
-                    invalidateSession("session_source_changed")
-                    mutableState.value = mutableState.value.copy(
-                        isLoading = false,
-                        missionProgress = GlobalMissionProgress(
-                            mission = mission,
-                            pagesProcessed = pagesProcessed,
-                            recordsExamined = recordsExamined,
-                            sourcesProcessed = sourcesProcessed,
-                            sourceCount = sources.size,
-                            isRunning = false,
-                            coverageComplete = false,
-                            warningCount = warningCount,
-                            message = "session_stale",
-                        ),
-                    )
-                    return@launch
+                    // Nunca retorna plan = null por mudança concorrente do MediaStore: marca cobertura parcial
+                    // (o que desativa auto-seleção de duplicatas com segurança) e entrega os candidatos para revisão manual!
+                    coverageComplete = false
+                    warningCount++
                 }
 
                 val missionRecords = when (mission) {
@@ -583,22 +591,11 @@ class MediaScanViewModel(
                         SessionFreshness.SOURCE_CHANGED,
                     )
                 ) {
-                    invalidateSession("session_source_changed")
-                    mutableState.value = mutableState.value.copy(
-                        isLoading = false,
-                        missionProgress = GlobalMissionProgress(
-                            mission = mission,
-                            pagesProcessed = pagesProcessed,
-                            recordsExamined = recordsExamined,
-                            sourcesProcessed = sourcesProcessed,
-                            sourceCount = sources.size,
-                            isRunning = false,
-                            coverageComplete = false,
-                            warningCount = warningCount + 1,
-                            message = "session_stale",
-                        ),
-                    )
-                    return@launch
+                    // Se o MediaStore mudou durante a varredura (ex: mensagem do WhatsApp em background),
+                    // marca cobertura como parcial (o que desativa auto-seleção de duplicatas com segurança)
+                    // mas NÃO descarta os arquivos já encontrados com erro de falha na tela!
+                    coverageComplete = false
+                    warningCount++
                 }
                 if (freshness == SessionFreshness.UNVERIFIABLE) {
                     coverageComplete = false
@@ -629,9 +626,26 @@ class MediaScanViewModel(
                 }
 
                 val latest = mutableState.value
+                val ensuredFirstPage = latest.currentPage ?: runCatching {
+                    val defaultKind = accessibleKinds.first()
+                    val defaultVol = volumes.first()
+                    repository.loadPage(
+                        session,
+                        MediaPageRequest(
+                            sessionId = session.id,
+                            kind = defaultKind,
+                            volumeName = defaultVol,
+                            offset = 0,
+                            pageSize = SWEEP_PAGE_SIZE,
+                            hashSameSizeCandidates = false,
+                        ),
+                    )
+                }.getOrNull()
+
                 mutableState.value = latest.copy(
                     status = if (coverageComplete) ScanUiStatus.READY else ScanUiStatus.PARTIAL,
                     session = session,
+                    currentPage = ensuredFirstPage ?: latest.currentPage,
                     smartFilter = when (mission) {
                         DesiredOutcomeMission.FREE_MAX_SPACE_NOW -> SmartFilterMode.LARGE_FILES_10MB
                         DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES -> SmartFilterMode.SAME_SIZE_CANDIDATES
@@ -796,7 +810,7 @@ class MediaScanViewModel(
     /** Called from Activity.onResume; API 29 is explicitly unverifiable, not assumed stable. */
     fun checkSessionFreshness() {
         val currentState = mutableState.value
-        if (currentState.isLoading && currentState.missionProgress?.isRunning == true) return
+        if (currentState.isLoading) return
         val session = currentState.session ?: return
         // Android does not expose a stable, complete snapshot of the user-selected media set.
         // After the app resumes, discard partial-access pages and their review selection rather
@@ -816,8 +830,15 @@ class MediaScanViewModel(
             if (mutableState.value.session?.id != session.id) return@launch
             when (freshness) {
                 SessionFreshness.ACCESS_CHANGED,
-                SessionFreshness.VOLUMES_CHANGED,
-                SessionFreshness.SOURCE_CHANGED -> invalidateSession("session_source_changed")
+                SessionFreshness.VOLUMES_CHANGED -> invalidateSession("session_source_changed")
+                SessionFreshness.SOURCE_CHANGED -> {
+                    // Quando um novo arquivo (ex: print ou mídia do WhatsApp) entra no MediaStore durante o uso,
+                    // preserva a sessão ativa como PARTIAL em vez de derrubar a tela com SESSION_STALE!
+                    val current = mutableState.value
+                    if (current.session?.id == session.id && !current.isLoading) {
+                        mutableState.value = current.copy(status = ScanUiStatus.PARTIAL)
+                    }
+                }
                 SessionFreshness.REVISION_UNCHANGED -> Unit
                 SessionFreshness.UNVERIFIABLE -> {
                     val current = mutableState.value
