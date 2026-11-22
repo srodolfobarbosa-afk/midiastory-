@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Planta & Mockup — Midiastore v2.8.0 com Assistente Maria</title>
+  <title>Planta v2 (Hero Clean) — Midiastore v2.8.0 com Maria</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #07080c;
+      background: #06070a;
       color: #f5f5f7;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
@@ -20,176 +20,157 @@
     }
     .phone {
       width: 360px;
-      height: 740px;
+      height: 750px;
       background: #000000;
-      border-radius: 42px;
+      border-radius: 44px;
       border: 3px solid #2c2c2e;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06);
+      box-shadow: 0 28px 90px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       position: relative;
     }
     .status-bar {
-      height: 30px;
-      padding: 8px 22px 0;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 32px;
+      padding: 10px 24px 0;
       display: flex;
       justify-content: space-between;
       font-size: 11px;
-      color: #8e8e93;
-    }
-    .content {
-      flex: 1;
-      padding: 14px 16px 82px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .app-title {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-    }
-    .maria-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #1c1c1e;
-      border: 1px solid rgba(10,132,255,0.55);
-      border-radius: 999px;
-      padding: 4px 10px 4px 4px;
-      cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.2s ease;
-    }
-    .maria-pill:hover { transform: scale(1.03); border-color: #0a84ff; }
-    .maria-pill img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1.5px solid #0a84ff;
-    }
-    .maria-pill span {
-      font-size: 12px;
-      font-weight: 600;
-      color: #ffffff;
-    }
-    /* Non-intrusive, warm, Apple-clean Maria assistant banner */
-    .maria-card {
-      background: linear-gradient(135deg, #16181f 0%, #1c1c1e 100%);
-      border: 1px solid rgba(10,132,255,0.35);
-      border-radius: 18px;
-      padding: 12px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      position: relative;
-      animation: fadeIn 0.25s ease;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-    .maria-avatar-wrap {
-      position: relative;
-      flex-shrink: 0;
-    }
-    .maria-avatar-wrap img {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #0a84ff;
-      box-shadow: 0 0 16px rgba(10,132,255,0.28);
-    }
-    .speaking-ring {
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 2px solid #0a84ff;
-      opacity: 0;
+      color: rgba(255,255,255,0.75);
+      z-index: 10;
       pointer-events: none;
     }
-    .speaking .speaking-ring {
-      animation: pulse 1.2s infinite;
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 78px;
     }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.75; }
-      100% { transform: scale(1.18); opacity: 0; }
+    .scroll-area::-webkit-scrollbar { width: 0; }
+
+    /* HERO MARIA GRANDE CINEMATOGRÁFICO (APENAS NA ABA LIMPAR) */
+    .hero-maria {
+      position: relative;
+      height: 248px;
+      width: 100%;
+      overflow: hidden;
+      background: #080b12;
     }
-    .maria-body { flex: 1; min-width: 0; }
-    .maria-top {
+    .hero-maria img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      transition: transform 0.35s ease;
+    }
+    .hero-maria.speaking img {
+      transform: scale(1.03);
+    }
+    .hero-fade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.45) 0%,
+        rgba(0,0,0,0.05) 36%,
+        rgba(0,0,0,0.72) 78%,
+        #000000 100%
+      );
+    }
+    .hero-top-bar {
+      position: absolute;
+      top: 34px;
+      left: 18px;
+      right: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      z-index: 5;
     }
-    .maria-name {
-      font-size: 12px;
+    .brand {
+      font-size: 19px;
       font-weight: 700;
-      color: #64d2ff;
-      letter-spacing: 0.2px;
+      letter-spacing: -0.4px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
     }
-    .maria-actions {
-      display: flex;
-      gap: 6px;
-    }
-    .icon-btn {
-      background: rgba(255,255,255,0.08);
-      border: none;
-      color: #d1d1d6;
-      width: 24px;
-      height: 24px;
+    .audio-btn {
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      font-size: 11px;
+      background: rgba(28,28,30,0.72);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 14px;
       cursor: pointer;
-    }
-    .icon-btn:hover { background: rgba(10,132,255,0.3); color: #fff; }
-    .maria-text {
-      font-size: 12.5px;
-      line-height: 1.42;
-      color: #e5e5ea;
-    }
-    .faq-chips {
+      backdrop-filter: blur(10px);
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+    .audio-btn:hover { border-color: #0a84ff; background: rgba(10,132,255,0.35); }
+    .hero-caption {
+      position: absolute;
+      bottom: 12px;
+      left: 18px;
+      right: 18px;
+      z-index: 5;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
       gap: 6px;
-      margin-top: 9px;
-    }
-    .chip {
-      background: rgba(10,132,255,0.14);
-      border: 1px solid rgba(10,132,255,0.35);
-      color: #8cc8ff;
       font-size: 11px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.15s ease;
+      font-weight: 600;
+      color: #64d2ff;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
     }
-    .chip:hover { background: #0a84ff; color: #fff; }
+    .dot-live {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #0a84ff;
+      box-shadow: 0 0 8px #0a84ff;
+    }
+    .hero-line {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #ffffff;
+    }
+
+    .body-pad {
+      padding: 8px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
     .card {
       background: #1c1c1e;
       border-radius: 18px;
-      padding: 16px;
+      padding: 15px;
+    }
+    .storage-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
     }
     .storage-num {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 700;
-      margin-bottom: 4px;
+      letter-spacing: -0.5px;
     }
-    .muted { color: #8e8e93; font-size: 12.5px; }
+    .muted { color: #8e8e93; font-size: 12px; }
     .bar {
-      height: 10px;
+      height: 8px;
       background: #2c2c2e;
       border-radius: 999px;
       overflow: hidden;
       display: flex;
-      margin: 12px 0 8px;
+      margin: 10px 0 8px;
     }
-    .seg-photos { width: 38%; background: #0a84ff; }
+    .seg-photos { width: 40%; background: #0a84ff; }
     .seg-videos { width: 28%; background: #5e5ce6; }
     .seg-dup { width: 14%; background: #ff9f0a; }
     .cta-btn {
@@ -198,22 +179,26 @@
       color: #ffffff;
       border: none;
       border-radius: 14px;
-      padding: 14px;
+      padding: 13px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 8px;
+      transition: background 0.15s ease;
     }
     .cta-btn:hover { background: #2994ff; }
+
     .row-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 11px 0;
+      padding: 10px 0;
       border-bottom: 1px solid #2c2c2e;
       font-size: 13.5px;
+      cursor: pointer;
     }
-    .row-item:last-child { border-bottom: none; }
+    .row-item:last-child { border-bottom: none; padding-bottom: 2px; }
+    .row-item:first-child { padding-top: 2px; }
     .pill-val {
       background: #2c2c2e;
       color: #e5e5ea;
@@ -222,47 +207,81 @@
       padding: 4px 10px;
       border-radius: 999px;
     }
+
+    /* BANNER PRO ELEGANTE NA PRIMEIRA ABA */
+    .pro-banner {
+      background: linear-gradient(135deg, rgba(10,132,255,0.20) 0%, #1c1c1e 65%);
+      border: 1px solid rgba(10,132,255,0.45);
+      border-radius: 16px;
+      padding: 13px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+    .pro-banner:hover { border-color: #0a84ff; }
+    .pro-badge {
+      display: inline-block;
+      background: #0a84ff;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      letter-spacing: 0.4px;
+    }
+    .pro-title { font-size: 13.5px; font-weight: 700; color: #fff; }
+    .pro-arrow { font-size: 18px; color: #0a84ff; font-weight: 700; }
+
+    /* CABEÇALHO LIMPO PARA ABAS ARQUIVOS E PRO (SEM MARIA PERSISTENTE) */
+    .clean-header {
+      padding: 44px 18px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .clean-header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+
     .plan-card {
       background: #1c1c1e;
       border: 1px solid #2c2c2e;
       border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 10px;
+      padding: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .plan-card.best {
       border-color: #0a84ff;
-      background: linear-gradient(135deg, rgba(10,132,255,0.14), #1c1c1e);
+      background: linear-gradient(135deg, rgba(10,132,255,0.16), #1c1c1e);
     }
+
     .bottom-nav {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 66px;
-      background: rgba(18,18,20,0.96);
-      border-top: 1px solid #2c2c2e;
+      bottom: 0; left: 0; right: 0;
+      height: 64px;
+      background: rgba(14,14,16,0.96);
+      border-top: 1px solid #262629;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       align-items: center;
+      backdrop-filter: blur(12px);
     }
     .nav-btn {
       background: none;
       border: none;
       color: #8e8e93;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
+      height: 100%;
     }
     .nav-btn.active { color: #0a84ff; }
+
     .spec-panel {
-      max-width: 440px;
+      max-width: 420px;
       background: #11131a;
       border: 1px solid #252936;
       border-radius: 20px;
@@ -278,184 +297,163 @@
 <body>
   <div class="phone">
     <div class="status-bar">
-      <span>02:48</span>
+      <span>02:58</span>
       <span>5G • 94%</span>
     </div>
 
-    <div class="content">
-      <div class="header-row">
-        <div class="app-title" id="screenTitle">Midiastore</div>
-        <div class="maria-pill" id="mariaPill" title="Abrir/Minimizar Assistente Maria">
-          <img src="../../.agents/avatar/avatar-smile.png" alt="Maria" />
-          <span>Maria</span>
+    <div class="scroll-area">
+      <!-- ABA 1: LIMPAR (COM HERO MARIA GRANDE + FRASE CURTA + BANNER PRO) -->
+      <div id="tabClean">
+        <div class="hero-maria" id="heroMaria">
+          <img id="mariaImg" src="file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png" alt="Maria" />
+          <div class="hero-fade"></div>
+          <div class="hero-top-bar">
+            <div class="brand">Midiastore</div>
+            <button class="audio-btn" id="btnAudio" title="Ouvir / Silenciar Maria">🔊</button>
+          </div>
+          <div class="hero-caption">
+            <div class="hero-tag"><span class="dot-live"></span> MARIA • ASSISTENTE</div>
+            <div class="hero-line" id="mariaLine">Olá! Encontrei 4,8 GB prontos para liberar.</div>
+          </div>
         </div>
-      </div>
 
-      <!-- Card acolhedor e discreto da Maria (pode minimizar a qualquer momento) -->
-      <div class="maria-card speaking" id="mariaCard">
-        <div class="maria-avatar-wrap">
-          <img id="mariaImg" src="../../.agents/avatar/avatar-smile.png" alt="Assistente Maria" />
-          <div class="speaking-ring"></div>
-        </div>
-        <div class="maria-body">
-          <div class="maria-top">
-            <span class="maria-name">Maria • Assistente Pessoal</span>
-            <div class="maria-actions">
-              <button class="icon-btn" id="btnMute" title="Silenciar/Ativar voz">🔊</button>
-              <button class="icon-btn" id="btnHide" title="Minimizar Maria">—</button>
+        <div class="body-pad">
+          <div class="card">
+            <div class="storage-row">
+              <div class="storage-num">98,4 GB</div>
+              <div class="muted">de 128 GB usados</div>
+            </div>
+            <div class="bar">
+              <div class="seg-photos"></div>
+              <div class="seg-videos"></div>
+              <div class="seg-dup"></div>
+            </div>
+            <button class="cta-btn" id="btnCleanNow">Limpar meu espaço agora</button>
+          </div>
+
+          <div class="card">
+            <div class="row-item" data-line="Separei fotos e vídeos duplicados protegendo o original.">
+              <span>Duplicatas do WhatsApp e Galeria</span>
+              <span class="pill-val">1,9 GB</span>
+            </div>
+            <div class="row-item" data-line="Estes vídeos grandes ocupam mais espaço no aparelho.">
+              <span>Vídeos grandes</span>
+              <span class="pill-val">2,1 GB</span>
+            </div>
+            <div class="row-item" data-line="Capturas antigas com mais de 30 dias para revisar.">
+              <span>Capturas antigas</span>
+              <span class="pill-val">820 MB</span>
             </div>
           </div>
-          <div class="maria-text" id="mariaSpeech">
-            Olá! Eu sou a Maria, sua assistente pessoal aqui no Midiastore. Toque em <b>Limpar meu espaço agora</b> que eu encontro tudo o que ocupa memória com 100% de segurança!
-          </div>
-          <div class="faq-chips" id="faqChips">
-            <button class="chip" data-q="seguro">Minhas fotos ficam seguras?</button>
-            <button class="chip" data-q="rapido">Como limpar mais rápido?</button>
-            <button class="chip" data-q="pro">O que o Pro libera?</button>
+
+          <!-- CARD PRO ELEGANTE NA PRIMEIRA ABA -->
+          <div class="pro-banner" id="goProBanner">
+            <div>
+              <div class="pro-badge">PRO</div>
+              <div class="pro-title">Libere limpeza completa sem limites</div>
+              <div class="muted">A partir de R$ 14,99 • Anual e Vitalício</div>
+            </div>
+            <div class="pro-arrow">›</div>
           </div>
         </div>
       </div>
 
-      <!-- ABA 1: LIMPAR -->
-      <div id="tabClean">
-        <div class="card">
-          <div class="muted">Armazenamento do aparelho</div>
-          <div class="storage-num">98,4 GB <span class="muted">/ 128 GB</span></div>
-          <div class="bar">
-            <div class="seg-photos"></div>
-            <div class="seg-videos"></div>
-            <div class="seg-dup"></div>
-          </div>
-          <div class="muted">4,8 GB prontos para revisão segura</div>
-          <button class="cta-btn" id="btnCleanNow">Limpar meu espaço agora</button>
-        </div>
-
-        <div class="card" style="margin-top: 12px;">
-          <div class="row-item" data-say="dup" style="cursor:pointer;">
-            <span>Duplicatas (WhatsApp & Galeria)</span>
-            <span class="pill-val">1,9 GB</span>
-          </div>
-          <div class="row-item" data-say="vid" style="cursor:pointer;">
-            <span>Vídeos grandes</span>
-            <span class="pill-val">2,1 GB</span>
-          </div>
-          <div class="row-item" data-say="scr" style="cursor:pointer;">
-            <span>Capturas antigas (&gt;30 dias)</span>
-            <span class="pill-val">820 MB</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ABA 2: ARQUIVOS -->
+      <!-- ABA 2: ARQUIVOS (100% LIMPA, SEM MARIA PERSISTENTE) -->
       <div id="tabFiles" class="hidden">
-        <div class="card">
-          <div class="row-item"><span>Fotos da Câmera</span><span class="pill-val">18,4 GB</span></div>
-          <div class="row-item"><span>Vídeos</span><span class="pill-val">26,2 GB</span></div>
-          <div class="row-item"><span>Mídias do WhatsApp</span><span class="pill-val">6,7 GB</span></div>
-          <div class="row-item"><span>Capturas de tela</span><span class="pill-val">1,4 GB</span></div>
-          <div class="row-item"><span>Áudios</span><span class="pill-val">640 MB</span></div>
+        <div class="clean-header">
+          <h1>Arquivos</h1>
+        </div>
+        <div class="body-pad">
+          <div class="card">
+            <div class="row-item"><span>Fotos da Câmera</span><span class="pill-val">18,4 GB</span></div>
+            <div class="row-item"><span>Vídeos</span><span class="pill-val">26,2 GB</span></div>
+            <div class="row-item"><span>WhatsApp</span><span class="pill-val">6,7 GB</span></div>
+            <div class="row-item"><span>Capturas de tela</span><span class="pill-val">1,4 GB</span></div>
+            <div class="row-item"><span>Áudios</span><span class="pill-val">640 MB</span></div>
+          </div>
         </div>
       </div>
 
-      <!-- ABA 3: PRO -->
+      <!-- ABA 3: PRO (100% LIMPA E FOCADA EM CONVERSÃO) -->
       <div id="tabPro" class="hidden">
-        <div class="plan-card">
-          <div>
-            <div style="font-weight:700;">Pro Mensal</div>
-            <div class="muted">Cancele quando quiser no Google Play</div>
-          </div>
-          <div style="font-weight:700; color:#64d2ff;">R$ 14,99</div>
+        <div class="clean-header">
+          <h1>Midiastore Pro</h1>
         </div>
-        <div class="plan-card best">
-          <div>
-            <div style="font-weight:700;">Pro Anual • Mais Popular</div>
-            <div class="muted">Economize 55% no ano inteiro</div>
+        <div class="body-pad">
+          <div class="plan-card">
+            <div>
+              <div style="font-weight:700;">Pro Mensal</div>
+              <div class="muted">Cancele quando quiser no Google Play</div>
+            </div>
+            <div style="font-weight:700; color:#64d2ff;">R$ 14,99</div>
           </div>
-          <div style="font-weight:700; color:#0a84ff;">R$ 79,99</div>
-        </div>
-        <div class="plan-card">
-          <div>
-            <div style="font-weight:700;">Pro Vitalício</div>
-            <div class="muted">Pagamento único, seu para sempre</div>
+          <div class="plan-card best">
+            <div>
+              <div style="font-weight:700;">Pro Anual • Mais Popular</div>
+              <div class="muted">Economize 55% no ano inteiro</div>
+            </div>
+            <div style="font-weight:700; color:#0a84ff;">R$ 79,99</div>
           </div>
-          <div style="font-weight:700; color:#30d158;">R$ 149,99</div>
+          <div class="plan-card">
+            <div>
+              <div style="font-weight:700;">Pro Vitalício</div>
+              <div class="muted">Pagamento único, acesso para sempre</div>
+            </div>
+            <div style="font-weight:700; color:#30d158;">R$ 149,99</div>
+          </div>
+          <button class="cta-btn">Continuar com Google Play</button>
         </div>
       </div>
     </div>
 
     <div class="bottom-nav">
-      <button class="nav-btn active" data-tab="clean"><span>Limpar</span></button>
-      <button class="nav-btn" data-tab="files"><span>Arquivos</span></button>
-      <button class="nav-btn" data-tab="pro"><span>Pro</span></button>
+      <button class="nav-btn active" data-tab="clean">Limpar</button>
+      <button class="nav-btn" data-tab="files">Arquivos</button>
+      <button class="nav-btn" data-tab="pro">Pro</button>
     </div>
   </div>
 
   <div class="spec-panel">
-    <h2>📐 Planta Técnica — Midiastore v2.8.0 (Assistente Maria)</h2>
+    <h2>✨ Planta v2 (Padrão Apple Hero Clean)</h2>
     <ul>
-      <li><b>100% Limpador Puro OLED:</b> mantém exatamente as 3 abas aprovadas (Limpar, Arquivos, Pro) em preto <code>#000000</code>, grafite <code>#1C1C1E</code> e azul <code>#0A84FF</code>.</li>
-      <li><b>Zero impacto na v2.7.6 do Teste Fechado:</b> a versão em teste na Play Console continua intacta até aprovar Produção.</li>
-      <li><b>Vendedora simpática que não assusta:</b> card acolhedor com sorriso da Maria, botão de mudo (<code>🔇</code>) e minimizar (<code>—</code>) para um pequeno selo no topo.</li>
-      <li><b>Tira-dúvidas com 1 toque (Custo R$ 0,00 / Offline):</b> 3–4 chips de perguntas rápidas respondidas na hora com voz neural nos 14 idiomas (~18 KB cada áudio Opus).</li>
-      <li><b>Teste interativo ao lado:</b> clique nas abas <b>Limpar / Arquivos / Pro</b> e nas perguntas rápidas da Maria para testar a experiência!</li>
+      <li><b>Maria GRANDE em destaque Hero:</b> retrato cinematográfico no topo da Home fundindo suavemente no preto OLED <code>#000000</code>.</li>
+      <li><b>Frase curta e limpa (1 linha):</b> sem textão e <b>zero chips de perguntas</b> poluindo o visual.</li>
+      <li><b>Banner Pro elegante na 1ª aba:</b> aumenta a conversão logo na abertura sem atrapalhar a limpeza.</li>
+      <li><b>Abas Arquivos e Pro 100% limpas:</b> Maria não fica invadindo nem repetindo em todas as telas.</li>
     </ul>
   </div>
 
   <script>
-    const mariaCard = document.getElementById("mariaCard");
-    const mariaSpeech = document.getElementById("mariaSpeech");
+    const hero = document.getElementById("heroMaria");
     const mariaImg = document.getElementById("mariaImg");
-    const btnMute = document.getElementById("btnMute");
+    const mariaLine = document.getElementById("mariaLine");
+    const btnAudio = document.getElementById("btnAudio");
     let muted = false;
 
-    const LINES = {
-      clean: "Olá! Eu sou a Maria, sua assistente pessoal aqui no Midiastore. Toque em <b>Limpar meu espaço agora</b> que eu encontro tudo o que ocupa memória com 100% de segurança!",
-      files: "Aqui na aba <b>Arquivos</b>, eu organizo suas fotos, vídeos, mídias do WhatsApp e capturas por tamanho para você ver exatamente onde está o peso do celular.",
-      pro: "Quer deixar seu celular sempre leve? No <b>Midiastore Pro</b> você libera a limpeza avançada sem limites — e no plano <b>Anual</b> ou <b>Vitalício</b> você economiza muito, com total transparência pela Google Play!",
-      seguro: "Fique tranquilo! Eu <b>nunca apago nada sozinha</b>. Você vê todas as miniaturas, a foto original fica sempre protegida e você confirma tudo no aviso oficial do Android.",
-      rapido: "É super simples: toque no botão azul <b>Limpar meu espaço agora</b>, marque as duplicatas ou vídeos grandes que não precisa mais e confirme. Em dois cliques seu espaço volta!",
-      dup: "Eu comparo cada arquivo com precisão exata (SHA-256) para achar fotos e vídeos repetidos do WhatsApp, sempre mantendo o original salvo.",
-      vid: "Vídeos grandes costumam ocupar mais da metade da memória. Você pode visualizar antes de liberar gigabytes em segundos!",
-      scr: "Capturas de tela antigas acumulam rápido. Aqui eu separo as que têm mais de 30 dias para você revisar facilmente."
-    };
-
-    function mariaSay(key) {
-      mariaCard.classList.remove("hidden");
-      mariaSpeech.innerHTML = LINES[key] || LINES.clean;
-      mariaImg.src = key === "pro" || key === "clean"
-        ? "../../.agents/avatar/avatar-smile.png"
-        : "../../.agents/avatar/avatar-talk-mid.png";
-      mariaCard.classList.add("speaking");
+    function speakLine(text) {
+      mariaLine.textContent = text;
+      mariaImg.src = "file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-talk-mid.png";
+      hero.classList.add("speaking");
       setTimeout(() => {
-        mariaImg.src = "../../.agents/avatar/avatar-smile.png";
-        mariaCard.classList.remove("speaking");
-      }, 2800);
+        mariaImg.src = "file:///C:/Users/rodolfo/midiastory-/.agents/avatar/avatar-smile.png";
+        hero.classList.remove("speaking");
+      }, 2200);
     }
 
-    document.querySelectorAll(".nav-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        const tab = btn.dataset.tab;
-        document.getElementById("tabClean").classList.toggle("hidden", tab !== "clean");
-        document.getElementById("tabFiles").classList.toggle("hidden", tab !== "files");
-        document.getElementById("tabPro").classList.toggle("hidden", tab !== "pro");
-        mariaSay(tab);
-      });
-    });
+    function openTab(tab) {
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+      document.getElementById("tabClean").classList.toggle("hidden", tab !== "clean");
+      document.getElementById("tabFiles").classList.toggle("hidden", tab !== "files");
+      document.getElementById("tabPro").classList.toggle("hidden", tab !== "pro");
+    }
 
-    document.querySelectorAll(".chip").forEach((c) => {
-      c.addEventListener("click", () => mariaSay(c.dataset.q));
-    });
-    document.querySelectorAll("[data-say]").forEach((el) => {
-      el.addEventListener("click", () => mariaSay(el.dataset.say));
-    });
-    document.getElementById("btnCleanNow").addEventListener("click", () => mariaSay("rapido"));
-    document.getElementById("btnHide").addEventListener("click", () => mariaCard.classList.add("hidden"));
-    document.getElementById("mariaPill").addEventListener("click", () => mariaCard.classList.toggle("hidden"));
-    btnMute.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
+    document.getElementById("goProBanner").addEventListener("click", () => openTab("pro"));
+    document.getElementById("btnCleanNow").addEventListener("click", () => speakLine("Perfeito! Revise as miniaturas e confirme a limpeza."));
+    document.querySelectorAll("[data-line]").forEach((el) => el.addEventListener("click", () => speakLine(el.dataset.line)));
+    btnAudio.addEventListener("click", () => {
       muted = !muted;
-      btnMute.textContent = muted ? "🔇" : "🔊";
+      btnAudio.textContent = muted ? "🔇" : "🔊";
     });
   </script>
 </body>
