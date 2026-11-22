@@ -99,13 +99,27 @@ class WhatsAppCleanerDataSource(
                 MediaStore.Files.FileColumns.VOLUME_NAME,
             )
             val pathColumn = MediaStore.Files.FileColumns.RELATIVE_PATH
-            val selection = "$pathColumn LIKE ? OR $pathColumn LIKE ? OR $pathColumn LIKE ? OR $pathColumn LIKE ?"
-            val args = arrayOf(
+            // Suporte global aos 170+ países: WhatsApp (Brasil/LatAm/Índia/Europa), WeChat/WeiXin (China),
+            // LINE (Japão/Tailândia), KakaoTalk (Coreia), Telegram (Rússia/Global), Messenger/Instagram/TikTok e Downloads (EUA/Global).
+            val folderPatterns = arrayOf(
                 "%Android/media/com.whatsapp/WhatsApp/Media/%",
                 "%Android/media/com.whatsapp.w4b/WhatsApp Business/Media/%",
                 "%WhatsApp/Media/%",
                 "%WhatsApp Business/Media/%",
+                "%Telegram/%",
+                "%Android/media/org.telegram.messenger/%",
+                "%WeiXin/%",
+                "%WeChat/%",
+                "%MicroMsg/%",
+                "%LINE/%",
+                "%KakaoTalk/%",
+                "%Messenger/%",
+                "%Instagram/%",
+                "%TikTok/%",
+                "%Download/%",
             )
+            val selection = folderPatterns.joinToString(" OR ") { "$pathColumn LIKE ?" }
+            val args = folderPatterns
             val sortOrder = "${MediaStore.Files.FileColumns.SIZE} DESC"
             val items = mutableListOf<WhatsAppMediaItem>()
             val cursor = resolver.query(collection, projection, selection, args, sortOrder)

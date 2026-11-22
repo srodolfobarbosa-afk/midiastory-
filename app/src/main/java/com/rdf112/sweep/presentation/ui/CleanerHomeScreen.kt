@@ -59,9 +59,9 @@ fun CleanerHomeScreen(
 ) {
     val defaultCaption = when {
         state.isScanning -> stringResource(R.string.cleaner_home_scanning)
-        state.recoverableBytes > 0L -> "Olá! Encontrei ${state.recoverableLabel} prontos para liberar. Toque abaixo para revisar com calma."
+        state.recoverableBytes > 0L -> MariaI18n.homeDefaultGreeting(state.recoverableLabel)
         !state.statusMessage.isNullOrBlank() -> state.statusMessage
-        else -> "Olá! Já analisei seu celular e separei arquivos prontos para liberar espaço com segurança."
+        else -> MariaI18n.homeDefaultGreeting(null)
     }
     var customCaption by remember { mutableStateOf<String?>(null) }
     var activeAudioRes by remember { mutableIntStateOf(R.raw.maria_clean) }
@@ -133,23 +133,23 @@ fun CleanerHomeScreen(
             onMissionClick = { mission ->
                 when (mission) {
                     CleanMission.DUPLICATES -> {
-                        customCaption = "Separei fotos e vídeos duplicados protegendo sempre o arquivo original."
+                        customCaption = MariaI18n.duplicatesTitle()
                         activeAudioRes = R.raw.maria_dup
                     }
                     CleanMission.LARGE_VIDEOS -> {
-                        customCaption = "Estes são os vídeos grandes com mais de 10 MB que mais ocupam espaço."
+                        customCaption = MariaI18n.largeVideosTitle() + " (> 10 MB)"
                         activeAudioRes = R.raw.maria_videos
                     }
                     CleanMission.WHATSAPP -> {
-                        customCaption = "Fotos, vídeos e áudios acumulados nas conversas do WhatsApp."
+                        customCaption = MariaI18n.socialChatTileTitle() + " • " + MariaI18n.socialChatTileSub()
                         activeAudioRes = R.raw.maria_whatsapp
                     }
                     CleanMission.OLD_SCREENSHOTS -> {
-                        customCaption = "Capturas de tela antigas com mais de 30 dias prontas para revisar."
+                        customCaption = MariaI18n.oldScreenshotsTitle() + " • " + MariaI18n.moreThan30DaysSub()
                         activeAudioRes = R.raw.maria_screenshots
                     }
                     CleanMission.BLURRY_PHOTOS -> {
-                        customCaption = "Verificando fotos borradas ou com baixa nitidez no seu aparelho."
+                        customCaption = MariaI18n.blurryPhotosTitle()
                         activeAudioRes = R.raw.maria_clean
                     }
                 }
@@ -249,14 +249,14 @@ private fun SalesPsychologyProCard(
                     )
                 }
                 Text(
-                    text = "Libere limpeza completa + Gemini Nano",
+                    text = MariaI18n.proBannerTitle(),
                     color = MidiastoreColors.TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.ExtraBold,
                     lineHeight = 19.sp,
                 )
                 Text(
-                    text = "A partir de R$ 14,99 • Anual e Vitalício",
+                    text = MariaI18n.proBannerSub(),
                     color = MidiastoreColors.TextMuted,
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
@@ -327,11 +327,20 @@ private fun QuickMissionGrid(
                         CleanMission.WHATSAPP -> Color(0xFF30D158)
                         CleanMission.BLURRY_PHOTOS -> Color(0xFFFF375F)
                     }
+                    val tileTitle = when (item.mission) {
+                        CleanMission.WHATSAPP -> MariaI18n.socialChatTileTitle()
+                        else -> item.title
+                    }
+                    val tileSub = when {
+                        item.itemCount > 0 -> stringResource(R.string.cleaner_home_items_count, item.itemCount)
+                        item.mission == CleanMission.WHATSAPP -> MariaI18n.socialChatTileSub()
+                        else -> item.subtitle
+                    }
                     MariaSquareTile(
-                        label = item.title,
+                        label = tileTitle,
                         highlight = item.sizeLabel,
                         highlightColor = accentColor,
-                        subtitle = if (item.itemCount > 0) "${item.itemCount} itens" else item.subtitle,
+                        subtitle = tileSub,
                         onClick = { onMissionClick(item.mission) },
                         modifier = Modifier.weight(1f),
                     )

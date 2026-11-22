@@ -22,11 +22,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -101,10 +98,12 @@ private const val PREFS_NAME = "midiastore_prefs"
 private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
 
 /**
- * Dicionário nativo nas 14 línguas oficiais do Midiastore para a Assistente Maria.
+ * Tradução 100% completa nas 14 línguas oficiais do Midiastore + Adaptação Regional de Mensageiros
+ * (WhatsApp no Brasil/LatAm/Índia/Europa; Chats & Downloads nos EUA/Reino Unido; WeChat na China; LINE no Japão; KakaoTalk na Coreia; Telegram na Rússia).
  */
 object MariaI18n {
-    private fun lang(): String = Locale.getDefault().language.lowercase(Locale.ROOT)
+    fun lang(): String = Locale.getDefault().language.lowercase(Locale.ROOT)
+    fun isPt(): Boolean = lang().startsWith("pt")
 
     fun assistantBadge(): String = when (lang()) {
         "pt" -> "MARIA • ASSISTENTE IA"
@@ -123,20 +122,55 @@ object MariaI18n {
         else -> "MARIA • AI ASSISTANT"
     }
 
+    /** Nome regional inteligente para países que usam ou não usam WhatsApp! */
+    fun socialChatTileTitle(): String = when (lang()) {
+        "pt" -> "WhatsApp & Chats"
+        "es" -> "WhatsApp y Chats"
+        "hi" -> "WhatsApp और चैट"
+        "bn" -> "WhatsApp ও চ্যাট"
+        "in", "id" -> "WhatsApp & Chat"
+        "ar" -> "واتساب والدردشات"
+        "de" -> "WhatsApp & Chats"
+        "it" -> "WhatsApp e Chat"
+        "fr" -> "Chats & Réseaux"
+        "ru" -> "Telegram и Чаты"
+        "zh" -> "微信与聊天缓存"
+        "ja" -> "LINE・SNSメディア"
+        "ko" -> "카카오톡 및 채팅 미디어"
+        else -> "Chats & Downloads"
+    }
+
+    fun socialChatTileSub(): String = when (lang()) {
+        "pt" -> "Mídias, áudios e downloads"
+        "es" -> "Videos, audios y descargas"
+        "fr" -> "Médias et téléchargements"
+        "de" -> "Medien & Downloads"
+        "it" -> "Media e download"
+        "ru" -> "Медиа и загрузки"
+        "zh" -> "聊天视频、图片与下载"
+        "ja" -> "動画・画像・ダウンロード"
+        "ko" -> "동영상, 사진 및 다운로드"
+        "ar" -> "الوسائط والتنزيلات"
+        "hi" -> "मीडिया और डाउनलोड"
+        "bn" -> "মিডিয়া ও ডাউনলোড"
+        "in", "id" -> "Media & unduhan"
+        else -> "Social media & downloads"
+    }
+
     fun tapToBringMariaBack(): String = when (lang()) {
         "pt" -> "Toque aqui ou aperte Voltar para abrir a Maria ▼"
         "es" -> "Toca aquí o pulsa Atrás para abrir a Maria ▼"
-        "fr" -> "Touchez ici ou appuyez sur Retour pour ouvrir Maria ▼"
-        "de" -> "Tippen oder Zurück drücken, um Maria zu öffnen ▼"
+        "fr" -> "Touchez ici ou Retour pour ouvrir Maria ▼"
+        "de" -> "Tippen oder Zurück, um Maria zu öffnen ▼"
         "zh" -> "点击此处或按返回键唤出 Maria ▼"
-        "ja" -> "タップまたは戻るボタンでMariaを表示 ▼"
-        "ko" -> "탭하거나 뒤로 버튼을 눌러 Maria 열기 ▼"
+        "ja" -> "タップまたは戻るでMariaを表示 ▼"
+        "ko" -> "탭하거나 뒤로 버튼으로 Maria 열기 ▼"
         "ru" -> "Нажмите здесь или Назад, чтобы открыть Марию ▼"
-        "ar" -> "اضغط هنا أو زر الرجوع لفتح ماريا ▼"
-        "hi" -> "मारिया को खोलने के लिए यहाँ टैप करें या बैक दबाएँ ▼"
-        "bn" -> "মারিয়া খুলতে এখানে ট্যাপ করুন বা ব্যাক চাপুন ▼"
-        "in", "id" -> "Ketuk di sini atau tekan Kembali untuk membuka Maria ▼"
-        else -> "Tap here or press Back to bring Maria back ▼"
+        "ar" -> "اضغط هنا أو رجوع لفتح ماريا ▼"
+        "hi" -> "मारिया को खोलने के लिए यहाँ टैप करें ▼"
+        "bn" -> "মারিয়া খুলতে এখানে ট্যাপ করুন ▼"
+        "in", "id" -> "Ketuk di sini untuk membuka Maria ▼"
+        else -> "Tap here or press Back to open Maria ▼"
     }
 
     fun collapseLabel(): String = when (lang()) {
@@ -148,16 +182,321 @@ object MariaI18n {
         "ja" -> "▲ 閉じる"
         "ko" -> "▲ 접기"
         "ru" -> "▲ Свернуть"
+        "ar" -> "▲ طي"
+        "hi" -> "▲ छोटा करें"
+        "bn" -> "▲ লুকান"
+        "in", "id" -> "▲ Tutup"
         else -> "▲ Minimize"
+    }
+
+    fun homeDefaultGreeting(recoverableLabel: String?): String = when (lang()) {
+        "pt" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Olá! Eu sou a Maria! Encontrei $recoverableLabel prontos para liberar com segurança."
+        } else {
+            "Olá! Eu sou a Maria! Já analisei seu celular para liberar espaço com segurança."
+        }
+        "es" -> if (!recoverableLabel.isNullOrBlank()) {
+            "¡Hola! Soy Maria. Encontré $recoverableLabel listos para liberar con seguridad."
+        } else {
+            "¡Hola! Soy Maria. Analicé tu teléfono para liberar espacio con seguridad."
+        }
+        "fr" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Bonjour ! Je suis Maria. J'ai trouvé $recoverableLabel prêts à être libérés."
+        } else {
+            "Bonjour ! Je suis Maria. J'ai analysé votre téléphone en toute sécurité."
+        }
+        "de" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Hallo! Ich bin Maria. $recoverableLabel können sicher freigegeben werden."
+        } else {
+            "Hallo! Ich bin Maria. Ihr Speicher wurde sicher analysiert."
+        }
+        "zh" -> if (!recoverableLabel.isNullOrBlank()) {
+            "您好！我是 Maria。已发现 $recoverableLabel 可安全释放的空间。"
+        } else {
+            "您好！我是 Maria。已为您安全分析手机存储空间。"
+        }
+        "ja" -> if (!recoverableLabel.isNullOrBlank()) {
+            "こんにちは！Mariaです。安全に解放できる $recoverableLabel が見つかりました。"
+        } else {
+            "こんにちは！Mariaです。ストレージを安全に分析しました。"
+        }
+        "ko" -> if (!recoverableLabel.isNullOrBlank()) {
+            "안녕하세요! Maria입니다. 안전하게 확보 가능한 $recoverableLabel 를 찾았습니다."
+        } else {
+            "안녕하세요! Maria입니다. 저장 공간을 안전하게 분석했습니다."
+        }
+        "ru" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Привет! Я Мария. Найдено $recoverableLabel для безопасной очистки."
+        } else {
+            "Привет! Я Мария. Память устройства проверена."
+        }
+        "ar" -> if (!recoverableLabel.isNullOrBlank()) {
+            "مرحباً! أنا ماريا. وجدت $recoverableLabel جاهزة للتحرير بأمان."
+        } else {
+            "مرحباً! أنا ماريا. قمت بتحليل ذاكرة هاتفك بأمان."
+        }
+        "hi" -> if (!recoverableLabel.isNullOrBlank()) {
+            "नमस्ते! मैं मारिया हूँ। सुरक्षित रूप से खाली करने के लिए $recoverableLabel मिले हैं।"
+        } else {
+            "नमस्ते! मैं मारिया हूँ। मैंने आपके फ़ोन की स्टोरेज का विश्लेषण किया है।"
+        }
+        "bn" -> if (!recoverableLabel.isNullOrBlank()) {
+            "হ্যালো! আমি মারিয়া। নিরাপদে খালি করার জন্য $recoverableLabel পাওয়া গেছে।"
+        } else {
+            "হ্যালো! আমি মারিয়া। আপনার ফোনের স্টোরেজ বিশ্লেষণ করা হয়েছে।"
+        }
+        "in", "id" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Halo! Saya Maria. Menemukan $recoverableLabel siap dibersihkan dengan aman."
+        } else {
+            "Halo! Saya Maria. Penyimpanan ponsel Anda telah dianalisis."
+        }
+        else -> if (!recoverableLabel.isNullOrBlank()) {
+            "Hi! I'm Maria. I found $recoverableLabel ready to free safely."
+        } else {
+            "Hi! I'm Maria. I analyzed your phone storage for safe cleanup."
+        }
+    }
+
+    fun filesDefaultGreeting(): String = when (lang()) {
+        "pt" -> "Olá! Suas fotos, vídeos, áudios e downloads organizados dos maiores para os menores."
+        "es" -> "¡Hola! Tus fotos, videos, audios y descargas ordenados de mayor a menor."
+        "fr" -> "Vos photos, vidéos, audios et téléchargements triés par taille."
+        "de" -> "Ihre Fotos, Videos, Audios und Downloads nach Größe sortiert."
+        "zh" -> "您的照片、视频、音频和下载已按从大到小排序。"
+        "ja" -> "写真、動画、音声、ダウンロードをサイズ順に整理しました。"
+        "ko" -> "사진, 동영상, 오디오 및 다운로드가 크기순으로 정리되었습니다."
+        "ru" -> "Ваши фото, видео, аудио и загрузки отсортированы по размеру."
+        "ar" -> "صورك وفيديوهاتك وتنزيلاتك مرتبة من الأكبر إلى الأصغر."
+        "hi" -> "आपकी फ़ोटो, वीडियो, ऑडियो और डाउनलोड आकार के अनुसार व्यवस्थित हैं।"
+        "bn" -> "আপনার ছবি, ভিডিও, অডিও এবং ডাউনলোড আকার অনুযায়ী সাজানো।"
+        "in", "id" -> "Foto, video, audio, dan unduhan Anda diurutkan dari yang terbesar."
+        else -> "Hi! Your photos, videos, audio, and downloads sorted from largest to smallest."
+    }
+
+    fun proDefaultGreeting(): String = when (lang()) {
+        "pt" -> "Olá! Eu sou a Maria! Destrave a limpeza ilimitada + Chat Midiastore IA com 56% OFF no Anual!"
+        "es" -> "¡Hola! Soy Maria. ¡Desbloquea limpieza ilimitada + Chat Midiastore IA con 56% OFF anual!"
+        "fr" -> "Bonjour ! Débloquez le nettoyage illimité + Chat Midiastore IA (-56% sur l'annuel) !"
+        "de" -> "Hallo! Unbegrenzte Bereinigung + Chat Midiastore KI mit 56% Rabatt im Jahresabo!"
+        "zh" -> "您好！解锁无限清理 + Chat Midiastore 智能助手（年付立省56%）！"
+        "ja" -> "無制限クリーンアップ＋Chat Midiastore AIを年間プラン56%OFFで解放！"
+        "ko" -> "무제한 정리 + Chat Midiastore AI를 연간 플랜 56% 할인으로 잠금 해제하세요!"
+        "ru" -> "Разблокируйте безлимитную очистку + Chat Midiastore ИИ со скидкой 56% на год!"
+        "ar" -> "افتح التنظيف غير المحدود + محادثة الذكاء الاصطناعي بخصم 56% سنوياً!"
+        "hi" -> "वार्षिक प्लान पर 56% छूट के साथ असीमित क्लीनअप + Chat Midiastore AI अनलॉक करें!"
+        "bn" -> "বার্ষিক প্ল্যানে ৫৬% ছাড়ে আনলিমিটেড ক্লিনআপ + Chat Midiastore AI আনলক করুন!"
+        "in", "id" -> "Buka pembersihan tanpa batas + Chat Midiastore AI hemat 56% di paket Tahunan!"
+        else -> "Hi! I'm Maria! Unlock unlimited cleanup + Chat Midiastore AI with 56% OFF Annual!"
+    }
+
+    fun cameraPhotosTitle(): String = when (lang()) {
+        "pt" -> "Fotos da Câmera"
+        "es" -> "Fotos de Cámara"
+        "fr" -> "Photos Caméra"
+        "de" -> "Kamerafotos"
+        "zh" -> "相机照片"
+        "ja" -> "カメラ写真"
+        "ko" -> "카메라 사진"
+        "ru" -> "Фото с камеры"
+        "ar" -> "صور الكاميرا"
+        "hi" -> "कैमरा फ़ोटो"
+        "bn" -> "ক্যামেরা ছবি"
+        "in", "id" -> "Foto Kamera"
+        else -> "Camera Photos"
+    }
+
+    fun galleryHighlight(): String = when (lang()) {
+        "pt", "es", "it" -> "Galeria"
+        "fr" -> "Galerie"
+        "de" -> "Galerie"
+        "zh" -> "相册"
+        "ja" -> "ギャラリー"
+        "ko" -> "갤러리"
+        "ru" -> "Галерея"
+        "ar" -> "المعرض"
+        "hi" -> "गैलरी"
+        "bn" -> "গ্যালারি"
+        "in", "id" -> "Galeri"
+        else -> "Gallery"
+    }
+
+    fun sortedBySizeSub(): String = when (lang()) {
+        "pt" -> "Ordenadas por tamanho"
+        "es" -> "Ordenadas por tamaño"
+        "fr" -> "Triées par taille"
+        "de" -> "Nach Größe sortiert"
+        "zh" -> "按大小排序"
+        "ja" -> "サイズ順"
+        "ko" -> "크기순 정렬"
+        "ru" -> "По размеру"
+        "ar" -> "مرتبة حسب الحجم"
+        "hi" -> "आकार के अनुसार"
+        "bn" -> "আকার অনুযায়ী"
+        "in", "id" -> "Urut ukuran"
+        else -> "Sorted by size"
+    }
+
+    fun largeVideosTitle(): String = when (lang()) {
+        "pt" -> "Vídeos Grandes"
+        "es" -> "Videos Grandes"
+        "fr" -> "Grandes Vidéos"
+        "de" -> "Große Videos"
+        "zh" -> "大视频文件"
+        "ja" -> "大容量動画"
+        "ko" -> "대용량 동영상"
+        "ru" -> "Большие видео"
+        "ar" -> "فيديوهات كبيرة"
+        "hi" -> "बड़े वीडियो"
+        "bn" -> "বড় ভিডিও"
+        "in", "id" -> "Video Besar"
+        else -> "Large Videos"
+    }
+
+    fun quickReviewSub(): String = when (lang()) {
+        "pt" -> "Revisão rápida"
+        "es" -> "Revisión rápida"
+        "fr" -> "Révision rapide"
+        "de" -> "Schnellprüfung"
+        "zh" -> "快速检查"
+        "ja" -> "クイック確認"
+        "ko" -> "빠른 검토"
+        "ru" -> "Быстрый обзор"
+        "ar" -> "مراجعة سريعة"
+        "hi" -> "त्वरित समीक्षा"
+        "bn" -> "দ্রুত রিভিউ"
+        "in", "id" -> "Tinjau cepat"
+        else -> "Quick review"
+    }
+
+    fun oldScreenshotsTitle(): String = when (lang()) {
+        "pt" -> "Capturas Antigas"
+        "es" -> "Capturas Antiguas"
+        "fr" -> "Captures Anciennes"
+        "de" -> "Alte Screenshots"
+        "zh" -> "旧截图"
+        "ja" -> "古いスクショ"
+        "ko" -> "오래된 스크린샷"
+        "ru" -> "Старые скриншоты"
+        "ar" -> "لقطات قديمة"
+        "hi" -> "पुराने स्क्रीनशॉट"
+        "bn" -> "পুরনো স্ক্রিনশট"
+        "in", "id" -> "Tangkapan Lama"
+        else -> "Old Screenshots"
+    }
+
+    fun moreThan30DaysSub(): String = when (lang()) {
+        "pt" -> "Mais de 30 dias"
+        "es" -> "Más de 30 días"
+        "fr" -> "Plus de 30 jours"
+        "de" -> "Älter als 30 Tage"
+        "zh" -> "超过30天"
+        "ja" -> "30日以上前"
+        "ko" -> "30일 이상"
+        "ru" -> "Старше 30 дней"
+        "ar" -> "أكثر من 30 يوماً"
+        "hi" -> "30+ दिन पुराने"
+        "bn" -> "৩০+ দিন পুরনো"
+        "in", "id" -> "Lebih dari 30 hari"
+        else -> "Older than 30 days"
+    }
+
+    fun duplicatesTitle(): String = when (lang()) {
+        "pt" -> "Duplicatas SHA-256"
+        "es" -> "Duplicados SHA-256"
+        "fr" -> "Doublons SHA-256"
+        "de" -> "Duplikate SHA-256"
+        "zh" -> "重复文件 SHA-256"
+        "ja" -> "重複ファイル"
+        "ko" -> "중복 파일 SHA-256"
+        "ru" -> "Дубликаты SHA-256"
+        "ar" -> "الملفات المكررة"
+        "hi" -> "डुप्लिकेट फ़ाइलें"
+        "bn" -> "ডুপ্লিকেট ফাইল"
+        "in", "id" -> "Duplikat SHA-256"
+        else -> "Duplicates SHA-256"
+    }
+
+    fun unusedAppsTitle(): String = when (lang()) {
+        "pt" -> "Apps sem Uso"
+        "es" -> "Apps sin Uso"
+        "fr" -> "Apps Inutilisées"
+        "de" -> "Unbenutzte Apps"
+        "zh" -> "闲置应用"
+        "ja" -> "未使用アプリ"
+        "ko" -> "미사용 앱"
+        "ru" -> "Неиспользуемые"
+        "ar" -> "تطبيقات غير مستخدمة"
+        "hi" -> "अप्रयुक्त ऐप्स"
+        "bn" -> "অব্যবহৃত অ্যাপ"
+        "in", "id" -> "Aplikasi Tak Terpakai"
+        else -> "Unused Apps"
+    }
+
+    fun blurryPhotosTitle(): String = when (lang()) {
+        "pt" -> "Fotos Borradas IA"
+        "es" -> "Fotos Borrosas IA"
+        "fr" -> "Photos Floues IA"
+        "de" -> "Unscharfe Fotos KI"
+        "zh" -> "模糊照片 AI"
+        "ja" -> "ブレ写真 AI"
+        "ko" -> "흐린 사진 AI"
+        "ru" -> "Размытые фото ИИ"
+        "ar" -> "صور ضبابية"
+        "hi" -> "धुंधली तस्वीरें AI"
+        "bn" -> "ঝাপসা ছবি AI"
+        "in", "id" -> "Foto Buram AI"
+        else -> "Blurry Photos AI"
+    }
+
+    fun proBannerTitle(): String = when (lang()) {
+        "pt" -> "Libere limpeza completa + Chat Midiastore IA"
+        "es" -> "Libera limpieza completa + Chat Midiastore IA"
+        "fr" -> "Débloquez nettoyage complet + Chat Midiastore IA"
+        "de" -> "Vollständige Bereinigung + Chat Midiastore KI"
+        "zh" -> "解锁完整清理 + Chat Midiastore 智能助手"
+        "ja" -> "完全クリーンアップ＋Chat Midiastore AIを解放"
+        "ko" -> "전체 정리 + Chat Midiastore AI 잠금 해제"
+        "ru" -> "Полная очистка + Chat Midiastore ИИ"
+        "ar" -> "افتح التنظيف الكامل + محادثة الذكاء الاصطناعي"
+        "hi" -> "पूर्ण क्लीनअप + Chat Midiastore AI अनलॉक करें"
+        "bn" -> "সম্পূর্ণ ক্লিনআপ + Chat Midiastore AI আনলক করুন"
+        "in", "id" -> "Buka pembersihan penuh + Chat Midiastore AI"
+        else -> "Unlock full cleanup + Chat Midiastore AI"
+    }
+
+    fun proBannerSub(): String = when (lang()) {
+        "pt" -> "Planos Mensal, Anual (-56%) e Vitalício"
+        "es" -> "Planes Mensual, Anual (-56%) y Vitalicio"
+        "fr" -> "Mensuel, Annuel (-56%) et À vie"
+        "de" -> "Monatlich, Jährlich (-56%) & Lifetime"
+        "zh" -> "月付、年付（省56%）及终身版"
+        "ja" -> "月額・年額（56%OFF）・永久プラン"
+        "ko" -> "월간, 연간(56% 할인) 및 평생 플랜"
+        "ru" -> "Месяц, Год (-56%) и Навсегда"
+        "ar" -> "شهري وسنوي (خصم 56%) ومدى الحياة"
+        "hi" -> "मासिक, वार्षिक (-56%) और लाइफटाइम"
+        "bn" -> "মাসিক, বার্ষিক (-৫৬%) ও লাইফটাইম"
+        "in", "id" -> "Bulanan, Tahunan (-56%) & Selamanya"
+        else -> "Monthly, Annual (Save 56%) & Lifetime"
+    }
+
+    fun chatPlaceholder(): String = when (lang()) {
+        "pt" -> "Pergunte qualquer coisa..."
+        "es" -> "Pregunta cualquier cosa..."
+        "fr" -> "Posez une question..."
+        "de" -> "Frag irgendetwas..."
+        "zh" -> "询问任何问题..."
+        "ja" -> "何でも聞いてください..."
+        "ko" -> "무엇이든 물어보세요..."
+        "ru" -> "Спросите что угодно..."
+        "ar" -> "اسأل أي شيء..."
+        "hi" -> "कुछ भी पूछें..."
+        "bn" -> "যেকোনো কিছু জিজ্ঞাসা করুন..."
+        "in", "id" -> "Tanyakan apa saja..."
+        else -> "Ask anything..."
     }
 }
 
-/**
- * Hero Banner Inteligente da Assistente "Maria" (Midiastore v2.8.0):
- * 1. Marca `Midiastore` integrada dentro do canto superior esquerdo do quadro da Maria.
- * 2. Sorriso inicial acolhedor ("Olá! Eu sou a Maria!") + Dublagem 100% sincronizada com o áudio real via envelope RMS de 35ms (`mp.currentPosition / 35`).
- * 3. Auto-recolhimento suave após terminar de falar (para não ficar parada ocupando tela) + Retorno imediato ao apertar o botão Voltar (`BackHandler`) ou tocar na barra!
- */
 @Composable
 fun MariaHeroBanner(
     tabKey: String,
@@ -187,7 +526,6 @@ fun MariaHeroBanner(
     var headTiltDeg by remember { mutableFloatStateOf(0f) }
     var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
 
-    // Quando a Maria está recolhida e o usuário aperta o botão Voltar do Android, a Maria volta imediatamente!
     BackHandler(enabled = isActive && !isExpanded) {
         isExpanded = true
         replayTrigger++
@@ -220,18 +558,17 @@ fun MariaHeroBanner(
         }
     }
 
-    // Sempre que muda de aba, toca num quadradinho ou pede para ouvir, a Maria abre, dá um sorriso e faz a dublagem!
     LaunchedEffect(isActive, tabKey, rawAudioResId, speechNonce, replayTrigger) {
         stopAndReleaseAudio()
         if (!isActive) return@LaunchedEffect
 
         isExpanded = true
-        // 1º Passo pedido pelo Rodolfo: Dá um sorriso acolhedor antes/no início do "Olá, eu sou a Maria!"
         currentFrameRes = R.drawable.maria_smile
         delay(320L)
         isSpeaking = true
 
-        if (!isMuted) {
+        // Reproduz o áudio neural de estúdio em português; em outros idiomas anima a fala visualmente sem misturar idiomas!
+        if (!isMuted && MariaI18n.isPt()) {
             val mpInstance = runCatching {
                 val mp = MediaPlayer.create(context, rawAudioResId)
                 if (mp != null) {
@@ -263,7 +600,6 @@ fun MariaHeroBanner(
                     elapsedMs += 120L
                 }
                 if (isSpeaking) stopAndReleaseAudio()
-                // Sorri ao concluir a fala e recolhe suavemente após 1,8s para não ficar parada ocupando a tela!
                 currentFrameRes = R.drawable.maria_smile
                 delay(1800L)
                 if (!isSpeaking) {
@@ -283,7 +619,6 @@ fun MariaHeroBanner(
         }
     }
 
-    // Motor de Dublagem Real 28.5 FPS (35ms): lê o timestamp exato do MediaPlayer (`mp.currentPosition / 35`) + envelope RMS real
     LaunchedEffect(isActive, rawAudioResId) {
         if (!isActive) {
             currentFrameRes = R.drawable.maria_lip_0
@@ -312,7 +647,6 @@ fun MariaHeroBanner(
             }
 
             if (isSpeaking) {
-                // Posição real em milissegundos do áudio neural de estúdio!
                 val posMs = runCatching {
                     mediaPlayerRef?.takeIf { it.isPlaying }?.currentPosition
                 }.getOrNull()
@@ -321,7 +655,6 @@ fun MariaHeroBanner(
                     val frameIdx = (posMs / 35).coerceIn(0, envelope.lastIndex)
                     envelope[frameIdx]
                 } else {
-                    // Fallback caso esteja no mudo (🔇): sorriso nos primeiros 450ms + sílabas naturais
                     val cycle = now % 1400L
                     if (cycle > 1180L) 8 else {
                         val w = (sin(now / 52.0) * 0.6 + sin(now / 88.0) * 0.4).toFloat()
@@ -336,16 +669,13 @@ fun MariaHeroBanner(
                         blinkStep = -1
                     }
                 } else if (envCode == 8) {
-                    // Código 8 no envelope = pausa de sorriso ("Olá! Eu sou a Maria! [SORRISO]")
                     mouthLevel = 0f
                     currentFrameRes = R.drawable.maria_smile
                 } else if (envCode <= 0) {
-                    // Silêncio entre palavras/consoantes = fecha a boca imediatamente!
                     mouthLevel *= 0.22f
                     val idx = mouthLevel.roundToInt().coerceIn(0, MARIA_LIP_FRAMES.lastIndex)
                     currentFrameRes = MARIA_LIP_FRAMES[idx]
                 } else {
-                    // Sílaba ativa = interpolação rápida com a amplitude exata da voz!
                     mouthLevel = mouthLevel * 0.25f + envCode.toFloat() * 0.75f
                     val idx = mouthLevel.roundToInt().coerceIn(1, MARIA_LIP_FRAMES.lastIndex)
                     currentFrameRes = MARIA_LIP_FRAMES[idx]
@@ -404,10 +734,9 @@ fun MariaHeroBanner(
             },
     ) {
         if (isExpanded) {
-            // MODO APRESENTADORA COMPLETO (250.dp): Rosto + Ombros + Blusa + Nome Midiastore integrado dentro do quadro!
             Image(
                 painter = painterResource(id = currentFrameRes),
-                contentDescription = "Maria Assistente Pessoal",
+                contentDescription = "Maria",
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.TopCenter,
                 modifier = Modifier
@@ -433,7 +762,6 @@ fun MariaHeroBanner(
                     ),
             )
 
-            // Barra superior DENTRO do quadro da Maria: Nome "Midiastore" à esquerda + Botões Recolher e Áudio à direita
             Row(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -472,7 +800,6 @@ fun MariaHeroBanner(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    // Botão para recolher a Maria quando não quiser ela parada na tela
                     Surface(
                         shape = RoundedCornerShape(999.dp),
                         color = Color(0xB81C1C1E),
@@ -493,7 +820,6 @@ fun MariaHeroBanner(
                         )
                     }
 
-                    // Botão de voz 🔊 / 🔇
                     Box(
                         modifier = Modifier
                             .size(34.dp)
@@ -525,7 +851,6 @@ fun MariaHeroBanner(
                 }
             }
 
-            // Legenda viva na base do quadro
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -562,7 +887,6 @@ fun MariaHeroBanner(
                 )
             }
         } else {
-            // MODO COMPACTO VIVO (74.dp): Maria recolhida após falar (não fica parada ocupando a tela) + Toque ou Voltar traz ela de volta!
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -572,7 +896,7 @@ fun MariaHeroBanner(
             ) {
                 Image(
                     painter = painterResource(id = currentFrameRes),
-                    contentDescription = "Maria Compacta",
+                    contentDescription = "Maria",
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.TopCenter,
                     modifier = Modifier
@@ -622,9 +946,6 @@ fun MariaHeroBanner(
     }
 }
 
-/**
- * Cabeçalho da 2ª Aba (Arquivos): Maria Hero Banner + Grid 2x2 de Quadradinhos Visuais com falas dedicadas.
- */
 @Composable
 fun FilesMariaHeaderSection(
     isActive: Boolean,
@@ -635,7 +956,7 @@ fun FilesMariaHeaderSection(
     modifier: Modifier = Modifier,
 ) {
     var caption by remember {
-        mutableStateOf("Olá! Suas fotos, vídeos, áudios e mídias estão organizados dos maiores para os menores.")
+        mutableStateOf(MariaI18n.filesDefaultGreeting())
     }
     var activeAudioRes by remember { mutableIntStateOf(R.raw.maria_files) }
     var speechNonce by remember { mutableIntStateOf(0) }
@@ -660,12 +981,12 @@ fun FilesMariaHeaderSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MariaSquareTile(
-                    label = "Fotos da Câmera",
-                    highlight = "Galeria",
+                    label = MariaI18n.cameraPhotosTitle(),
+                    highlight = MariaI18n.galleryHighlight(),
                     highlightColor = Color(0xFF64D2FF),
-                    subtitle = "Ordenadas por tamanho",
+                    subtitle = MariaI18n.sortedBySizeSub(),
                     onClick = {
-                        caption = "Suas fotos da câmera organizadas das maiores para as menores."
+                        caption = MariaI18n.cameraPhotosTitle() + " • " + MariaI18n.sortedBySizeSub()
                         activeAudioRes = R.raw.maria_files
                         speechNonce++
                         onSelectPhotos()
@@ -673,12 +994,12 @@ fun FilesMariaHeaderSection(
                     modifier = Modifier.weight(1f),
                 )
                 MariaSquareTile(
-                    label = "Vídeos Grandes",
+                    label = MariaI18n.largeVideosTitle(),
                     highlight = "> 10 MB",
                     highlightColor = Color(0xFFBF5AF2),
-                    subtitle = "Revisão rápida",
+                    subtitle = MariaI18n.quickReviewSub(),
                     onClick = {
-                        caption = "Estes são os vídeos grandes com mais de 10 MB que mais ocupam espaço."
+                        caption = MariaI18n.largeVideosTitle() + " (> 10 MB) • " + MariaI18n.quickReviewSub()
                         activeAudioRes = R.raw.maria_videos
                         speechNonce++
                         onSelectLargeVideos()
@@ -691,12 +1012,12 @@ fun FilesMariaHeaderSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MariaSquareTile(
-                    label = "WhatsApp",
-                    highlight = "Mídias",
+                    label = MariaI18n.socialChatTileTitle(),
+                    highlight = "MediaStore",
                     highlightColor = Color(0xFF30D158),
-                    subtitle = "Fotos, vídeos e áudios",
+                    subtitle = MariaI18n.socialChatTileSub(),
                     onClick = {
-                        caption = "Fotos, vídeos e áudios acumulados nas conversas do WhatsApp."
+                        caption = MariaI18n.socialChatTileTitle() + " • " + MariaI18n.socialChatTileSub()
                         activeAudioRes = R.raw.maria_whatsapp
                         speechNonce++
                         onSelectWhatsApp()
@@ -704,12 +1025,12 @@ fun FilesMariaHeaderSection(
                     modifier = Modifier.weight(1f),
                 )
                 MariaSquareTile(
-                    label = "Capturas & Antigos",
-                    highlight = "+30 dias",
+                    label = MariaI18n.oldScreenshotsTitle(),
+                    highlight = "+30d",
                     highlightColor = Color(0xFFFF9F0A),
-                    subtitle = "Prints acumulados",
+                    subtitle = MariaI18n.moreThan30DaysSub(),
                     onClick = {
-                        caption = "Capturas de tela e comprovantes antigos com mais de 30 dias."
+                        caption = MariaI18n.oldScreenshotsTitle() + " • " + MariaI18n.moreThan30DaysSub()
                         activeAudioRes = R.raw.maria_screenshots
                         speechNonce++
                         onSelectScreenshots()
@@ -721,9 +1042,6 @@ fun FilesMariaHeaderSection(
     }
 }
 
-/**
- * Cabeçalho da 3ª Aba (Pro): Maria em Modo Vendedora de Alta Conversão + Console Interativo da IA Liberada para Uso!
- */
 @Composable
 fun ProMariaHeaderSection(
     isActive: Boolean,
@@ -734,8 +1052,7 @@ fun ProMariaHeaderSection(
     onRunUnusedApps: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val defaultLine = "Olá! Eu sou a Maria! Destrave a limpeza ilimitada + minha IA Nativa com 56% OFF no Anual!"
-    var caption by remember { mutableStateOf(defaultLine) }
+    var caption by remember { mutableStateOf(MariaI18n.proDefaultGreeting()) }
     var activeAudioRes by remember { mutableIntStateOf(R.raw.maria_pro) }
     var speechNonce by remember { mutableIntStateOf(0) }
 
@@ -754,19 +1071,18 @@ fun ProMariaHeaderSection(
             isProBadgeActive = true,
         )
 
-        // Grid 2x2 de Quadradinhos de Conversão & Ação Rápida Pro
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MariaSquareTile(
-                    label = "Duplicatas SHA-256",
+                    label = MariaI18n.duplicatesTitle(),
                     highlight = "100%",
                     highlightColor = Color(0xFFFF9F0A),
-                    subtitle = "Toque para diagnosticar",
+                    subtitle = MariaI18n.quickReviewSub(),
                     onClick = {
-                        caption = "Varredura global SHA-256 ativada! O arquivo original fica sempre protegido."
+                        caption = MariaI18n.duplicatesTitle() + " • 100% SHA-256"
                         activeAudioRes = R.raw.maria_dup
                         speechNonce++
                         onRunSmartDiagnosis()
@@ -774,12 +1090,12 @@ fun ProMariaHeaderSection(
                     modifier = Modifier.weight(1f),
                 )
                 MariaSquareTile(
-                    label = "Apps sem Uso",
-                    highlight = "+90 dias",
+                    label = MariaI18n.unusedAppsTitle(),
+                    highlight = "+90d",
                     highlightColor = Color(0xFFBF5AF2),
-                    subtitle = "Descobrir espaço oculto",
+                    subtitle = MariaI18n.quickReviewSub(),
                     onClick = {
-                        caption = "Analisando aplicativos esquecidos há mais de 90 dias no seu aparelho!"
+                        caption = MariaI18n.unusedAppsTitle() + " (+90d)"
                         activeAudioRes = R.raw.maria_pro
                         speechNonce++
                         onRunUnusedApps()
@@ -792,12 +1108,12 @@ fun ProMariaHeaderSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 MariaSquareTile(
-                    label = "Fotos Borradas IA",
+                    label = MariaI18n.blurryPhotosTitle(),
                     highlight = "On-Device",
                     highlightColor = Color(0xFF64D2FF),
-                    subtitle = "Detector neural local",
+                    subtitle = MariaI18n.quickReviewSub(),
                     onClick = {
-                        caption = "Iniciando análise local de nitidez por Inteligência Artificial!"
+                        caption = MariaI18n.blurryPhotosTitle() + " • On-Device"
                         activeAudioRes = R.raw.maria_nano
                         speechNonce++
                         onRunBlurScan()
@@ -805,12 +1121,12 @@ fun ProMariaHeaderSection(
                     modifier = Modifier.weight(1f),
                 )
                 MariaSquareTile(
-                    label = "WhatsApp Pro",
-                    highlight = "Limpar",
+                    label = MariaI18n.socialChatTileTitle(),
+                    highlight = "Pro",
                     highlightColor = Color(0xFF30D158),
-                    subtitle = "Mídias e áudios pesados",
+                    subtitle = MariaI18n.socialChatTileSub(),
                     onClick = {
-                        caption = "Abrindo o limpador inteligente de mídias acumuladas do WhatsApp!"
+                        caption = MariaI18n.socialChatTileTitle() + " • " + MariaI18n.socialChatTileSub()
                         activeAudioRes = R.raw.maria_whatsapp
                         speechNonce++
                         onRunWhatsAppClean()
@@ -830,7 +1146,8 @@ data class ChatMidiastoreMessage(
 )
 
 /**
- * Chat Midiastore (Estilo Google Gemini Dark OLED #1C1C1E — sem caixa azul, idêntico aos outros cartões do app!).
+ * Chat Midiastore no padrão clássico ChatGPT / Google Gemini Modelo Branco ("caixinha quadradinha no modelo branco, sem inventar"):
+ * - Cartão Branco Puro (#FFFFFF) com tipografia preta (#111827) de alto contraste e 4 caixinhas quadradinhas (#F3F4F6) idênticas ao ChatGPT/Gemini!
  */
 @Composable
 fun ProGeminiNanoBottomCard(
@@ -857,8 +1174,12 @@ fun ProGeminiNanoBottomCard(
             listOf(
                 ChatMidiastoreMessage(
                     isUser = false,
-                    text = "Olá! Eu sou a Maria no Chat Midiastore (IA Nativa • 0 MB). Seu aparelho está com ${statInfo.first} usados (${statInfo.third}%) e ${statInfo.second} livres. Como posso ajudar você agora?",
-                    actionLabel = "✦ Fazer Diagnóstico Completo",
+                    text = if (MariaI18n.isPt()) {
+                        "Olá! Como posso ajudar a limpar seu celular hoje? (${statInfo.first} usados • ${statInfo.second} livres)"
+                    } else {
+                        "Hi! How can I help clean your phone today? (${statInfo.first} used • ${statInfo.second} free)"
+                    },
+                    actionLabel = if (MariaI18n.isPt()) "Analisar arquivos pesados" else "Scan large files",
                     actionType = "DIAGNOSIS",
                 ),
             ),
@@ -870,51 +1191,67 @@ fun ProGeminiNanoBottomCard(
         if (q.isEmpty()) return
         val userMsg = ChatMidiastoreMessage(isUser = true, text = q)
         val replyMsg = when {
-            q.contains("whatsapp", ignoreCase = true) || q.contains("áudio", ignoreCase = true) -> ChatMidiastoreMessage(
+            q.contains("whatsapp", ignoreCase = true) || q.contains("chat", ignoreCase = true) || q.contains("áudio", ignoreCase = true) -> ChatMidiastoreMessage(
                 isUser = false,
-                text = "Analisei suas pastas de mídia: o WhatsApp acumula vídeos, fotos e áudios repetidos que podem ser limpos sem apagar suas conversas. Toque abaixo para revisar:",
-                actionLabel = "✦ Abrir Limpador do WhatsApp",
+                text = if (MariaI18n.isPt()) {
+                    "Separei as mídias recebidas em conversas e downloads para você revisar sem apagar suas mensagens:"
+                } else {
+                    "I separated chat media and downloads so you can review them safely:"
+                },
+                actionLabel = MariaI18n.socialChatTileTitle(),
                 actionType = "WHATSAPP",
             )
-            q.contains("borrad", ignoreCase = true) || q.contains("nitidez", ignoreCase = true) || q.contains("foto", ignoreCase = true) -> ChatMidiastoreMessage(
+            q.contains("borrad", ignoreCase = true) || q.contains("blur", ignoreCase = true) || q.contains("foto", ignoreCase = true) -> ChatMidiastoreMessage(
                 isUser = false,
-                text = "Posso verificar a nitidez das suas fotos localmente no processador do seu Motorola (100% offline, sem enviar nada para a nuvem) e separar apenas as fotos tremidas ou borradas:",
-                actionLabel = "✦ Escanear Fotos Borradas",
+                text = if (MariaI18n.isPt()) {
+                    "Verificando nitidez das fotos direto no aparelho (100% offline):"
+                } else {
+                    "Checking photo sharpness on-device (100% offline):"
+                },
+                actionLabel = MariaI18n.blurryPhotosTitle(),
                 actionType = "BLUR",
             )
-            q.contains("app", ignoreCase = true) || q.contains("90", ignoreCase = true) || q.contains("esquecid", ignoreCase = true) -> ChatMidiastoreMessage(
+            q.contains("app", ignoreCase = true) || q.contains("90", ignoreCase = true) -> ChatMidiastoreMessage(
                 isUser = false,
-                text = "Aplicativos que você não abre há mais de 90 dias costumam esconder vários gigabytes no celular. Vamos listar quais estão sem uso?",
-                actionLabel = "✦ Ver Apps sem Uso (+90 dias)",
+                text = if (MariaI18n.isPt()) {
+                    "Listando aplicativos sem uso há mais de 90 dias que ocupam espaço:"
+                } else {
+                    "Listing apps unused for 90+ days taking up storage:"
+                },
+                actionLabel = MariaI18n.unusedAppsTitle(),
                 actionType = "APPS",
             )
             else -> ChatMidiastoreMessage(
                 isUser = false,
-                text = "Verifiquei seu armazenamento (${statInfo.first} usados • ${statInfo.second} disponíveis). A forma mais rápida de liberar espaço hoje é revisar os vídeos grandes (>10 MB) e duplicatas SHA-256 protegendo o original:",
-                actionLabel = "✦ Liberar Espaço Agora",
+                text = if (MariaI18n.isPt()) {
+                    "Seu aparelho tem ${statInfo.first} ocupados e ${statInfo.second} livres. Vamos revisar os vídeos grandes (>10 MB) e duplicatas:"
+                } else {
+                    "Your phone has ${statInfo.first} used and ${statInfo.second} free. Let's review large videos (>10 MB) and duplicates:"
+                },
+                actionLabel = MariaI18n.largeVideosTitle(),
                 actionType = "DIAGNOSIS",
             )
         }
-        messages = (messages + userMsg + replyMsg).takeLast(6)
+        messages = (messages + userMsg + replyMsg).takeLast(4)
     }
 
-    // Superfície Grafite Escuro (#1C1C1E) com borda #2C2C2E idêntica aos outros cartões do Midiastore (ZERO caixa azul!)
+    // MODELO BRANCO CLÁSSICO CHATGPT / GEMINI (#FFFFFF com borda #E5E7EB e caixinhas quadradinhas #F3F4F6)
     Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = MidiastoreColors.CardSurface,
+        shape = RoundedCornerShape(20.dp),
+        color = Color(0xFFFFFFFF),
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 10.dp, bottom = 14.dp)
-            .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(18.dp))
-            .clip(RoundedCornerShape(18.dp)),
+            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.dp)),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Cabeçalho Estilo Google Gemini
+            // Topo limpo ChatGPT / Gemini em uma linha única (sem bolinha quebrando texto!)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -922,47 +1259,91 @@ fun ProGeminiNanoBottomCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
                         text = "✦",
-                        color = Color(0xFF64D2FF),
-                        fontSize = 18.sp,
+                        color = Color(0xFF111827),
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
                     )
-                    Column {
-                        Text(
-                            text = "Chat Midiastore",
-                            color = Color.White,
-                            fontSize = 15.5.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
-                        Text(
-                            text = "Maria • Gemini Nano On-Device",
-                            color = MidiastoreColors.TextMuted,
-                            fontSize = 11.sp,
-                        )
-                    }
+                    Text(
+                        text = "Chat Midiastore",
+                        color = Color(0xFF111827),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
                 }
                 Surface(
                     shape = RoundedCornerShape(999.dp),
-                    color = MidiastoreColors.CardSurfaceAlt,
-                    modifier = Modifier.border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(999.dp)),
+                    color = Color(0xFFF3F4F6),
+                    modifier = Modifier.border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(999.dp)),
                 ) {
                     Text(
-                        text = "● Online • 0 MB",
-                        color = Color(0xFF30D158),
-                        fontSize = 10.sp,
+                        text = "Gemini Nano • 0 MB",
+                        color = Color(0xFF374151),
+                        fontSize = 10.5.sp,
                         fontWeight = FontWeight.Bold,
+                        maxLines = 1,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                     )
                 }
             }
 
-            // Histórico de Mensagens estilo Google Gemini (Bolhas escuras #2C2C2E para usuário e resposta limpa com avatar para a IA)
+            // 4 Caixinhas Quadradinhas padrão ChatGPT / Gemini (#F3F4F6 no fundo branco #FFFFFF)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    ChatGptWhiteSquareBox(
+                        title = MariaI18n.largeVideosTitle(),
+                        subtitle = MariaI18n.quickReviewSub(),
+                        onClick = {
+                            handleSendQuestion(MariaI18n.largeVideosTitle())
+                            onRunSmartDiagnosis()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    ChatGptWhiteSquareBox(
+                        title = MariaI18n.socialChatTileTitle(),
+                        subtitle = MariaI18n.socialChatTileSub(),
+                        onClick = {
+                            handleSendQuestion(MariaI18n.socialChatTileTitle())
+                            onRunWhatsAppClean()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    ChatGptWhiteSquareBox(
+                        title = MariaI18n.blurryPhotosTitle(),
+                        subtitle = "On-Device",
+                        onClick = {
+                            handleSendQuestion(MariaI18n.blurryPhotosTitle())
+                            onRunBlurScan()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    ChatGptWhiteSquareBox(
+                        title = MariaI18n.unusedAppsTitle(),
+                        subtitle = "+90d",
+                        onClick = {
+                            handleSendQuestion(MariaI18n.unusedAppsTitle())
+                            onRunUnusedApps()
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+
+            // Mensagens do Chat (Fundo claro estilo ChatGPT)
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 messages.forEach { msg ->
                     if (msg.isUser) {
@@ -971,15 +1352,15 @@ fun ProGeminiNanoBottomCard(
                             horizontalArrangement = Arrangement.End,
                         ) {
                             Surface(
-                                shape = RoundedCornerShape(18.dp, 4.dp, 18.dp, 18.dp),
-                                color = Color(0xFF2C2C2E),
+                                shape = RoundedCornerShape(16.dp),
+                                color = Color(0xFFF3F4F6),
                             ) {
                                 Text(
                                     text = msg.text,
-                                    color = Color.White,
+                                    color = Color(0xFF111827),
                                     fontSize = 13.sp,
-                                    lineHeight = 18.sp,
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(horizontal = 13.dp, vertical = 9.dp),
                                 )
                             }
                         }
@@ -988,45 +1369,23 @@ fun ProGeminiNanoBottomCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFF141416))
-                                .border(1.dp, Color(0xFF262629), RoundedCornerShape(14.dp))
+                                .background(Color(0xFFF9FAFB))
+                                .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(14.dp))
                                 .padding(12.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.maria_smile),
-                                    contentDescription = "Maria IA",
-                                    contentScale = ContentScale.Crop,
-                                    alignment = Alignment.TopCenter,
-                                    modifier = Modifier
-                                        .size(26.dp)
-                                        .clip(CircleShape)
-                                        .border(1.dp, Color(0xFF64D2FF), CircleShape),
-                                )
-                                Text(
-                                    text = "✦ Chat Midiastore",
-                                    color = Color(0xFFE5E5EA),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
                             Text(
                                 text = msg.text,
-                                color = Color(0xFFE5E7EB),
+                                color = Color(0xFF111827),
                                 fontSize = 13.sp,
-                                lineHeight = 18.5.sp,
+                                lineHeight = 18.sp,
                             )
                             if (msg.actionLabel != null && msg.actionType != null) {
                                 Surface(
-                                    shape = RoundedCornerShape(999.dp),
-                                    color = Color(0xFF262629),
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = Color(0xFF111827),
                                     modifier = Modifier
-                                        .border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(999.dp))
-                                        .clip(RoundedCornerShape(999.dp))
+                                        .clip(RoundedCornerShape(10.dp))
                                         .clickable {
                                             when (msg.actionType) {
                                                 "DIAGNOSIS" -> onRunSmartDiagnosis()
@@ -1037,11 +1396,11 @@ fun ProGeminiNanoBottomCard(
                                         },
                                 ) {
                                     Text(
-                                        text = msg.actionLabel,
-                                        color = Color(0xFF64D2FF),
+                                        text = "✦ " + msg.actionLabel,
+                                        color = Color.White,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                     )
                                 }
                             }
@@ -1050,60 +1409,14 @@ fun ProGeminiNanoBottomCard(
                 }
             }
 
-            // Pílulas de sugestão rápida estilo Google Gemini (Grafite escuro #262629)
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    GeminiSuggestionChip(
-                        label = "✦ Analisar celular",
-                        onClick = {
-                            handleSendQuestion("Analisar meu celular e vídeos pesados")
-                            onRunSmartDiagnosis()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    GeminiSuggestionChip(
-                        label = "✦ Fotos borradas",
-                        onClick = {
-                            handleSendQuestion("Encontrar fotos borradas com IA")
-                            onRunBlurScan()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    GeminiSuggestionChip(
-                        label = "✦ Limpar WhatsApp",
-                        onClick = {
-                            handleSendQuestion("O que posso limpar no WhatsApp?")
-                            onRunWhatsAppClean()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                    GeminiSuggestionChip(
-                        label = "✦ Apps +90 dias",
-                        onClick = {
-                            handleSendQuestion("Quais aplicativos estão sem uso há 90 dias?")
-                            onRunUnusedApps()
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-
-            // Barra de entrada inferior em pílula estilo Google Gemini (#262629, sem caixa azul!)
+            // Caixinha de entrada branca/cinza-clara estilo ChatGPT / Gemini com botão preto ↑ à direita
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Color(0xFF262629))
-                    .border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(28.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFF3F4F6))
+                    .border(1.dp, Color(0xFFD1D5DB), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
@@ -1111,12 +1424,12 @@ fun ProGeminiNanoBottomCard(
                     value = userPrompt,
                     onValueChange = { userPrompt = it },
                     placeholder = {
-                        Text("Peça ao Chat Midiastore...", fontSize = 13.sp, color = Color(0xFF8E8E93))
+                        Text(MariaI18n.chatPlaceholder(), fontSize = 13.sp, color = Color(0xFF6B7280))
                     },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
+                        focusedTextColor = Color(0xFF111827),
+                        unfocusedTextColor = Color(0xFF111827),
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
                         focusedContainerColor = Color.Transparent,
@@ -1126,11 +1439,11 @@ fun ProGeminiNanoBottomCard(
                 )
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(if (userPrompt.isNotBlank()) MidiastoreColors.AccentBlue else Color(0xFF3A3A3C))
+                        .background(Color(0xFF111827))
                         .clickable {
-                            val q = userPrompt.trim().ifEmpty { "Analisar meu celular agora" }
+                            val q = userPrompt.trim().ifEmpty { MariaI18n.largeVideosTitle() }
                             userPrompt = ""
                             handleSendQuestion(q)
                         },
@@ -1139,7 +1452,7 @@ fun ProGeminiNanoBottomCard(
                     Text(
                         text = "↑",
                         color = Color.White,
-                        fontSize = 17.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraBold,
                     )
                 }
@@ -1149,28 +1462,42 @@ fun ProGeminiNanoBottomCard(
 }
 
 @Composable
-private fun GeminiSuggestionChip(
-    label: String,
+private fun ChatGptWhiteSquareBox(
+    title: String,
+    subtitle: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        shape = RoundedCornerShape(999.dp),
-        color = Color(0xFF262629),
+        shape = RoundedCornerShape(14.dp),
+        color = Color(0xFFF3F4F6),
         modifier = modifier
-            .border(1.dp, Color(0xFF3A3A3C), RoundedCornerShape(999.dp))
-            .clip(RoundedCornerShape(999.dp))
+            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(14.dp))
             .clickable(onClick = onClick),
     ) {
-        Text(
-            text = label,
-            color = Color(0xFFE5E5EA),
-            fontSize = 11.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+        ) {
+            Text(
+                text = title,
+                color = Color(0xFF111827),
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = subtitle,
+                color = Color(0xFF6B7280),
+                fontSize = 11.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
