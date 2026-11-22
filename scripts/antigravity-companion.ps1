@@ -256,21 +256,27 @@ $script:brushWave = Load-AvatarBrush (Join-Path $avatarDir "avatar-wave.png") $s
 $script:brushKiss = Load-AvatarBrush (Join-Path $avatarDir "avatar-kiss.png") $script:brushIdle
 $script:brushSmile = Load-AvatarBrush (Join-Path $avatarDir "avatar-smile.png") $script:brushIdle
 
-# Load 39 GPU LivePortrait neural video frames into frozen ImageBrushes (zero black-screen bug, ~500KB RAM, frame-accurate voice sync!)
-$script:neuralBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
-$neuralDir = Join-Path $avatarDir "neural-frames"
-if (Test-Path -LiteralPath $neuralDir) {
-  $nFiles = Get-ChildItem -LiteralPath $neuralDir -Filter "f_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
-  foreach ($nf in $nFiles) {
-    $b = Load-AvatarBrush $nf.FullName $null
-    if ($b) { $script:neuralBrushes.Add($b) }
+# Load 16 continuous Optical-Flow mouth levels (lip_01..lip_16) and 6 eyelid blink levels (blink_01..blink_06) for 30 FPS video-smooth speech!
+$script:lipFlowBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
+$script:blinkFlowBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
+$lipFlowDir = Join-Path $avatarDir "lip-flow"
+if (Test-Path -LiteralPath $lipFlowDir) {
+  $lFiles = Get-ChildItem -LiteralPath $lipFlowDir -Filter "lip_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
+  foreach ($lf in $lFiles) {
+    $b = Load-AvatarBrush $lf.FullName $null
+    if ($b) { $script:lipFlowBrushes.Add($b) }
+  }
+  $bFiles = Get-ChildItem -LiteralPath $lipFlowDir -Filter "blink_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
+  foreach ($bf in $bFiles) {
+    $b = Load-AvatarBrush $bf.FullName $null
+    if ($b) { $script:blinkFlowBrushes.Add($b) }
   }
 }
-$script:neuralIdx = 0
-$script:neuralDirStep = 1
-$script:talkPhaseIdx = 12
+$script:smoothMouth = 0.0
+$script:blinkSeq = @(0, 2, 4, 5, 4, 2, 0)
+$script:blinkTick = -1
 
-$avatarEllipse.Fill = if ($script:neuralBrushes.Count -gt 0) { $script:neuralBrushes[0] } else { $script:brushIdle }
+$avatarEllipse.Fill = if ($script:lipFlowBrushes.Count -gt 0) { $script:lipFlowBrushes[0] } else { $script:brushIdle }
 $script:activeBrush = $script:brushIdle
 $script:targetBrush = $script:brushIdle
 $script:blendAlpha = 1.0
@@ -396,7 +402,7 @@ function Start-WavPlayback([string]$wavFile, [bool]$saveAsLast = $true) {
     try { Copy-Item -LiteralPath $wavFile -Destination $lastSpokenWav -Force -ErrorAction SilentlyContinue } catch {}
   }
   $script:currentWav = $wavFile
-  $script:lipSyncFrames = Get-WavLipSyncEnvelope $wavFile 70
+  $script:lipSyncFrames = Get-WavLipSyncEnvelope $wavFile 35
   $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = $FfplayPath
   $psi.Arguments = "-nodisp -autoexit -loglevel quiet `"$wavFile`""
@@ -657,14 +663,14 @@ $btnMic.Add_Click({
   }
 })
 
-# Timer: heartbeat + async STT completion + WAV queue playback + 70ms real lip-sync & eye blink
+# Timer: heartbeat + async STT completion + WAV queue playback + 35ms (28.5 FPS) continuous Optical-Flow lip-sync & eyelid motion
 $timer = New-Object System.Windows.Threading.DispatcherTimer
-$timer.Interval = [TimeSpan]::FromMilliseconds(70)
+$timer.Interval = [TimeSpan]::FromMilliseconds(35)
 $timer.Add_Tick({
   $script:pulseTick++
 
   # Write heartbeat every ~1s so voice-narrator.mjs knows companion is alive
-  if ($script:pulseTick % 14 -eq 0) {
+  if ($script:pulseTick % 28 -eq 0) {
     try { [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString() | Set-Content -LiteralPath $heartbeatPath -Encoding ASCII } catch {}
   }
 
@@ -726,113 +732,99 @@ $timer.Add_Tick({
     }
   }
 
-  # Real audio-driven lip-sync + natural eye blink + smooth breathing/head-sway & hand gesture motion
+  # 28.5 FPS continuous Optical-Flow lip-sync + multi-frame natural eye blink + subtle organic breathing
   $nowUtc = [DateTime]::UtcNow
-  $tSec = $script:pulseTick * 0.07
-  $isBlinking = ($nowUtc -lt $script:blinkEndAt)
-  if ($nowUtc -ge $script:nextBlinkAt) {
-    $script:blinkEndAt = $nowUtc.AddMilliseconds(150)
-    $script:nextBlinkAt = $nowUtc.AddMilliseconds($script:rng.Next(2800, 5600))
-    $isBlinking = $true
+  $tSec = $script:pulseTick * 0.035
+  if ($nowUtc -ge $script:nextBlinkAt -and $script:blinkTick -lt 0) {
+    $script:blinkTick = 0
+    $script:nextBlinkAt = $nowUtc.AddMilliseconds($script:rng.Next(3000, 5800))
+  }
+  $blinkFrameIdx = -1
+  if ($script:blinkTick -ge 0) {
+    if ($script:blinkTick -lt $script:blinkSeq.Length) {
+      $blinkFrameIdx = $script:blinkSeq[$script:blinkTick]
+      $script:blinkTick++
+    } else {
+      $script:blinkTick = -1
+    }
   }
 
-  $bright = (($script:pulseTick / 3) % 2 -lt 1)
+  $bright = (($script:pulseTick / 6) % 2 -lt 1)
   if ($script:isRecording) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#FF3B30")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.3 }
-    $desired = if ($isBlinking) { $script:brushBlink } else { $script:brushListenTilt }
-    Set-AvatarPoseSmooth $desired 0.38
-    $avatarRotate.Angle = 1.8 * [Math]::Sin($tSec * 1.4)
-    $avatarScale.ScaleX = 1.015 + 0.008 * [Math]::Sin($tSec * 2.2)
+    $script:smoothMouth = 0.0
+    if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $avatarEllipse.Fill = $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt 0) {
+      $avatarEllipse.Fill = $script:lipFlowBrushes[0]
+    } else {
+      $avatarEllipse.Fill = $script:brushIdle
+    }
+    $avatarOverlayEllipse.Opacity = 0.0
+    $avatarRotate.Angle = 1.2 * [Math]::Sin($tSec * 1.4)
+    $avatarScale.ScaleX = 1.012 + 0.006 * [Math]::Sin($tSec * 2.0)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -1.2 * [Math]::Sin($tSec * 1.4)
+    $avatarTranslate.Y = -1.0 * [Math]::Sin($tSec * 1.4)
   } elseif ($script:playProc -and -not $script:playProc.HasExited) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#0A84FF")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.35 }
     $amp = 0.0
     $elapsedMs = $script:playWatch.ElapsedMilliseconds
     if ($script:lipSyncFrames -and $script:lipSyncFrames.Length -gt 0) {
-      $idx = [int]([Math]::Max(0, $elapsedMs - 180) / 70)
+      $idx = [int]([Math]::Max(0, $elapsedMs - 110) / 35)
       if ($idx -lt $script:lipSyncFrames.Length) {
         $amp = $script:lipSyncFrames[$idx]
       }
     }
-    # Natural head/neck sway & breathing synced with speech energy
-    $avatarRotate.Angle = (2.6 * [Math]::Sin($tSec * 1.8)) + ($amp * 1.4 * [Math]::Cos($tSec * 3.1))
-    $avatarScale.ScaleX = 1.0 + (0.014 * [Math]::Sin($tSec * 2.0)) + ($amp * 0.018)
+    # Subtle natural head/neck sway & breathing synced with speech energy
+    $avatarRotate.Angle = (1.6 * [Math]::Sin($tSec * 1.7)) + ($amp * 0.9 * [Math]::Cos($tSec * 2.9))
+    $avatarScale.ScaleX = 1.0 + (0.010 * [Math]::Sin($tSec * 1.9)) + ($amp * 0.014)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -2.0 * [Math]::Sin($tSec * 2.3)
+    $avatarTranslate.Y = -1.4 * [Math]::Sin($tSec * 2.1)
 
-    # Voice-synchronized Neural Video + Hand Gestures + Lip-Sync (zero black screen!)
-    $borderW = 2.2 + [Math]::Min(1.8, $amp * 3.2)
+    $borderW = 2.2 + [Math]::Min(1.6, $amp * 2.8)
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
-    $phase = $elapsedMs % 7800
 
-    if ($elapsedMs -lt 1050) {
-      # Open speech with a warm friendly wave
-      Set-AvatarPoseSmooth $script:brushWave 0.36
-    } elseif ($phase -gt 2600 -and $phase -lt 3900 -and $amp -ge 0.22) {
-      # Explaining hand gesture on strong mid-sentence emphasis
-      Set-AvatarPoseSmooth $script:brushGestureExplain 0.36
-    } elseif ($amp -ge 0.35) {
-      # High vocal energy: alternate between open vowel lip-sync and expressive GPU neural video frames (14..38)
-      if (($script:pulseTick % 3) -eq 0 -and $script:neuralBrushes.Count -gt 20) {
-        $script:talkPhaseIdx = 14 + (($script:talkPhaseIdx + 2) % ($script:neuralBrushes.Count - 14))
-        Set-AvatarPoseSmooth $script:neuralBrushes[$script:talkPhaseIdx] 0.65
-      } else {
-        Set-AvatarPoseSmooth $script:brushTalkOpen 0.55
-      }
-    } elseif ($amp -ge 0.12) {
-      # Medium vocal energy: smooth neural video frames + talk-mid lip-sync
-      if (($script:pulseTick % 2) -eq 0 -and $script:neuralBrushes.Count -gt 15) {
-        $script:talkPhaseIdx = 8 + (($script:talkPhaseIdx + 1) % ($script:neuralBrushes.Count - 8))
-        Set-AvatarPoseSmooth $script:neuralBrushes[$script:talkPhaseIdx] 0.65
-      } else {
-        Set-AvatarPoseSmooth $script:brushTalkMid 0.55
-      }
+    # Physical jaw inertia over the 16 continuous Optical-Flow mouth frames (0..15)
+    $maxLip = [Math]::Max(1, $script:lipFlowBrushes.Count - 1)
+    $targetMouth = [Math]::Min(1.0, [Math]::Pow([Math]::Max(0.0, ($amp - 0.04) * 1.35), 0.78)) * $maxLip
+    $inertia = if ($targetMouth -gt $script:smoothMouth) { 0.62 } else { 0.44 }
+    $script:smoothMouth = ($script:smoothMouth * (1.0 - $inertia)) + ($targetMouth * $inertia)
+    $lipIdx = [Math]::Max(0, [Math]::Min($maxLip, [int][Math]::Round($script:smoothMouth)))
+
+    if ($lipIdx -le 1 -and $blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $avatarEllipse.Fill = $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt $lipIdx) {
+      $avatarEllipse.Fill = $script:lipFlowBrushes[$lipIdx]
     } else {
-      # Brief pause between words: closed/gentle mouth from early neural video frames (0..9)
-      if ($isBlinking) {
-        Set-AvatarPoseSmooth $script:brushBlink 0.50
-      } elseif ($script:neuralBrushes.Count -gt 9) {
-        $calmIdx = $script:pulseTick % 9
-        Set-AvatarPoseSmooth $script:neuralBrushes[$calmIdx] 0.45
-      } else {
-        Set-AvatarPoseSmooth $script:brushIdle 0.40
-      }
+      $avatarEllipse.Fill = $script:brushTalkMid
     }
+    $avatarOverlayEllipse.Opacity = 0.0
   } else {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#30D158")
     $statusDot.Opacity = 1.0
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
 
-    # Continuous alive GPU neural video ping-pong loop (frames 0..14) + periodic natural wave/kiss/listen movements
-    $nowMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-    $cycleMs = $nowMs % 18000
-
-    if ($isBlinking) {
-      Set-AvatarPoseSmooth $script:brushBlink 0.45
-    } elseif ($cycleMs -gt 4200 -and $cycleMs -lt 5600) {
-      Set-AvatarPoseSmooth $script:brushWave 0.24
-    } elseif ($cycleMs -gt 9800 -and $cycleMs -lt 11200) {
-      Set-AvatarPoseSmooth $script:brushListenTilt 0.24
-    } elseif ($cycleMs -gt 14200 -and $cycleMs -lt 15600) {
-      Set-AvatarPoseSmooth $script:brushKiss 0.24
-    } elseif ($script:neuralBrushes.Count -ge 14) {
-      $maxCalm = [Math]::Min(14, $script:neuralBrushes.Count - 1)
-      $script:neuralIdx += $script:neuralDirStep
-      if ($script:neuralIdx -ge $maxCalm) { $script:neuralIdx = $maxCalm; $script:neuralDirStep = -1 }
-      elseif ($script:neuralIdx -le 0) { $script:neuralIdx = 0; $script:neuralDirStep = 1 }
-      Set-AvatarPoseSmooth $script:neuralBrushes[$script:neuralIdx] 0.55
+    # Smoothly close mouth if speech just ended, then play multi-frame natural eye blinks while looking straight at user
+    if ($script:smoothMouth -gt 0.4 -and $script:lipFlowBrushes.Count -gt 0) {
+      $script:smoothMouth = $script:smoothMouth * 0.55
+      $lipIdx = [Math]::Max(0, [int][Math]::Round($script:smoothMouth))
+      $avatarEllipse.Fill = $script:lipFlowBrushes[$lipIdx]
+    } elseif ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $avatarEllipse.Fill = $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt 0) {
+      $avatarEllipse.Fill = $script:lipFlowBrushes[0]
     } else {
-      Set-AvatarPoseSmooth $script:brushIdle 0.25
+      $avatarEllipse.Fill = $script:brushIdle
     }
+    $avatarOverlayEllipse.Opacity = 0.0
 
     # Gentle alive idle breathing & micro head movement
-    $avatarRotate.Angle = 1.4 * [Math]::Sin($tSec * 0.85)
-    $avatarScale.ScaleX = 1.0 + 0.010 * [Math]::Sin($tSec * 1.25)
+    $avatarRotate.Angle = 1.0 * [Math]::Sin($tSec * 0.8)
+    $avatarScale.ScaleX = 1.0 + 0.008 * [Math]::Sin($tSec * 1.2)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -1.2 * [Math]::Sin($tSec * 0.95)
+    $avatarTranslate.Y = -0.9 * [Math]::Sin($tSec * 0.9)
   }
 })
 Update-VoiceConfig $true
