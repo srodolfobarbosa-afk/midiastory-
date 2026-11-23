@@ -131,12 +131,13 @@ async function cmdExtendToken() {
 
 async function cmdSetup() {
   const accounts = await graphGet("/me/accounts", {
-    fields: "id,name,instagram_business_account{id,username}",
+    fields: "id,name,access_token,instagram_business_account{id,username}",
   });
   const pages = accounts.data || [];
   const summary = pages.map((p) => ({
     pageId: p.id,
     pageName: p.name,
+    hasPageAccessToken: Boolean(p.access_token),
     igId: p.instagram_business_account?.id || null,
     igUsername: p.instagram_business_account?.username || null,
   }));
@@ -149,6 +150,9 @@ async function cmdSetup() {
 
   if (target) {
     upsertEnvVar("FACEBOOK_PAGE_ID", target.id);
+    if (target.access_token) {
+      upsertEnvVar("FACEBOOK_PAGE_ACCESS_TOKEN", target.access_token);
+    }
     if (target.instagram_business_account?.id) {
       upsertEnvVar("INSTAGRAM_USER_ID", target.instagram_business_account.id);
     }
@@ -163,12 +167,45 @@ async function cmdSetup() {
         savedToEnv: {
           FACEBOOK_PAGE_ID: process.env.FACEBOOK_PAGE_ID || null,
           INSTAGRAM_USER_ID: process.env.INSTAGRAM_USER_ID || null,
+          FACEBOOK_PAGE_ACCESS_TOKEN_SAVED: Boolean(process.env.FACEBOOK_PAGE_ACCESS_TOKEN),
         },
       },
       null,
       2
     )
   );
+}
+
+async function cmdDebugToken() {
+  const appId = process.env.META_APP_ID?.trim();
+  const appSecret = process.env.META_APP_SECRET?.trim();
+  if (!appId || !appSecret) {
+    throw new Error("META_APP_ID e META_APP_SECRET são obrigatórios no .env para debug-token.");
+  }
+  const appToken = `${appId}|${appSecret}`;
+  const inspect = async (label, tok) => {
+    if (!tok) return { label, present: false };
+    const url = new URL(`${GRAPH_BASE}/debug_token`);
+    url.searchParams.set("input_token", tok);
+    url.searchParams.set("access_token", appToken);
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    const json = await res.json();
+    const d = json.data || {};
+    const expIso = d.expires_at === 0 ? "NEVER (PERMANENTE)" : d.expires_at ? new Date(d.expires_at * 1000).toISOString() : null;
+    const daysLeft = d.expires_at === 0 ? "INF" : d.expires_at ? Math.round((d.expires_at * 1000 - Date.now()) / 86400000) : null;
+    return {
+      label,
+      isValid: Boolean(d.is_valid),
+      type: d.type || null,
+      expiresAt: expIso,
+      daysLeft,
+      scopesCount: Array.isArray(d.scopes) ? d.scopes.length : 0,
+    };
+  };
+
+  const userCheck = await inspect("META_ACCESS_TOKEN", process.env.META_ACCESS_TOKEN?.trim());
+  const pageCheck = await inspect("FACEBOOK_PAGE_ACCESS_TOKEN", process.env.FACEBOOK_PAGE_ACCESS_TOKEN?.trim());
+  console.log(JSON.stringify({ userToken: userCheck, pageToken: pageCheck }, null, 2));
 }
 
 async function cmdStatus() {
@@ -329,6 +366,9 @@ async function main() {
       break;
     case "extend-token":
       await cmdExtendToken();
+      break;
+    case "debug-token":
+      await cmdDebugToken();
       break;
     case "comments":
       await cmdComments(pos[1]);
