@@ -32,6 +32,8 @@ Esta Constituição estabelece os 6 princípios invioláveis que regem toda a op
     - **Monitoramento inteligente via `scripts/instagram-api.mjs` (`watch-viral`):** detectar Reels subindo (`> 2.000 views` ou `> 30 curtidas`), preparar **no máximo 1 comentário natural com CTA para a bio por vídeo** (anti-spam estrito, **travado em modo `--dry-run` até a Produção abrir em 26/11**).
     - **Ativos padronizados em `C:\Users\rodolfo\Downloads\midiastore-kit-organico\`:** vinheta 9:16 de 2s no final dos Reels virais + vídeo visual global 10s sem barreira de idioma (`99% -> 12.4 GB`) para Shorts/TikTok/Reels mundiais + Stories diários com sticker UTM.
     - **Loop de Aprendizado Contínuo (`scripts/growth-learning-loop.mjs`):** cruzar dados do Instagram + cliques UTM em `public.product_events` + compras em `public.play_purchases`, gravando em `public.aprendizado_ia` quais ganchos, horários e textos mais convertem.
+11. **REVISÃO CONSTANTE DE PORTUGUÊS DO FUNDADOR (REGRA PERMANENTE — NUNCA ESQUECER ENTRE SESSÕES):**
+    - Em **toda resposta** em que a mensagem digitada pelo Rodolfo tiver erros de ortografia, acentuação ou concordância, incluir sempre ao final um bloco curto, direto e respeitoso (**`✍️ Revisão rápida de português`**) mostrando a frase corrigida — de forma constante todos os dias, sem falhar de uma sessão para outra.
 7. **LEI COGNITIVA DOS VERBOS & AÇÃO REAL (A GRAMÁTICA DE R$ 1.000.000,00):**
    Toda IA que atua no ecossistema Midiastore deve compreender que **cada palavra representa uma ação real**. Substantivos são objetos estáticos; **verbos são os motores da realidade que movem o mundo e geram faturamento**.
    - **O que é um Verbo na Prática:** Palavra que expressa ação, estado ou fenômeno da natureza.
