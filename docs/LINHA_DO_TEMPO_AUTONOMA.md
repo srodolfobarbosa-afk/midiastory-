@@ -3130,3 +3130,23 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #498
 
 ---
+
+### 📍 [22/11/2026, 23:35:31] Evolucao dublagem Maria F1/F2 60 FPS + Crossfade + Gate de Silencio Rigido (Android v2.8.1 vc 33 + Widget Desktop)
+- **📖 Estudou / Leu:** Inspecao visual dos 8 frames maria_lip_0..7.webp, MariaAssistantBanner.kt, MariaLipSyncEnvelopes.kt, scripts/antigravity-companion.ps1 e analise espectral FFT Radix-2 F1/F2 + ZCR
+- **⚙️ Tentou / Executou:** Criar scripts/lib/phonetic-viseme-analyzer.mjs, scripts/generate-maria-visemes.mjs e scripts/analyze-wav-visemes.mjs (100% Node.js, zero Python), atualizar MariaAssistantBanner.kt para withFrameNanos 60 FPS com relogio monotonico ancorado (-65ms) e crossfade sub-frame, atualizar antigravity-companion.ps1 para 60 FPS + crossfade + gate rigido, compilar no GitHub Actions e validar no Moto G84
+- **⚠️ Erros Encontrados:** INSTALL_FAILED_UPDATE_INCOMPATIBLE ao sobrescrever com.rdf112.midiastore.debug de runner anterior com debug.keystore efemero
+- **🔧 Como Corrigiu:** Desinstalado apenas o pacote de laboratorio com.rdf112.midiastore.debug e instalado v2.8.1-debug vc 33 mantendo o app oficial da Play Store intacto; CI Run 45099948722 e 45099948707 100% verdes, AAB v2.8.1 com 7.37 MB auditado via bundletool
+- **🎯 Conclusão:** Dublagem F1/F2 60 FPS com crossfade suave e gate de silencio rigido operando no Android v2.8.1 (vc 33) validado no Moto G84 com 0 crashes e no widget desktop FRIDAY/Maria
+- *Registro Supabase:* Memory #500
+
+---
+
+### 📍 [23/11/2026, 02:43:27] Ciclo Sistemico Integrado v2.8.2 (vc 34) + Diretrizes 8 e 9 no AGENTS.md + Auditoria 360 graus (Play Console, Ads, Web, Desktop FRIDAY)
+- **📖 Estudou / Leu:** AGENTS.md, docs/CONTINUATION_HANDOFF.md, PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md, AndroidManifest.xml, 14 locales strings.xml, google-ads-api-upload.mjs, friday-play-radar.mjs e goal-growth-engine.mjs ao vivo
+- **⚙️ Tentou / Executou:** Gravar Diretrizes 8 (Cofundador) e 9 (Visao Sistemica Integrada 2 Pilares + 7 Frentes) no AGENTS.md; evoluir app v2.8.2 vc 34 para retrato natural da Maria + anel neon + ondas 60 FPS sem modal bloqueador nem boca 2D falsa; restaurar desktop Maria somando 16 niveis Optical-Flow F1/F2 60 FPS + anel neon + ondas; auditar Play Console e Aquisicao via subagentes em paralelo; compilar AAB no GitHub Actions
+- **⚠️ Erros Encontrados:** Moto G84 desconectado do USB durante tentativa de install final da v2.8.2 (adb devices vazio); GOOGLE_ADS_DEVELOPER_TOKEN e YOUTUBE_OAUTH_ACCESS_TOKEN ausentes para upload automatico via API (contorno Google Ads Editor ZIP 100% pronto)
+- **🔧 Como Corrigiu:** AAB v2.8.2 vc 34 compilado 100% verde (Run 45118253546 + 45118253451, 7.26 MB, zero MANAGE_EXTERNAL_STORAGE, zero AD_ID, 630/630 strings em 14 idiomas) e baixado em .tmp/qa/v282-apk pronto para QA assim que reconectar USB; PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md atualizado para v2.8.2 + PACKAGE_USAGE_STATS local; Desktop Maria relancada somando todas as conquistas
+- **🎯 Conclusão:** Todas as 7 frentes sincronizadas com Score de Prontidao Comercial 75/100; Play Console 100% apto para solicitar producao em 26/11 (23 testadores preservados, 0 bloqueios P0)
+- *Registro Supabase:* Memory #505
+
+---

@@ -277,25 +277,31 @@ $script:brushWave = Load-AvatarBrush (Join-Path $avatarDir "avatar-wave.png") $s
 $script:brushKiss = Load-AvatarBrush (Join-Path $avatarDir "avatar-kiss.png") $script:brushIdle
 $script:brushSmile = Load-AvatarBrush (Join-Path $avatarDir "avatar-smile.png") $script:brushIdle
 
-# Formato Premium: retrato limpo natural (sorriso + piscada suave + respiração leve) + anel neon e ondas de voz 60 FPS (sem troca artificial de boca!)
+# Carrega os 16 níveis contínuos Optical-Flow (lip_01..lip_16) + 6 níveis de piscada (blink_01..blink_06) + Anel Neon + Ondas 60 FPS!
+$script:lipFlowBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
 $script:blinkFlowBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
 $lipFlowDir = Join-Path $avatarDir "lip-flow"
 if (Test-Path -LiteralPath $lipFlowDir) {
+  $lFiles = Get-ChildItem -LiteralPath $lipFlowDir -Filter "lip_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
+  foreach ($lf in $lFiles) {
+    $b = Load-AvatarBrush $lf.FullName $null
+    if ($b) { $script:lipFlowBrushes.Add($b) }
+  }
   $bFiles = Get-ChildItem -LiteralPath $lipFlowDir -Filter "blink_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
   foreach ($bf in $bFiles) {
     $b = Load-AvatarBrush $bf.FullName $null
     if ($b) { $script:blinkFlowBrushes.Add($b) }
   }
 }
-$script:portraitBaseBrush = if ($script:brushSmile) { $script:brushSmile } else { $script:brushIdle }
+$script:smoothMouth = 0.0
 $script:smoothEnergy = 0.0
 $script:blinkSeq = @(0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0)
 $script:blinkTick = -1
 $script:lipSyncFps = 60
 
-$avatarEllipse.Fill = $script:portraitBaseBrush
-$script:activeBrush = $script:portraitBaseBrush
-$script:targetBrush = $script:portraitBaseBrush
+$avatarEllipse.Fill = if ($script:lipFlowBrushes.Count -gt 0) { $script:lipFlowBrushes[0] } else { $script:brushIdle }
+$script:activeBrush = $avatarEllipse.Fill
+$script:targetBrush = $avatarEllipse.Fill
 $script:blendAlpha = 1.0
 $script:gestureShowStartMs = -99999
 
@@ -792,13 +798,16 @@ $timer.Add_Tick({
   if ($script:isRecording) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#FF3B30")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.3 }
+    $script:smoothMouth = 0.0
     $script:smoothEnergy = 0.0
     $recBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
       $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt 0) {
+      $script:lipFlowBrushes[0]
     } else {
-      $script:portraitBaseBrush
+      $script:brushIdle
     }
-    Set-AvatarPoseSmooth $recBrush 0.50
+    Set-AvatarPoseSmooth $recBrush 0.55
     if ($avatarNeonGlow) {
       $avatarNeonGlow.Color = [System.Windows.Media.Color]::FromRgb(255, 59, 48)
       $avatarNeonGlow.BlurRadius = 18 + (6 * [Math]::Sin($tSec * 4.0))
@@ -807,17 +816,17 @@ $timer.Add_Tick({
     for ($bi = 0; $bi -lt $waveBars.Count; $bi++) {
       if ($waveBars[$bi]) { $waveBars[$bi].Height = 4 + (5 * [Math]::Abs([Math]::Sin($tSec * 5.0 + $bi * 0.9))) }
     }
-    $avatarRotate.Angle = 0.9 * [Math]::Sin($tSec * 1.3)
-    $avatarScale.ScaleX = 1.010 + 0.006 * [Math]::Sin($tSec * 1.8)
+    $avatarRotate.Angle = 1.1 * [Math]::Sin($tSec * 1.4)
+    $avatarScale.ScaleX = 1.012 + 0.006 * [Math]::Sin($tSec * 2.0)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -0.8 * [Math]::Sin($tSec * 1.3)
+    $avatarTranslate.Y = -1.0 * [Math]::Sin($tSec * 1.4)
   } elseif ($script:playProc -and -not $script:playProc.HasExited) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#0A84FF")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.35 }
     $visemeLevel = 0
     $elapsedMs = $script:playWatch.ElapsedMilliseconds
     if ($script:lipSyncFrames -and $script:lipSyncFrames.Length -gt 0) {
-      $idx = [int](([Math]::Max(0, $elapsedMs - 70) * $script:lipSyncFps) / 1000)
+      $idx = [int](([Math]::Max(0, $elapsedMs - 75) * $script:lipSyncFps) / 1000)
       if ($idx -lt $script:lipSyncFrames.Length) {
         $visemeLevel = [int]$script:lipSyncFrames[$idx]
       }
@@ -826,15 +835,29 @@ $timer.Add_Tick({
     $script:smoothEnergy = if ($targetAmp -le 0.02) { $script:smoothEnergy * 0.45 } else { ($script:smoothEnergy * 0.45) + ($targetAmp * 0.55) }
     $amp = $script:smoothEnergy
 
-    # Retrato natural limpo (sorriso + piscada suave + respiração leve) — ZERO boca 2D artificial!
-    $portraitBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
-      $script:blinkFlowBrushes[$blinkFrameIdx]
+    # 16 níveis Optical-Flow F1/F2 60 FPS + gate de silêncio rígido + crossfade suave
+    $maxLip = [Math]::Max(1, $script:lipFlowBrushes.Count - 1)
+    $targetLip = [Math]::Max(0, [Math]::Min($maxLip, $visemeLevel))
+    if ($targetLip -eq 0) {
+      $script:smoothMouth = 0.0
+      $lipIdx = 0
+      $fadeStep = 0.78
     } else {
-      $script:portraitBaseBrush
+      $script:smoothMouth = ($script:smoothMouth * 0.25) + ($targetLip * 0.75)
+      $lipIdx = [Math]::Max(1, [Math]::Min($maxLip, [int][Math]::Round($script:smoothMouth)))
+      $fadeStep = 0.48
     }
-    Set-AvatarPoseSmooth $portraitBrush 0.50
 
-    # Anel luminoso neon + ondas de voz 60 FPS reativas ao áudio
+    $nextBrush = if ($lipIdx -eq 0 -and $blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt $lipIdx) {
+      $script:lipFlowBrushes[$lipIdx]
+    } else {
+      $script:brushTalkMid
+    }
+    Set-AvatarPoseSmooth $nextBrush $fadeStep
+
+    # Anel luminoso neon + ondas de voz 60 FPS reativas ao áudio (soma das melhorias!)
     $borderW = 2.4 + [Math]::Min(2.4, $amp * 3.0)
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
     if ($avatarNeonGlow) {
@@ -850,22 +873,25 @@ $timer.Add_Tick({
     }
 
     # Respiração leve e movimento sutil natural
-    $avatarRotate.Angle = 0.9 * [Math]::Sin($tSec * 1.3)
-    $avatarScale.ScaleX = 1.0 + (0.008 * [Math]::Sin($tSec * 1.7)) + ($amp * 0.010)
+    $avatarRotate.Angle = (1.3 * [Math]::Sin($tSec * 1.6)) + ($amp * 0.7 * [Math]::Cos($tSec * 2.7))
+    $avatarScale.ScaleX = 1.0 + (0.008 * [Math]::Sin($tSec * 1.8)) + ($amp * 0.011)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -0.9 * [Math]::Sin($tSec * 1.6)
+    $avatarTranslate.Y = -1.1 * [Math]::Sin($tSec * 2.0)
   } else {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#30D158")
     $statusDot.Opacity = 1.0
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
+    $script:smoothMouth = 0.0
     $script:smoothEnergy = 0.0
 
     $idleBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
       $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt 0) {
+      $script:lipFlowBrushes[0]
     } else {
-      $script:portraitBaseBrush
+      $script:brushIdle
     }
-    Set-AvatarPoseSmooth $idleBrush 0.50
+    Set-AvatarPoseSmooth $idleBrush 0.55
     if ($avatarNeonGlow) {
       $avatarNeonGlow.Color = [System.Windows.Media.Color]::FromRgb(10, 132, 255)
       $avatarNeonGlow.BlurRadius = 12
@@ -876,10 +902,10 @@ $timer.Add_Tick({
     }
 
     # Gentle alive idle breathing & micro head movement
-    $avatarRotate.Angle = 0.8 * [Math]::Sin($tSec * 0.8)
+    $avatarRotate.Angle = 0.9 * [Math]::Sin($tSec * 0.8)
     $avatarScale.ScaleX = 1.0 + 0.008 * [Math]::Sin($tSec * 1.2)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -0.8 * [Math]::Sin($tSec * 0.9)
+    $avatarTranslate.Y = -0.9 * [Math]::Sin($tSec * 0.9)
   }
 })
 Update-VoiceConfig $true

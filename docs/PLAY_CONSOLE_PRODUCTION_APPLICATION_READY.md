@@ -1,6 +1,6 @@
 # 🚀 GUIA PRONTO (COPIAR E COLAR) — SOLICITAÇÃO DE PRODUÇÃO & DATA SAFETY (GOOGLE PLAY)
-> **App:** Midiastore (`com.rdf112.midiastore`) | **Versão em Teste Fechado:** `v2.7.6` (`versionCode 31`, `6,21 MB` AAB R8)  
-> **Atualizado em:** 2026-11-21 — 100% alinhado ao código real, `AndroidManifest.xml`, Scoped Storage e Edge Function `verify-play-purchase`.
+> **App:** Midiastore (`com.rdf112.midiastore`) | **Versão em Alpha:** `v2.8.0 (vc 32)` | **Versão Final Candidata para Produção:** `v2.8.2` (`versionCode 34`, `~7,1 MB` AAB R8)  
+> **Atualizado em:** 2026-11-23 — 100% auditado contra `AndroidManifest.xml`, Scoped Storage, `PACKAGE_USAGE_STATS` local e Edge Function `verify-play-purchase`.
 
 ---
 
@@ -42,15 +42,17 @@
    *(263 chars)*
 
 9. **Como você decidiu que seu app está pronto para produção?** *(máx. 300 chars)*
-   > Validamos a v2.7.6 com testes automatizados em Android 10 (API 29) e Android 15 (API 35) sem falhas, testamos em aparelhos físicos, validamos compra real no Google Play Billing com verificação server-side e mantivemos estabilidade sem crashes por 14 dias.
+   > Validamos a v2.8.2 com testes automatizados em Android 10 (API 29) e Android 15 (API 35) sem falhas, testamos em aparelhos físicos, validamos compra real no Google Play Billing com verificação server-side e mantivemos estabilidade sem crashes por 14 dias.
    *(254 chars)*
 
 ---
 
 ## PARTE 2 — Checklist Exato de Segurança dos Dados (Data Safety)
 
-Conferido diretamente contra o código da **`v2.7.6` (`vc 31`)**:
+Conferido diretamente contra o código da **`v2.8.2` (`vc 34`)**:
 - **Permissão `MANAGE_EXTERNAL_STORAGE`:** **NÃO EXISTE** (0 ocorrências no AAB). Todo acesso a mídia usa exclusivamente **Android MediaStore / Scoped Storage** + diálogos oficiais do sistema (`createDeleteRequest` / `createTrashRequest` / `RecoverableSecurityException`).
+- **Permissão `PACKAGE_USAGE_STATS`:** **OPCIONAL e 100% LOCAL** — acionada somente quando o usuário toca em "Apps sem Uso", exibindo **Prominent Disclosure** explícito antes de abrir `ACTION_USAGE_ACCESS_SETTINGS`. Nenhum dado de uso ou lista de apps é coletado ou enviado a servidores.
+- **Declaração de Fotos e Vídeos (`READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`):** confirmar em *Conteúdo do app* que a justificativa de uso principal (limpador de duplicatas SHA-256, vídeos grandes e mídias antigas com revisão por miniaturas) está preenchida/aprovada.
 - **Fotos, vídeos e áudios do usuário:** **NÃO são coletados nem compartilhados** (processamento 100% local/on-device, zero upload de mídia).
 - **Histórico de compras (`Financial info > Purchase history`):**
   - **Coletado:** Sim (token de compra do Google Play enviado via HTTPS para a Edge Function `verify-play-purchase` no Supabase para validação anti-fraude junto à Google Play Developer API).

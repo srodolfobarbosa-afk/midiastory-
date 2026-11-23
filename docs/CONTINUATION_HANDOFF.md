@@ -1,5 +1,15 @@
 # Midiastore — CONTINUIDADE DO PROJETO
 
+## Checkpoint Oficial Verificado Ao Vivo — 2026-11-23 (Visão Sistêmica Integrada — v2.8.2 vc 34 Pronta para QA USB & Produção 26/11)
+
+- **Fonte Única de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-23.md`](CONTINUATION_UPDATE_2026-11-23.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
+- **App Android `v2.8.2 (vc 34)` (`735dcd3`, CI `Run 45118253546` + `45118253451` 100% verdes):** AAB assinado **`7,26 MB`** (`b0d0fe6e...`) auditado via `bundletool` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, `630/630` strings válidas nos 14 idiomas). Removido modal bloqueador + 9 frames `maria_lip_0..7`/`maria_talk_blink`; nova barra compacta Maria (`76dp`, retrato natural + piscada + respiração + anel neon + ondas 60 FPS sob demanda). APK/AAB em `.tmp/qa/v282-apk/` aguardando reconexão USB do Moto G84 para QA visual final.
+- **Widget Desktop FRIDAY/Maria:** restaurado somando todas as conquistas (16 níveis Optical-Flow F1/F2 60 FPS + crossfade + gate rígido + anel neon + 5 ondas de voz 60 FPS).
+- **Play Console (Dia 10/14 • Previsão 26/11):** `internal`/`alpha` intactos em `v2.8.0 (vc 32)` com 23 testadores preservados; **APTO para solicitar produção em 26/11 (0 bloqueios P0)**.
+- **Score de Prontidão Comercial (`node scripts/goal-growth-engine.mjs`):** **`75/100`** (único gargalo de caixa = abertura de Produção em 26/11).
+
+---
+
 ## Checkpoint Oficial Verificado Ao Vivo — 2026-11-22 (Parede Única Ativa — Fechamento do Dia v2.8.0 vc 32)
 
 - **Fonte Única de Prioridades (Parede Única):** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-22.md`](CONTINUATION_UPDATE_2026-11-22.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md). **Regra da Parede Única:** nunca iniciar nova arquitetura paralela sem concluir o tijolo atual; cada sessão e cada mensagem continua diretamente do estado verificado abaixo.
