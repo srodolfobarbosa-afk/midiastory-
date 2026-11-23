@@ -1,0 +1,93 @@
+{
+  "checkedAt": "2026-11-23T07:10:49.080Z",
+  "instagram": {
+    "ok": true,
+    "username": "aconteceunobr",
+    "followers": 27847,
+    "mediaCount": 264,
+    "postsAnalyzed": 20,
+    "bestHours": [
+      {
+        "hour": "11h BRT",
+        "posts": 2,
+        "avgScore": 221.5
+      },
+      {
+        "hour": "19h BRT",
+        "posts": 2,
+        "avgScore": 77
+      },
+      {
+        "hour": "01h BRT",
+        "posts": 2,
+        "avgScore": 58
+      }
+    ],
+    "topHooks": [
+      {
+        "id": "18198783394379571",
+        "type": "REELS",
+        "brtHour": "11h",
+        "likes": 75,
+        "comments": 99,
+        "score": 372,
+        "hook": "Deixa um recado aqui para o lula no comentário. @lulaoficial #lulalivre "
+      },
+      {
+        "id": "17972765036960019",
+        "type": "REELS",
+        "brtHour": "19h",
+        "likes": 110,
+        "comments": 6,
+        "score": 128,
+        "hook": "https://midiastory-df6a0.web.app/ ( vídeo patrocinado) A dor de um pai a"
+      },
+      {
+        "id": "18031089368906520",
+        "type": "REELS",
+        "brtHour": "08h",
+        "likes": 86,
+        "comments": 7,
+        "score": 107,
+        "hook": "Horas após ser apresentado à polícia, 'Bucho de Lama' foi posto em liber"
+      }
+    ]
+  },
+  "webEvents": {
+    "total7d": 344,
+    "pageViews": 237,
+    "playClicks": 107,
+    "ctrPct": 45.1,
+    "byEvent": [
+      {
+        "event_name": "page_view",
+        "total": 237
+      },
+      {
+        "event_name": "play_store_click",
+        "total": 107
+      }
+    ],
+    "bySource": [
+      {
+        "utm_source": "direct",
+        "utm_medium": "none",
+        "total": 341
+      },
+      {
+        "utm_source": "ig",
+        "utm_medium": "social",
+        "total": 2
+      },
+      {
+        "utm_source": "instagram",
+        "utm_medium": "bio",
+        "total": 1
+      }
+    ]
+  },
+  "purchases": {
+    "total_purchases": 1,
+    "last_purchase_at": "2026-11-09 12:07:35.042253+00"
+  }
+}

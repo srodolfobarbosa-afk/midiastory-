@@ -250,6 +250,67 @@ async function cmdStatus() {
   );
 }
 
+async function cmdWatchViral() {
+  const igId = process.env.INSTAGRAM_USER_ID?.trim();
+  if (!igId) throw new Error("INSTAGRAM_USER_ID ausente no .env.");
+
+  const media = await graphGet(`/${igId}/media`, {
+    fields: "id,caption,media_type,media_product_type,permalink,timestamp,like_count,comments_count",
+    limit: 20,
+  });
+
+  const CTA_TEMPLATES = [
+    "Celular travando ou WhatsApp lotado? Libere espaço em 2 toques no app Midiastore (link na bio 👆)",
+    "Memória cheia no Android? O Midiastore acha vídeos grandes e duplicatas em 1 toque sem apagar nada sozinho — link na bio 👆",
+    "Dica rápida: se seu celular vive dando 'armazenamento cheio', testa o Midiastore (grátis, leve e 100% seguro) no link da bio 👆",
+  ];
+
+  const reels = (media.data || []).filter((m) => (m.media_product_type || m.media_type) === "REELS");
+  const candidates = [];
+
+  for (let i = 0; i < reels.length; i++) {
+    const r = reels[i];
+    const likes = r.like_count ?? 0;
+    const comments = r.comments_count ?? 0;
+    const isRising = likes >= 30 || comments >= 8;
+    if (!isRising) continue;
+
+    // Anti-spam: verifica se já existe comentário nosso citando "Midiastore" neste vídeo
+    let alreadyCommented = false;
+    try {
+      const cData = await graphGet(`/${r.id}/comments`, { fields: "id,username,text", limit: 30 });
+      alreadyCommented = (cData.data || []).some(
+        (c) => (c.username || "").toLowerCase() === "aconteceunobr" && /midiastore/i.test(c.text || "")
+      );
+    } catch {}
+
+    candidates.push({
+      mediaId: r.id,
+      permalink: r.permalink,
+      timestamp: r.timestamp,
+      likes,
+      comments,
+      alreadyCommented,
+      action: alreadyCommented ? "SKIP_ANTI_SPAM" : "DRY_RUN_READY_FOR_2026_11_26",
+      suggestedComment: CTA_TEMPLATES[i % CTA_TEMPLATES.length],
+    });
+  }
+
+  console.log(
+    JSON.stringify(
+      {
+        mode: "DRY_RUN_LOCKED_UNTIL_PRODUCTION_2026_11_26",
+        rule: "Max 1 comentario natural por Reel subindo (>30 curtidas ou >2000 views), zero spam",
+        reelsScanned: reels.length,
+        risingCandidates: candidates.length,
+        candidates,
+      },
+      null,
+      2
+    )
+  );
+}
+
 async function cmdComments(mediaId) {
   if (!mediaId) throw new Error("Informe o mediaId: node scripts/instagram-api.mjs comments <mediaId>");
   const data = await graphGet(`/${mediaId}/comments`, {
@@ -372,6 +433,9 @@ async function main() {
       break;
     case "debug-token":
       await cmdDebugToken();
+      break;
+    case "watch-viral":
+      await cmdWatchViral();
       break;
     case "comments":
       await cmdComments(pos[1]);
