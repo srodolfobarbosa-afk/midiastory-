@@ -508,6 +508,7 @@ fun MariaHeroBanner(
     var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
     var voiceEnergy by remember { mutableFloatStateOf(0f) }
     var wavePhase by remember { mutableFloatStateOf(0f) }
+    var breathScale by remember { mutableFloatStateOf(1.01f) }
     var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
 
     fun stopAndReleaseAudio() {
@@ -610,6 +611,7 @@ fun MariaHeroBanner(
                 val dtMs = if (lastFrameNs == 0L) 16.67f else ((frameNs - lastFrameNs) / 1_000_000f).coerceIn(1f, 50f)
                 lastFrameNs = frameNs
                 val now = System.currentTimeMillis()
+                breathScale = 1.015f + (sin(now / 900.0).toFloat() * 0.012f)
 
                 if (now >= nextBlinkAtMs && blinkTimerMs < 0L) {
                     blinkTimerMs = 0L
@@ -717,7 +719,11 @@ fun MariaHeroBanner(
                     alignment = Alignment.TopCenter,
                     modifier = Modifier
                         .size(46.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                        .graphicsLayer {
+                            scaleX = breathScale
+                            scaleY = breathScale
+                        },
                 )
             }
 

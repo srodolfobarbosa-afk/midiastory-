@@ -153,6 +153,9 @@ $xaml = @"
                 HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Hand"
                 RenderTransformOrigin="0.5,0.5"
                 ToolTip="Clique para arrastar ou silenciar">
+          <Border.Effect>
+            <DropShadowEffect x:Name="AvatarNeonGlow" Color="#0A84FF" BlurRadius="14" ShadowDepth="0" Opacity="0.35"/>
+          </Border.Effect>
           <Border.RenderTransform>
             <TransformGroup>
               <ScaleTransform x:Name="AvatarScale" ScaleX="1" ScaleY="1"/>
@@ -165,8 +168,17 @@ $xaml = @"
             <Ellipse x:Name="AvatarOverlayEllipse" Width="134" Height="134" Opacity="0"/>
           </Grid>
         </Border>
-        <TextBlock x:Name="StatusText" Grid.Row="1" Text="Pronta para ouvir" Foreground="#AEAEB2"
-                   FontFamily="Segoe UI" FontSize="11.5" HorizontalAlignment="Center" Margin="0,8,0,0" TextTrimming="CharacterEllipsis"/>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,6,0,0">
+          <StackPanel x:Name="VoiceWavePanel" Orientation="Horizontal" HorizontalAlignment="Center" Height="18" VerticalAlignment="Center" Margin="0,0,0,4">
+            <Border x:Name="WaveBar0" Width="3.5" Height="4" CornerRadius="2" Background="#64D2FF" Margin="2,0" VerticalAlignment="Center"/>
+            <Border x:Name="WaveBar1" Width="3.5" Height="4" CornerRadius="2" Background="#0A84FF" Margin="2,0" VerticalAlignment="Center"/>
+            <Border x:Name="WaveBar2" Width="3.5" Height="4" CornerRadius="2" Background="#64D2FF" Margin="2,0" VerticalAlignment="Center"/>
+            <Border x:Name="WaveBar3" Width="3.5" Height="4" CornerRadius="2" Background="#0A84FF" Margin="2,0" VerticalAlignment="Center"/>
+            <Border x:Name="WaveBar4" Width="3.5" Height="4" CornerRadius="2" Background="#64D2FF" Margin="2,0" VerticalAlignment="Center"/>
+          </StackPanel>
+          <TextBlock x:Name="StatusText" Text="Pronta para ouvir" Foreground="#AEAEB2"
+                     FontFamily="Segoe UI" FontSize="11.5" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
       </Grid>
 
       <!-- Controls: Mic + Voice Toggle + Quick Tools (Motorola, Quadro Professor, Web) -->
@@ -225,6 +237,14 @@ $btnWeb = $window.FindName("BtnWeb")
 $avatarScale = $window.FindName("AvatarScale")
 $avatarRotate = $window.FindName("AvatarRotate")
 $avatarTranslate = $window.FindName("AvatarTranslate")
+$avatarNeonGlow = $window.FindName("AvatarNeonGlow")
+$waveBars = @(
+  $window.FindName("WaveBar0"),
+  $window.FindName("WaveBar1"),
+  $window.FindName("WaveBar2"),
+  $window.FindName("WaveBar3"),
+  $window.FindName("WaveBar4")
+)
 
 # Load avatar animation frames (idle, blink, talk-mid, talk-open)
 function Load-AvatarBrush([string]$imgPath, $fallbackBrush) {
@@ -257,30 +277,25 @@ $script:brushWave = Load-AvatarBrush (Join-Path $avatarDir "avatar-wave.png") $s
 $script:brushKiss = Load-AvatarBrush (Join-Path $avatarDir "avatar-kiss.png") $script:brushIdle
 $script:brushSmile = Load-AvatarBrush (Join-Path $avatarDir "avatar-smile.png") $script:brushIdle
 
-# Load 16 continuous Optical-Flow mouth levels (lip_01..lip_16) and 6 eyelid blink levels (blink_01..blink_06) for 30 FPS video-smooth speech!
-$script:lipFlowBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
+# Formato Premium: retrato limpo natural (sorriso + piscada suave + respiração leve) + anel neon e ondas de voz 60 FPS (sem troca artificial de boca!)
 $script:blinkFlowBrushes = New-Object System.Collections.Generic.List[System.Windows.Media.Brush]
 $lipFlowDir = Join-Path $avatarDir "lip-flow"
 if (Test-Path -LiteralPath $lipFlowDir) {
-  $lFiles = Get-ChildItem -LiteralPath $lipFlowDir -Filter "lip_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
-  foreach ($lf in $lFiles) {
-    $b = Load-AvatarBrush $lf.FullName $null
-    if ($b) { $script:lipFlowBrushes.Add($b) }
-  }
   $bFiles = Get-ChildItem -LiteralPath $lipFlowDir -Filter "blink_*.jpg" -ErrorAction SilentlyContinue | Sort-Object Name
   foreach ($bf in $bFiles) {
     $b = Load-AvatarBrush $bf.FullName $null
     if ($b) { $script:blinkFlowBrushes.Add($b) }
   }
 }
-$script:smoothMouth = 0.0
+$script:portraitBaseBrush = if ($script:brushSmile) { $script:brushSmile } else { $script:brushIdle }
+$script:smoothEnergy = 0.0
 $script:blinkSeq = @(0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0)
 $script:blinkTick = -1
 $script:lipSyncFps = 60
 
-$avatarEllipse.Fill = if ($script:lipFlowBrushes.Count -gt 0) { $script:lipFlowBrushes[0] } else { $script:brushIdle }
-$script:activeBrush = $script:brushIdle
-$script:targetBrush = $script:brushIdle
+$avatarEllipse.Fill = $script:portraitBaseBrush
+$script:activeBrush = $script:portraitBaseBrush
+$script:targetBrush = $script:portraitBaseBrush
 $script:blendAlpha = 1.0
 $script:gestureShowStartMs = -99999
 
@@ -777,85 +792,94 @@ $timer.Add_Tick({
   if ($script:isRecording) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#FF3B30")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.3 }
-    $script:smoothMouth = 0.0
+    $script:smoothEnergy = 0.0
     $recBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
       $script:blinkFlowBrushes[$blinkFrameIdx]
-    } elseif ($script:lipFlowBrushes.Count -gt 0) {
-      $script:lipFlowBrushes[0]
     } else {
-      $script:brushIdle
+      $script:portraitBaseBrush
     }
-    Set-AvatarPoseSmooth $recBrush 0.60
-    $avatarRotate.Angle = 1.2 * [Math]::Sin($tSec * 1.4)
-    $avatarScale.ScaleX = 1.012 + 0.006 * [Math]::Sin($tSec * 2.0)
+    Set-AvatarPoseSmooth $recBrush 0.50
+    if ($avatarNeonGlow) {
+      $avatarNeonGlow.Color = [System.Windows.Media.Color]::FromRgb(255, 59, 48)
+      $avatarNeonGlow.BlurRadius = 18 + (6 * [Math]::Sin($tSec * 4.0))
+      $avatarNeonGlow.Opacity = 0.72
+    }
+    for ($bi = 0; $bi -lt $waveBars.Count; $bi++) {
+      if ($waveBars[$bi]) { $waveBars[$bi].Height = 4 + (5 * [Math]::Abs([Math]::Sin($tSec * 5.0 + $bi * 0.9))) }
+    }
+    $avatarRotate.Angle = 0.9 * [Math]::Sin($tSec * 1.3)
+    $avatarScale.ScaleX = 1.010 + 0.006 * [Math]::Sin($tSec * 1.8)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -1.0 * [Math]::Sin($tSec * 1.4)
+    $avatarTranslate.Y = -0.8 * [Math]::Sin($tSec * 1.3)
   } elseif ($script:playProc -and -not $script:playProc.HasExited) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#0A84FF")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.35 }
     $visemeLevel = 0
     $elapsedMs = $script:playWatch.ElapsedMilliseconds
     if ($script:lipSyncFrames -and $script:lipSyncFrames.Length -gt 0) {
-      # Compensação calibrada de ~75ms de latência do buffer de saída ffplay/WASAPI a 60 FPS
-      $idx = [int](([Math]::Max(0, $elapsedMs - 75) * $script:lipSyncFps) / 1000)
+      $idx = [int](([Math]::Max(0, $elapsedMs - 70) * $script:lipSyncFps) / 1000)
       if ($idx -lt $script:lipSyncFrames.Length) {
         $visemeLevel = [int]$script:lipSyncFrames[$idx]
       }
     }
-    $amp = $visemeLevel / 15.0
-    # Subtle natural head/neck sway & breathing synced with speech energy
-    $avatarRotate.Angle = (1.4 * [Math]::Sin($tSec * 1.7)) + ($amp * 0.8 * [Math]::Cos($tSec * 2.9))
-    $avatarScale.ScaleX = 1.0 + (0.009 * [Math]::Sin($tSec * 1.9)) + ($amp * 0.012)
-    $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -1.2 * [Math]::Sin($tSec * 2.1)
+    $targetAmp = $visemeLevel / 15.0
+    $script:smoothEnergy = if ($targetAmp -le 0.02) { $script:smoothEnergy * 0.45 } else { ($script:smoothEnergy * 0.45) + ($targetAmp * 0.55) }
+    $amp = $script:smoothEnergy
 
-    $borderW = 2.2 + [Math]::Min(1.6, $amp * 2.6)
-    $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
-
-    # Gate de silêncio rígido + Crossfade suave a 60 FPS nos 16 frames lip_01..lip_16
-    $maxLip = [Math]::Max(1, $script:lipFlowBrushes.Count - 1)
-    $targetLip = [Math]::Max(0, [Math]::Min($maxLip, $visemeLevel))
-    if ($targetLip -eq 0) {
-      # Fechamento imediato entre palavras (sem arrasto de inércia!)
-      $script:smoothMouth = 0.0
-      $lipIdx = 0
-      $fadeStep = 0.78
-    } else {
-      # Articulação fonética direta com leve suavização para 60 FPS
-      $script:smoothMouth = ($script:smoothMouth * 0.25) + ($targetLip * 0.75)
-      $lipIdx = [Math]::Max(1, [Math]::Min($maxLip, [int][Math]::Round($script:smoothMouth)))
-      $fadeStep = 0.48
-    }
-
-    $nextBrush = if ($lipIdx -eq 0 -and $blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+    # Retrato natural limpo (sorriso + piscada suave + respiração leve) — ZERO boca 2D artificial!
+    $portraitBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
       $script:blinkFlowBrushes[$blinkFrameIdx]
-    } elseif ($script:lipFlowBrushes.Count -gt $lipIdx) {
-      $script:lipFlowBrushes[$lipIdx]
     } else {
-      $script:brushTalkMid
+      $script:portraitBaseBrush
     }
-    Set-AvatarPoseSmooth $nextBrush $fadeStep
+    Set-AvatarPoseSmooth $portraitBrush 0.50
+
+    # Anel luminoso neon + ondas de voz 60 FPS reativas ao áudio
+    $borderW = 2.4 + [Math]::Min(2.4, $amp * 3.0)
+    $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
+    if ($avatarNeonGlow) {
+      $avatarNeonGlow.Color = [System.Windows.Media.Color]::FromRgb(10, 132, 255)
+      $avatarNeonGlow.BlurRadius = 14 + ($amp * 22)
+      $avatarNeonGlow.Opacity = 0.45 + ($amp * 0.50)
+    }
+    for ($bi = 0; $bi -lt $waveBars.Count; $bi++) {
+      if ($waveBars[$bi]) {
+        $osc = 0.45 + 0.55 * [Math]::Abs([Math]::Sin($tSec * 9.5 + $bi * 1.15))
+        $waveBars[$bi].Height = [Math]::Max(3.5, 4.0 + ($amp * 14.0 * $osc))
+      }
+    }
+
+    # Respiração leve e movimento sutil natural
+    $avatarRotate.Angle = 0.9 * [Math]::Sin($tSec * 1.3)
+    $avatarScale.ScaleX = 1.0 + (0.008 * [Math]::Sin($tSec * 1.7)) + ($amp * 0.010)
+    $avatarScale.ScaleY = $avatarScale.ScaleX
+    $avatarTranslate.Y = -0.9 * [Math]::Sin($tSec * 1.6)
   } else {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#30D158")
     $statusDot.Opacity = 1.0
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
+    $script:smoothEnergy = 0.0
 
-    # Gate imediato ao encerrar fala + piscada natural suave
-    $script:smoothMouth = 0.0
     $idleBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
       $script:blinkFlowBrushes[$blinkFrameIdx]
-    } elseif ($script:lipFlowBrushes.Count -gt 0) {
-      $script:lipFlowBrushes[0]
     } else {
-      $script:brushIdle
+      $script:portraitBaseBrush
     }
-    Set-AvatarPoseSmooth $idleBrush 0.55
+    Set-AvatarPoseSmooth $idleBrush 0.50
+    if ($avatarNeonGlow) {
+      $avatarNeonGlow.Color = [System.Windows.Media.Color]::FromRgb(10, 132, 255)
+      $avatarNeonGlow.BlurRadius = 12
+      $avatarNeonGlow.Opacity = 0.25
+    }
+    for ($bi = 0; $bi -lt $waveBars.Count; $bi++) {
+      if ($waveBars[$bi]) { $waveBars[$bi].Height = 3.5 }
+    }
 
     # Gentle alive idle breathing & micro head movement
-    $avatarRotate.Angle = 1.0 * [Math]::Sin($tSec * 0.8)
+    $avatarRotate.Angle = 0.8 * [Math]::Sin($tSec * 0.8)
     $avatarScale.ScaleX = 1.0 + 0.008 * [Math]::Sin($tSec * 1.2)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -0.9 * [Math]::Sin($tSec * 0.9)
+    $avatarTranslate.Y = -0.8 * [Math]::Sin($tSec * 0.9)
   }
 })
 Update-VoiceConfig $true
