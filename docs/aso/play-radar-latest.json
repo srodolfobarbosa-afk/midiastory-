@@ -1,0 +1,137 @@
+{
+  "checkedAt": "2026-11-23T06:01:44.181Z",
+  "ownApp": {
+    "published": false,
+    "note": "Ainda em Teste Fechado (previsão Produção: 26/11) — monitoramento público será ativado automaticamente após aprovação."
+  },
+  "markets": {
+    "pt-BR": {
+      "term": "limpador de armazenamento celular",
+      "ownRank": null,
+      "top5": [
+        {
+          "title": "AVG Cleaner - App de limpeza",
+          "appId": "com.avg.cleaner",
+          "score": "4,8",
+          "developer": "AVG Mobile"
+        },
+        {
+          "title": "Limpeza de Celular・AI Cleaner",
+          "appId": "myfiles.filemanager.fileexplorer.cleaner",
+          "score": "4,8",
+          "developer": "Brain Trust"
+        },
+        {
+          "title": "CCleaner - Limpeza de Celular",
+          "appId": "com.piriform.ccleaner",
+          "score": "4,7",
+          "developer": "Piriform"
+        },
+        {
+          "title": "Cleaner – Limpeza de Celular",
+          "appId": "phonecleaner.junkfiles.appmanager.duplicatefileremover.applock",
+          "score": "4,5",
+          "developer": "JonDev. Studio"
+        },
+        {
+          "title": "1Tap Cleaner (Português)",
+          "appId": "com.a0soft.gphone.acc.free",
+          "score": "4,8",
+          "developer": "AZSoft Technology Inc."
+        }
+      ],
+      "painPoints": [
+        {
+          "score": 2,
+          "text": "travando muito desde que instalei começou travar o celt entrou com vírus nao conseguir tirar da página inicial . nao abri nada . estou pe da visando usar o aparelho e nao posso 0re"
+        },
+        {
+          "score": 1,
+          "text": "Modo de suspensão tem que pagar."
+        },
+        {
+          "score": 2,
+          "text": "sempre dando problema"
+        },
+        {
+          "score": 1,
+          "text": "muita enrolação na primeira vez que abre o app, oferece o app pago, enche linguiça, quero algo curto e direto."
+        }
+      ]
+    },
+    "en-US": {
+      "term": "phone storage cleaner duplicate photos",
+      "ownRank": null,
+      "top5": [
+        {
+          "title": "Duplicates Cleaner",
+          "appId": "com.kaerosduplicatescleaner",
+          "score": "4.7",
+          "developer": "kaeros corps"
+        },
+        {
+          "title": "Cleanup: Phone Storage Cleaner",
+          "appId": "com.storage.androidcleaner",
+          "score": "4.4",
+          "developer": "Codeway Technologies"
+        },
+        {
+          "title": "AVG Cleaner – Storage Cleaner",
+          "appId": "com.avg.cleaner",
+          "score": "4.6",
+          "developer": "AVG Mobile"
+        },
+        {
+          "title": "Remo Duplicate Photos Remover",
+          "appId": "com.remo.remoduplicatephotosremover",
+          "score": "4.0",
+          "developer": "Remo Software"
+        },
+        {
+          "title": "Storage Cleaner: Cleanup Phone",
+          "appId": "app.quiet.storagecleaner",
+          "score": "4.9",
+          "developer": "Quiet Games."
+        }
+      ],
+      "painPoints": []
+    },
+    "es-ES": {
+      "term": "limpiador almacenamiento celular",
+      "ownRank": null,
+      "top5": [
+        {
+          "title": "AVG Cleaner: limpiador",
+          "appId": "com.avg.cleaner",
+          "score": "4,5",
+          "developer": "AVG Mobile"
+        },
+        {
+          "title": "CCleaner – Limpiador de Móvil",
+          "appId": "com.piriform.ccleaner",
+          "score": "4,4",
+          "developer": "Piriform"
+        },
+        {
+          "title": "Limpiador de Movil・AI Cleaner",
+          "appId": "myfiles.filemanager.fileexplorer.cleaner",
+          "score": "4,6",
+          "developer": "Brain Trust"
+        },
+        {
+          "title": "Cleaner – Limpiador de Móvil",
+          "appId": "phonecleaner.junkfiles.appmanager.duplicatefileremover.applock",
+          "score": "4,4",
+          "developer": "JonDev. Studio"
+        },
+        {
+          "title": "Limpiador De Teléfono - Limpia",
+          "appId": "com.cleaner.phone.junk.files",
+          "score": "3,9",
+          "developer": "Smart Solution System"
+        }
+      ],
+      "painPoints": []
+    }
+  }
+}

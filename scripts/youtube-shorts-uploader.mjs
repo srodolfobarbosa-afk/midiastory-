@@ -24,22 +24,31 @@ const PLAY_URL = "https://play.google.com/store/apps/details?id=com.rdf112.midia
 
 const METADATA_BY_LANG = {
   "pt-BR": {
-    title: "Celular sem espaço? Libere GBs com apenas 5,9 MB! #Shorts",
+    title: "Celular sem espaço? Libere GBs com um app ultra leve (< 8 MB)! #Shorts",
     description:
-      "Pare de apagar fotos importantes! O Midiastore pesa apenas 5,9 MB, roda 100% offline e usa verificação SHA-256 para achar duplicatas exatas e vídeos gigantes sem apagar nada sem sua permissão.\n\nBaixe grátis na Google Play: " +
+      "Pare de apagar fotos importantes! O Midiastore pesa menos de 8 MB, roda 100% offline e usa verificação SHA-256 para achar duplicatas exatas e vídeos gigantes sem apagar nada sem sua permissão.\n\nBaixe grátis na Google Play: " +
       PLAY_URL +
       "\nGuia completo: https://midiastory-df6a0.web.app/guides/pt-br/whatsapp-storage-full/?utm_source=youtube_shorts\n\n#Shorts #Android #DicasDeCelular #MemoriaCheia #Midiastore",
     tags: ["android", "memoria cheia", "whatsapp", "limpar celular", "midiastore", "shorts"],
     defaultLanguage: "pt-BR",
   },
   "en-US": {
-    title: "Android Storage Full? Reclaim GBs With Only 5.9 MB! #Shorts",
+    title: "Android Storage Full? Reclaim GBs With an Ultra-Light Cleaner! #Shorts",
     description:
-      "Stop uninstalling apps because of Storage Full! Midiastore is 5.9 MB, pure OLED dark, runs 100% on-device with exact SHA-256 duplicate detection and zero auto-delete bloatware.\n\nGet it free on Google Play: " +
+      "Stop uninstalling apps because of Storage Full! Midiastore is under 8 MB, pure OLED dark, runs 100% on-device with exact SHA-256 duplicate detection and zero auto-delete bloatware.\n\nGet it free on Google Play: " +
       PLAY_URL +
       "\nFull guide: https://midiastory-df6a0.web.app/guides/en-us/android-storage-full-fix/?utm_source=youtube_shorts\n\n#Shorts #AndroidTips #StorageFull #TechTips #Midiastore",
     tags: ["android", "storage full", "phone cleaner", "duplicate photos", "midiastore", "shorts"],
     defaultLanguage: "en-US",
+  },
+  "es-419": {
+    title: "¿Celular sin espacio? ¡Libera GBs con una app ultra ligera (< 8 MB)! #Shorts",
+    description:
+      "¡Deja de borrar recuerdos importantes! Midiastore pesa menos de 8 MB, funciona 100% sin conexión y usa SHA-256 exacto para encontrar fotos duplicadas y videos pesados de WhatsApp sin borrar nada sin tu permiso.\n\nDescárgalo gratis en Google Play: " +
+      PLAY_URL +
+      "\nGuía completa: https://midiastory-df6a0.web.app/es/?utm_source=youtube_shorts\n\n#Shorts #Android #EspacioLleno #LimpiarCelular #Midiastore",
+    tags: ["android", "espacio lleno", "whatsapp", "limpiar celular", "midiastore", "shorts"],
+    defaultLanguage: "es",
   },
 };
 

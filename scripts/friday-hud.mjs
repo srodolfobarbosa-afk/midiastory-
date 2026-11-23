@@ -117,10 +117,16 @@ async function main() {
     `- **Semáforo de Cota:** ${session.level || "N/D"}`,
     `- **Motor de Voz Ativo:** ${session.ttsMode || "Francisca Neural"}`,
     "",
-    "## 🎯 Meta Suprema: R$ 1.000.000,00 na Google Play (Parede Única)",
-    "- **Google Play Console:** v2.7.6 (vc 31) [completed] em internal + alpha | 3 Planos ATIVOS (Mensal, Anual, Vitalício 170+ países).",
-    "- **Próxima Versão v2.8.0 (Pós-Produção):** Assistente Maria Hero (14 idiomas, voz de estúdio) + Gemini Nano nativo no Modo Pro.",
-    "- **Regra 50/50:** 50% Lucro/Retirada + 50% Reinvestimento em Tráfego, IA e Escala.",
+    "## 🎯 Meta Suprema: R$ 1.000.000,00 na Google Play (Escada 50/50)",
+    "- **Score de Prontidão Comercial:** **75/100** (únicos 25 pts pendentes = liberação de Produção em **26/11**, Dia 10/14).",
+    "- **Google Play Console:** `v2.8.0 (vc 32) [completed]` em internal + alpha (**23 testadores intactos**) | 3 Planos ATIVOS (Mensal R$ 14,99, Anual R$ 79,99, Vitalício R$ 149,99).",
+    "- **Versão Candidata Final:** `v2.8.2 (vc 34)` (`7,26 MB` AAB R8 verde no CI, 14 idiomas `630/630`, retrato natural Maria + anel neon 60 FPS, zero modal bloqueador).",
+    "- **Escada Financeira (Regra 50/50):** Marco 1 (Produção 26/11 + 1ª venda real) -> Marco 2 (R$ 5k/mês: financia VPS 24/7 + APIs + Ads) -> Marco 3 (R$ 50k/mês: escala 14 idiomas) -> Marco 4 (**R$ 1.000.000,00**).",
+    "",
+    "## ✅ Checklist Viva de Execução (Próximos Passos Reais)",
+    "- [ ] **1. Moto G84 USB:** plugar cabo para instalar e validar visualmente `v2.8.2 (vc 34)` nas 3 abas.",
+    "- [ ] **2. Quinta-feira 26/11:** clicar em **'Solicitar a produção'** colando `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`.",
+    "- [ ] **3. Dia 1 de Produção:** publicar Reels/Shorts prontos (`marketing/videos/`) + importar `google-ads-editor-lote-14-idiomas.zip` no Ads Editor.",
   ].join("\n");
 
   const boardArgs = [

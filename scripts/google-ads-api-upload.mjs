@@ -25,6 +25,34 @@ const ADS_DIR = "C:\\Users\\rodolfo\\Downloads\\google-ads-midiastore";
 const CSV_PATH = path.join(ADS_DIR, "google-ads-import-14-idiomas.csv");
 const SERVICE_ACCOUNT_PATH = path.join(projectRoot, ".secrets", "play-service-account.json");
 
+// Critérios oficiais de país/região na Google Ads API (geoTargetConstants/{id})
+// Evita cruzamento de verba entre mercados do mesmo idioma (ex.: pt-BR Brasil vs pt-PT Portugal)
+const GEO_TARGET_BY_CAMPAIGN_TAG = {
+  "pt-br": "geoTargetConstants/2076", // Brazil
+  "pt-pt": "geoTargetConstants/2620", // Portugal
+  "en-us": "geoTargetConstants/2840", // United States
+  "es-es": "geoTargetConstants/2724", // Spain
+  "fr-fr": "geoTargetConstants/2250", // France
+  "de-de": "geoTargetConstants/2276", // Germany
+  "hi-in": "geoTargetConstants/2356", // India
+  "ja-jp": "geoTargetConstants/2392", // Japan
+  "zh-cn": "geoTargetConstants/2158", // Taiwan (Google Ads CN/ZH)
+  "ar": "geoTargetConstants/2682",    // Saudi Arabia
+  "ru-ru": "geoTargetConstants/2643", // Russia
+  "id": "geoTargetConstants/2360",    // Indonesia
+  "bn-bd": "geoTargetConstants/2050", // Bangladesh
+  "ko-kr": "geoTargetConstants/2410", // South Korea
+};
+
+function resolveGeoTarget(campaignName, finalUrl) {
+  const hay = `${campaignName} ${finalUrl}`.toLowerCase();
+  for (const [tag, constant] of Object.entries(GEO_TARGET_BY_CAMPAIGN_TAG)) {
+    const underscore = tag.replace("-", "_");
+    if (hay.includes(tag) || hay.includes(underscore)) return constant;
+  }
+  return "geoTargetConstants/2076";
+}
+
 // Critérios oficiais de idioma na Google Ads API (languageConstants/{id})
 const LANGUAGE_CRITERION_IDS = {
   Portuguese: "languageConstants/1014",
@@ -212,6 +240,16 @@ function buildGoogleAdsMutatePayload(customerId, campaignEntry, idx) {
             campaign: `customers/${customerId}/campaigns/${campaignTempId}`,
             language: {
               languageConstant: langConstant,
+            },
+          },
+        },
+      },
+      {
+        campaignCriterionOperation: {
+          create: {
+            campaign: `customers/${customerId}/campaigns/${campaignTempId}`,
+            location: {
+              geoTargetConstant: resolveGeoTarget(row["Campaign"], row["Final URL"]),
             },
           },
         },
