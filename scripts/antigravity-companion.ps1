@@ -6,6 +6,7 @@
   [string]$NodePath = "C:\Program Files\nodejs\node.exe",
   [string]$TranscribeScript = "C:\Users\rodolfo\midiastory-\scripts\voice-transcribe.mjs",
   [string]$BoardScript = "C:\Users\rodolfo\midiastory-\scripts\antigravity-board.mjs",
+  [string]$VisemeAnalyzerScript = "C:\Users\rodolfo\midiastory-\scripts\analyze-wav-visemes.mjs",
   [string]$MicDevice = "Microphone (High Definition Audio Device)"
 )
 
@@ -273,8 +274,9 @@ if (Test-Path -LiteralPath $lipFlowDir) {
   }
 }
 $script:smoothMouth = 0.0
-$script:blinkSeq = @(0, 2, 4, 5, 4, 2, 0)
+$script:blinkSeq = @(0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0)
 $script:blinkTick = -1
+$script:lipSyncFps = 60
 
 $avatarEllipse.Fill = if ($script:lipFlowBrushes.Count -gt 0) { $script:lipFlowBrushes[0] } else { $script:brushIdle }
 $script:activeBrush = $script:brushIdle
@@ -304,8 +306,30 @@ function Set-AvatarPoseSmooth($newBrush, [double]$step = 0.34) {
   }
 }
 
-# Compute 70ms RMS amplitude envelope from a 16-bit PCM WAV file for real audio-driven lip-sync
-function Get-WavLipSyncEnvelope([string]$wavFile, [int]$frameMs = 70) {
+# Compute 60 FPS Phonetic-Viseme (F1/F2 + ZCR + strict silence gate) track via Node.js (zero Python)
+# Returns int[] with values 0..15 mapped directly to lip_01..lip_16 (0 = strict silence / closed lips)
+function Get-WavLipSyncEnvelope([string]$wavFile, [int]$fps = 60) {
+  if ((Test-Path -LiteralPath $NodePath) -and (Test-Path -LiteralPath $VisemeAnalyzerScript)) {
+    try {
+      $psi = New-Object System.Diagnostics.ProcessStartInfo
+      $psi.FileName = $NodePath
+      $psi.Arguments = "`"$VisemeAnalyzerScript`" `"$wavFile`""
+      $psi.UseShellExecute = $false
+      $psi.RedirectStandardOutput = $true
+      $psi.CreateNoWindow = $true
+      $p = [System.Diagnostics.Process]::Start($psi)
+      $hex = $p.StandardOutput.ReadToEnd().Trim()
+      if ($p.WaitForExit(4500) -and $p.ExitCode -eq 0 -and $hex.Length -gt 0) {
+        $arr = New-Object int[] $hex.Length
+        for ($i = 0; $i -lt $hex.Length; $i++) {
+          $arr[$i] = [Convert]::ToInt32($hex.Substring($i, 1), 16)
+        }
+        return $arr
+      }
+    } catch {}
+  }
+
+  # Fallback rápido em PowerShell (60 FPS com gate de silêncio rígido)
   try {
     $bytes = [System.IO.File]::ReadAllBytes($wavFile)
     if ($bytes.Length -lt 64) { return @() }
@@ -313,7 +337,6 @@ function Get-WavLipSyncEnvelope([string]$wavFile, [int]$frameMs = 70) {
     $channels = [BitConverter]::ToInt16($bytes, 22)
     if ($sampleRate -lt 8000 -or $sampleRate -gt 96000) { $sampleRate = 24000 }
     if ($channels -lt 1 -or $channels -gt 2) { $channels = 1 }
-    # Locate "data" chunk
     $dataOffset = 44
     for ($pos = 12; $pos -lt [Math]::Min($bytes.Length - 8, 256); $pos++) {
       if ($bytes[$pos] -eq 100 -and $bytes[$pos+1] -eq 97 -and $bytes[$pos+2] -eq 116 -and $bytes[$pos+3] -eq 97) {
@@ -321,8 +344,8 @@ function Get-WavLipSyncEnvelope([string]$wavFile, [int]$frameMs = 70) {
         break
       }
     }
-    $bytesPerFrame = [Math]::Max(2, [int](($sampleRate * $channels * 2 * $frameMs) / 1000))
-    $step = [Math]::Max(2, 2 * $channels * 8) # subsample for <5ms parse speed
+    $bytesPerFrame = [Math]::Max(2, [int](($sampleRate * $channels * 2) / $fps))
+    $step = [Math]::Max(2, 2 * $channels * 4)
     $levels = New-Object System.Collections.Generic.List[double]
     $peak = 0.001
     for ($off = $dataOffset; $off -lt ($bytes.Length - 2); $off += $bytesPerFrame) {
@@ -338,10 +361,11 @@ function Get-WavLipSyncEnvelope([string]$wavFile, [int]$frameMs = 70) {
       if ($rms -gt $peak) { $peak = $rms }
       $levels.Add($rms)
     }
-    # Normalize 0..1 relative to peak
-    $norm = New-Object double[] $levels.Count
+    $norm = New-Object int[] $levels.Count
     for ($k = 0; $k -lt $levels.Count; $k++) {
-      $norm[$k] = $levels[$k] / $peak
+      $r = $levels[$k] / $peak
+      # Gate de silêncio rígido (< 8% fecha imediatamente para 0)
+      $norm[$k] = if ($r -lt 0.08) { 0 } else { [Math]::Min(15, [int][Math]::Round([Math]::Pow($r, 0.78) * 15)) }
     }
     return $norm
   } catch {
@@ -402,7 +426,7 @@ function Start-WavPlayback([string]$wavFile, [bool]$saveAsLast = $true) {
     try { Copy-Item -LiteralPath $wavFile -Destination $lastSpokenWav -Force -ErrorAction SilentlyContinue } catch {}
   }
   $script:currentWav = $wavFile
-  $script:lipSyncFrames = Get-WavLipSyncEnvelope $wavFile 35
+  $script:lipSyncFrames = Get-WavLipSyncEnvelope $wavFile $script:lipSyncFps
   $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = $FfplayPath
   $psi.Arguments = "-nodisp -autoexit -loglevel quiet `"$wavFile`""
@@ -663,14 +687,14 @@ $btnMic.Add_Click({
   }
 })
 
-# Timer: heartbeat + async STT completion + WAV queue playback + 35ms (28.5 FPS) continuous Optical-Flow lip-sync & eyelid motion
+# Timer: heartbeat + async STT completion + WAV queue playback + 16ms (60 FPS) F1/F2 Phonetic-Viseme lip-sync with smooth crossfade & strict silence gate
 $timer = New-Object System.Windows.Threading.DispatcherTimer
-$timer.Interval = [TimeSpan]::FromMilliseconds(35)
+$timer.Interval = [TimeSpan]::FromMilliseconds(16)
 $timer.Add_Tick({
   $script:pulseTick++
 
   # Write heartbeat every ~1s so voice-narrator.mjs knows companion is alive
-  if ($script:pulseTick % 28 -eq 0) {
+  if ($script:pulseTick % 60 -eq 0) {
     try { [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString() | Set-Content -LiteralPath $heartbeatPath -Encoding ASCII } catch {}
   }
 
@@ -732,9 +756,9 @@ $timer.Add_Tick({
     }
   }
 
-  # 28.5 FPS continuous Optical-Flow lip-sync + multi-frame natural eye blink + subtle organic breathing
+  # 60 FPS Phonetic-Viseme F1/F2 lip-sync + smooth sub-frame crossfade + strict silence gate + natural eye blink
   $nowUtc = [DateTime]::UtcNow
-  $tSec = $script:pulseTick * 0.035
+  $tSec = $script:pulseTick * 0.01667
   if ($nowUtc -ge $script:nextBlinkAt -and $script:blinkTick -lt 0) {
     $script:blinkTick = 0
     $script:nextBlinkAt = $nowUtc.AddMilliseconds($script:rng.Next(3000, 5800))
@@ -749,19 +773,19 @@ $timer.Add_Tick({
     }
   }
 
-  $bright = (($script:pulseTick / 6) % 2 -lt 1)
+  $bright = (($script:pulseTick / 12) % 2 -lt 1)
   if ($script:isRecording) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#FF3B30")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.3 }
     $script:smoothMouth = 0.0
-    if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
-      $avatarEllipse.Fill = $script:blinkFlowBrushes[$blinkFrameIdx]
+    $recBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $script:blinkFlowBrushes[$blinkFrameIdx]
     } elseif ($script:lipFlowBrushes.Count -gt 0) {
-      $avatarEllipse.Fill = $script:lipFlowBrushes[0]
+      $script:lipFlowBrushes[0]
     } else {
-      $avatarEllipse.Fill = $script:brushIdle
+      $script:brushIdle
     }
-    $avatarOverlayEllipse.Opacity = 0.0
+    Set-AvatarPoseSmooth $recBrush 0.60
     $avatarRotate.Angle = 1.2 * [Math]::Sin($tSec * 1.4)
     $avatarScale.ScaleX = 1.012 + 0.006 * [Math]::Sin($tSec * 2.0)
     $avatarScale.ScaleY = $avatarScale.ScaleX
@@ -769,56 +793,63 @@ $timer.Add_Tick({
   } elseif ($script:playProc -and -not $script:playProc.HasExited) {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#0A84FF")
     $statusDot.Opacity = if ($bright) { 1.0 } else { 0.35 }
-    $amp = 0.0
+    $visemeLevel = 0
     $elapsedMs = $script:playWatch.ElapsedMilliseconds
     if ($script:lipSyncFrames -and $script:lipSyncFrames.Length -gt 0) {
-      $idx = [int]([Math]::Max(0, $elapsedMs - 110) / 35)
+      # Compensação calibrada de ~75ms de latência do buffer de saída ffplay/WASAPI a 60 FPS
+      $idx = [int](([Math]::Max(0, $elapsedMs - 75) * $script:lipSyncFps) / 1000)
       if ($idx -lt $script:lipSyncFrames.Length) {
-        $amp = $script:lipSyncFrames[$idx]
+        $visemeLevel = [int]$script:lipSyncFrames[$idx]
       }
     }
+    $amp = $visemeLevel / 15.0
     # Subtle natural head/neck sway & breathing synced with speech energy
-    $avatarRotate.Angle = (1.6 * [Math]::Sin($tSec * 1.7)) + ($amp * 0.9 * [Math]::Cos($tSec * 2.9))
-    $avatarScale.ScaleX = 1.0 + (0.010 * [Math]::Sin($tSec * 1.9)) + ($amp * 0.014)
+    $avatarRotate.Angle = (1.4 * [Math]::Sin($tSec * 1.7)) + ($amp * 0.8 * [Math]::Cos($tSec * 2.9))
+    $avatarScale.ScaleX = 1.0 + (0.009 * [Math]::Sin($tSec * 1.9)) + ($amp * 0.012)
     $avatarScale.ScaleY = $avatarScale.ScaleX
-    $avatarTranslate.Y = -1.4 * [Math]::Sin($tSec * 2.1)
+    $avatarTranslate.Y = -1.2 * [Math]::Sin($tSec * 2.1)
 
-    $borderW = 2.2 + [Math]::Min(1.6, $amp * 2.8)
+    $borderW = 2.2 + [Math]::Min(1.6, $amp * 2.6)
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new($borderW)
 
-    # Physical jaw inertia over the 16 continuous Optical-Flow mouth frames (0..15)
+    # Gate de silêncio rígido + Crossfade suave a 60 FPS nos 16 frames lip_01..lip_16
     $maxLip = [Math]::Max(1, $script:lipFlowBrushes.Count - 1)
-    $targetMouth = [Math]::Min(1.0, [Math]::Pow([Math]::Max(0.0, ($amp - 0.04) * 1.35), 0.78)) * $maxLip
-    $inertia = if ($targetMouth -gt $script:smoothMouth) { 0.62 } else { 0.44 }
-    $script:smoothMouth = ($script:smoothMouth * (1.0 - $inertia)) + ($targetMouth * $inertia)
-    $lipIdx = [Math]::Max(0, [Math]::Min($maxLip, [int][Math]::Round($script:smoothMouth)))
-
-    if ($lipIdx -le 1 -and $blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
-      $avatarEllipse.Fill = $script:blinkFlowBrushes[$blinkFrameIdx]
-    } elseif ($script:lipFlowBrushes.Count -gt $lipIdx) {
-      $avatarEllipse.Fill = $script:lipFlowBrushes[$lipIdx]
+    $targetLip = [Math]::Max(0, [Math]::Min($maxLip, $visemeLevel))
+    if ($targetLip -eq 0) {
+      # Fechamento imediato entre palavras (sem arrasto de inércia!)
+      $script:smoothMouth = 0.0
+      $lipIdx = 0
+      $fadeStep = 0.78
     } else {
-      $avatarEllipse.Fill = $script:brushTalkMid
+      # Articulação fonética direta com leve suavização para 60 FPS
+      $script:smoothMouth = ($script:smoothMouth * 0.25) + ($targetLip * 0.75)
+      $lipIdx = [Math]::Max(1, [Math]::Min($maxLip, [int][Math]::Round($script:smoothMouth)))
+      $fadeStep = 0.48
     }
-    $avatarOverlayEllipse.Opacity = 0.0
+
+    $nextBrush = if ($lipIdx -eq 0 -and $blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $script:blinkFlowBrushes[$blinkFrameIdx]
+    } elseif ($script:lipFlowBrushes.Count -gt $lipIdx) {
+      $script:lipFlowBrushes[$lipIdx]
+    } else {
+      $script:brushTalkMid
+    }
+    Set-AvatarPoseSmooth $nextBrush $fadeStep
   } else {
     $statusDot.Fill = (New-Object System.Windows.Media.BrushConverter).ConvertFromString("#30D158")
     $statusDot.Opacity = 1.0
     $avatarFrame.BorderThickness = [System.Windows.Thickness]::new(2.0)
 
-    # Smoothly close mouth if speech just ended, then play multi-frame natural eye blinks while looking straight at user
-    if ($script:smoothMouth -gt 0.4 -and $script:lipFlowBrushes.Count -gt 0) {
-      $script:smoothMouth = $script:smoothMouth * 0.55
-      $lipIdx = [Math]::Max(0, [int][Math]::Round($script:smoothMouth))
-      $avatarEllipse.Fill = $script:lipFlowBrushes[$lipIdx]
-    } elseif ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
-      $avatarEllipse.Fill = $script:blinkFlowBrushes[$blinkFrameIdx]
+    # Gate imediato ao encerrar fala + piscada natural suave
+    $script:smoothMouth = 0.0
+    $idleBrush = if ($blinkFrameIdx -ge 0 -and $script:blinkFlowBrushes.Count -gt $blinkFrameIdx) {
+      $script:blinkFlowBrushes[$blinkFrameIdx]
     } elseif ($script:lipFlowBrushes.Count -gt 0) {
-      $avatarEllipse.Fill = $script:lipFlowBrushes[0]
+      $script:lipFlowBrushes[0]
     } else {
-      $avatarEllipse.Fill = $script:brushIdle
+      $script:brushIdle
     }
-    $avatarOverlayEllipse.Opacity = 0.0
+    Set-AvatarPoseSmooth $idleBrush 0.55
 
     # Gentle alive idle breathing & micro head movement
     $avatarRotate.Angle = 1.0 * [Math]::Sin($tSec * 0.8)

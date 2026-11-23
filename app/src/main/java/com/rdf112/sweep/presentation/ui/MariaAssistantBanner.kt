@@ -37,6 +37,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -516,7 +517,9 @@ fun MariaHeroBanner(
     var isSpeaking by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(true) }
     var replayTrigger by remember { mutableIntStateOf(0) }
+    var prevFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
     var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
+    var frameBlendAlpha by remember { mutableFloatStateOf(1f) }
     var mouthLevel by remember { mutableFloatStateOf(0f) }
     var breathScale by remember { mutableFloatStateOf(1.01f) }
     var bodyOffsetY by remember { mutableFloatStateOf(0f) }
@@ -610,81 +613,149 @@ fun MariaHeroBanner(
 
     LaunchedEffect(isActive, rawAudioResId) {
         if (!isActive) {
+            prevFrameRes = R.drawable.maria_lip_0
             currentFrameRes = R.drawable.maria_lip_0
+            frameBlendAlpha = 1f
             return@LaunchedEffect
         }
-        val envelope = MariaLipSyncEnvelopes.forAudioRes(rawAudioResId)
-        var blinkStep = -1
+        val visemeTrack = MariaLipSyncEnvelopes.trackForAudioRes(rawAudioResId)
+        var blinkTimerMs = -1L
         var nextBlinkAtMs = System.currentTimeMillis() + 1900L
 
+        // Relógio monotônico ancorado ao MediaPlayer.currentPosition para eliminar jitter de 50-100ms do AudioFlinger
+        var lastMpRef: MediaPlayer? = null
+        var lastReportedPosMs = -1
+        var anchorWallNs = 0L
+        var anchorAudioMs = 0L
+        var lastFrameNs = 0L
+
+        fun transitionToFrame(nextRes: Int, crossfadeMs: Float) {
+            if (nextRes != currentFrameRes) {
+                prevFrameRes = currentFrameRes
+                currentFrameRes = nextRes
+                frameBlendAlpha = if (crossfadeMs <= 1f) 1f else 0f
+            }
+        }
+
         while (true) {
-            val now = System.currentTimeMillis()
+            withFrameNanos { frameNs ->
+                val dtMs = if (lastFrameNs == 0L) 16.67f else ((frameNs - lastFrameNs) / 1_000_000f).coerceIn(1f, 50f)
+                lastFrameNs = frameNs
+                val now = System.currentTimeMillis()
 
-            if (isSpeaking) {
-                breathScale = 1.018f + (sin(now / 420.0).toFloat() * 0.010f)
-                bodyOffsetY = sin(now / 320.0).toFloat() * 1.8f
-                headTiltDeg = cos(now / 540.0).toFloat() * 0.55f
-            } else {
-                breathScale = 1.006f + (sin(now / 950.0).toFloat() * 0.005f)
-                bodyOffsetY = sin(now / 950.0).toFloat() * 0.7f
-                headTiltDeg = 0f
-            }
-
-            if (now >= nextBlinkAtMs && blinkStep < 0) {
-                blinkStep = 0
-                nextBlinkAtMs = now + Random.nextLong(2200L, 3300L)
-            }
-
-            if (isSpeaking) {
-                // Compensa ~85ms de latência do buffer de saída AudioTrack/AudioFlinger do Android
-                val posMs = runCatching {
-                    mediaPlayerRef?.takeIf { it.isPlaying }?.let { mp ->
-                        (mp.currentPosition - 85).coerceAtLeast(0)
-                    }
-                }.getOrNull()
-
-                val envCode = if (posMs != null && envelope.isNotEmpty()) {
-                    val frameIdx = (posMs / 35).coerceIn(0, envelope.lastIndex)
-                    envelope[frameIdx]
+                if (isSpeaking) {
+                    breathScale = 1.016f + (sin(now / 440.0).toFloat() * 0.008f)
+                    bodyOffsetY = sin(now / 340.0).toFloat() * 1.4f
+                    headTiltDeg = cos(now / 560.0).toFloat() * 0.45f
                 } else {
-                    val cycle = now % 1400L
-                    if (cycle > 1180L) 8 else {
-                        val w = (sin(now / 42.0) * 0.55 + sin(now / 68.0) * 0.45).toFloat()
-                        if (w > 0.04f) ((w - 0.04f) / 0.96f * 7f).roundToInt().coerceIn(1, 7) else 0
-                    }
+                    breathScale = 1.006f + (sin(now / 950.0).toFloat() * 0.005f)
+                    bodyOffsetY = sin(now / 950.0).toFloat() * 0.7f
+                    headTiltDeg = 0f
                 }
 
-                if (blinkStep >= 0) {
-                    currentFrameRes = MARIA_TALK_BLINK_SEQUENCE[blinkStep.coerceAtMost(MARIA_TALK_BLINK_SEQUENCE.lastIndex)]
-                    blinkStep++
-                    if (blinkStep >= MARIA_TALK_BLINK_SEQUENCE.size) {
-                        blinkStep = -1
+                if (now >= nextBlinkAtMs && blinkTimerMs < 0L) {
+                    blinkTimerMs = 0L
+                    nextBlinkAtMs = now + Random.nextLong(2400L, 3800L)
+                }
+
+                val targetRes: Int
+                val fadeDurationMs: Float
+
+                if (isSpeaking) {
+                    val mp = mediaPlayerRef
+                    val mpPlaying = mp != null && runCatching { mp.isPlaying }.getOrDefault(false)
+                    val smoothPosMs: Int? = if (mpPlaying && mp != null) {
+                        val rawPos = runCatching { mp.currentPosition }.getOrDefault(-1)
+                        if (rawPos >= 0) {
+                            if (mp !== lastMpRef || lastReportedPosMs < 0 || rawPos < lastReportedPosMs) {
+                                lastMpRef = mp
+                                lastReportedPosMs = rawPos
+                                anchorAudioMs = rawPos.toLong()
+                                anchorWallNs = frameNs
+                            } else if (rawPos != lastReportedPosMs) {
+                                // Atualiza âncora quando o MediaPlayer avança o buffer real
+                                lastReportedPosMs = rawPos
+                                anchorAudioMs = rawPos.toLong()
+                                anchorWallNs = frameNs
+                            }
+                            val extrapolatedMs = anchorAudioMs + ((frameNs - anchorWallNs) / 1_000_000L).coerceIn(0L, 120L)
+                            // Compensa ~65ms de latência do buffer de saída AudioTrack/AudioFlinger no Android
+                            (extrapolatedMs - 65L).toInt().coerceAtLeast(0)
+                        } else {
+                            null
+                        }
+                    } else {
+                        lastMpRef = null
+                        lastReportedPosMs = -1
+                        null
                     }
-                } else if (envCode == 8) {
+
+                    val envCode = if (smoothPosMs != null && visemeTrack.isNotEmpty()) {
+                        MariaLipSyncEnvelopes.visemeAtMs(visemeTrack, smoothPosMs)
+                    } else {
+                        val cycle = now % 1400L
+                        if (cycle > 1160L) 0 else {
+                            val w = (sin(now / 46.0) * 0.55 + sin(now / 74.0) * 0.45).toFloat()
+                            if (w > 0.14f) ((w - 0.14f) / 0.86f * 6f).roundToInt().coerceIn(1, 6) else 0
+                        }
+                    }
+
+                    if (blinkTimerMs >= 0L) {
+                        val stepIdx = (blinkTimerMs / 48L).toInt()
+                        blinkTimerMs += dtMs.roundToInt().toLong()
+                        if (stepIdx < MARIA_TALK_BLINK_SEQUENCE.size) {
+                            targetRes = MARIA_TALK_BLINK_SEQUENCE[stepIdx]
+                            fadeDurationMs = 20f
+                        } else {
+                            blinkTimerMs = -1L
+                            targetRes = if (envCode == 8) R.drawable.maria_smile else MARIA_LIP_FRAMES[envCode.coerceIn(0, MARIA_LIP_FRAMES.lastIndex)]
+                            fadeDurationMs = 22f
+                        }
+                    } else if (envCode == 8) {
+                        mouthLevel = 0f
+                        targetRes = R.drawable.maria_smile
+                        fadeDurationMs = 45f
+                    } else if (envCode <= 0) {
+                        // Gate de silêncio rígido: fecha a boca imediatamente entre palavras (~18ms)
+                        mouthLevel = 0f
+                        targetRes = MARIA_LIP_FRAMES[0]
+                        fadeDurationMs = 18f
+                    } else {
+                        mouthLevel = envCode.toFloat()
+                        val idx = envCode.coerceIn(1, MARIA_LIP_FRAMES.lastIndex)
+                        targetRes = MARIA_LIP_FRAMES[idx]
+                        // Crossfade sub-frame suave a 60 FPS (~32ms = 2 frames)
+                        fadeDurationMs = 32f
+                    }
+                } else {
+                    lastMpRef = null
+                    lastReportedPosMs = -1
                     mouthLevel = 0f
-                    currentFrameRes = R.drawable.maria_smile
-                } else if (envCode <= 0) {
-                    mouthLevel = 0f
-                    currentFrameRes = MARIA_LIP_FRAMES[0]
-                } else {
-                    // Articulação silábica direta sem arrasto que travava a boca aberta entre consoantes
-                    mouthLevel = envCode.toFloat()
-                    val idx = envCode.coerceIn(1, MARIA_LIP_FRAMES.lastIndex)
-                    currentFrameRes = MARIA_LIP_FRAMES[idx]
-                }
-            } else {
-                mouthLevel = 0f
-                if (blinkStep >= 0) {
-                    currentFrameRes = MARIA_IDLE_BLINK_SEQUENCE[blinkStep.coerceAtMost(MARIA_IDLE_BLINK_SEQUENCE.lastIndex)]
-                    blinkStep++
-                    if (blinkStep >= MARIA_IDLE_BLINK_SEQUENCE.size) {
-                        blinkStep = -1
+                    if (blinkTimerMs >= 0L) {
+                        val stepIdx = (blinkTimerMs / 32L).toInt()
+                        blinkTimerMs += dtMs.roundToInt().toLong()
+                        if (stepIdx < MARIA_IDLE_BLINK_SEQUENCE.size) {
+                            targetRes = MARIA_IDLE_BLINK_SEQUENCE[stepIdx]
+                            fadeDurationMs = 20f
+                        } else {
+                            blinkTimerMs = -1L
+                            targetRes = R.drawable.maria_smile
+                            fadeDurationMs = 40f
+                        }
+                    } else {
+                        targetRes = R.drawable.maria_smile
+                        fadeDurationMs = 45f
                     }
-                } else {
-                    currentFrameRes = R.drawable.maria_smile
+                }
+
+                transitionToFrame(targetRes, fadeDurationMs)
+                if (frameBlendAlpha < 1f) {
+                    frameBlendAlpha = (frameBlendAlpha + (dtMs / fadeDurationMs)).coerceAtMost(1f)
+                    if (frameBlendAlpha >= 1f) {
+                        prevFrameRes = currentFrameRes
+                    }
                 }
             }
-            delay(28L)
         }
     }
 
@@ -726,6 +797,22 @@ fun MariaHeroBanner(
             },
     ) {
         if (isExpanded) {
+            if (frameBlendAlpha < 0.999f && prevFrameRes != currentFrameRes) {
+                Image(
+                    painter = painterResource(id = prevFrameRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.TopCenter,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            scaleX = breathScale
+                            scaleY = breathScale
+                            translationY = bodyOffsetY
+                            rotationZ = headTiltDeg
+                        },
+                )
+            }
             Image(
                 painter = painterResource(id = currentFrameRes),
                 contentDescription = "Maria",
@@ -734,6 +821,7 @@ fun MariaHeroBanner(
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
+                        alpha = frameBlendAlpha
                         scaleX = breathScale
                         scaleY = breathScale
                         translationY = bodyOffsetY
