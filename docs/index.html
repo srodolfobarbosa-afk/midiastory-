@@ -169,20 +169,45 @@
 
   <main class="wrap">
     <section class="hero">
-      <div class="eyebrow">v2.7.5 Oficial • Apenas 5,9 MB • Limpeza Real em 2 Toques</div>
+      <div id="igWelcomeBanner" style="display:none;margin:0 auto 16px;max-width:640px;padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(10,132,255,0.22),rgba(48,209,88,0.14));border:1px solid #0A84FF;font-size:0.92rem;font-weight:700;color:#fff;">
+        📱 Veio do Instagram? Libere espaço no seu Android em 2 toques — grátis, leve (&lt; 8 MB) e 100% seguro!
+      </div>
+      <div class="eyebrow">v2.8.2 • Ultra Leve (&lt; 8 MB) • Limpeza Real em 2 Toques</div>
       <h1>Descubra o que ocupa espaço.<br><em>Revise e limpe em 2 toques.</em></h1>
-      <p class="lead">O Midiastore é um limpador de armazenamento Android puro e ultraleve (5,9 MB). Localize vídeos pesados (&gt;10 MB), mídias antigas (+30 dias) e duplicatas exatas SHA-256 com miniaturas reais e confirmação oficial do Android.</p>
+      <p class="lead">O Midiastore é um limpador de armazenamento Android puro e ultraleve (&lt; 8 MB). Localize vídeos pesados (&gt;10 MB), mídias antigas (+30 dias), WhatsApp e duplicatas exatas SHA-256 com miniaturas reais e confirmação oficial do Android.</p>
       <div class="actions">
-        <a class="button" href="#vip-testers" data-track-cta="hero_waitlist" onclick="document.getElementById('testerEmail').focus()">Liberar Acesso Gratuito na Google Play</a>
-        <a class="button secondary" href="https://play.google.com/apps/testing/com.rdf112.midiastore" data-track-cta="hero_optin" target="_blank" rel="noopener">Já Sou Testador (Abrir Google Play)</a>
+        <a id="heroPlayBtn" class="button" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore&amp;referrer=utm_source%3Dinstagram%26utm_medium%3Dbio%26utm_campaign%3Daconteceunobr" data-track-cta="hero_play_store" target="_blank" rel="noopener" style="font-size:1.05rem;padding:16px 30px;min-height:56px;box-shadow:0 10px 28px rgba(10,132,255,0.42);">📱 Baixar Grátis na Google Play</a>
+        <a class="button secondary" href="#vip-testers" data-track-cta="hero_waitlist" onclick="document.getElementById('testerEmail').focus()">Acesso Antecipado (Teste Fechado)</a>
       </div>
       <div class="pulse-strip" aria-label="Movimento Pré-Lançamento em Tempo Real">
-        <span class="pulse-item">⚡ Tamanho do App: <strong>5,9 MB (OLED)</strong></span>
+        <span class="pulse-item">⚡ Tamanho do App: <strong>7,2 MB (OLED)</strong></span>
         <span class="pulse-item">🔒 Privacidade: <strong>100% No Aparelho</strong></span>
         <span class="pulse-item">👁️ Visitas: <strong data-stat="total_visits">—</strong></span>
         <span class="pulse-item">👥 Testadores ativos: <strong data-stat="waitlist_count">—</strong></span>
       </div>
       <p class="note">Análise e revisão gratuitas. Nenhum arquivo é apagado automaticamente: toda exclusão passa pelo diálogo oficial do Android.</p>
+      <script>
+        (function(){
+          try {
+            var p = new URLSearchParams(window.location.search);
+            var src = (p.get("utm_source") || "").toLowerCase();
+            var ref = (document.referrer || "").toLowerCase();
+            var fromIg = src.indexOf("instagram") !== -1 || src === "ig" || ref.indexOf("instagram.com") !== -1;
+            if (fromIg) {
+              var b = document.getElementById("igWelcomeBanner");
+              if (b) b.style.display = "block";
+            }
+            var btn = document.getElementById("heroPlayBtn");
+            if (btn) {
+              var utmSource = src || (fromIg ? "instagram" : "web_direct");
+              var utmMedium = p.get("utm_medium") || (fromIg ? "bio" : "organic");
+              var utmCampaign = p.get("utm_campaign") || (fromIg ? "aconteceunobr" : "home_hero");
+              var playRef = "utm_source=" + utmSource + "&utm_medium=" + utmMedium + "&utm_campaign=" + utmCampaign;
+              btn.href = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore&referrer=" + encodeURIComponent(playRef);
+            }
+          } catch(e) {}
+        })();
+      </script>
     </section>
 
     <!-- INSTANT SITE SEARCH + GOOGLE SEARCHACTION -->

@@ -3150,3 +3150,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #505
 
 ---
+
+### 📍 [23/11/2026, 03:05:28] Otimizacao Home Web para Trafego Instagram (AconteceuNoBR 2M views/mes) + Deploy Firebase + Monitor Search Console API
+- **📖 Estudou / Leu:** Estrategia de conversao organica do canal AconteceuNoBR (2M views/30d), link da bio, UTM referrer Google Play, Search Console API e plano de dominio proprio midiastore.app na Regra 50/50
+- **⚙️ Tentou / Executou:** Atualizar docs/index.html com botao gigante Google Play no topo + banner dinamico utm_source=instagram + propagacao de referrer para Play Store, publicar ao vivo no Firebase Hosting e criar scripts/search-console-monitor.mjs
+- **⚠️ Erros Encontrados:** Service account midiastore-agent@cultivated-pen-469823-p3.iam.gserviceaccount.com ainda precisa ser adicionada na propriedade do Search Console
+- **🔧 Como Corrigiu:** Deploy ao vivo validado HTTP 200 em https://midiastory-df6a0.web.app/ com heroPlayBtn e igWelcomeBanner ativos; script search-console-monitor.mjs pronto salvando docs/aso/search-console-latest.json
+- **🎯 Conclusão:** Funil web 100% pronto para absorver o trafego de 2M views/mes do Instagram a partir da abertura da Producao em 26/11; proximo passo de dominio proprio midiastore.app com as primeiras vendas (Regra 50/50)
+- *Registro Supabase:* Memory #508
+
+---
