@@ -34,10 +34,19 @@ const TTS_COOLDOWN_FILE = path.join(os.tmpdir(), "antigravity-tts-429-until.txt"
 
 function isCompanionAlive() {
   try {
-    if (!fs.existsSync(COMPANION_HEARTBEAT)) return false;
-    const ts = Number(fs.readFileSync(COMPANION_HEARTBEAT, "utf8").trim());
-    const nowSec = Math.floor(Date.now() / 1000);
-    return Number.isFinite(ts) && nowSec - ts <= 6;
+    if (fs.existsSync(COMPANION_HEARTBEAT)) {
+      const ts = Number(fs.readFileSync(COMPANION_HEARTBEAT, "utf8").trim());
+      const nowSec = Math.floor(Date.now() / 1000);
+      if (Number.isFinite(ts) && nowSec - ts <= 20) return true;
+    }
+  } catch {}
+  // Fallback seguro: nunca abre uma 2ª janela se o processo antigravity-companion.ps1 já estiver ativo
+  try {
+    const out = execSync(
+      'powershell.exe -NoProfile -Command "(Get-CimInstance Win32_Process -Filter \\"Name=\'powershell.exe\'\\" | Where-Object { $_.CommandLine -like \'*antigravity-companion.ps1*\' }).Count"',
+      { encoding: "utf8", timeout: 4000, windowsHide: true, stdio: ["ignore", "pipe", "ignore"] }
+    ).trim();
+    return Number(out) > 0;
   } catch {
     return false;
   }

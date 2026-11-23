@@ -714,8 +714,8 @@ $timer.Interval = [TimeSpan]::FromMilliseconds(16)
 $timer.Add_Tick({
   $script:pulseTick++
 
-  # Write heartbeat every ~1s so voice-narrator.mjs knows companion is alive
-  if ($script:pulseTick % 60 -eq 0) {
+  # Write heartbeat every ~0.5s so voice-narrator.mjs NEVER spawns a duplicate overlay window
+  if ($script:pulseTick % 30 -eq 0) {
     try { [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString() | Set-Content -LiteralPath $heartbeatPath -Encoding ASCII } catch {}
   }
 
@@ -909,6 +909,7 @@ $timer.Add_Tick({
   }
 })
 Update-VoiceConfig $true
+try { [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString() | Set-Content -LiteralPath $heartbeatPath -Encoding ASCII } catch {}
 $timer.Start()
 
 $null = $window.ShowDialog()
