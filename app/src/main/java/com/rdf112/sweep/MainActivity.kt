@@ -4388,19 +4388,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAndShowFirstRunOnboarding() {
+        // Abertura imediata padrão Apple/CleanMyPhone: sem modal cinza bloqueador travando a Home.
         val prefs = getSharedPreferences("midiastore_prefs", MODE_PRIVATE)
-        val shown = prefs.getBoolean("onboarding_shown_v1", false)
-        if (!shown) {
-            AlertDialog.Builder(this)
-                .setTitle(getString(R.string.onboarding_welcome_title))
-                .setMessage(getString(R.string.onboarding_welcome_message))
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.onboarding_start_button)) { dialog, _ ->
-                    prefs.edit().putBoolean("onboarding_shown_v1", true).apply()
-                    dialog.dismiss()
-                    startOneTapCleanup()
-                }
-                .show()
+        if (!prefs.getBoolean("onboarding_shown_v1", false)) {
+            prefs.edit().putBoolean("onboarding_shown_v1", true).apply()
         }
     }
 

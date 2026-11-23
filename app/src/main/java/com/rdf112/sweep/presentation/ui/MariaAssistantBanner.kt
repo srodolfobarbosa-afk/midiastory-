@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.RawRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,8 +23,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -66,17 +71,6 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
-private val MARIA_LIP_FRAMES = intArrayOf(
-    R.drawable.maria_lip_0,
-    R.drawable.maria_lip_1,
-    R.drawable.maria_lip_2,
-    R.drawable.maria_lip_3,
-    R.drawable.maria_lip_4,
-    R.drawable.maria_lip_5,
-    R.drawable.maria_lip_6,
-    R.drawable.maria_lip_7,
-)
-
 private val MARIA_IDLE_BLINK_SEQUENCE = intArrayOf(
     R.drawable.maria_blink_0,
     R.drawable.maria_blink_1,
@@ -85,11 +79,6 @@ private val MARIA_IDLE_BLINK_SEQUENCE = intArrayOf(
     R.drawable.maria_blink_2,
     R.drawable.maria_blink_1,
     R.drawable.maria_blink_0,
-)
-
-private val MARIA_TALK_BLINK_SEQUENCE = intArrayOf(
-    R.drawable.maria_talk_blink,
-    R.drawable.maria_blink_1,
 )
 
 private const val PREFS_NAME = "midiastore_prefs"
@@ -515,21 +504,11 @@ fun MariaHeroBanner(
         mutableStateOf(prefs.getBoolean(KEY_MARIA_MUTED, false))
     }
     var isSpeaking by remember { mutableStateOf(false) }
-    var isExpanded by remember { mutableStateOf(true) }
-    var replayTrigger by remember { mutableIntStateOf(0) }
-    var prevFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
+    var userPlayTrigger by remember { mutableIntStateOf(0) }
     var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
-    var frameBlendAlpha by remember { mutableFloatStateOf(1f) }
-    var mouthLevel by remember { mutableFloatStateOf(0f) }
-    var breathScale by remember { mutableFloatStateOf(1.01f) }
-    var bodyOffsetY by remember { mutableFloatStateOf(0f) }
-    var headTiltDeg by remember { mutableFloatStateOf(0f) }
+    var voiceEnergy by remember { mutableFloatStateOf(0f) }
+    var wavePhase by remember { mutableFloatStateOf(0f) }
     var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
-
-    BackHandler(enabled = isActive && !isExpanded) {
-        isExpanded = true
-        replayTrigger++
-    }
 
     fun stopAndReleaseAudio() {
         runCatching {
@@ -540,6 +519,7 @@ fun MariaHeroBanner(
         }
         mediaPlayerRef = null
         isSpeaking = false
+        voiceEnergy = 0f
     }
 
     DisposableEffect(lifecycleOwner, isActive) {
@@ -558,28 +538,31 @@ fun MariaHeroBanner(
         }
     }
 
-    LaunchedEffect(isActive, tabKey, rawAudioResId, speechNonce, replayTrigger) {
+    // Padrão Apple / Gemini Live: NUNCA começa a falar sozinha sem o usuário pedir!
+    // Só fala quando o usuário toca explicitamente no botão de áudio ou no card da Maria.
+    LaunchedEffect(userPlayTrigger, rawAudioResId, isActive) {
+        if (!isActive || userPlayTrigger == 0) {
+            stopAndReleaseAudio()
+            return@LaunchedEffect
+        }
         stopAndReleaseAudio()
-        if (!isActive) return@LaunchedEffect
+        if (isMuted) return@LaunchedEffect
 
-        isExpanded = true
-        currentFrameRes = R.drawable.maria_smile
-        delay(320L)
         isSpeaking = true
-
-        // Reproduz o áudio neural de estúdio em português; em outros idiomas anima a fala visualmente sem misturar idiomas!
-        if (!isMuted && MariaI18n.isPt()) {
+        if (MariaI18n.isPt()) {
             val mpInstance = runCatching {
                 val mp = MediaPlayer.create(context, rawAudioResId)
                 if (mp != null) {
                     mediaPlayerRef = mp
                     mp.setOnCompletionListener {
                         isSpeaking = false
+                        voiceEnergy = 0f
                         runCatching { it.release() }
                         if (mediaPlayerRef === it) mediaPlayerRef = null
                     }
                     mp.setOnErrorListener { player, _, _ ->
                         isSpeaking = false
+                        voiceEnergy = 0f
                         runCatching { player.release() }
                         if (mediaPlayerRef === player) mediaPlayerRef = null
                         true
@@ -595,47 +578,32 @@ fun MariaHeroBanner(
                 var elapsedMs = 0L
                 while (isSpeaking && elapsedMs < 40000L) {
                     val stillPlaying = runCatching { mpInstance.isPlaying }.getOrDefault(false)
-                    if (!stillPlaying && elapsedMs > 600L) break
+                    if (!stillPlaying && elapsedMs > 500L) break
                     delay(120L)
                     elapsedMs += 120L
                 }
                 if (isSpeaking) stopAndReleaseAudio()
-                currentFrameRes = R.drawable.maria_smile
                 return@LaunchedEffect
             }
         }
 
-        val simulatedMs = (captionText.length * 65L).coerceIn(4000L, 10000L)
-        delay(simulatedMs)
+        // Em outros 13 idiomas, pulsa a onda viva elegante por um breve ciclo visual sem áudio em idioma trocado
+        delay(3200L)
         isSpeaking = false
-        currentFrameRes = R.drawable.maria_smile
+        voiceEnergy = 0f
     }
 
+    // 60 FPS VSYNC: foto editorial impecável (zero boca 2D falsa!) + piscar natural sutil + anel/onda sonora viva
     LaunchedEffect(isActive, rawAudioResId) {
         if (!isActive) {
-            prevFrameRes = R.drawable.maria_lip_0
-            currentFrameRes = R.drawable.maria_lip_0
-            frameBlendAlpha = 1f
+            currentFrameRes = R.drawable.maria_smile
+            voiceEnergy = 0f
             return@LaunchedEffect
         }
         val visemeTrack = MariaLipSyncEnvelopes.trackForAudioRes(rawAudioResId)
         var blinkTimerMs = -1L
-        var nextBlinkAtMs = System.currentTimeMillis() + 1900L
-
-        // Relógio monotônico ancorado ao MediaPlayer.currentPosition para eliminar jitter de 50-100ms do AudioFlinger
-        var lastMpRef: MediaPlayer? = null
-        var lastReportedPosMs = -1
-        var anchorWallNs = 0L
-        var anchorAudioMs = 0L
+        var nextBlinkAtMs = System.currentTimeMillis() + 2600L
         var lastFrameNs = 0L
-
-        fun transitionToFrame(nextRes: Int, crossfadeMs: Float) {
-            if (nextRes != currentFrameRes) {
-                prevFrameRes = currentFrameRes
-                currentFrameRes = nextRes
-                frameBlendAlpha = if (crossfadeMs <= 1f) 1f else 0f
-            }
-        }
 
         while (true) {
             withFrameNanos { frameNs ->
@@ -643,127 +611,42 @@ fun MariaHeroBanner(
                 lastFrameNs = frameNs
                 val now = System.currentTimeMillis()
 
-                if (isSpeaking) {
-                    breathScale = 1.016f + (sin(now / 440.0).toFloat() * 0.008f)
-                    bodyOffsetY = sin(now / 340.0).toFloat() * 1.4f
-                    headTiltDeg = cos(now / 560.0).toFloat() * 0.45f
-                } else {
-                    breathScale = 1.006f + (sin(now / 950.0).toFloat() * 0.005f)
-                    bodyOffsetY = sin(now / 950.0).toFloat() * 0.7f
-                    headTiltDeg = 0f
-                }
-
                 if (now >= nextBlinkAtMs && blinkTimerMs < 0L) {
                     blinkTimerMs = 0L
-                    nextBlinkAtMs = now + Random.nextLong(2400L, 3800L)
+                    nextBlinkAtMs = now + Random.nextLong(2800L, 4800L)
                 }
 
-                val targetRes: Int
-                val fadeDurationMs: Float
-
-                if (isSpeaking) {
-                    val mp = mediaPlayerRef
-                    val mpPlaying = mp != null && runCatching { mp.isPlaying }.getOrDefault(false)
-                    val smoothPosMs: Int? = if (mpPlaying && mp != null) {
-                        val rawPos = runCatching { mp.currentPosition }.getOrDefault(-1)
-                        if (rawPos >= 0) {
-                            if (mp !== lastMpRef || lastReportedPosMs < 0 || rawPos < lastReportedPosMs) {
-                                lastMpRef = mp
-                                lastReportedPosMs = rawPos
-                                anchorAudioMs = rawPos.toLong()
-                                anchorWallNs = frameNs
-                            } else if (rawPos != lastReportedPosMs) {
-                                // Atualiza âncora quando o MediaPlayer avança o buffer real
-                                lastReportedPosMs = rawPos
-                                anchorAudioMs = rawPos.toLong()
-                                anchorWallNs = frameNs
-                            }
-                            val extrapolatedMs = anchorAudioMs + ((frameNs - anchorWallNs) / 1_000_000L).coerceIn(0L, 120L)
-                            // Compensa ~65ms de latência do buffer de saída AudioTrack/AudioFlinger no Android
-                            (extrapolatedMs - 65L).toInt().coerceAtLeast(0)
-                        } else {
-                            null
-                        }
+                if (blinkTimerMs >= 0L) {
+                    val stepIdx = (blinkTimerMs / 34L).toInt()
+                    blinkTimerMs += dtMs.roundToInt().toLong()
+                    if (stepIdx < MARIA_IDLE_BLINK_SEQUENCE.size) {
+                        currentFrameRes = MARIA_IDLE_BLINK_SEQUENCE[stepIdx]
                     } else {
-                        lastMpRef = null
-                        lastReportedPosMs = -1
-                        null
-                    }
-
-                    val envCode = if (smoothPosMs != null && visemeTrack.isNotEmpty()) {
-                        MariaLipSyncEnvelopes.visemeAtMs(visemeTrack, smoothPosMs)
-                    } else {
-                        val cycle = now % 1400L
-                        if (cycle > 1160L) 0 else {
-                            val w = (sin(now / 46.0) * 0.55 + sin(now / 74.0) * 0.45).toFloat()
-                            if (w > 0.14f) ((w - 0.14f) / 0.86f * 6f).roundToInt().coerceIn(1, 6) else 0
-                        }
-                    }
-
-                    if (blinkTimerMs >= 0L) {
-                        val stepIdx = (blinkTimerMs / 48L).toInt()
-                        blinkTimerMs += dtMs.roundToInt().toLong()
-                        if (stepIdx < MARIA_TALK_BLINK_SEQUENCE.size) {
-                            targetRes = MARIA_TALK_BLINK_SEQUENCE[stepIdx]
-                            fadeDurationMs = 20f
-                        } else {
-                            blinkTimerMs = -1L
-                            targetRes = if (envCode == 8) R.drawable.maria_smile else MARIA_LIP_FRAMES[envCode.coerceIn(0, MARIA_LIP_FRAMES.lastIndex)]
-                            fadeDurationMs = 22f
-                        }
-                    } else if (envCode == 8) {
-                        mouthLevel = 0f
-                        targetRes = R.drawable.maria_smile
-                        fadeDurationMs = 45f
-                    } else if (envCode <= 0) {
-                        // Gate de silêncio rígido: fecha a boca imediatamente entre palavras (~18ms)
-                        mouthLevel = 0f
-                        targetRes = MARIA_LIP_FRAMES[0]
-                        fadeDurationMs = 18f
-                    } else {
-                        mouthLevel = envCode.toFloat()
-                        val idx = envCode.coerceIn(1, MARIA_LIP_FRAMES.lastIndex)
-                        targetRes = MARIA_LIP_FRAMES[idx]
-                        // Crossfade sub-frame suave a 60 FPS (~32ms = 2 frames)
-                        fadeDurationMs = 32f
+                        blinkTimerMs = -1L
+                        currentFrameRes = R.drawable.maria_smile
                     }
                 } else {
-                    lastMpRef = null
-                    lastReportedPosMs = -1
-                    mouthLevel = 0f
-                    if (blinkTimerMs >= 0L) {
-                        val stepIdx = (blinkTimerMs / 32L).toInt()
-                        blinkTimerMs += dtMs.roundToInt().toLong()
-                        if (stepIdx < MARIA_IDLE_BLINK_SEQUENCE.size) {
-                            targetRes = MARIA_IDLE_BLINK_SEQUENCE[stepIdx]
-                            fadeDurationMs = 20f
-                        } else {
-                            blinkTimerMs = -1L
-                            targetRes = R.drawable.maria_smile
-                            fadeDurationMs = 40f
-                        }
-                    } else {
-                        targetRes = R.drawable.maria_smile
-                        fadeDurationMs = 45f
-                    }
+                    currentFrameRes = R.drawable.maria_smile
                 }
 
-                transitionToFrame(targetRes, fadeDurationMs)
-                if (frameBlendAlpha < 1f) {
-                    frameBlendAlpha = (frameBlendAlpha + (dtMs / fadeDurationMs)).coerceAtMost(1f)
-                    if (frameBlendAlpha >= 1f) {
-                        prevFrameRes = currentFrameRes
+                if (isSpeaking) {
+                    wavePhase += dtMs * 0.012f
+                    val posMs = runCatching {
+                        mediaPlayerRef?.takeIf { it.isPlaying }?.currentPosition
+                    }.getOrNull()
+                    val targetEnergy = if (posMs != null && visemeTrack.isNotEmpty()) {
+                        val code = MariaLipSyncEnvelopes.visemeAtMs(visemeTrack, (posMs - 60).coerceAtLeast(0))
+                        if (code in 1..7) (code / 7f) else 0.06f
+                    } else {
+                        (0.35f + 0.45f * sin(wavePhase.toDouble()).toFloat()).coerceIn(0.1f, 1f)
                     }
+                    voiceEnergy = (voiceEnergy * 0.65f) + (targetEnergy * 0.35f)
+                } else {
+                    voiceEnergy = (voiceEnergy * 0.80f).let { if (it < 0.01f) 0f else it }
                 }
             }
         }
     }
-
-    val targetHeight by animateDpAsState(
-        targetValue = if (isExpanded) 250.dp else 74.dp,
-        animationSpec = tween(durationMillis = 320),
-        label = "maria_card_height",
-    )
 
     val brandAnnotated = remember {
         buildAnnotatedString {
@@ -776,79 +659,71 @@ fun MariaHeroBanner(
         }
     }
 
-    Box(
+    Surface(
+        shape = RoundedCornerShape(18.dp),
+        color = MidiastoreColors.CardSurface,
         modifier = modifier
             .fillMaxWidth()
-            .height(targetHeight)
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFF040B14))
+            .height(76.dp)
             .border(
                 width = 1.dp,
-                color = if (isSpeaking) Color(0x880A84FF) else Color(0xFF1F2430),
-                shape = RoundedCornerShape(20.dp),
+                color = if (isSpeaking) Color(0xAA0A84FF) else MidiastoreColors.CardStroke,
+                shape = RoundedCornerShape(18.dp),
             )
+            .clip(RoundedCornerShape(18.dp))
             .clickable {
-                if (!isExpanded) {
-                    isExpanded = true
-                    replayTrigger++
+                if (isSpeaking) {
+                    stopAndReleaseAudio()
                 } else {
-                    replayTrigger++
+                    if (isMuted) {
+                        isMuted = false
+                        prefs.edit().putBoolean(KEY_MARIA_MUTED, false).apply()
+                    }
+                    userPlayTrigger++
                 }
             },
     ) {
-        if (isExpanded) {
-            if (frameBlendAlpha < 0.999f && prevFrameRes != currentFrameRes) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            // Avatar Editorial da Maria com Anel Luminoso Vivo (estilo Apple Siri / Gemini Live)
+            Box(
+                modifier = Modifier.size(54.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val baseRadius = (size.minDimension / 2f) - 2.dp.toPx()
+                    if (isSpeaking && voiceEnergy > 0.02f) {
+                        drawCircle(
+                            color = Color(0xFF0A84FF).copy(alpha = (0.18f + voiceEnergy * 0.32f).coerceIn(0f, 0.55f)),
+                            radius = baseRadius + (voiceEnergy * 2.5.dp.toPx()),
+                            style = Stroke(width = (2.2f + voiceEnergy * 2.2f).dp.toPx()),
+                        )
+                    }
+                    drawCircle(
+                        color = if (isSpeaking) Color(0xFF64D2FF) else Color(0x550A84FF),
+                        radius = baseRadius,
+                        style = Stroke(width = 1.6.dp.toPx()),
+                    )
+                }
                 Image(
-                    painter = painterResource(id = prevFrameRes),
-                    contentDescription = null,
+                    painter = painterResource(id = currentFrameRes),
+                    contentDescription = "Maria",
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.TopCenter,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = breathScale
-                            scaleY = breathScale
-                            translationY = bodyOffsetY
-                            rotationZ = headTiltDeg
-                        },
+                        .size(46.dp)
+                        .clip(CircleShape),
                 )
             }
-            Image(
-                painter = painterResource(id = currentFrameRes),
-                contentDescription = "Maria",
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.TopCenter,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        alpha = frameBlendAlpha
-                        scaleX = breathScale
-                        scaleY = breathScale
-                        translationY = bodyOffsetY
-                        rotationZ = headTiltDeg
-                    },
-            )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0.0f to Color(0x66000000),
-                            0.28f to Color.Transparent,
-                            0.72f to Color(0xB8000000),
-                            1.0f to Color(0xF5000000),
-                        ),
-                    ),
-            )
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -856,8 +731,9 @@ fun MariaHeroBanner(
                 ) {
                     Text(
                         text = brandAnnotated,
-                        fontSize = 20.sp,
-                        letterSpacing = (-0.4).sp,
+                        fontSize = 16.sp,
+                        letterSpacing = (-0.3).sp,
+                        maxLines = 1,
                     )
                     if (isProBadgeActive) {
                         Surface(
@@ -866,136 +742,86 @@ fun MariaHeroBanner(
                             modifier = Modifier.border(1.dp, Color(0xFF0A84FF), RoundedCornerShape(6.dp)),
                         ) {
                             Text(
-                                text = "PRO IA",
+                                text = "PRO",
                                 color = Color(0xFF64D2FF),
-                                fontSize = 9.5.sp,
+                                fontSize = 9.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(if (isSpeaking) Color(0xFF30D158) else MidiastoreColors.AccentBlue),
+                        )
+                        Text(
+                            text = "MARIA",
+                            color = Color(0xFF64D2FF),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 0.6.sp,
+                            maxLines = 1,
+                        )
+                    }
+                }
+                Text(
+                    text = captionText,
+                    color = MidiastoreColors.TextMuted,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            // Onda sonora viva 60 FPS quando falando ou botão discreto de áudio sob demanda
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(if (isSpeaking) Color(0x2E0A84FF) else MidiastoreColors.CardSurfaceAlt)
+                    .border(
+                        width = 1.dp,
+                        color = if (isSpeaking) MidiastoreColors.AccentBlue else Color(0x28FFFFFF),
+                        shape = CircleShape,
+                    )
+                    .clickable {
+                        if (isSpeaking) {
+                            stopAndReleaseAudio()
+                        } else {
+                            if (isMuted) {
+                                isMuted = false
+                                prefs.edit().putBoolean(KEY_MARIA_MUTED, false).apply()
+                            }
+                            userPlayTrigger++
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                if (isSpeaking) {
+                    Canvas(modifier = Modifier.size(18.dp)) {
+                        val barCount = 4
+                        val spacing = size.width / (barCount + 1)
+                        val centerY = size.height / 2f
+                        for (i in 0 until barCount) {
+                            val osc = (0.45f + 0.55f * sin((wavePhase * 1.4f + i * 1.15f).toDouble()).toFloat())
+                            val halfH = (size.height * 0.42f * (0.25f + voiceEnergy * 0.75f) * osc).coerceAtLeast(2.dp.toPx())
+                            val x = spacing * (i + 1)
+                            drawLine(
+                                color = Color(0xFF64D2FF),
+                                start = Offset(x, centerY - halfH),
+                                end = Offset(x, centerY + halfH),
+                                strokeWidth = 2.2.dp.toPx(),
+                                cap = StrokeCap.Round,
                             )
                         }
                     }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(999.dp),
-                        color = Color(0xB81C1C1E),
-                        modifier = Modifier
-                            .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(999.dp))
-                            .clip(RoundedCornerShape(999.dp))
-                            .clickable {
-                                stopAndReleaseAudio()
-                                isExpanded = false
-                            },
-                    ) {
-                        Text(
-                            text = MariaI18n.collapseLabel(),
-                            color = Color(0xFFE5E5EA),
-                            fontSize = 10.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .size(34.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xCC1C1C1E))
-                            .border(
-                                width = 1.dp,
-                                color = if (!isMuted && isSpeaking) MidiastoreColors.AccentBlue else Color(0x38FFFFFF),
-                                shape = CircleShape,
-                            )
-                            .clickable {
-                                val newMuted = !isMuted
-                                isMuted = newMuted
-                                prefs.edit().putBoolean(KEY_MARIA_MUTED, newMuted).apply()
-                                if (newMuted) {
-                                    stopAndReleaseAudio()
-                                } else {
-                                    replayTrigger++
-                                }
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = if (isMuted) "🔇" else "🔊",
-                            fontSize = 13.sp,
-                            color = Color.White,
-                        )
-                    }
-                }
-            }
-
-            // Apenas o selo limpo "● MARIA • ASSISTENTE IA" na base do quadro (sem texto sobre a blusa da Maria!)
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (isSpeaking) Color(0xFF30D158) else MidiastoreColors.AccentBlue),
-                )
-                Text(
-                    text = MariaI18n.assistantBadge(),
-                    color = Color(0xFF64D2FF),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 0.6.sp,
-                )
-            }
-        } else {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Image(
-                    painter = painterResource(id = currentFrameRes),
-                    contentDescription = "Maria",
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.TopCenter,
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .border(1.5.dp, MidiastoreColors.AccentBlue, CircleShape),
-                )
-                Column(modifier = Modifier.weight(1f)) {
+                } else {
                     Text(
-                        text = brandAnnotated,
-                        fontSize = 16.sp,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = "● " + MariaI18n.assistantBadge(),
-                        color = Color(0xFF64D2FF),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = MidiastoreColors.AccentBlue,
-                ) {
-                    Text(
-                        text = "▼ Maria",
+                        text = if (isMuted) "🔇" else "🔊",
+                        fontSize = 14.sp,
                         color = Color.White,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                     )
                 }
             }
