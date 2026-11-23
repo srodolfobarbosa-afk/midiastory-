@@ -42,15 +42,18 @@ function loadDotEnv() {
 }
 
 function upsertEnvVar(key, value) {
-  let content = fs.existsSync(ENV_PATH) ? fs.readFileSync(ENV_PATH, "utf8") : "";
-  const regex = new RegExp(`^${key}=.*$`, "m");
-  if (regex.test(content)) {
-    content = content.replace(regex, `${key}=${value}`);
-  } else {
-    if (content.length > 0 && !content.endsWith("\n")) content += "\n";
-    content += `${key}=${value}\n`;
+  const lines = fs.existsSync(ENV_PATH)
+    ? fs.readFileSync(ENV_PATH, "utf8").split(/\r?\n/)
+    : [];
+  const filtered = lines.filter((line) => {
+    const t = line.trim();
+    return !(t.startsWith(`${key}=`) || t.startsWith(`${key} =`));
+  });
+  while (filtered.length > 0 && filtered[filtered.length - 1].trim() === "") {
+    filtered.pop();
   }
-  fs.writeFileSync(ENV_PATH, content, "utf8");
+  filtered.push(`${key}=${value}`);
+  fs.writeFileSync(ENV_PATH, filtered.join("\n") + "\n", "utf8");
   process.env[key] = value;
 }
 
