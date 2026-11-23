@@ -106,6 +106,29 @@ async function cmdPermissions() {
   console.log(JSON.stringify({ me, permissions: perms.data || [] }, null, 2));
 }
 
+async function cmdExtendToken() {
+  const appId = process.env.META_APP_ID?.trim();
+  const appSecret = process.env.META_APP_SECRET?.trim();
+  const shortToken = requireToken();
+  if (!appId || !appSecret) {
+    throw new Error("META_APP_ID e META_APP_SECRET são obrigatórios no .env para estender o token.");
+  }
+  const url = new URL(`${GRAPH_BASE}/oauth/access_token`);
+  url.searchParams.set("grant_type", "fb_exchange_token");
+  url.searchParams.set("client_id", appId);
+  url.searchParams.set("client_secret", appSecret);
+  url.searchParams.set("fb_exchange_token", shortToken);
+
+  const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+  const data = await res.json();
+  if (!res.ok || !data.access_token) {
+    throw new Error(`Falha ao estender token (HTTP ${res.status}): ${JSON.stringify(data)}`);
+  }
+  upsertEnvVar("META_ACCESS_TOKEN", data.access_token);
+  const days = data.expires_in ? Math.round(data.expires_in / 86400) : 60;
+  console.log(JSON.stringify({ extended: true, tokenType: data.token_type || "bearer", expiresInSeconds: data.expires_in || null, approxDays: days }, null, 2));
+}
+
 async function cmdSetup() {
   const accounts = await graphGet("/me/accounts", {
     fields: "id,name,instagram_business_account{id,username}",
@@ -303,6 +326,9 @@ async function main() {
       break;
     case "permissions":
       await cmdPermissions();
+      break;
+    case "extend-token":
+      await cmdExtendToken();
       break;
     case "comments":
       await cmdComments(pos[1]);
