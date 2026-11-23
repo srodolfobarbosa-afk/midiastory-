@@ -3160,3 +3160,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #508
 
 ---
+
+### 📍 [23/11/2026, 03:22:14] Plano de Conversao Organica @aconteceunobr (2M views/mes) + Funil Web 14 Idiomas Mobile + SEO 139/139 JSON-LD + IndexNow 200 + Kit Organico FFmpeg
+- **📖 Estudou / Leu:** Print @aconteceunobr (27.8k seguidores, 2.0M views/30d), Edge Function ingest-product-event, 146 paginas HTML em docs/, sitemap.xml, IndexNow, Search Console API e FFmpeg 9:16
+- **⚙️ Tentou / Executou:** Executar 3 subagentes em paralelo (100% Node.js + FFmpeg, zero Python, sem mexer no App v2.8.2 nem FRIDAY Desktop): (1) primeira dobra mobile nos 14 idiomas + telemetria UTM para public.product_events + deploy Firebase; (2) auditoria SEO 139 paginas + correcao 4 JSON-LD + IndexNow + scripts/seo-search-console-monitor.mjs; (3) gerar vinheta 2s 9:16, video global 10s 9:16 e comentarios/stories TXT em Downloads/midiastore-kit-organico
+- **⚠️ Erros Encontrados:** IndexNow deu 404 na 1a tentativa porque chave txt nao estava publicada; Search Console API deu 403 no site porque service account ainda nao foi adicionada como usuaria no painel
+- **🔧 Como Corrigiu:** Publicado chave IndexNow + 4 JSON-LD + otimizacao mobile 14 idiomas no Firebase Hosting (Release 1795414817143000, 14/14 HTTP 200), IndexNow retornou HTTP 200 (139 URLs), ingest-product-event retornou HTTP 200 (accepted: 1), e 2 MP4s 1080x1920 validados via ffprobe + QA visual
+- **🎯 Conclusão:** Maquina organica conectada ao @aconteceunobr (2M views/mes) 100% pronta e publicada no ar para converter em instalacoes e vendas assim que a Producao abrir em 26/11
+- *Registro Supabase:* Memory #511
+
+---

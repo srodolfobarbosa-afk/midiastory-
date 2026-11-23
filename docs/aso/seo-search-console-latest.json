@@ -1,0 +1,122 @@
+{
+  "checkedAt": "2026-11-23T06:15:08.670Z",
+  "apiEndpoint": "https://searchconsole.googleapis.com/webmasters/v3",
+  "targetSiteUrl": "https://midiastory-df6a0.web.app/",
+  "serviceAccountEmail": "midiastore-agent@cultivated-pen-469823-p3.iam.gserviceaccount.com",
+  "sitesApiHttpStatus": 200,
+  "sitesCount": 0,
+  "sites": [],
+  "period": {
+    "startDate": "2026-10-26",
+    "endDate": "2026-11-23",
+    "days": 28
+  },
+  "summary": null,
+  "byLanguage14": {
+    "pt": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "en": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "es": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "de": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "fr": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "hi": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "ja": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "zh": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "ar": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "ru": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "id": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "bn": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "ko": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    },
+    "it": {
+      "clicks": 0,
+      "impressions": 0,
+      "ctr": 0,
+      "avgPosition": null,
+      "pagesWithTraffic": 0
+    }
+  },
+  "topQueries": [],
+  "topPages": [],
+  "sitemaps": null,
+  "status": "PENDING_GSC_PERMISSION",
+  "actionNeeded": "Adicione midiastore-agent@cultivated-pen-469823-p3.iam.gserviceaccount.com como usuario ou proprietario na propriedade https://midiastory-df6a0.web.app/ no Google Search Console (Configuracoes -> Usuarios e permissoes) e submeta https://midiastory-df6a0.web.app/sitemap.xml.",
+  "directProbeHttpStatus": 403,
+  "directProbeError": "User does not have sufficient permission for site 'https://midiastory-df6a0.web.app/'. See also: https://support.google.com/webmasters/answer/2451999."
+}
