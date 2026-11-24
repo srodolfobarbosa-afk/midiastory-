@@ -3271,3 +3271,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #552
 
 ---
+
+### 📍 [24/11/2026, 18:34:32] Etapa 1 v2.9.0 Concluida (Cache SQLite WAL SHA-256 + Remocao Codigo Morto/ZXing/3D sem tocar na Maria + 264 Chaves Limpas nos 14 Idiomas) CI Verde Run 45491856092
+- **📖 Estudou / Leu:** MainActivity.kt (7503->4263 linhas), MariaAssistantBanner.kt + MariaLipSyncEnvelopes.kt, AndroidMediaFingerprintStore.kt, AndroidMediaPageRepository.kt, MediaScanViewModel.kt, 14 strings.xml e Diretriz 12
+- **⚙️ Tentou / Executou:** Remover presentation/studio/*, ZXing, friday-core/avatar-3d/* e abas mortas preservando Maria 100% intocada; integrar SQLite WAL no SHA-256 global e paginado com invalidacao por size/dateModified; limpar emojis/estrelinhas e validar paridade 264/264 chaves nos 14 idiomas
+- **⚠️ Erros Encontrados:** MariaLipSyncEnvelopes.kt ainda e usado pela onda viva 60 FPS de MariaAssistantBanner.kt; COALESCE em upsertBatch precisava validar size_bytes e date_modified_sec para nao herdar SHA-256 obsoleto
+- **🔧 Como Corrigiu:** Preservado MariaLipSyncEnvelopes.kt 100% intacto; blindado ON CONFLICT DO UPDATE com CASE WHEN size_bytes/date_modified_sec iguais; validado no GitHub Actions Run 45491856092 (100% verde)
+- **🎯 Conclusão:** Etapa 1 concluida e aprovada na nuvem (8206 linhas liquidas removidas, 0 KB bloat, tag v2.8.2-carbon-baseline cd0a661 intacta para 26/11). Pronta para iniciar Etapa 2 sob aprovacao.
+- *Registro Supabase:* Memory #553
+
+---
