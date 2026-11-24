@@ -74,7 +74,7 @@ Toda instância de IA (Antigravity, Codex CLI, OpenRouter, Google AI Studio e fu
 
 ---
 
-You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_MESTRE.md`**, and `README.md`, then `docs/CONTINUATION_HANDOFF.md`, `docs/FEATURE_IMPLEMENTATION_MATRIX.md`, and `docs/RELEASE_BLOCKERS.md` before changing code.
+You are working on the Android app **Midiastore**. Start at the central documentation hub [**`docs/INDICE_MESTRE.md`**](docs/INDICE_MESTRE.md), which links this file, **`CONTEXTO_MESTRE.md`**, `README.md`, `docs/CHECKLIST_PRODUCAO_VIVA.md`, `docs/CHECKLIST_EVOLUCAO_CARBON.md`, `docs/CONTINUATION_HANDOFF.md`, `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`, and `docs/LINHA_DO_TEMPO_AUTONOMA.md` before changing code. Historical/superseded docs live in `docs/archive/`.
 
 ## Project identity — do not guess
 

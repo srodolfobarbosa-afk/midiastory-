@@ -1,3 +1,5 @@
+> 🧭 **Índice Central Atualizado (2026-11-24):** [INDICE_MESTRE.md](INDICE_MESTRE.md)
+
 # Matriz de Implementação de Funcionalidades — Midiastore
 
 ## Evidência local atualizada — 2026-11-06 — API35

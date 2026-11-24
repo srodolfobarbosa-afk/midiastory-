@@ -2,31 +2,30 @@
 /**
  * generate-play-screenshots.mjs
  *
- * Generates 56 Play Store phone screenshots (4 slides x 14 locales) at 1080x1920 (9:16 PNG)
- * wrapping clean captured Midiastore Android screens inside an OLED device showcase frame via
- * Windows WPF DirectWrite/Direct2D hardware-independent rasterizer (scripts/render-screenshots.ps1).
- *
- * Policy & Product Direction Safeguards:
- * - 100% pure storage cleaner (3 tabs: Limpar, Arquivos, Pro).
- * - Zero prohibited or deprecated claims (no Studio, games, blur/similarity, compression,
- *   other-app cache, RAM boost, CPU cooling, or misleading promos).
+ * Generates 56 Play Store phone screenshots (4 slides x 14 locales at 1080x1920 PNG)
+ * PLUS 14 Play Store feature graphics (1024x500 PNG) wrapping clean v2.8.2 Midiastore
+ * Android screens inside an OLED showcase frame via Windows WPF DirectWrite/Direct2D
+ * hardware-independent rasterizer (scripts/render-screenshots.ps1).
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const ROOT = process.cwd();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
 const OUT_ROOT = path.join(ROOT, "docs", "campaigns", "store-screenshots");
 const BASE_DIR = path.join(OUT_ROOT, "_base");
+const ICON_PATH = path.join(ROOT, "docs", "icon-512.png");
 const PS_RENDERER = path.join(ROOT, "scripts", "render-screenshots.ps1");
 
 const SLIDE_SPECS = [
-  { id: "01_storage", baseFile: "home.png", accent: "#0A84FF" },
-  { id: "02_large_files", baseFile: "review_result.png", accent: "#38BDF8" },
-  { id: "03_duplicates_sha256", baseFile: "trash_safety.png", accent: "#30D158" },
-  { id: "04_privacy_studio", baseFile: "pro_privacy.png", accent: "#0A84FF" },
+  { id: "01_storage", baseFilePt: "home_pt.png", baseFileEn: "home_en.png", accent: "#0A84FF" },
+  { id: "02_large_files", baseFilePt: "files_clean.png", baseFileEn: "files_clean.png", accent: "#38BDF8" },
+  { id: "03_duplicates_sha256", baseFilePt: "review_clean.png", baseFileEn: "review_clean.png", accent: "#30D158" },
+  { id: "04_pro_privacy", baseFilePt: "pro_pt.png", baseFileEn: "pro_en.png", accent: "#0A84FF" },
 ];
 
 const LOCALES = {
@@ -34,12 +33,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 52,
     titleLineHeight: 60,
+    featureTitleFontSize: 38,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% No aparelho", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "RAIO-X DO APARELHO",
         title: "Veja onde está seu\nespaço em segundos",
         subtitle: "Mapa real de fotos, vídeos e áudios direto no aparelho, sem enviar nada à nuvem.",
-        chips: ["100% No aparelho", "Scoped Storage", "Apenas 5,9 MB"],
+        chips: ["100% No aparelho", "Scoped Storage", "Menos de 8 MB"],
       },
       {
         badge: "LIMPEZA EM 2 TOQUES",
@@ -55,8 +57,8 @@ const LOCALES = {
       },
       {
         badge: "100% PRIVADO & PRO",
-        title: "Limpador OLED leve e\nvarredura global Pro",
-        subtitle: "Apenas 5,9 MB, zero exclusão automática, relatórios de limpeza e planos Google Play.",
+        title: "Limpador OLED (< 8 MB)\ne varredura global Pro",
+        subtitle: "Menos de 8 MB, zero exclusão automática, 100% local e planos Google Play.",
         chips: ["Preto OLED", "Zero Nuvem", "Planos Google Play"],
       },
     ],
@@ -65,12 +67,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 52,
     titleLineHeight: 60,
+    featureTitleFontSize: 38,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% Local", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "MAPA NO TELEMÓVEL",
         title: "Veja o que ocupa o seu\nespaço em segundos",
         subtitle: "Análise real de fotos, vídeos e áudios no equipamento, sem enviar nada para a nuvem.",
-        chips: ["100% Local", "Scoped Storage", "Apenas 5,9 MB"],
+        chips: ["100% Local", "Scoped Storage", "Menos de 8 MB"],
       },
       {
         badge: "LIMPEZA EM 2 TOQUES",
@@ -86,8 +91,8 @@ const LOCALES = {
       },
       {
         badge: "PRIVACIDADE & PRO",
-        title: "Limpeza OLED rápida e\nanálise global Pro",
-        subtitle: "Apenas 5,9 MB, privacidade no telemóvel e planos validados no Google Play.",
+        title: "Limpeza OLED (< 8 MB)\ne análise global Pro",
+        subtitle: "Menos de 8 MB, zero exclusão automática, 100% local e planos Google Play.",
         chips: ["Design OLED", "Sem Nuvem", "Google Play Billing"],
       },
     ],
@@ -96,12 +101,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 52,
     titleLineHeight: 60,
+    featureTitleFontSize: 38,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% On-Device", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "ON-DEVICE STORAGE MAP",
         title: "See what fills your\nstorage in seconds",
         subtitle: "Clear breakdown of photos, videos and audio processed privately on your phone.",
-        chips: ["100% On-Device", "Scoped Storage", "Only 5.9 MB"],
+        chips: ["100% On-Device", "Scoped Storage", "Under 8 MB"],
       },
       {
         badge: "2-TAP REVIEW CLEANUP",
@@ -117,8 +125,8 @@ const LOCALES = {
       },
       {
         badge: "PURE OLED CLEANER PRO",
-        title: "Ultra-light 5.9 MB &\nfull-library Pro scan",
-        subtitle: "Pure OLED dark interface, zero cloud uploads, and official Google Play Billing.",
+        title: "Ultra-light (< 8 MB) &\nfull-library Pro scan",
+        subtitle: "Under 8 MB, zero auto-delete, 100% local OLED UI & official Google Play plans.",
         chips: ["Pure OLED UI", "No Cloud Upload", "Google Play Billing"],
       },
     ],
@@ -127,12 +135,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 52,
     titleLineHeight: 60,
+    featureTitleFontSize: 38,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% Local", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "MAPA LOCAL EN EL TELÉFONO",
         title: "Mira qué ocupa tu\nespacio al instante",
         subtitle: "Analiza fotos, videos y audios en tu dispositivo sin subir archivos a la nube.",
-        chips: ["100% En el móvil", "Scoped Storage", "Solo 5,9 MB"],
+        chips: ["100% En el móvil", "Scoped Storage", "Menos de 8 MB"],
       },
       {
         badge: "LIMPIEZA EN 2 TOQUES",
@@ -148,8 +159,8 @@ const LOCALES = {
       },
       {
         badge: "PRIVACIDAD OLED & PRO",
-        title: "Limpiador ligero 5,9 MB\ny escaneo global Pro",
-        subtitle: "Diseño negro OLED puro, cero subidas a la nube y planes oficiales Google Play.",
+        title: "Limpiador ligero (< 8 MB)\ny escaneo global Pro",
+        subtitle: "Menos de 8 MB, cero borrado automático, 100% local y planes Google Play.",
         chips: ["Diseño OLED", "100% Privado", "Google Play Billing"],
       },
     ],
@@ -158,12 +169,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 50,
     titleLineHeight: 58,
+    featureTitleFontSize: 35,
+    featureTitleLineHeight: 43,
+    featureChips: ["100% Hors ligne", "SHA-256", "< 8 Mo"],
     slides: [
       {
         badge: "ANALYSE LOCALE",
         title: "Visualisez votre espace\nen quelques secondes",
         subtitle: "Cartographie privée des photos, vidéos et audios directement sur votre téléphone.",
-        chips: ["100% Hors ligne", "Scoped Storage", "Seulement 5,9 Mo"],
+        chips: ["100% Hors ligne", "Scoped Storage", "< 8 Mo"],
       },
       {
         badge: "NETTOYAGE EN 2 GESTES",
@@ -179,8 +193,8 @@ const LOCALES = {
       },
       {
         badge: "CONFIDENTIALITÉ & PRO",
-        title: "Nettoyeur OLED 5,9 Mo\n& analyse globale Pro",
-        subtitle: "Interface OLED épurée, aucun envoi cloud et abonnements officiels Google Play.",
+        title: "Nettoyeur OLED (< 8 Mo)\n& analyse globale Pro",
+        subtitle: "Moins de 8 Mo, zéro suppression auto, 100 % local et plans Google Play.",
         chips: ["Noir OLED", "Zéro Cloud", "Google Play Billing"],
       },
     ],
@@ -189,12 +203,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 50,
     titleLineHeight: 58,
+    featureTitleFontSize: 35,
+    featureTitleLineHeight: 43,
+    featureChips: ["100% Lokal", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "LOKALE SPEICHERKARTE",
         title: "Sieh sofort, was deinen\nSpeicher füllt",
         subtitle: "Privater Überblick über Fotos, Videos und Audio direkt auf deinem Gerät.",
-        chips: ["100% Lokal", "Scoped Storage", "Nur 5,9 MB"],
+        chips: ["100% Lokal", "Scoped Storage", "Unter 8 MB"],
       },
       {
         badge: "PRÜFUNG IN 2 TIPPS",
@@ -210,8 +227,8 @@ const LOCALES = {
       },
       {
         badge: "DATENSCHUTZ & PRO",
-        title: "Schlanker 5,9 MB OLED\n& globaler Pro-Scan",
-        subtitle: "Reines OLED-Design, 100 % auf dem Gerät ohne Cloud und Google Play Billing.",
+        title: "Schlank (< 8 MB) OLED\n& globaler Pro-Scan",
+        subtitle: "Unter 8 MB, kein Auto-Löschen, 100 % lokal auf dem Gerät & Google Play.",
         chips: ["OLED-Design", "Ohne Cloud", "Google Play Billing"],
       },
     ],
@@ -220,12 +237,15 @@ const LOCALES = {
     wpfFont: "Nirmala UI",
     titleFontSize: 48,
     titleLineHeight: 60,
+    featureTitleFontSize: 34,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% ऑफ़लाइन", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "ऑन-डिवाइस स्टोरेज मैप",
         title: "सेकंडों में देखें फ़ोन में\nजगह कहाँ भरी है",
         subtitle: "फ़ोटो, वीडियो और ऑडियो की सुरक्षित जांच — सीधे आपके डिवाइस पर, बिना क्लाउड अपलोड।",
-        chips: ["100% ऑफ़लाइन", "Scoped Storage", "सिर्फ 5.9 MB"],
+        chips: ["100% ऑफ़लाइन", "Scoped Storage", "< 8 MB"],
       },
       {
         badge: "2 टैप में सुरक्षित सफाई",
@@ -241,8 +261,8 @@ const LOCALES = {
       },
       {
         badge: "100% प्राइवेट और PRO",
-        title: "हल्का 5.9 MB OLED और\nग्लोबल Pro स्टोरेज स्कैन",
-        subtitle: "प्योर OLED डार्क डिज़ाइन, ज़ीरो क्लाउड अपलोड और आधिकारिक Google Play बिलिंग।",
+        title: "हल्का (< 8 MB) OLED और\nग्लोबल Pro स्टोरेज स्कैन",
+        subtitle: "< 8 MB आकार, बिना ऑटो-डिलीट, 100% लोकल प्राइवेसी और Google Play प्लान।",
         chips: ["OLED डार्क UI", "ज़ीरो क्लाउड", "Google Play बिलिंग"],
       },
     ],
@@ -251,12 +271,15 @@ const LOCALES = {
     wpfFont: "Yu Gothic UI",
     titleFontSize: 48,
     titleLineHeight: 58,
+    featureTitleFontSize: 34,
+    featureTitleLineHeight: 44,
+    featureChips: ["100% 端末内処理", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "端末内ストレージ解析",
         title: "容量の使い道を数秒で\nわかりやすく表示",
         subtitle: "写真・動画・音声の内訳を端末内だけで解析。クラウドへの送信はありません。",
-        chips: ["100% 端末内処理", "Scoped Storage", "わずか 5.9 MB"],
+        chips: ["100% 端末内処理", "Scoped Storage", "軽量 < 8 MB"],
       },
       {
         badge: "2タップで確認＆整理",
@@ -272,8 +295,8 @@ const LOCALES = {
       },
       {
         badge: "高プライバシー & PRO",
-        title: "軽量5.9 MB OLED設計と\n全体Proスキャン",
-        subtitle: "目に優しいOLEDダークUI、クラウド送信ゼロ、公式Google Play決済に対応。",
+        title: "軽量 (< 8 MB) OLED設計と\n全体Proスキャン",
+        subtitle: "8 MB未満、自動削除ゼロ、100%端末内処理と公式Google Playプラン。",
         chips: ["OLEDダークUI", "完全ローカル", "Google Play決済"],
       },
     ],
@@ -282,12 +305,15 @@ const LOCALES = {
     wpfFont: "Microsoft YaHei UI",
     titleFontSize: 50,
     titleLineHeight: 60,
+    featureTitleFontSize: 36,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% 本地处理", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "本机存储全景分析",
         title: "几秒看清手机空间\n到底被什么占用",
         subtitle: "纯本地扫描照片、视频与音频占用，无需联网或上传云端，隐私安全。",
-        chips: ["100% 本地处理", "Scoped Storage", "仅 5.9 MB"],
+        chips: ["100% 本地处理", "Scoped Storage", "< 8 MB"],
       },
       {
         badge: "2步快速核对清理",
@@ -303,8 +329,8 @@ const LOCALES = {
       },
       {
         badge: "纯粹清理与 PRO",
-        title: "5.9 MB 轻量 OLED 与\n全盘 Pro 深度查重",
-        subtitle: "纯粹黑曜 OLED 界面，零云端上传，支持 Google Play 官方安全订阅。",
+        title: "< 8 MB 轻量 OLED 与\n全盘 Pro 深度查重",
+        subtitle: "小于 8 MB、绝不自动删除、100% 本地隐私与 Google Play 官方订阅。",
         chips: ["OLED 暗黑界面", "零云端上传", "Google Play 计费"],
       },
     ],
@@ -313,12 +339,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 48,
     titleLineHeight: 58,
+    featureTitleFontSize: 36,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% على الجهاز", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "تحليل التخزين على الجهاز",
         title: "اعرف ما يملأ مساحة\nهاتفك في ثوانٍ",
         subtitle: "تحليل واضح للصور والفيديوهات والصوتيات محلياً على هاتفك بدون رفع للسحابة.",
-        chips: ["100% على الجهاز", "Scoped Storage", "فقط 5.9 MB"],
+        chips: ["100% على الجهاز", "Scoped Storage", "أقل من 8 MB"],
       },
       {
         badge: "تنظيف آمن بخطوتين",
@@ -334,8 +363,8 @@ const LOCALES = {
       },
       {
         badge: "خصوصية تامة & PRO",
-        title: "تصميم OLED خفيف 5.9MB\nوفحص شامل Pro",
-        subtitle: "واجهة OLED داكنة، خصوصية كاملة بدون سحابة واشتراكات Google Play الرسمية.",
+        title: "تصميم OLED خفيف (< 8 MB)\nوفحص شامل Pro",
+        subtitle: "أقل من 8 MB، بدون حذف تلقائي، خصوصية محلية 100% وخطط Google Play.",
         chips: ["واجهة OLED", "خصوصية 100%", "Google Play"],
       },
     ],
@@ -344,12 +373,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 48,
     titleLineHeight: 56,
+    featureTitleFontSize: 35,
+    featureTitleLineHeight: 43,
+    featureChips: ["100% Локально", "SHA-256", "< 8 МБ"],
     slides: [
       {
         badge: "АНАЛИЗ ПАМЯТИ НА УСТРОЙСТВЕ",
         title: "Узнайте, что занимает\nместо, за секунды",
         subtitle: "Наглядная карта фото, видео и аудио локально на телефоне без загрузки в облако.",
-        chips: ["100% Локально", "Scoped Storage", "Всего 5,9 МБ"],
+        chips: ["100% Локально", "Scoped Storage", "< 8 МБ"],
       },
       {
         badge: "ОЧИСТКА В 2 КАСАНИЯ",
@@ -365,8 +397,8 @@ const LOCALES = {
       },
       {
         badge: "ПРИВАТНОСТЬ OLED & PRO",
-        title: "Легкий 5,9 МБ OLED и\nполное сканирование Pro",
-        subtitle: "Чистый OLED-интерфейс, нулевая отправка в облако и подписки Google Play.",
+        title: "Легкий (< 8 МБ) OLED и\nполное сканирование Pro",
+        subtitle: "Менее 8 МБ, без автоудаления, 100% локально и планы Google Play.",
         chips: ["Дизайн OLED", "Без облака", "Google Play Billing"],
       },
     ],
@@ -375,12 +407,15 @@ const LOCALES = {
     wpfFont: "Segoe UI",
     titleFontSize: 50,
     titleLineHeight: 58,
+    featureTitleFontSize: 35,
+    featureTitleLineHeight: 43,
+    featureChips: ["100% Lokal", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "PETA PENYIMPANAN LOKAL",
         title: "Lihat apa yang memenuhi\nmemori dalam detik",
         subtitle: "Rincian foto, video, dan audio diproses 100% di ponsel tanpa unggah ke cloud.",
-        chips: ["100% Di Perangkat", "Scoped Storage", "Hanya 5,9 MB"],
+        chips: ["100% Di Perangkat", "Scoped Storage", "< 8 MB"],
       },
       {
         badge: "BERSIHKAN DALAM 2 KETUKAN",
@@ -396,8 +431,8 @@ const LOCALES = {
       },
       {
         badge: "PEMBERSIH OLED & PRO",
-        title: "Ringan 5,9 MB OLED &\npemindaian penuh Pro",
-        subtitle: "Antarmuka gelap OLED murni, privasi penuh tanpa cloud, dan Google Play Billing.",
+        title: "Ringan (< 8 MB) OLED &\npemindaian penuh Pro",
+        subtitle: "Di bawah 8 MB, tanpa hapus otomatis, 100% lokal, dan paket Google Play.",
         chips: ["Layar OLED", "Tanpa Cloud", "Google Play Billing"],
       },
     ],
@@ -406,12 +441,15 @@ const LOCALES = {
     wpfFont: "Nirmala UI",
     titleFontSize: 48,
     titleLineHeight: 60,
+    featureTitleFontSize: 34,
+    featureTitleLineHeight: 46,
+    featureChips: ["100% অফলাইন", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "অন-ডিভাইস স্টোরেজ ম্যাপ",
         title: "কয়েক সেকেন্ডে দেখুন ফোনে\nকোথায় জায়গা ভরছে",
         subtitle: "ফটো, ভিডিও ও অডিওর নিরাপদ বিশ্লেষণ — সরাসরি আপনার ফোনে, কোনো ক্লাউড আপলোড ছাড়া।",
-        chips: ["100% অফলাইন", "Scoped Storage", "মাত্র 5.9 MB"],
+        chips: ["100% অফলাইন", "Scoped Storage", "< 8 MB"],
       },
       {
         badge: "২ ট্যাপে নিরাপদ ক্লিনআপ",
@@ -427,8 +465,8 @@ const LOCALES = {
       },
       {
         badge: "প্রাইভেসি ও PRO স্ক্যান",
-        title: "হালকা 5.9 MB OLED এবং\nসম্পূর্ণ Pro স্টোরেজ স্ক্যান",
-        subtitle: "পিওর OLED ডার্ক ডিজাইন, জিরো ক্লাউড আপলোড এবং অফিসিয়াল Google Play বিলিং।",
+        title: "হালকা (< 8 MB) OLED এবং\nসম্পূর্ণ Pro স্টোরেজ স্ক্যান",
+        subtitle: "< 8 MB আকার, অটো-ডিলিট নেই, 100% লোকাল প্রাইভেসি ও Google Play প্ল্যান।",
         chips: ["OLED ডার্ক UI", "ক্লাউড ছাড়া", "Google Play বিলিং"],
       },
     ],
@@ -437,12 +475,15 @@ const LOCALES = {
     wpfFont: "Malgun Gothic",
     titleFontSize: 48,
     titleLineHeight: 58,
+    featureTitleFontSize: 35,
+    featureTitleLineHeight: 45,
+    featureChips: ["100% 기기 내 처리", "SHA-256", "< 8 MB"],
     slides: [
       {
         badge: "기기 내 저장공간 분석",
         title: "몇 초 만에 저장공간\n사용 내역을 한눈에",
         subtitle: "사진, 동영상, 오디오 용량을 클라우드 전송 없이 기기 내부에서 안전하게 분석합니다.",
-        chips: ["100% 기기 내 처리", "Scoped Storage", "초경량 5.9 MB"],
+        chips: ["100% 기기 내 처리", "Scoped Storage", "초경량 < 8 MB"],
       },
       {
         badge: "2번 탭으로 빠른 검토 정리",
@@ -458,15 +499,15 @@ const LOCALES = {
       },
       {
         badge: "완벽한 프라이버시 & PRO",
-        title: "5.9 MB 초경량 OLED 및\n전체 Pro 정밀 스캔",
-        subtitle: "깔끔한 OLED 다크 UI, 클라우드 업로드 제로, 공식 Google Play 결제를 지원합니다.",
+        title: "< 8 MB 초경량 OLED 및\n전체 Pro 정밀 스캔",
+        subtitle: "8 MB 미만, 자동 삭제 없음, 100% 기기 내 처리 및 공식 Google Play 플랜.",
         chips: ["OLED 다크 UI", "클라우드 없음", "Google Play 결제"],
       },
     ],
   },
 };
 
-function assertValidPng1080x1920(filePath) {
+function assertValidPngDimensions(filePath, expectedW, expectedH) {
   const buf = fs.readFileSync(filePath);
   if (buf.length < 32) {
     throw new Error(`PNG too small: ${filePath} (${buf.length} bytes)`);
@@ -481,8 +522,8 @@ function assertValidPng1080x1920(filePath) {
   }
   const width = buf.readUInt32BE(16);
   const height = buf.readUInt32BE(20);
-  if (width !== 1080 || height !== 1920) {
-    throw new Error(`Unexpected dimensions in ${filePath}: ${width}x${height} (expected 1080x1920)`);
+  if (width !== expectedW || height !== expectedH) {
+    throw new Error(`Unexpected dimensions in ${filePath}: ${width}x${height} (expected ${expectedW}x${expectedH})`);
   }
   return { width, height, bytes: buf.length };
 }
@@ -490,6 +531,9 @@ function assertValidPng1080x1920(filePath) {
 function main() {
   if (!fs.existsSync(PS_RENDERER)) {
     throw new Error(`Missing WPF renderer script: ${PS_RENDERER}`);
+  }
+  if (!fs.existsSync(ICON_PATH)) {
+    throw new Error(`Missing app icon: ${ICON_PATH}`);
   }
 
   const localeArg = process.argv.find((arg) => arg.startsWith("--locale="));
@@ -507,14 +551,27 @@ function main() {
 
   const manifest = [];
   for (const [localeCode, config] of targetLocales) {
+    const isPortuguese = localeCode === "pt-BR" || localeCode === "pt-PT";
+    const localeOutDir = path.join(OUT_ROOT, localeCode);
+
+    // Clean up deprecated 04_privacy_studio.png if present
+    const oldSlide4 = path.join(localeOutDir, "04_privacy_studio.png");
+    if (fs.existsSync(oldSlide4)) {
+      fs.unlinkSync(oldSlide4);
+    }
+
     for (let i = 0; i < SLIDE_SPECS.length; i++) {
       const spec = SLIDE_SPECS[i];
       const slide = config.slides[i];
-      const baseImagePath = path.join(BASE_DIR, spec.baseFile);
+      const chosenBase = isPortuguese ? spec.baseFilePt : spec.baseFileEn;
+      const baseImagePath = path.join(BASE_DIR, chosenBase);
       if (!fs.existsSync(baseImagePath)) {
         throw new Error(`Missing base screenshot: ${baseImagePath}`);
       }
       manifest.push({
+        kind: "phone",
+        expectedW: 1080,
+        expectedH: 1920,
         locale: localeCode,
         id: spec.id,
         wpfFont: config.wpfFont,
@@ -526,9 +583,31 @@ function main() {
         subtitle: slide.subtitle,
         chips: slide.chips,
         baseImagePath,
-        outPngPath: path.join(OUT_ROOT, localeCode, `${spec.id}.png`),
+        iconImagePath: ICON_PATH,
+        outPngPath: path.join(localeOutDir, `${spec.id}.png`),
       });
     }
+
+    // Add 1024x500 feature_graphic.png item
+    const fgBasePath = path.join(BASE_DIR, isPortuguese ? "home_pt.png" : "home_en.png");
+    manifest.push({
+      kind: "feature",
+      expectedW: 1024,
+      expectedH: 500,
+      locale: localeCode,
+      id: "feature_graphic",
+      wpfFont: config.wpfFont,
+      featureTitleFontSize: config.featureTitleFontSize,
+      featureTitleLineHeight: config.featureTitleLineHeight,
+      accent: "#0A84FF",
+      badge: config.slides[0].badge,
+      title: config.slides[0].title,
+      subtitle: "",
+      chips: config.featureChips,
+      baseImagePath: fgBasePath,
+      iconImagePath: ICON_PATH,
+      outPngPath: path.join(localeOutDir, "feature_graphic.png"),
+    });
   }
 
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "midiastore-wpf-"));
@@ -546,7 +625,7 @@ function main() {
       ],
       {
         encoding: "utf8",
-        timeout: 180000,
+        timeout: 240000,
         env: {
           ...process.env,
           MIDI_SHOTS_MANIFEST: manifestPath,
@@ -562,12 +641,18 @@ function main() {
   }
 
   let totalBytes = 0;
+  let phoneCount = 0;
+  let featureCount = 0;
   for (const item of manifest) {
-    const meta = assertValidPng1080x1920(item.outPngPath);
+    const meta = assertValidPngDimensions(item.outPngPath, item.expectedW, item.expectedH);
     totalBytes += meta.bytes;
+    if (item.kind === "feature") featureCount += 1;
+    else phoneCount += 1;
   }
 
-  console.log(`\nDONE: Generated & verified ${manifest.length} PNGs across ${targetLocales.length} locales (all 1080x1920).`);
+  console.log(
+    `\nDONE: Generated & IHDR-verified ${phoneCount} phone screenshots (1080x1920) + ${featureCount} feature graphics (1024x500) across ${targetLocales.length} locales.`
+  );
   console.log(`Total size: ${(totalBytes / 1024 / 1024).toFixed(2)} MB`);
 }
 

@@ -1,6 +1,7 @@
 # 🚀 GUIA PRONTO (COPIAR E COLAR) — SOLICITAÇÃO DE PRODUÇÃO & DATA SAFETY (GOOGLE PLAY)
-> **App:** Midiastore (`com.rdf112.midiastore`) | **Versão em Alpha:** `v2.8.0 (vc 32)` | **Versão Final Candidata para Produção:** `v2.8.2` (`versionCode 34`, `~7,1 MB` AAB R8)  
-> **Atualizado em:** 2026-11-23 — 100% auditado contra `AndroidManifest.xml`, Scoped Storage, `PACKAGE_USAGE_STATS` local e Edge Function `verify-play-purchase`.
+> 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md)
+> **App:** Midiastore (`com.rdf112.midiastore`) | **Versão em Alpha:** `v2.8.0 (vc 32)` | **Versão Final Candidata para Produção:** `v2.8.2` (`versionCode 34`, `7,26 MB` AAB R8, SHA-256 `5151aa51ac753efb78427d90591d6faaa13d7bdc16038642cda2704f017634f1`)  
+> **Atualizado em:** 2026-11-24 — 100% auditado contra `AndroidManifest.xml` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, zero `ACTION_SEND`), Scoped Storage, `PACKAGE_USAGE_STATS` local e Edge Functions `verify-play-purchase` (`v9`) + `play-rtdn-webhook` (`v5`).
 
 ---
 
@@ -59,11 +60,12 @@ Conferido diretamente contra o código da **`v2.8.2` (`vc 34`)**:
   - **Compartilhado com terceiros:** Não.
   - **Finalidade:** Funcionalidade do app e prevenção contra fraudes/conformidade.
   - **Criptografado em trânsito:** Sim (HTTPS/TLS).
-- **ID de publicidade (`Advertising ID`):** **NÃO** — confirmado diretamente em `app/src/main/AndroidManifest.xml` (zero permissão `AD_ID`, zero SDK de anúncios).
-- **Política de Privacidade (URL ativa HTTP 200):** `https://midiastory-df6a0.web.app/privacidade.html` (e `https://midiastory-df6a0.web.app/privacy.html`).
+- **ID de publicidade (`Advertising ID`):** **NÃO** — confirmado diretamente via `bundletool dump manifest` no AAB assinado `v2.8.2` (zero permissão `AD_ID`, zero SDK de anúncios, zero `ACTION_SEND`).
+- **Política de Privacidade (URLs ativas HTTP 200 — Release Firebase `1795515742674000`):** `https://midiastory-df6a0.web.app/privacidade.html` e `https://midiastory-df6a0.web.app/privacy.html` (atualizadas em `2026-11-24` com contato visível `srodolfobarbosa@gmail.com` e escopo 100% limpador puro OLED).
 
 ---
 
-## PARTE 3 — Verificação Ao Vivo do Site & SEO (2026-11-21)
-- Todas as **13 páginas de idioma** (`/` + `/en/`, `/es/`, `/fr/`, `/de/`, `/hi/`, `/ja/`, `/zh/`, `/ar/`, `/ru/`, `/id/`, `/bn/`, `/ko/`) + `sitemap.xml` + `robots.txt` + `llms.txt` verificadas com **HTTP 200**.
+## PARTE 3 — Verificação Ao Vivo do Site, Fichas 14 Idiomas & SEO (2026-11-24)
+- Todas as **14 páginas de idioma** (`/` + `/en/`, `/es/`, `/fr/`, `/de/`, `/hi/`, `/ja/`, `/zh/`, `/ar/`, `/ru/`, `/id/`, `/bn/`, `/ko/`) + `/privacidade.html` + `/privacy.html` + `sitemap.xml` (`139/139` JSON-LD válidos) + `robots.txt` + `llms.txt` verificadas com **HTTP 200**.
+- Todas as **14 fichas da Google Play Store** sincronizadas (`< 8 MB`, zero claims removidos, `phoneScreenshots: 4`, `featureGraphic: 1`, `icon: 1`).
 - Pronto para submissão de `https://midiastory-df6a0.web.app/sitemap.xml` no Google Search Console.

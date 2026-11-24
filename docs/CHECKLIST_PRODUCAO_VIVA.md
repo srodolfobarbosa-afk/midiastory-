@@ -1,30 +1,34 @@
 # 📋 CHECKLIST VIVA DE PRIORIDADES — MIDIASTORE (ÚNICA PAREDE ATIVA)
+> 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`AGENTS.md`**](../AGENTS.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) · [**`PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`**](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md) · [**`LINHA_DO_TEMPO_AUTONOMA.md`**](LINHA_DO_TEMPO_AUTONOMA.md)
 
-**Última Verificação Ao Vivo:** `2026-11-24 03:20 BRT` (Dia 12/14 do Teste Fechado • Faltam 2 dias para Produção: **quinta-feira 26/11**)  
-**Objetivo Único:** Publicar o Midiastore (`com.rdf112.midiastore`) em **Produção na Google Play Store** com padrão premium (nível Apple/MacPaw) para gerar caixa recorrente rumo a **R$ 1.000.000,00** (Regra 50/50 — Pilar 1), mantendo a evolução da IA Central FRIDAY (Pilar 2).
-
----
-
-## 🟢 O QUE ESTÁ VERIFICADO AO VIVO HOJE (`2026-11-23`)
-- [x] **Versão Final Candidata `v2.8.2 (vc 34)` compilada e auditada no GitHub Actions (`success`):**
-  - `Run 45118253546` (`build-debug-apk` + `build-signed-release-aab`) e `Run 45118253451` (`Midiastore CI/CD & Security Pipeline`) **100% verdes**.
-  - **AAB Release Assinado (`sweep-upload.jks`):** **`7,26 MB`** (`7.256.107 bytes`, SHA-256 `b0d0fe6e47f90eee124b7a53e818b8514e60bf9f623e8a17d7a584926e5de`), auditado via `bundletool` (`com.rdf112.midiastore`, `vc 34`, `v2.8.2`, **zero `MANAGE_EXTERNAL_STORAGE`**, **zero `AD_ID`**).
-  - **UX/UI Premium:** removido modal cinza bloqueador na abertura, removidos os 9 frames artificiais `maria_lip_0..7` + `maria_talk_blink`, substituídos por **retrato limpo natural da Maria + piscada suave + respiração leve + anel luminoso neon e ondas de voz 60 FPS sob demanda** (funciona nos **14 idiomas**, `630/630` strings válidas em todos os locales).
-- [x] **Widget Desktop FRIDAY/Maria (`scripts/antigravity-companion.ps1`):** somadas todas as conquistas sem regressão (**16 níveis Optical-Flow F1/F2 60 FPS + crossfade + gate de silêncio rígido + anel neon + 5 ondas de voz 60 FPS**), `PS1_PARSE_ERRORS=0`, rodando ao vivo.
-- [x] **Google Play Console (API v3 Ao Vivo):** `internal` e `alpha` em `v2.8.0 (vc 32) [completed]` com **23 testadores fechados 100% preservados**; 3 SKUs Billing (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`) `ACTIVE`.
-- [x] **Formulário de Produção + Data Safety (`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`):** 100% auditado e atualizado para `v2.8.2 (vc 34)` (zero bloqueios P0; `PACKAGE_USAGE_STATS` com Prominent Disclosure local documentado).
-- [x] **Backend Supabase (`19,77 MB / 500 MB`):** `play_purchases = 1` compra testada validada, `beta_testers = 2` (sem novos e-mails pendentes hoje), telemetria ao vivo (`148` visitas, `114` únicos, `16` nas últimas 24h).
-- [x] **Funil Web (`https://midiastory-df6a0.web.app/` — Release `1795414817143000`):** `14/14` páginas `HTTP 200`, primeira dobra mobile otimizada (CTA grande Google Play sem rolar + prova visual `99% -> 12 GB livres`), captura de UTM (`instagram/bio/story/reels/shorts/tiktok`) gravando em `public.product_events` (`HTTP 200`, `accepted: 1`), **139/139 páginas públicas do sitemap com JSON-LD válido**, **IndexNow `HTTP 200 OK` (139 URLs)** e monitor `scripts/seo-search-console-monitor.mjs` ativo.
-- [x] **Kit Orgânico `@aconteceunobr` (`2M views/mês`, `27,8 mil seguidores`) em `C:\Users\rodolfo\Downloads\midiastore-kit-organico\`:** `vinheta-final-2s-reels-9x16.mp4` (`46,5 KB`), `video-global-10s-sem-idioma-9x16.mp4` (`157,5 KB`) e `comentarios-fixados-e-stories.txt` validados via `ffprobe` e inspeção visual.
-- [x] **Máquina de Aquisição (Google Ads + Reels/Shorts):** `google-ads-editor-lote-14-idiomas.zip` (`5,80 MB`) + 28 banners + CSV EN/PT + 2 reels MP4 (`pt-BR`/`en-US`) validados (`0` erros no `--dry-run`).
-- [x] **Motor de Crescimento Orientado a Meta (`scripts/goal-growth-engine.mjs`):** Score de Prontidão Comercial ao vivo = **`75/100`** (únicos 25 pontos pendentes = abertura de Produção em 26/11).
+**Última Verificação Ao Vivo:** `2026-11-24 07:45 BRT` (**Dia 12/14** do Teste Fechado • Faltam **2 dias** para Produção: **quinta-feira 26/11**)  
+**Objetivo Único:** Publicar o Midiastore (`com.rdf112.midiastore`) em **Produção na Google Play Store** com padrão premium (nível Apple/MacPaw) para gerar caixa recorrente rumo a **R$ 1.000.000,00** (Regra 50/50 — Pilar 1), mantendo a evolução da IA Central FRIDAY e Maria 2.0 (Pilar 2 — roteiro completo em [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md)).
 
 ---
 
-## 🔴 FILA ÚNICA DE PRIORIDADES DE MAIOR IMPACTO FINANCEIRO
+## 🟢 O QUE ESTÁ 100% VERIFICADO AO VIVO HOJE (`2026-11-24`)
+- [x] **Versão Final Candidata `v2.8.2 (vc 34)` compilada, assinada e validada no Moto G84 (`0085353748`):**
+  - Tag de segurança travada no Git: **`v2.8.2-carbon-baseline`** (`cd0a661` / HEAD `6fd8020`, CI `Run 45342357954`, `45342358085` e `45343870292` **100% verdes**).
+  - **AAB Release Assinado (`.tmp/qa/v282-carbon-aab/app-release.aab`):** **`7,26 MB`** (`7.263.824 bytes`, SHA-256 `5151aa51ac753efb78427d90591d6faaa13d7bdc16038642cda2704f017634f1`), auditado via `bundletool` (`com.rdf112.midiastore`, `vc 34`, `v2.8.2`, **zero `MANAGE_EXTERNAL_STORAGE`**, **zero `AD_ID`**, **zero `ACTION_SEND`**, `631/631` chaves em 14 idiomas).
+  - **QA Físico Real:** validado em retrato (`PT-BR` e `EN-US`) nas 3 abas (`Limpar`, `Arquivos`, `Pro`), zero erros no `logcat`.
+- [x] **Google Play Console Store Presence 14 Idiomas (`Edit 15816757970827593747` -> `HTTP 200`):**
+  - `internal` e `alpha` intactos em `v2.8.0 (vc 32) [completed]` com **23 testadores fechados 100% preservados**; 3 SKUs Billing (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`) `ACTIVE`.
+  - **14/14 fichas sincronizadas ao vivo:** textos `< 8 MB`, `bn-BD` sem caracteres cirílicos, **56 novos `phoneScreenshots` `1080x1920`** da `v2.8.2` (zero fotos pessoais, zero telas vazias repetidas), **14 `featureGraphic` `1024x500`** (cobrindo os 6 idiomas antes zerados) e **14 ícones `512x512`**.
+- [x] **Políticas de Privacidade + Formulário de Produção (`HTTP 200`):**
+  - `/privacidade.html` e `/privacy.html` sincronizadas e publicadas no Firebase Hosting (`Release 1795515742674000`, zero menção a Estúdio, contato `srodolfobarbosa@gmail.com` visível).
+  - Respostas de 300 chars e Data Safety prontas em [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
+- [x] **Backend Supabase (`20,29 MB / 500 MB`):**
+  - Relógio dinâmico corrigido em `public.play_console_sync_state` + `get_prelaunch_stats()` (`23 testadores`, `Dia 12 de 14` em BRT).
+  - 5 Edge Functions `ACTIVE` (`verify-play-purchase` v9, `play-rtdn-webhook` v5, `get-paywall-variant` v3, `ingest-product-event` v4, `native-orchestrator` v6); `play_purchases = 1` venda testada; `product_events` com `44,1%` CTR.
+- [x] **Máquina de Aquisição (`@aconteceunobr` + Google Ads + Reels/Shorts):**
+  - Tokens Meta Graph API v27.0 permanentes validados (`8` Reels em alta prontos em `--dry-run` para `26/11`) + lote `google-ads-editor-lote-14-idiomas.zip` pronto.
 
-1. **[IMEDIATO — 2 min] Reconectar o Moto G84 no USB para QA visual final da `v2.8.2 (vc 34)`:** instalar `.tmp/qa/v282-apk/app-debug.apk`, validar as 3 abas (`Limpar`, `Arquivos`, `Pro`) na tela e decidir se congela `v2.8.2 (vc 34)` para subir em `internal`/`alpha` antes de quinta-feira.
-2. **[QUINTA-FEIRA 26/11 — PORTÃO DE CAIXA] Clicar em "Solicitar a produção" na Google Play Console:** colar as respostas prontas de `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`, confirmar declaração de Fotos e Vídeos e submeter `v2.8.2 (vc 34)` (ou manter `v2.8.0 vc 32` se preferir não mexer antes da aprovação).
-3. **[PÓS-APROVAÇÃO DE PRODUÇÃO — DIA 1 DE VENDAS] Ligar Aquisição Orgânica + Paga (Regra 50/50):**
-   - Publicar imediatamente os 2 Reels/Shorts prontos (`marketing/videos/midiastore-reel-ptbr-2026-11-19.mp4` e `enus`) no YouTube Shorts, Instagram Reels e TikTok com link direto para a Play Store.
-   - Importar `Downloads/google-ads-midiastore/google-ads-editor-lote-14-idiomas.zip` no **Google Ads Editor** (conta `649-729-9513`), começar com orçamento controlado em `pt-BR` e `en-US`, validar 1 compra real em Produção (`public.play_purchases`) e reinvestir 50% do lucro líquido em escala.
+---
+
+## 🔴 FILA ÚNICA DE EXECUÇÃO (ORDEM ESTRATÉGICA)
+
+1. **[QUINTA-FEIRA 26/11 — PORTÃO DE CAIXA] Clicar em "Solicitar a produção" na Google Play Console:** colar as respostas auditadas de [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md), confirmar declarações e promover `v2.8.2 (vc 34)` (ou aprovar com `v2.8.0 vc 32` e subir `v2.8.2` em seguida, preservando zero risco).
+2. **[PÓS-APROVAÇÃO DE PRODUÇÃO — DIA 1 DE VENDAS] Ligar Aquisição Orgânica + Paga (Regra 50/50):**
+   - Ativar comentários/Stories no `@aconteceunobr` + publicar Reels/Shorts globais e importar lote no Google Ads Editor (`649-729-9513`), validando a 1ª compra real de Produção em `public.play_purchases`.
+3. **[EM BRANCH ISOLADA — ZERO RISCO À `v2.8.2`] Executar Roadmap `v2.9.0` + Maria 2.0 ([`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md)):**
+   - Fotos Parecidas IA (`dHash/pHash`), Cache SQLite Instantâneo, Compressor de Vídeo H.265 Pro, modularização da `MainActivity.kt` e **Maria 2.0** (micro-loops faciais neurais reais + TTS neural 14 idiomas + avatar 3D 52 blendshapes no Desktop).

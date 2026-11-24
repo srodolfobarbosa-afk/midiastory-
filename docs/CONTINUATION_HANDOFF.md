@@ -1,4 +1,15 @@
 # Midiastore — CONTINUIDADE DO PROJETO
+> 🧭 **Navegação Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) | **Checklist Produção (`26/11`):** [**`docs/CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) | **Roadmap `v2.9.0` & Maria 2.0:** [**`docs/CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) | **Histórico Arquivado:** [`docs/archive/`](archive/README.md)
+
+## Checkpoint Oficial Verificado Ao Vivo — 2026-11-24 (Blindagem 360° Carbon Concluída — Pronto para Produção 26/11 + Roadmap v2.9.0/Maria 2.0)
+
+- **Fonte Única de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md), [`docs/CONTINUATION_UPDATE_2026-11-24.md`](CONTINUATION_UPDATE_2026-11-24.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
+- **App Android `v2.8.2 (vc 34)` (Tag `v2.8.2-carbon-baseline` em `cd0a661` / HEAD `6fd8020`, CI `Run 45342358085` + `45343870292` 100% verdes):** AAB assinado **`7,26 MB`** (`7.263.824 bytes`, SHA-256 `5151aa51ac753efb78427d90591d6faaa13d7bdc16038642cda2704f017634f1` em `.tmp/qa/v282-carbon-aab/app-release.aab`) auditado via `bundletool` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, zero `ACTION_SEND`, `631/631` strings válidas nos 14 idiomas) e validado ao vivo em retrato no **Motorola Moto G84 5G (`0085353748`)** (`PT-BR` e `EN-US`).
+- **Google Play Console (Dia 12/14 • Abertura de Produção Quinta 26/11):** `internal`/`alpha` intactos em `v2.8.0 (vc 32)` com **23 testadores preservados**; **14/14 fichas da loja** atualizadas ao vivo (`Edit 15816757970827593747`, `HTTP 200`: `< 8 MB`, correção `bn-BD`, `phoneScreenshots: 4` `1080x1920`, `featureGraphic: 1` `1024x500`, `icon: 1`). **0 bloqueios P0.**
+- **Supabase & Políticas Web:** `play_console_sync_state` + `get_prelaunch_stats()` corrigidos com relógio dinâmico BRT (`23 testadores`, `Dia 12 de 14`); `/privacidade.html` e `/privacy.html` limpas e publicadas no Firebase (`Release 1795515742674000`, `HTTP 200`, `srodolfobarbosa@gmail.com`).
+- **Score de Prontidão Comercial (`node scripts/goal-growth-engine.mjs`):** **`75/100`** (únicos 25 pontos = clicar em *"Solicitar a produção"* na quinta `26/11`). Evoluções `v2.9.0` e **Maria 2.0** organizadas sob o Protocolo Catraca em [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md).
+
+---
 
 ## Checkpoint Oficial Verificado Ao Vivo — 2026-11-23 (Visão Sistêmica Integrada — v2.8.2 vc 34 Pronta para QA USB & Produção 26/11)
 

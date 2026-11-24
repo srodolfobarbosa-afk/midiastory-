@@ -1,3 +1,5 @@
+> 🧭 **Índice Central Atualizado (2026-11-24):** [docs/INDICE_MESTRE.md](docs/INDICE_MESTRE.md)
+
 # 🏛️ CONTEXTO MESTRE & DIRETRIZ EXECUTIVA DE AUTONOMIA — MIDIASTORE
 
 > **Atualização de direção (2026-11-20):** para o objetivo vigente, prioridades de mercado, mandato dos agentes e padrão de memória, consulte [`docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md`](docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md). Este arquivo também contém contexto histórico; dados operacionais e propostas antigas não prevalecem sobre `AGENTS.md`, decisões recentes do proprietário ou fontes atuais verificadas. A direção de produto aprovada é limpador puro nas abas Limpar/Arquivos/Pro.

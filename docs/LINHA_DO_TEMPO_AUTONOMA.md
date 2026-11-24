@@ -1,4 +1,5 @@
 # 📜 Linha do Tempo Autônoma do Ecossistema Midiastore
+> 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md)
 
 Este documento registra a evolução contínua, os experimentos, erros e correções em conformidade com a Regra de Ouro.
 
@@ -3238,5 +3239,15 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - **🔧 Como Corrigiu:** Atualizado STT_MODELS com gemini-3-flash-preview + gemini-3.6-flash (HTTP 200), commit cd0a661 verde nos 2 workflows CI/AAB, deploy Firebase e Supabase Edge v5 concluidos e QA retrato validado no Moto G84 (zero erros logcat, zero MANAGE_EXTERNAL_STORAGE/AD_ID/ACTION_SEND no bundletool)
 - **🎯 Conclusão:** Ecossistema inteiro (Pilar 1 Midiastore v2.8.2 vc 34 + Pilar 2 FRIDAY/Maria) sincronizado, limpo e validado ao vivo para abertura de Producao em 26/11 rumo a R$ 1.000.000,00.
 - *Registro Supabase:* Memory #545
+
+---
+
+### 📍 [24/11/2026, 07:47:54] Auditoria 360 Carbon + Store Presence 14 Idiomas (56 Screenshots + 14 Feature Graphics) + Correcao Relogio Supabase + Privacidade PT/EN + Checklist Evolucao v2.9.0/Maria 2.0
+- **📖 Estudou / Leu:** docs/CONTINUATION_HANDOFF.md, Memoria #545, Play Console API v3 (14 listings/images), Supabase play_console_sync_state/get_prelaunch_stats, docs/privacidade.html, MainActivity.kt (361KB), MariaAssistantBanner.kt e friday-core/avatar-3d
+- **⚙️ Tentou / Executou:** Auditar gargalos ocultos pre-Producao 26/11, corrigir relogio congelado no Supabase, limpar privacidade.html, gerar e subir 56 screenshots v2.8.2 + 14 featureGraphic 1024x500 + corrigir bn-BD na Play Console, travar tag v2.8.2-carbon-baseline e estruturar Checklist Mestra Carbon
+- **⚠️ Erros Encontrados:** 1. play_console_sync_state congelado em Dia 2/12 testadores desde 15/11; 2. privacidade.html ainda citava Estudio removido; 3. 6 idiomas na Play Console tinham featureGraphic=0, bn-BD continha palavra cirilica e screenshots base eram de 18/11
+- **🔧 Como Corrigiu:** 1. Coluna closed_test_started_at + calculo dinamico BRT (Dia 12/14, 23 testadores); 2. Deploy Firebase Release 1795515742674000 (HTTP 200, zero Estudio, email visivel); 3. Upload Play Console Edit 15816757970827593747 HTTP 200 (14/14 idiomas completos com 4 screenshots + featureGraphic + icon)
+- **🎯 Conclusão:** Fase 0 100% blindada para abertura de Producao em 26/11 sem risco aos 23 testadores; baseline v2.8.2-carbon-baseline travada no Git e Roadmap v2.9.0 + Maria 2.0 consolidado em docs/CHECKLIST_EVOLUCAO_CARBON.md.
+- *Registro Supabase:* Memory #546
 
 ---

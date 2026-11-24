@@ -1,5 +1,7 @@
 # Bloqueadores de release — Midiastore
 
+> ⚠️ **AVISO DE ATUALIZAÇÃO (`2026-11-24`):** Este arquivo preserva o histórico de auditoria de bloqueadores iniciais (`v2.2.1` a `v2.4.0`). O status **ao vivo atual (`v2.8.2 • vc 34`, 0 bloqueios P0 para abertura de Produção em `26/11`)** está em [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md), [**`docs/CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) e [**`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`**](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
+
 ## Atualização verificada — 2026-11-14
 
 - **Build e Play Console atuais:** `versionCode 21` / `versionName 2.4.0` publicados em `internal` e `alpha` (`com.rdf112.midiastore`). Os 3 produtos Billing (`sweep_pro_monthly`, `sweep_pro_annual`, `sweep_pro_lifetime`) estão **ACTIVE** na Google Play Developer API v3 (`BR R$ 14,99/mês`, `R$ 79,99/ano`, `R$ 149,99` vitalício).

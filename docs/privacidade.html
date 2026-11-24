@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Política de Privacidade oficial do Midiastore (com.rdf112.midiastore): limpeza 100% local via Scoped Storage, zero upload de fotos/vídeos e validação segura via Google Play Billing." />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Política de Privacidade e Segurança de Dados oficial do Midiastore (com.rdf112.midiastore): limpador de armazenamento 100% local via Scoped Storage, zero upload de fotos/vídeos, zero MANAGE_EXTERNAL_STORAGE, zero ID de Publicidade e validação segura via Google Play Billing." />
   <title>Política de Privacidade — Midiastore (com.rdf112.midiastore)</title>
+  <link rel="icon" type="image/png" href="/icon-512.png" />
   <link rel="canonical" href="https://midiastory-df6a0.web.app/privacidade.html" />
+  <link rel="alternate" hreflang="pt-BR" href="https://midiastory-df6a0.web.app/privacidade.html" />
+  <link rel="alternate" hreflang="en" href="https://midiastory-df6a0.web.app/privacy.html" />
+  <link rel="alternate" hreflang="x-default" href="https://midiastory-df6a0.web.app/privacy.html" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -14,13 +19,15 @@
         "@type": "WebPage",
         "name": "Política de Privacidade — Midiastore",
         "url": "https://midiastory-df6a0.web.app/privacidade.html",
-        "description": "Política de Privacidade oficial do Midiastore (com.rdf112.midiastore): limpeza 100% local via Scoped Storage, zero upload de fotos/vídeos e validação segura via Google Play Billing."
+        "inLanguage": "pt-BR",
+        "description": "Política de Privacidade oficial do Midiastore (com.rdf112.midiastore): limpeza 100% local via Scoped Storage, zero upload de fotos/vídeos, zero MANAGE_EXTERNAL_STORAGE, zero Advertising ID e validação segura via Google Play Billing."
       },
       {
         "@type": "SoftwareApplication",
         "name": "Midiastore",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Android 10+",
+        "softwareVersion": "2.8.2",
         "url": "https://midiastory-df6a0.web.app/",
         "offers": {
           "@type": "Offer",
@@ -32,78 +39,182 @@
   }
   </script>
   <style>
-    :root { --bg:#090b10; --card:#131722; --text:#e8edf5; --muted:#9aa6bc; --accent:#2ee59d; --border:#252c3d; }
-    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; }
-    main { max-width:860px; margin:0 auto; padding:32px 20px 64px; }
-    header { border-bottom:1px solid var(--border); padding-bottom:20px; margin-bottom:28px; }
-    h1 { margin:0 0 8px; font-size:1.85rem; }
-    h2 { margin-top:28px; font-size:1.2rem; color:var(--accent); }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin:16px 0; }
-    .muted { color:var(--muted); font-size:0.95rem; }
-    a { color:var(--accent); }
-    ul { padding-left:20px; }
-    li { margin:8px 0; }
+    :root {
+      --bg: #000000;
+      --card: #1C1C1E;
+      --border: #2C2C2E;
+      --text: #F5F5F7;
+      --muted: #98989D;
+      --accent: #0A84FF;
+      --ok: #30D158;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 36px 20px 72px;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 22px;
+      margin-bottom: 28px;
+    }
+    h1 {
+      margin: 8px 0 10px;
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      margin: 0 0 10px;
+      font-size: 1.18rem;
+      color: var(--accent);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin: 16px 0;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(48, 209, 88, 0.12);
+      color: var(--ok);
+      border: 1px solid rgba(48, 209, 88, 0.38);
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    code {
+      background: #111114;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+    ul {
+      padding-left: 20px;
+      margin: 10px 0 0;
+    }
+    li {
+      margin: 8px 0;
+    }
+    footer {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
   <main>
     <header>
-      <p class="muted"><a href="/">← Voltar para Midiastore</a> · <a href="/en/">English Funil</a></p>
-      <h1>Política de Privacidade / Privacy Policy</h1>
+      <p class="muted"><a href="/">← Voltar para Midiastore (PT-BR)</a> · <a href="/en/">English Home</a> · <a href="/privacy.html">English Privacy Policy</a></p>
+      <h1>Política de Privacidade e Segurança de Dados</h1>
       <p class="muted"><strong>Aplicativo:</strong> Midiastore (<code>com.rdf112.midiastore</code>) · <strong>Site oficial:</strong> <a href="https://midiastory-df6a0.web.app/">midiastory-df6a0.web.app</a></p>
-      <p class="muted">Última atualização / Last updated: 2026-11-14</p>
+      <p class="muted">Vigência e última atualização: 24 de novembro de 2026</p>
+      <div class="badges" aria-label="Resumo de Privacidade">
+        <span class="badge">100% Local (Scoped Storage)</span>
+        <span class="badge">Zero Upload de Fotos e Vídeos</span>
+        <span class="badge">Zero MANAGE_EXTERNAL_STORAGE</span>
+        <span class="badge">Zero ID de Publicidade (AD_ID)</span>
+      </div>
     </header>
 
-    <div class="card">
-      <h2>🇧🇷 Português (Brasil) — Resumo e Transparência Total</h2>
-      <p>O <strong>Midiastore</strong> foi projetado para analisar e organizar mídias localmente no seu dispositivo Android, com privacidade por padrão e controle explícito do usuário antes de qualquer exclusão ou modificação.</p>
+    <section class="card">
+      <h2>1. Compromisso Central de Privacidade</h2>
+      <p>O <strong>Midiastore</strong> (<code>com.rdf112.midiastore</code>) é um limpador puro de armazenamento para Android construído com privacidade por padrão. Suas fotos pessoais, vídeos, áudios, capturas de tela e miniaturas permanecem estritamente no seu aparelho Android e <strong>nunca</strong> são enviados, copiados ou transmitidos para servidores externos.</p>
+    </section>
 
-      <h3>1. Acesso a Mídias (MediaStore / Scoped Storage)</h3>
+    <section class="card">
+      <h2>2. Acesso Local a Mídias (Android MediaStore &amp; Scoped Storage)</h2>
       <ul>
-        <li>O aplicativo acessa apenas fotos, vídeos e áudios que você autorizar via permissões granulares do Android (<code>READ_MEDIA_IMAGES</code>, <code>READ_MEDIA_VIDEO</code>, <code>READ_MEDIA_AUDIO</code>, <code>READ_MEDIA_VISUAL_USER_SELECTED</code> no Android 14+ ou <code>READ_EXTERNAL_STORAGE</code> em versões anteriores).</li>
-        <li>O Midiastore <strong>não</strong> solicita <code>MANAGE_EXTERNAL_STORAGE</code>.</li>
-        <li>A leitura de tamanhos, datas e cálculo criptográfico <strong>SHA-256</strong> para detectar cópias exatas acontece 100% localmente no aparelho. Arquivos de mídia e miniaturas <strong>nunca</strong> são enviados aos nossos servidores.</li>
-        <li>Nenhuma exclusão ou envio à Lixeira ocorre automaticamente: o aplicativo revalida os itens escolhidos e solicita confirmação oficial do sistema Android antes de mover para a Lixeira ou excluir permanentemente.</li>
+        <li><strong>Apenas Permissões Granulares:</strong> O aplicativo acessa somente as categorias de mídia que você autorizar pelas permissões oficiais do Android (<code>READ_MEDIA_IMAGES</code>, <code>READ_MEDIA_VIDEO</code>, <code>READ_MEDIA_AUDIO</code>, <code>READ_MEDIA_VISUAL_USER_SELECTED</code> no Android 14+, ou <code>READ_EXTERNAL_STORAGE</code> no Android 10 a 12).</li>
+        <li><strong>Zero Acesso Amplo a Todos os Arquivos:</strong> O Midiastore <strong>não</strong> declara nem solicita a permissão <code>MANAGE_EXTERNAL_STORAGE</code>.</li>
+        <li><strong>Processamento 100% On-Device:</strong> O cálculo criptográfico em streaming <strong>SHA-256</strong> para detectar duplicatas exatas, a localização de vídeos grandes (&gt;10 MB), o filtro de mídias e capturas antigas (+30 dias) e o diagnóstico local de fotos borradas rodam integralmente no processador e na memória do seu telefone.</li>
+        <li><strong>Zero Exclusão Automática:</strong> Nenhum arquivo é apagado em segundo plano. Toda ação de mover para a Lixeira ou excluir definitivamente revalida os itens marcados e exige sua confirmação explícita no diálogo oficial do sistema Android (<code>MediaStore.createTrashRequest</code> / <code>MediaStore.createDeleteRequest</code> ou <code>RecoverableSecurityException</code> no Android 10).</li>
       </ul>
+    </section>
 
-      <h3>2. Ferramentas Locais do Estúdio de Mídia</h3>
+    <section class="card">
+      <h2>3. Acesso Opcional ao Uso de Aplicativos (<code>PACKAGE_USAGE_STATS</code>)</h2>
       <ul>
-        <li>Os recursos do Estúdio (filtros em fotos, extração de faixa de áudio para M4A, remoção de metadados GPS EXIF, geração de QR Code e conversão de fotos para PDF A4) são executados integralmente no dispositivo. Os arquivos resultantes são salvos localmente ou compartilhados somente quando você aciona a ação de exportação do Android.</li>
+        <li><strong>Divulgação em Destaque (Prominent Disclosure):</strong> O recurso opcional Pro "Apps sem Uso" (que destaca aplicativos instalados pelo usuário sem abertura nos últimos 90 dias) vem desativado por padrão e apresenta um aviso explícito de <strong>Divulgação em Destaque</strong> antes de redirecionar às Configurações do Android.</li>
+        <li><strong>Estritamente Local e Efêmero:</strong> Os horários de último uso consultados via <code>UsageStatsManager</code> são avaliados exclusivamente na memória local do aparelho para exibir sugestões de revisão a você. Listas de aplicativos instalados e estatísticas de uso <strong>nunca</strong> são coletadas, enviadas à nuvem ou compartilhadas com terceiros.</li>
       </ul>
+    </section>
 
-      <h3>3. Acesso ao Uso de Aplicativos (<code>PACKAGE_USAGE_STATS</code>)</h3>
+    <section class="card">
+      <h2>4. Zero ID de Publicidade (<code>AD_ID</code>) e Zero Rastreadores de Anúncios</h2>
       <ul>
-        <li>Utilizado exclusivamente de forma opcional, mediante <strong>Divulgação em Destaque (Prominent Disclosure)</strong> e consentimento prévio explícito no app, para identificar aplicativos sem abertura nos últimos 90 dias.</li>
-        <li>Os timestamps consultados permanecem apenas na memória local do aparelho e nunca são coletados, armazenados em nuvem ou compartilhados com terceiros.</li>
+        <li>O Midiastore <strong>não contém SDKs de anúncios de terceiros</strong>, <strong>não</strong> solicita <code>com.google.android.gms.permission.AD_ID</code> e não realiza rastreamento entre aplicativos nem criação de perfil comportamental.</li>
+        <li>Nunca vendemos, alugamos ou compartilhamos dados de usuários com corretores de dados ou redes publicitárias.</li>
       </ul>
+    </section>
 
-      <h3>4. Compras no App e Assinaturas (Google Play Billing)</h3>
+    <section class="card">
+      <h2>5. Compras no App e Assinaturas (Google Play Billing)</h2>
       <ul>
-        <li>As assinaturas Pro (Mensal e Anual) e a compra única (Vitalício) são processadas exclusivamente pela <strong>Google Play Store</strong>.</li>
-        <li>Para validar direitos de acesso contra fraudes, nosso servidor de validação (Supabase Edge Function) verifica o identificador de compra junto à Google Play Developer API e armazena apenas registros técnicos mínimos de auditoria (<code>package_name</code>, <code>product_id</code>, <code>order_id</code>, estado da assinatura/compra e hash <strong>SHA-256</strong> irreversível do <code>purchase_token</code>, sem armazenar o token bruto nem dados bancários).</li>
+        <li>Todos os planos Midiastore Pro — Mensal (<code>sweep_pro_monthly</code>), Anual (<code>sweep_pro_annual</code>) e Vitalício em pagamento único (<code>sweep_pro_lifetime</code>) — são cobrados e processados exclusivamente pelo <strong>Google Play Billing</strong>. O Midiastore nunca acessa nem armazena dados de cartão de crédito, conta bancária ou endereço de cobrança.</li>
+        <li><strong>Validação Antifraude Server-Side:</strong> Para validar direitos Pro com precisão e processar renovações ou cancelamentos, nosso endpoint HTTPS (Supabase Edge Functions) consulta o status oficial da compra na <strong>Google Play Developer API v3</strong> e armazena apenas metadados técnicos mínimos de auditoria: <code>package_name</code>, <code>product_id</code>, <code>order_id</code>, estado da assinatura/compra, data de expiração e um <strong>hash criptográfico SHA-256 irreversível</strong> do <code>purchase_token</code> (nunca o token bruto). Todo o tráfego é criptografado em trânsito via TLS/HTTPS.</li>
       </ul>
+    </section>
 
-      <h3>5. Inscrição Opcional no Teste Fechado e Contagem Anônima de Visitas (Site Web)</h3>
+    <section class="card">
+      <h2>6. Lista Opcional de Acesso Antecipado e Telemetria Agregada Anônima</h2>
       <ul>
-        <li>Se você informar voluntariamente seu e-mail Gmail no formulário de acesso antecipado em <a href="/#vip-testers">midiastory-df6a0.web.app</a>, o endereço é salvo exclusivamente para envio/gerenciamento do convite oficial do Teste Fechado e fila de lançamento na Google Play Console.</li>
-        <li>O site também registra métricas agregadas estritamente anônimas de visitação (caminho da página, idioma, parâmetro UTM da campanha, host de referência e um identificador anônimo aleatório local no navegador), sem anúncios, sem cookies de rastreamento de terceiros e sem identificação pessoal de visitantes.</li>
+        <li><strong>Inscrição Opcional no Site:</strong> Caso você informe voluntariamente seu endereço Gmail em <a href="https://midiastory-df6a0.web.app/#vip-testers">midiastory-df6a0.web.app</a>, o e-mail é armazenado exclusivamente para autorizar seu convite oficial de testes e avisos de lançamento na Google Play Store.</li>
+        <li><strong>Diagnóstico Anônimo:</strong> Para medir a estabilidade do funil sem invadir sua privacidade, o site e o app registram apenas contadores operacionais estritamente anônimos (versão do app, idioma, etapa do funil, parâmetro UTM e um identificador aleatório não associável à sua identidade pessoal), jamais contendo nomes de arquivos, caminhos de mídia ou identificadores de hardware.</li>
       </ul>
+    </section>
 
-      <h3>6. Contato e Solicitação de Exclusão de Dados</h3>
-      <p>Para dúvidas de privacidade ou remoção de e-mail cadastrado no programa de testes fechados, utilize o canal de contato do desenvolvedor listado na página oficial do aplicativo na Google Play Store (<code>com.rdf112.midiastore</code>).</p>
-    </div>
-
-    <div class="card">
-      <h2>🇺🇸 English — Privacy &amp; Data Safety Disclosure</h2>
-      <p><strong>Midiastore</strong> (<code>com.rdf112.midiastore</code>) performs media analysis and cleanup preparation locally on your Android device.</p>
+    <section class="card">
+      <h2>7. Controles do Usuário, Retenção e Contato de Privacidade</h2>
       <ul>
-        <li><strong>On-Device Media Access:</strong> Uses standard Android MediaStore granular permissions (no <code>MANAGE_EXTERNAL_STORAGE</code>). Exact-duplicate SHA-256 hashing, large/old file scanning, and Media Studio tools (Photo Filters, M4A Audio Extractor, EXIF GPS Remover, QR Generator, Photos-to-PDF) run 100% locally on your phone. Your media files are never uploaded.</li>
-        <li><strong>App Usage Access (<code>PACKAGE_USAGE_STATS</code>):</strong> Optional Pro feature gated by an explicit in-app Prominent Disclosure modal and user consent. Used solely on-device to suggest apps not opened in 90+ days; usage timestamps are never transmitted or shared.</li>
-        <li><strong>Google Play Billing Validation:</strong> In-app purchases and subscriptions are processed by Google Play. Our verification endpoint validates purchase status with the Google Play Developer API and stores only minimal entitlement audit metadata (product ID, order ID, purchase/subscription state, and an irreversible SHA-256 hash of the purchase token — never raw payment details).</li>
-        <li><strong>Optional Closed-Test Signup &amp; Aggregate Web Counters:</strong> Gmail addresses voluntarily submitted via the landing page opt-in form are used strictly for Google Play closed-testing and launch waitlist access. Our website logs strictly anonymized aggregate page-view and UTM counters (using a random first-party local ID with zero third-party ad trackers or PII).</li>
-        <li><strong>Contact &amp; Deletion Requests:</strong> Contact the developer via the official Google Play Store listing for <code>com.rdf112.midiastore</code> to request removal of closed-test signup data.</li>
+        <li><strong>Controle Direto no Aparelho:</strong> Você pode revogar permissões de mídia ou de Acesso de Uso a qualquer momento nas Configurações do Android, limpar os dados locais do aplicativo e gerenciar ou cancelar assinaturas diretamente em <em>Google Play Store → Pagamentos e assinaturas</em>.</li>
+        <li><strong>Solicitação de Exclusão de Dados e Contato Oficial:</strong> Para solicitar a remoção imediata de um e-mail informado voluntariamente na lista de acesso antecipado ou esclarecer qualquer dúvida sobre privacidade e segurança de dados, entre em contato diretamente com o desenvolvedor pelo e-mail oficial <a href="mailto:srodolfobarbosa@gmail.com">srodolfobarbosa@gmail.com</a> (também publicado na página oficial do aplicativo <code>com.rdf112.midiastore</code> na Google Play Store). Hashes anônimos de auditoria de compras exigidos para prevenção a fraudes e obrigações fiscais são retidos apenas pelo prazo legal aplicável, sem vínculo com sua identidade pessoal.</li>
       </ul>
-    </div>
+    </section>
+
+    <footer>
+      <div>&copy; 2026 Midiastore (<code>com.rdf112.midiastore</code>). Todos os direitos reservados.</div>
+      <div>
+        <a href="/">Página Inicial</a> ·
+        <a href="/privacy.html">English Privacy Policy</a> ·
+        <a href="mailto:srodolfobarbosa@gmail.com">srodolfobarbosa@gmail.com</a>
+      </div>
+    </footer>
   </main>
 </body>
 </html>

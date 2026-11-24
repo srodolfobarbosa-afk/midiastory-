@@ -81,7 +81,21 @@ export async function deploySite() {
   }
 
   function getDocsFiles(dir, baseDir = "") {
-    const EXCLUDED_DIRS = new Set(["campaigns", "datasets", "store", "reports", "audit", "ebook"]);
+    const EXCLUDED_DIRS = new Set([
+      "archive",
+      "aso",
+      "audit",
+      "audits",
+      "campaigns",
+      "datasets",
+      "ebook",
+      "ebook-en",
+      "knowledge",
+      "mockups",
+      "reports",
+      "research",
+      "store",
+    ]);
     const EXCLUDED_ROOT_FILES = new Set(["painel.html", "terminal.html", "ferramentas.html", "livros.html"]);
     const ALLOWED_EXTS = new Set([".html", ".xml", ".css", ".js", ".png", ".jpg", ".jpeg", ".svg", ".webp", ".ico"]);
     const ALLOWED_ROOT_FILES = new Set(["robots.txt", "llms.txt", "live-activity.json", "ab-config.json", "a9f4c2e8b1d740369e5a8c2f1b4d7e90.txt"]);

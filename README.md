@@ -140,3 +140,12 @@ A successful Debug build or an emulator run does not make the app production-rea
 ## Trust, privacy and store-readiness requirements
 
 The product guardrails, audit-report requirements, permission principles and current CI evidence are maintained in [`docs/PRODUCT_TRUST_AND_PRIVACY.md`](docs/PRODUCT_TRUST_AND_PRIVACY.md). Treat this as an engineering gate, not a claim that Play review or release readiness has been achieved.
+
+## Official Android Storage Guides (Global)
+
+- [All Storage Guides (48 pages — PT-BR, EN-US, ES-419, HI-IN)](https://midiastory-df6a0.web.app/guides/)
+- [WhatsApp Storage Full Without Losing Photos (EN)](https://midiastory-df6a0.web.app/guides/en-us/whatsapp-storage-full/) · [(PT-BR)](https://midiastory-df6a0.web.app/guides/pt-br/whatsapp-storage-full/)
+- [Remove Duplicate Photos on Android With SHA-256 (EN)](https://midiastory-df6a0.web.app/guides/en-us/remove-duplicate-photos-android/) · [(PT-BR)](https://midiastory-df6a0.web.app/guides/pt-br/remove-duplicate-photos-android/)
+- [Samsung Galaxy / Motorola / Xiaomi Storage Full Fixes](https://midiastory-df6a0.web.app/guides/en-us/samsung-galaxy-storage-full/)
+- [Google Play Store — Midiastore (`com.rdf112.midiastore`)](https://play.google.com/store/apps/details?id=com.rdf112.midiastore)
+
