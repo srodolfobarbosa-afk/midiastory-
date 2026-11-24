@@ -1,6 +1,6 @@
 # 🚀 CHECKLIST MESTRA UNIFICADA — SUPER PACOTE `v2.9.0 BIG-TECH` ("TUDO DE UMA VEZ")
 > 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`AGENTS.md`**](../AGENTS.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`**](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md) · [**`LINHA_DO_TEMPO_AUTONOMA.md`**](LINHA_DO_TEMPO_AUTONOMA.md)
-**Atualizada em:** `2026-11-24 10:06 BRT` | **Motor:** Gemini 4 Carbon | **Branch Isolada:** `feat/v2.9.0-motor-app` | **Baseline Protegida (26/11):** `tag v2.8.2-carbon-baseline`
+**Atualizada em:** `2026-11-24 19:01 BRT` | **Motor:** Gemini 4 Carbon | **Branch Isolada:** `feat/v2.9.0-motor-app` (`CI Run 45496347206` 100% verde) | **Baseline Protegida (26/11):** `tag v2.8.2-carbon-baseline`
 
 ---
 

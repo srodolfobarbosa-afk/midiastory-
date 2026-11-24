@@ -3281,3 +3281,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #553
 
 ---
+
+### 📍 [24/11/2026, 19:01:22] Concluida Etapa 2 do Super Pacote v2.9.0 na branch feat/v2.9.0-motor-app (Blocos 1, 2, 3 e 6 + 288/288 strings nos 14 idiomas) com CI Run 45496347206 100% verde
+- **📖 Estudou / Leu:** AndroidSimilarPhotoScanner.kt, CleanerHomeScreen.kt, MariaAssistantBanner.kt, InAppReviewCoordinator.kt, MediaCodec/MediaExtractor/MediaMuxer EGL Surface zero-copy e ci-cd-governance-audit.mjs
+- **⚙️ Tentou / Executou:** Implementar UI Fotos Parecidas IA com selo MELHOR FOTO PROTEGIDA, Preview Tela Cheia OLED (pinch-zoom + VideoView), Compressor de Video H.265 GPU nativo sem bloat (<8 MB), selo vitalicio de GB na Home + InAppReview 5 estrelas (cooldown 7d) e paridade 288/288 chaves nos 14 idiomas
+- **⚠️ Erros Encontrados:** Run 45495870484 falhou apenas em :app:mergeDebugResources por apostrofos franceses sem barra invertida em values-fr/strings.xml
+- **🔧 Como Corrigiu:** Escapados apostrofos franceses (\\') e setas Unicode em sync-etapa2-strings.mjs, adicionada validacao AAPT2 no ci-cd-governance-audit.mjs e validado 100% verde na Run 45496347206 (commit 667be1f)
+- **🎯 Conclusão:** Blocos 1 a 7 de CHECKLIST_EVOLUCAO_CARBON.md 100% implementados e verdes no Cloud CI com tag v2.8.2-carbon-baseline (cd0a661) e Maria atual 100% intocadas; pronta Etapa 3 (Bloco 8: APK .debug lado a lado no Moto G84 0085353748)
+- *Registro Supabase:* Memory #554
+
+---
