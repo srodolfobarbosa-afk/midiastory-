@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="ja-JP">
+<html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#000000">
-  <title>Midiastore — 軽量7.2 MB Androidストレージ整理＆SHA-256重複ファイル検出</title>
-  <meta name="description" content="実サムネイル確認と2タップでAndroidの空き容量を安全に確保：大容量動画（10MB以上）、古いメディア（30日以上）、厳密なSHA-256重複検出。100%端末内処理。">
-  <meta name="keywords" content="Android ストレージ 整理, 重複写真 削除 SHA-256, 容量不足 解消 アプリ 軽量 7.2 MB, midiastore">
+  <title>Midiastore — 高精度オンデバイス Android ストレージ整理 (&lt; 8 MB)</title>
+  <meta name="description" content="Androidの空き容量を精密に確保：大容量動画（&gt;10MB）や厳密なSHA-256重複ファイルを端末内で安全に検出。広告ゼロ・クラウド送信ゼロ。">
   <meta name="robots" content="index,follow">
-  <link rel="icon" type="image/png" href="/icon-512.png">
+  <link rel="icon" type="image/png" href="/icon-512.png?v=ring1">
+  <link rel="apple-touch-icon" href="/icon-512.png?v=ring1">
   <link rel="canonical" href="https://midiastory-df6a0.web.app/ja/">
   <link rel="alternate" hreflang="pt-BR" href="https://midiastory-df6a0.web.app/">
   <link rel="alternate" hreflang="en" href="https://midiastory-df6a0.web.app/en/">
@@ -25,561 +25,293 @@
   <link rel="alternate" hreflang="zh-CN" href="https://midiastory-df6a0.web.app/zh/">
   <link rel="alternate" hreflang="x-default" href="https://midiastory-df6a0.web.app/en/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Midiastore — 軽量7.2 MB Androidストレージ整理＆SHA-256重複ファイル検出">
-  <meta property="og:description" content="実サムネイル確認と2タップでAndroidの空き容量を安全に確保：大容量動画（10MB以上）、古いメディア（30日以上）、厳密なSHA-256重複検出。100%端末内処理。">
+  <meta property="og:title" content="Midiastore — 高精度オンデバイス Android ストレージ整理 (&lt; 8 MB)">
+  <meta property="og:description" content="Androidの空き容量を精密に確保：大容量動画（&gt;10MB）や厳密なSHA-256重複ファイルを端末内で安全に検出。広告ゼロ・クラウド送信ゼロ。">
   <meta property="og:url" content="https://midiastory-df6a0.web.app/ja/">
-  <meta property="og:image" content="https://midiastory-df6a0.web.app/icon-512.png">
+  <meta property="og:image" content="https://midiastory-df6a0.web.app/og-banner.png?v=ring1">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Midiastore">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Midiastore — 軽量7.2 MB Androidストレージ整理＆SHA-256重複ファイル検出">
-  <meta name="twitter:description" content="実サムネイル確認と2タップでAndroidの空き容量を安全に確保：大容量動画（10MB以上）、古いメディア（30日以上）、厳密なSHA-256重複検出。100%端末内処理。">
-  <meta name="twitter:image" content="https://midiastory-df6a0.web.app/icon-512.png">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Midiastore","alternateName":"Midiastore — 軽量7.2 MB Androidストレージ整理＆SHA-256重複ファイル検出","operatingSystem":"Android 10+","applicationCategory":"UtilitiesApplication","inLanguage":"ja-JP","softwareVersion":"2.8.2","fileSize":"7.2 MB","url":"https://midiastory-df6a0.web.app/ja/","downloadUrl":"https://play.google.com/store/apps/details?id=com.rdf112.midiastore","installUrl":"https://play.google.com/apps/testing/com.rdf112.midiastore","description":"実サムネイル確認と2タップでAndroidの空き容量を安全に確保：大容量動画（10MB以上）、古いメディア（30日以上）、厳密なSHA-256重複検出。100%端末内処理。","keywords":"Android ストレージ 整理, 重複写真 削除 SHA-256, 容量不足 解消 アプリ 軽量 7.2 MB, midiastore","featureList":"1-Button 2-Tap Visual Cleanup, Exact SHA-256 Duplicate Finder, Large Video Cleaner (>10 MB), Old Media & Screenshots (+30 days), Blurry Photo Review, Unused Apps Finder (+90 days), Official Android Trash & Consent Flow, 100% On-Device Scoped Storage","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Midiastore","url":"https://midiastory-df6a0.web.app/","inLanguage":"ja-JP","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://midiastory-df6a0.web.app/ja/?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does Midiastore analyze storage 100% on-device without uploading photos?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every storage scan, real thumbnail preview, exact SHA-256 duplicate hash, large video check (>10 MB), old screenshot filter (+30 days), local blur check, and optional unused-app check runs 100% locally via Android Scoped Storage with zero cloud uploads."}},{"@type":"Question","name":"Does Midiastore keep one original file safe during duplicate cleanup?","acceptedAnswer":{"@type":"Answer","text":"Nothing is ever deleted automatically. Every removal requires the official Android system confirmation dialog, and exact SHA-256 duplicate groups always keep at least one original file unselected and protected."}}]}</script>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Midiastore — 高精度オンデバイス Android ストレージ整理 (&lt; 8 MB)">
+  <meta name="twitter:description" content="Androidの空き容量を精密に確保：大容量動画（&gt;10MB）や厳密なSHA-256重複ファイルを端末内で安全に検出。広告ゼロ・クラウド送信ゼロ。">
+  <meta name="twitter:image" content="https://midiastory-df6a0.web.app/og-banner.png?v=ring1">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Midiastore","operatingSystem":"Android 10+","applicationCategory":"UtilitiesApplication","inLanguage":"ja","softwareVersion":"2.8.2","fileSize":"7.2 MB","url":"https://midiastory-df6a0.web.app/ja/","downloadUrl":"https://play.google.com/store/apps/details?id=com.rdf112.midiastore","description":"Androidの空き容量を精密に確保：大容量動画（>10MB）や厳密なSHA-256重複ファイルを端末内で安全に検出。広告ゼロ・クラウド送信ゼロ。","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Midiastore","url":"https://midiastory-df6a0.web.app/ja/","inLanguage":"ja"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"写真や動画がクラウドに送信されることはありますか？","acceptedAnswer":{"@type":"Answer","text":"一切ありません。すべての解析とSHA-256計算は端末内（Scoped Storage）で完結します。"}},{"@type":"Question","name":"自動的にファイルが削除されることはありますか？","acceptedAnswer":{"@type":"Answer","text":"ありません。必ずプレビューを確認し、Android公式の確認画面で承認した項目のみ処理されます。"}}]}</script>
   <style>
-    :root{--bg:#000000;--card:#1C1C1E;--line:#2C2C2E;--text:#F5F5F7;--muted:#98989D;--mint:#0A84FF;--white:#fff;--max:980px}
+    :root{--bg:#000000;--surface:#141416;--card:#1C1C1E;--border:#2C2C2E;--text:#F5F5F7;--muted:#8E8E93;--blue:#0A84FF;--cyan:#5AC8FA;--green:#30D158;--max:1060px}
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
-    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
-    header{border-bottom:1px solid var(--line);background:rgba(7,17,31,0.92);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
-    .nav{display:flex;align-items:center;justify-content:space-between;min-height:64px;gap:12px;flex-wrap:wrap;padding:8px 0}
-    .brand{font-size:1.25rem;font-weight:900;letter-spacing:-.02em;text-decoration:none;color:var(--white)}
-    .brand span{color:var(--mint)}
-    .lang-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-    .lang-nav a{text-decoration:none;font-size:0.78rem;font-weight:700;color:var(--muted);padding:4px 8px;border-radius:6px;border:1px solid var(--line);transition:all .15s ease}
-    .lang-nav a:hover,.lang-nav a.active{color:var(--white);background:#1a2b42;border-color:var(--mint)}
-    .hero{padding:48px 0 24px;text-align:center}
-    .eyebrow{color:var(--mint);font-weight:700;font-size:0.88rem;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
-    h1{font-size:clamp(1.9rem,4.8vw,2.9rem);line-height:1.15;letter-spacing:-.03em;margin:0 0 16px}
-    h1 em{font-style:normal;color:var(--mint)}
-    .lead{font-size:1.1rem;color:var(--muted);max-width:640px;margin:0 auto 24px}
-    .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
-    .button{display:inline-flex;align-items:center;justify-content:center;background:var(--mint);color:#ffffff;font-weight:800;text-decoration:none;padding:12px 24px;border-radius:12px;min-height:48px;border:none;cursor:pointer;font-size:0.95rem;transition:transform .15s,box-shadow .15s}
-    .button:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(93,227,191,0.35)}
-    .button.secondary{background:transparent;color:var(--text);border:1px solid var(--line)}
-    .button.secondary:hover{border-color:var(--mint);color:var(--white)}
-    .note{font-size:0.84rem;color:var(--muted);margin-top:10px}
-    .pulse-strip{margin:20px auto 0;padding:12px 18px;max-width:740px;border:1px solid var(--line);border-radius:16px;background:rgba(15,29,49,0.78);display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;font-size:0.86rem}
-    .pulse-item{display:flex;align-items:center;gap:6px;color:var(--muted)}
-    .pulse-item strong{color:var(--mint);font-size:0.98rem;font-weight:900}
-    .share-row{margin-top:14px;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
-    .share-feedback{font-size:0.84rem;color:var(--mint);font-weight:700;display:none}
-    
-    .calculator-card{margin:36px auto;padding:32px 24px;border:1px solid #338d79;border-radius:24px;background:linear-gradient(135deg,#0c2331,#101e30 75%);text-align:center;max-width:680px;box-shadow:0 12px 36px rgba(0,0,0,0.4)}
-    .calculator-card h2{font-size:clamp(1.5rem,3.8vw,2.1rem);margin:8px 0 12px;letter-spacing:-.03em}
-    .calculator-card p{color:var(--muted);max-width:560px;margin:0 auto 20px}
-    .calc-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:20px}
-    .calc-control-group{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:240px;flex:1}
-    .calc-control-group label{font-size:0.86rem;color:var(--mint);font-weight:700}
-    .calc-select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:0.95rem;outline:none}
-    .calc-select:focus{border-color:var(--mint)}
-    .calc-result-box{background:rgba(93,227,191,0.06);padding:22px;border-radius:18px;border:1px dashed rgba(93,227,191,0.35);margin-top:10px}
-    .calc-result-label{font-size:0.85rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--mint);font-weight:800}
-    .calc-result-value{font-size:clamp(2.4rem,6vw,3.2rem);font-weight:900;color:var(--white);margin:4px 0}
-    .calc-result-value span{color:var(--mint)}
-    .calc-subtext{font-size:0.88rem;color:var(--muted);margin:0 auto 16px;max-width:480px}
-
-    .vip-testers{margin:40px auto 32px;padding:32px 24px;border:1px solid var(--mint);border-radius:24px;background:linear-gradient(135deg,#0c2331,#081729);text-align:center;max-width:860px;box-shadow:0 12px 40px rgba(93,227,191,0.15)}
-    .tester-badge{display:inline-block;padding:6px 12px;background:rgba(93,227,191,0.12);border:1px solid var(--mint);border-radius:20px;font-size:0.82rem;font-weight:800;color:var(--mint);margin-bottom:12px}
-    .vip-testers h2{font-size:clamp(1.4rem,3.6vw,1.9rem);margin:0 0 10px;letter-spacing:-.02em}
-    .vip-testers p{color:var(--muted);max-width:620px;margin:0 auto 20px;font-size:0.96rem}
-    .vip-testers p strong{color:var(--mint)}
-    .tester-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:540px;margin:0 auto}
-    .tester-input{flex:1;min-width:240px;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:0.95rem;outline:none}
-    .tester-input:focus{border-color:var(--mint)}
-    .feedback-msg{margin:14px auto 0;max-width:620px;padding:12px 16px;border-radius:12px;font-size:0.92rem;font-weight:700;display:none}
-    .feedback-msg.success{color:var(--mint);background:rgba(93,227,191,0.1);border:1px solid rgba(93,227,191,0.4);display:block}
-    .feedback-msg.error{color:#ff9b9b;background:rgba(255,117,117,0.1);border:1px solid rgba(255,117,117,0.35);display:block}
-
-    .onboarding-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:24px;text-align:left}
-    .onboarding-steps.highlighted .step-card{border-color:var(--mint);box-shadow:0 0 24px rgba(93,227,191,0.18)}
-    .step-card{background:rgba(7,17,31,0.78);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;transition:border-color .2s,box-shadow .2s}
-    .step-badge{display:inline-block;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:var(--mint);background:rgba(93,227,191,0.1);padding:4px 10px;border-radius:999px;width:fit-content}
-    .step-card h3{margin:6px 0 4px;font-size:1.05rem;color:var(--white)}
-    .step-card p{margin:0;font-size:0.86rem;color:var(--muted);line-height:1.45}
-    .step-btn{width:100%;min-height:42px;padding:10px 14px;font-size:0.86rem;border-radius:10px}
-    .step-note{margin:18px auto 0;max-width:720px;font-size:0.83rem;color:var(--muted);background:rgba(7,17,31,0.65);border:1px dashed var(--line);padding:10px 14px;border-radius:12px}
-
-    .section-title{font-size:1.6rem;letter-spacing:-.02em;margin:36px 0 16px}
-    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
-    .card .tag{display:inline-block;color:var(--mint);font-weight:800;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px}
-    .card h3{margin:0 0 8px;font-size:1.15rem}
-    .card p{margin:0;color:var(--muted);font-size:0.92rem}
-    .pro-box{margin:36px 0;border:1px solid var(--line);border-radius:20px;background:#0b192c;padding:32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
-    .pro-copy h2{margin:0 0 8px;font-size:1.45rem}
-    .pro-copy p{margin:0;color:var(--muted);max-width:560px}
-    footer{border-top:1px solid var(--line);padding:24px 0;margin-top:48px;font-size:0.85rem;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+    .wrap{width:min(var(--max),calc(100% - 36px));margin:0 auto}
+    header{position:sticky;top:0;z-index:40;background:rgba(0,0,0,0.84);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+    .nav{display:flex;align-items:center;justify-content:space-between;min-height:64px;gap:14px;padding:8px 0;flex-wrap:wrap}
+    .brand{display:inline-flex;align-items:center;gap:11px;text-decoration:none;color:var(--text);font-size:1.22rem;font-weight:700;letter-spacing:-.03em}
+    .brand span{color:var(--blue)}
+    .lang-nav{display:flex;gap:5px;align-items:center;overflow-x:auto;max-width:100%;scrollbar-width:none}
+    .lang-nav::-webkit-scrollbar{display:none}
+    .lang-nav a{text-decoration:none;font-size:.74rem;font-weight:600;color:var(--muted);padding:5px 8px;border-radius:8px;border:1px solid transparent;transition:all .15s}
+    .lang-nav a:hover,.lang-nav a.active{color:#fff;background:var(--card);border-color:var(--border)}
+    .social-banner{display:none;margin:18px 0 0;padding:11px 16px;border-radius:14px;background:rgba(10,132,255,0.14);border:1px solid rgba(10,132,255,0.45);color:#fff;font-size:.88rem;font-weight:600;text-align:center}
+    .hero{padding:52px 0 40px;display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+    .eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+    h1{font-size:clamp(2.15rem,4.8vw,3.55rem);line-height:1.06;letter-spacing:-.04em;margin:0 0 18px;font-weight:800}
+    .lead{font-size:1.08rem;color:var(--muted);margin:0 0 28px;max-width:540px}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .btn-primary{display:inline-flex;align-items:center;justify-content:center;background:var(--blue);color:#fff;font-weight:700;font-size:1.02rem;padding:16px 30px;border-radius:14px;text-decoration:none;min-height:54px;border:none;cursor:pointer;box-shadow:0 12px 32px rgba(10,132,255,0.34);transition:transform .15s,background .15s}
+    .btn-primary:hover{transform:translateY(-1px);background:#198BFF}
+    .btn-secondary{display:inline-flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text);font-weight:600;font-size:.95rem;padding:15px 22px;border-radius:14px;text-decoration:none;min-height:54px;border:1px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--blue)}
+    .pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+    .pill{font-size:.79rem;font-weight:600;color:#E5E5EA;background:var(--surface);border:1px solid var(--border);padding:7px 13px;border-radius:999px}
+    .phone-shell{max-width:340px;width:100%;margin:0 auto;background:#0C0C0E;border:1.5px solid var(--border);border-radius:38px;padding:18px;box-shadow:0 24px 64px rgba(0,0,0,0.85)}
+    .p-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:11px;text-align:start}
+    .p-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+    .p-metric{font-size:2.05rem;font-weight:800;letter-spacing:-.03em;margin:4px 0}
+    .p-sub{font-size:.8rem;color:var(--muted)}
+    .seg-bar{height:7px;background:#2C2C2E;border-radius:999px;display:flex;overflow:hidden;margin:14px 0 16px}
+    .p-btn{display:block;background:var(--blue);color:#fff;text-decoration:none;text-align:center;padding:11px;border-radius:12px;font-weight:700;font-size:.88rem}
+    .p-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .bento{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:24px 0 56px}
+    .bento-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:26px}
+    .bento-card h3{margin:0 0 8px;font-size:1.14rem;letter-spacing:-.02em}
+    .bento-card p{margin:0;color:var(--muted);font-size:.93rem;line-height:1.55}
+    .sec-head{margin:0 0 22px}
+    .sec-head h2{font-size:clamp(1.55rem,3.4vw,2.1rem);letter-spacing:-.03em;margin:0 0 8px}
+    .sec-head p{margin:0;color:var(--muted);max-width:680px;font-size:.98rem}
+    .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:56px}
+    .plan-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:26px;display:flex;flex-direction:column;justify-content:space-between}
+    .plan-card.featured{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+    .plan-name{font-size:.86rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.05em}
+    .plan-price{font-size:1.85rem;font-weight:800;letter-spacing:-.03em;margin:8px 0 10px}
+    .plan-price span{font-size:.86rem;font-weight:500;color:var(--muted)}
+    .plan-desc{margin:0;color:var(--muted);font-size:.91rem}
+    .vip-box{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:28px;margin-bottom:48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
+    .vip-copy{max-width:500px}
+    .vip-copy h3{margin:0 0 6px;font-size:1.18rem}
+    .vip-copy p{margin:0;color:var(--muted);font-size:.91rem}
+    .tester-form{display:flex;gap:10px;flex-wrap:wrap;flex:1;min-width:260px;justify-content:flex-end}
+    .tester-input{flex:1;min-width:210px;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:#0A0A0C;color:#fff;font-size:.94rem;outline:none}
+    .tester-input:focus{border-color:var(--blue)}
+    .vip-msg{width:100%;font-size:.86rem;color:var(--green);font-weight:600;display:none;margin-top:8px}
+    .faq{display:grid;gap:12px;margin-bottom:56px}
+    .faq details{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 22px}
+    .faq summary{font-weight:700;cursor:pointer;list-style:none}
+    .faq summary::-webkit-details-marker{display:none}
+    .faq p{margin:10px 0 0;color:var(--muted);font-size:.92rem}
+    footer{border-top:1px solid var(--border);padding:26px 0 40px;color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     footer a{color:var(--muted);text-decoration:none}
-    footer a:hover{color:var(--mint)}
-    .search-card{margin:18px auto 28px;padding:24px;border:1px solid var(--line);border-radius:20px;background:rgba(15,29,49,0.88);max-width:860px}
-    .search-card h2{font-size:1.3rem;margin:0 0 12px}
-    .search-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .search-input{flex:1;min-width:220px;padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:#07111f;color:#fff;font-size:0.95rem;outline:none}
-    .search-input:focus{border-color:var(--mint)}
-    .search-chips{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
-    .search-chip{background:#0b182a;border:1px solid var(--line);color:var(--muted);padding:5px 11px;border-radius:999px;font-size:0.78rem;font-weight:700;cursor:pointer}
-    .search-chip:hover,.search-chip.active{border-color:var(--mint);color:var(--mint)}
-    .search-meta{font-size:0.82rem;color:var(--mint);font-weight:700;margin-bottom:10px}
-    .search-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-    .search-result-card{display:block;text-decoration:none;background:#07111f;border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);transition:border-color .15s}
-    .search-result-card:hover{border-color:var(--mint)}
-    .search-result-card strong{display:block;color:var(--mint);font-size:0.95rem;margin-bottom:4px}
-    .search-result-card span{display:block;color:var(--muted);font-size:0.83rem;line-height:1.4}
-  
-    .compare-section{margin:40px 0;padding:28px 24px;border:1px solid var(--line);border-radius:22px;background:#0B0B0D}
-    .compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:18px}
-    .compare-col{padding:20px;border-radius:16px;border:1px solid var(--line);background:var(--card)}
-    .compare-col.highlight{border-color:var(--mint);box-shadow:0 0 28px rgba(10,132,255,0.16)}
-    .compare-col h3{margin:0 0 12px;font-size:1.15rem;display:flex;align-items:center;gap:8px}
-    .compare-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;font-size:0.92rem;color:var(--muted)}
-    .compare-list li strong{color:var(--white)}
-    .pricing-section{margin:40px 0}
-    .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:18px}
-    .price-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:16px;position:relative}
-    .price-card.featured{border:2px solid var(--mint);box-shadow:0 12px 36px rgba(10,132,255,0.22)}
-    .price-ribbon{display:inline-block;background:#163322;color:#30D158;border:1px solid #30D158;font-size:0.75rem;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:0.04em;text-transform:uppercase;width:fit-content}
-    .price-title{font-size:1.2rem;font-weight:800;margin:6px 0 4px;color:var(--white)}
-    .price-amount{font-size:2rem;font-weight:900;color:var(--white);letter-spacing:-.03em}
-    .price-amount small{font-size:0.9rem;color:var(--muted);font-weight:600}
-    .price-daily{font-size:0.84rem;color:#30D158;font-weight:700;margin-top:2px}
-    .price-features{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px;font-size:0.88rem;color:var(--muted)}
-    .faq-section{margin:40px 0}
-    .faq-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
-    .faq-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
-    .faq-item summary{font-weight:800;font-size:1rem;color:var(--white);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
-    .faq-item summary::-webkit-details-marker{display:none}
-    .faq-item p{margin:10px 0 0;color:var(--muted);font-size:0.92rem;line-height:1.55}
-  
-    /* MOBILE-FIRST-FOLD-START */
-    .social-welcome-banner{display:none;margin:0 auto 12px;max-width:640px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(10,132,255,0.22),rgba(48,209,88,0.14));border:1px solid #0A84FF;font-size:0.86rem;font-weight:700;color:#fff;line-height:1.35}
-    .hero-proof-pill{margin:12px auto 16px;padding:8px 14px;max-width:460px;border-radius:999px;background:#1C1C1E;border:1px solid #2C2C2E;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:0.84rem;font-weight:700;color:var(--text)}
-    .hero-proof-pill .proof-before{color:#FF453A;font-weight:800}
-    .hero-proof-pill .proof-arrow{color:var(--muted)}
-    .hero-proof-pill .proof-after{color:#30D158;font-weight:900}
-    .hero-proof-pill .proof-dot{color:var(--muted)}
-    .hero-proof-pill .proof-size{color:var(--mint);font-weight:800}
-    .hero-proof-bar{width:100%;max-width:280px;height:5px;border-radius:999px;background:#2C2C2E;overflow:hidden;margin:2px auto 0;display:flex}
-    .hero-proof-bar span:first-child{width:38%;background:#0A84FF}
-    .hero-proof-bar span:last-child{width:62%;background:#30D158;opacity:0.35}
-    .hero-play-cta{font-size:1.05rem;padding:16px 30px;min-height:56px;box-shadow:0 10px 28px rgba(10,132,255,0.42)}
-    @media (max-width: 640px){
-      .wrap{width:calc(100% - 24px)}
-      .nav{min-height:46px;padding:6px 0;gap:6px}
-      .brand{font-size:1.1rem}
-      .lang-nav{flex-wrap:nowrap;overflow-x:auto;max-width:100%;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-      .lang-nav::-webkit-scrollbar{display:none}
-      .lang-nav a{font-size:0.72rem;padding:3px 6px;flex:0 0 auto}
-      header .nav > div:last-child{display:none !important}
-      .hero{padding:12px 0 10px}
-      .social-welcome-banner{margin:0 auto 8px;padding:7px 10px;font-size:0.78rem}
-      .eyebrow{font-size:0.74rem;margin-bottom:4px;letter-spacing:0.04em}
-      h1{font-size:1.52rem;line-height:1.12;margin:0 0 8px}
-      .lead{font-size:0.88rem;line-height:1.35;margin:0 auto 10px}
-      .hero-proof-pill{margin:0 auto 10px;padding:7px 12px;font-size:0.78rem;gap:6px;width:100%;border-radius:14px}
-      .actions{flex-direction:column;align-items:stretch;gap:8px}
-      .hero-play-cta{width:100%;font-size:1rem !important;padding:14px 18px !important;min-height:52px !important}
-      .actions .button.secondary{width:100%;min-height:42px;padding:9px 14px;font-size:0.86rem}
-      .pulse-strip{margin:10px auto 0;padding:8px 10px;gap:8px;font-size:0.76rem;border-radius:12px}
-      .note{font-size:0.74rem;margin-top:8px;line-height:1.35}
+    footer a:hover{color:#fff}
+    @media (max-width:820px){
+      .hero{grid-template-columns:1fr;padding:24px 0 28px;gap:26px;text-align:center}
+      .lead{margin-left:auto;margin-right:auto}
+      .cta-row,.pills{justify-content:center}
+      .btn-primary,.btn-secondary{width:100%}
+      .tester-form{justify-content:stretch}
     }
-    /* MOBILE-FIRST-FOLD-END */
   </style>
 </head>
 <body>
   <header>
     <div class="wrap nav">
-      <a class="brand" href="https://midiastory-df6a0.web.app/">Midia<span>store</span></a>
-      <div class="lang-nav"><a href="/" class="">PT</a><a href="/en/" class="">EN</a><a href="/es/" class="">ES</a><a href="/ar/" class="">AR</a><a href="/ru/" class="">RU</a><a href="/hi/" class="">HI</a><a href="/id/" class="">ID</a><a href="/bn/" class="">BN</a><a href="/ko/" class="">KO</a><a href="/de/" class="">DE</a><a href="/fr/" class="">FR</a><a href="/ja/" class="active">JA</a><a href="/zh/" class="">ZH</a></div>
-      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-        <a class="button secondary" href="#site-search" style="min-height: 40px; padding: 8px 14px; font-size: 0.88rem;">🔎 Search</a>
-        <a class="button secondary" href="/diagnostico.html" style="min-height: 40px; padding: 8px 14px; font-size: 0.88rem;">📱 容量診断</a>
-        <a class="button" href="#vip-testers" style="min-height: 40px; padding: 8px 14px; font-size: 0.88rem;">クローズドテスト</a>
-      </div>
+      <a class="brand" href="/ja/"><svg viewBox="0 0 184 184" width="38" height="38" aria-hidden="true"><rect width="184" height="184" rx="42" fill="#121722" stroke="rgba(255,255,255,0.14)" stroke-width="2"/><circle cx="92" cy="92" r="54" fill="none" stroke="#1E293B" stroke-width="18"/><path d="M99.5,38.5 A54,54 0 1,1 44.3,117.4" fill="none" stroke="#0A84FF" stroke-width="18" stroke-linecap="round"/><path d="M41.9,71.8 A54,54 0 0,1 71.8,41.9" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round"/></svg><div>Midia<span>store</span></div></a>
+      <nav class="lang-nav" aria-label="Language"><a href="/">PT</a><a href="/en/">EN</a><a href="/es/">ES</a><a href="/ar/">AR</a><a href="/ru/">RU</a><a href="/hi/">HI</a><a href="/id/">ID</a><a href="/bn/">BN</a><a href="/ko/">KO</a><a href="/de/">DE</a><a href="/fr/">FR</a><a href="/ja/" class="active">JA</a><a href="/zh/">ZH</a></nav>
     </div>
   </header>
 
   <main class="wrap">
+    <div id="igWelcomeBanner" class="social-banner">ダイレクトアクセス — 大容量動画や重複写真を2タップで安全に確認（軽量 7.2 MB）。</div>
+
     <section class="hero">
-      <div id="igWelcomeBanner" class="social-welcome-banner">📱 SNSからお越しですか？2タップでAndroidの空き容量を確保 — 無料・超軽量(7.2 MB)・100%端末内処理！</div>
-      <div class="eyebrow">ストレージがいっぱい？ まずは安全な確認から</div>
-      <h1>何が容量を圧迫しているか一目で把握。<br><em>削除の判断はあなた次第。</em></h1>
-      <p class="lead">MidiastoreはAndroid端末内のアクセス可能な大容量動画、古い音声ファイル、SHA-256完全一致の重複写真を検出し、Android標準の確認画面で安全に整理します。</p>
-      <div class="hero-proof-pill" aria-label="99%使用中 -> 12 GB空き • 7.2 MB">
-        <span class="proof-before">99%使用中</span>
-        <span class="proof-arrow">→</span>
-        <span class="proof-after">12 GB空き</span>
-        <span class="proof-dot">•</span>
-        <span class="proof-size">7.2 MB</span>
-        <span class="hero-proof-bar" aria-hidden="true"><span></span><span></span></span>
-      </div>
-      <div class="actions">
-        <a id="heroPlayBtn" class="button hero-play-cta" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore&amp;referrer=utm_source%3Dmidiastore_web%26utm_medium%3Dlanding_page" data-track-cta="hero_play_store" target="_blank" rel="noopener">📱 Google Playで無料ダウンロード</a>
-        <a class="button secondary" href="#vip-testers" data-track-cta="hero_waitlist" onclick="document.getElementById('testerEmail').focus()">先行アクセス（クローズドテスト）</a>
-      </div>
-      <div class="pulse-strip" aria-label="リアルタイム先行公開パルス">
-        <span class="pulse-item">👁️ 累計訪問数: <strong data-stat="total_visits">—</strong></span>
-        <span class="pulse-item">👥 待機リスト / テスター: <strong data-stat="waitlist_count">—</strong></span>
-        <span class="pulse-item">🔥 24時間の訪問: <strong data-stat="visits_24h">—</strong></span>
-      </div>
-      <p class="note">ストレージ分析とサムネイル確認は100%端末内で処理されます。ファイルの削除には必ずAndroid標準の確認ダイアログが表示されます。</p>
-      <!-- HERO-UTM-SCRIPT-START -->
-      <script>
-        (function(){
-          try {
-            var p = new URLSearchParams(window.location.search);
-            var rawSrc = (p.get("utm_source") || p.get("src") || "").toLowerCase();
-            var rawMed = (p.get("utm_medium") || "").toLowerCase();
-            var rawCamp = (p.get("utm_campaign") || "").toLowerCase();
-            var rawCont = (p.get("utm_content") || "").toLowerCase();
-            var ref = (document.referrer || "").toLowerCase();
-            var joined = [rawSrc, rawMed, rawCamp, rawCont, ref].join(" ");
-            var isSocial = /(instagram|\big\b|bio|story|stories|reels|shorts|tiktok|youtu\.be|youtube)/.test(joined);
-            if (isSocial) {
-              var b = document.getElementById("igWelcomeBanner");
-              if (b) b.style.display = "block";
-            }
-            var utmSource = rawSrc || (joined.indexOf("instagram") !== -1 ? "instagram" : joined.indexOf("tiktok") !== -1 ? "tiktok" : joined.indexOf("shorts") !== -1 || joined.indexOf("youtube") !== -1 ? "shorts" : "midiastore_web");
-            var utmMedium = rawMed || (joined.indexOf("story") !== -1 ? "story" : joined.indexOf("reels") !== -1 ? "reels" : joined.indexOf("bio") !== -1 ? "bio" : isSocial ? "social" : "landing_page");
-            var utmCampaign = rawCamp || (isSocial ? "aconteceunobr" : "home_hero");
-            var refParts = [
-              "utm_source=" + encodeURIComponent(utmSource),
-              "utm_medium=" + encodeURIComponent(utmMedium),
-              "utm_campaign=" + encodeURIComponent(utmCampaign)
-            ];
-            if (rawCont) refParts.push("utm_content=" + encodeURIComponent(rawCont));
-            var playRef = refParts.join("&");
-            var btn = document.getElementById("heroPlayBtn");
-            if (btn) {
-              btn.href = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore&referrer=" + encodeURIComponent(playRef);
-              btn.addEventListener("click", function() {
-                if (window.MidiastoreTelemetry && btn.dataset.msBound === "1") return;
-                var vid = "";
-                try { vid = localStorage.getItem("ms_anon_vid") || ""; } catch(_) {}
-                if (!/^[a-f0-9]{16,64}$/i.test(vid)) {
-                  vid = "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5";
-                }
-                var bodyStr = JSON.stringify({
-                  installHash: vid,
-                  eventName: "play_store_click",
-                  appVersion: "web-2.8.2",
-                  locale: "ja-JP",
-                  properties: {
-                    path: window.location.pathname || "/",
-                    cta: "hero_play_store",
-                    utm_source: utmSource,
-                    utm_medium: utmMedium,
-                    utm_campaign: utmCampaign,
-                    utm_content: rawCont || null
-                  }
-                });
-                var endpoint = "https://usmqtnlsaavxqguwrtix.supabase.co/functions/v1/ingest-product-event";
-                var sent = false;
-                try {
-                  if (navigator.sendBeacon) {
-                    sent = navigator.sendBeacon(endpoint, new Blob([bodyStr], { type: "text/plain;charset=UTF-8" }));
-                  }
-                } catch(_) {}
-                if (!sent) {
-                  try {
-                    fetch(endpoint, { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: bodyStr }).catch(function(){});
-                  } catch(_) {}
-                }
-              });
-            }
-          } catch(e) {}
-        })();
-      </script>
-      <!-- HERO-UTM-SCRIPT-END -->
-    </section>
-
-    <!-- INSTANT SITE SEARCH + GOOGLE SEARCHACTION -->
-    <section class="search-card" id="site-search" role="search" aria-label="🔎 Android ストレージ整理ガイド">
-      <div class="tester-badge">🔎 Android ストレージ整理ガイド</div>
-      <h2>安全に空き容量を増やすためのガイドを検索</h2>
-      <form class="search-row" id="siteSearchForm">
-        <input type="search" id="siteSearchInput" class="search-input" placeholder="検索: SHA-256重複, 大容量動画, WhatsApp, 古いスクリーンショット, ブレた写真..." autocomplete="off">
-        <button type="submit" class="button" style="min-height:46px;padding:10px 18px;">Search</button>
-        <button type="button" id="googleSiteSearchBtn" class="button secondary" style="min-height:46px;padding:10px 16px;font-size:0.86rem;">Search Google (site:)</button>
-      </form>
-      <div class="search-chips" id="searchChips">
-        <button type="button" class="search-chip" data-chip="duplicate">SHA-256重複</button><button type="button" class="search-chip" data-chip="whatsapp">WhatsApp整理</button><button type="button" class="search-chip" data-chip="videos">大容量動画</button><button type="button" class="search-chip" data-chip="screenshots">古いスクショ</button><button type="button" class="search-chip" data-chip="blurry">ブレ写真</button><button type="button" class="search-chip" data-chip="privacy">100%端末内処理</button>
-      </div>
-      <div id="searchMeta" class="search-meta"></div>
-      <div id="searchResults" class="search-results"></div>
-    </section>
-
-    <!-- INTERACTIVE CLUTTER ESTIMATOR -->
-    <section class="calculator-card" id="calculator">
-      <div class="tester-badge">⚡ メディア容量シミュレーター</div>
-      <h2>今すぐ見直せるメディア容量はどれくらい？</h2>
-      <p>重複した写真や古い音声ファイル、大きな動画は知らず知らずのうちに蓄積します。推定値をチェック：</p>
-
-      <div class="calc-controls">
-        <div class="calc-control-group">
-          <label for="timeSelect">端末のご利用期間：</label>
-          <select id="timeSelect" class="calc-select">
-            <option value="4.2">6ヶ月</option>
-            <option value="8.8" selected>1年</option>
-            <option value="16.5">2年</option>
-            <option value="26.0">3年以上</option>
-          </select>
+      <div>
+        <div class="eyebrow">100% 端末内処理 • クラウド送信ゼロ • ANDROID 10+</div>
+        <h1>精密な技術でストレージを美しく整理。</h1>
+        <p class="lead">大容量動画、古いスクリーンショット、厳密なSHA-256重複ファイルを端末内だけで高速検出。広告なし、クラウド送信なし、わずか7.2MB。</p>
+        <div class="cta-row">
+          <a id="heroPlayBtn" class="btn-primary" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore&amp;referrer=utm_source%3Dmidiastore_web%26utm_medium%3Dlanding_page" data-track-cta="hero_play_store" target="_blank" rel="noopener">Google Play で無料ダウンロード</a>
+          <a class="btn-secondary" href="#vip-testers">優先アクセス</a>
         </div>
-        <div class="calc-control-group">
-          <label for="groupSelect">日々のグループ数・チャット頻度：</label>
-          <select id="groupSelect" class="calc-select">
-            <option value="1">少ない (1〜3グループ)</option>
-            <option value="1.4" selected>標準 (4〜10グループ)</option>
-            <option value="2.1">多い (10グループ以上)</option>
-          </select>
-        </div>
+        <div class="pills"><span class="pill">7.2 MB OLED</span><span class="pill">厳密 SHA-256</span><span class="pill">100% 端末内処理</span><span class="pill">広告ゼロ</span></div>
       </div>
 
-      <div class="calc-result-box">
-        <div class="calc-result-label">確認対象の推定メディア容量：</div>
-        <div class="calc-result-value"><span id="calcGb">12.3</span> GB</div>
-        <p class="calc-subtext">重複ファイルや大容量動画、古い音声データが空き容量を占有しています。</p>
-        <a class="button" href="#vip-testers" onclick="document.getElementById('testerEmail').focus()">この容量を今すぐ無料で確認する</a>
+      <div class="phone-shell">
+        <div class="p-card">
+          <div class="p-eyebrow">確保可能な容量</div>
+          <div class="p-metric">12,4 GB</div>
+          <div class="p-sub">Android公式確認ダイアログによる安全な整理</div>
+          <div class="seg-bar">
+            <span style="width:48%;background:#0A84FF"></span>
+            <span style="width:24%;background:#5AC8FA"></span>
+            <span style="width:14%;background:#30D158"></span>
+          </div>
+          <a class="p-btn" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" rel="noopener">ファイルを確認 • 12.4 GB</a>
+        </div>
+        <div class="p-grid">
+          <div class="p-card" style="margin:0;padding:14px">
+            <div class="p-sub">重複検出</div>
+            <div style="font-size:1.12rem;font-weight:800;color:#FF9F0A;margin-top:4px">SHA-256</div>
+          </div>
+          <div class="p-card" style="margin:0;padding:14px">
+            <div class="p-sub">動画 &gt;10 MB</div>
+            <div style="font-size:1.12rem;font-weight:800;color:#5AC8FA;margin-top:4px">8.2 GB</div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- VIP TESTER FUNNEL -->
-    <section class="vip-testers" id="vip-testers">
-      <div class="tester-badge">⭐ Google Play 公式クローズドテスト（14日間 • 目標：12+ アクティブテスター、15+ 推奨）</div>
-      <h2>3つの簡単なステップでクローズドテストに無料参加</h2>
-      <p>Google Playの正式公開には最低12名以上（推奨目標15名以上）のテスターによる14日間の継続利用が必要です。下でGoogle Playのメールアドレスを登録し、<strong>公式クローズドテストの無料先行アクセス</strong>を受け取りましょう！</p>
-      
-      <form class="tester-form" id="testerForm">
-        <input type="email" id="testerEmail" class="tester-input" placeholder="Google Playアカウントのメール (例: you@gmail.com)" required>
-        <button type="submit" id="testerSubmitBtn" class="button">1. Google Play メールアドレスを登録</button>
-      </form>
-      <div id="feedbackMsg" class="feedback-msg" role="status" aria-live="polite"></div>
-
-      <div class="onboarding-steps" id="onboardingSteps">
-        <div class="step-card">
-          <div>
-            <span class="step-badge">ステップ 1 • アカウント承認</span>
-            <h3>Google Play の Gmail を登録</h3>
-            <p>上のフォームにGoogle Playのメールアドレスを送信して、公式クローズドテストトラックの承認リストに登録します。</p>
-          </div>
-          <a class="button secondary step-btn" href="#testerEmail" onclick="document.getElementById('testerEmail').focus(); return false;">上のフォームに Gmail を入力</a>
-        </div>
-        <div class="step-card">
-          <div>
-            <span class="step-badge">ステップ 2 • 公式オプトイン</span>
-            <h3>Google Play ウェブ招待を承認</h3>
-            <p>Google Play公式テストページを開き、「テスターになる (Become a tester)」をタップしてダウンロードを有効化します。</p>
-          </div>
-          <a class="button step-btn" id="optInStepBtn" data-track-cta="step2_optin" href="https://play.google.com/apps/testing/com.rdf112.midiastore" target="_blank" rel="noopener">ウェブ招待（オプトイン）を開く</a>
-        </div>
-        <div class="step-card">
-          <div>
-            <span class="step-badge">ステップ 3 • インストール（14日間）</span>
-            <h3>Google Play ストアからインストール</h3>
-            <p>ステップ2の承認後、Google PlayからMidiastoreをインストールし、14日間インストールしたままにしてください。</p>
-          </div>
-          <a class="button secondary step-btn" data-track-cta="step3_play" href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" rel="noopener">Google Play ストアを開く</a>
-        </div>
-      </div>
-      <div class="share-row">
-        <button type="button" class="button secondary" id="shareFunnelBtn" style="min-height:42px;padding:10px 18px;font-size:0.88rem;">🚀 友達を招待（先行公開）</button>
-        <span id="shareFeedback" class="share-feedback">🔗 紹介リンクをコピーしました！</span>
-      </div>
-      <div class="step-note">💡 重要：クローズドテスト（14日間）のため、Google Playのリンク（ステップ3）は、ステップ1の承認とステップ2の「テスターになる」承認を完了した後に開けるようになります。</div>
+    <section class="bento">
+      <article class="bento-card"><h3>バイト単位のSHA-256検証</h3><p>ファイル名ではなくSHA-256ハッシュで完全一致を証明し、常に元ファイル1件を保護します。</p></article>
+      <article class="bento-card"><h3>大容量動画・SNSメディア</h3><p>10MB以上の動画や30日以上前のメディアを瞬時に一覧化します。</p></article>
+      <article class="bento-card"><h3>最高水準のプライバシー設計</h3><p>過剰な権限なし、広告IDなし、Android公式ゴミ箱（30日間復元）に対応。</p></article>
     </section>
 
     <section>
-      <h2 class="section-title">Midiastore</h2>
-      <div class="cards">
-        <article class="card">
-          <div class="tag">検出</div>
-          <h3>大容量メディアファイル (>10 MB)</h3>
-          <p>共有ストレージを圧迫している大容量の動画・音声・画像をすばやく一覧表示します。</p>
-        </article>
-        <article class="card">
-          <div class="tag">メディア整理</div>
-          <h3>古い動画・音声ファイル (+30日)</h3>
-          <p>Android MediaStoreに記録された古いメディアを確認し、残すものと削除するものを自分で選べます。</p>
-        </article>
-        <article class="card">
-          <div class="tag">安全設計</div>
-          <h3>SHA-256 完全一致の重複検出</h3>
-          <p>ストリーミングSHA-256ハッシュ比較により完全に同一のファイルのみを検出し、常に1つの元ファイルを保護します。</p>
-        </article>
+      <div class="sec-head">
+        <h2>明確な Google Play プラン</h2>
+        <p>基本スキャンと重複・大容量整理は永久無料。Pro版で未使用アプリ検出（90日以上）とピンぼけ写真診断を解放。</p>
+      </div>
+      <div class="plans">
+      <div class="plan-card">
+        <div>
+          <div class="plan-name">無料プラン</div>
+          <div class="plan-price">¥0 <span>永久無料</span></div>
+          <p class="plan-desc">SHA-256重複検出、大容量動画（&gt;10MB）、Androidゴミ箱保護。</p>
+        </div>
+      </div>
+      <div class="plan-card featured">
+        <div>
+          <div class="plan-name">年額 Pro (-56%)</div>
+          <div class="plan-price">Google Play <span>一番人気</span></div>
+          <p class="plan-desc">90日以上未使用のアプリ検出＋端末内ピンぼけ写真チェック。</p>
+        </div>
+      </div>
+      <div class="plan-card">
+        <div>
+          <div class="plan-name">買い切り Pro</div>
+          <div class="plan-price">Google Play <span>1回払い</span></div>
+          <p class="plan-desc">Google Playアカウントに紐づく永久ライセンス。</p>
+        </div>
+      </div>
       </div>
     </section>
 
-    <section class="pro-box">
-      <div class="pro-copy">
-        <div class="eyebrow">迷わない3タブ構成：整理 • ファイル • Pro</div>
-        <h2>2タップの視覚的クリーンアップと純粋なOLEDデザイン</h2>
-        <p>全画面広告なし・クラウド送信ゼロ。実サムネイルを確認しながら、SHA-256完全一致の重複ファイル（原本1件を自動保護）、大容量動画（10MB以上）、古いスクリーンショット（30日以上）、ブレた写真、未使用アプリ（90日以上）を安全に整理できます。</p>
+    <section class="vip-box" id="vip-testers">
+      <div class="vip-copy">
+        <h3>Google Play ダイレクト案内</h3>
+        <p>Gmailを登録するか、上のGoogle Playボタンからインストールしてください。</p>
       </div>
-      <a class="button" href="#vip-testers" onclick="document.getElementById('testerEmail').focus()">1. Google Play メールアドレスを登録</a>
+      <form class="tester-form" id="testerForm">
+        <input type="email" id="testerEmail" class="tester-input" placeholder="Google Play の Gmail アドレス" required>
+        <button type="submit" class="btn-primary" style="padding:13px 22px;min-height:48px;font-size:.92rem">登録する</button>
+        <div id="vipMsg" class="vip-msg">登録が完了しました。</div>
+      </form>
     </section>
 
-    <section style="margin-top: 36px;">
-      <h2 class="section-title">お客様のファイル、お客様の完全な選択権</h2>
-      <p style="color: var(--muted); max-width: 680px;">MidiastoreはAndroidのScoped Storageに完全準拠（MANAGE_EXTERNAL_STORAGE不使用）。すべての処理は端末内で完結します。</p>
+    <section class="faq">
+      <details open>
+        <summary>写真や動画がクラウドに送信されることはありますか？</summary>
+        <p>一切ありません。すべての解析とSHA-256計算は端末内（Scoped Storage）で完結します。</p>
+      </details>
+      <details>
+        <summary>自動的にファイルが削除されることはありますか？</summary>
+        <p>ありません。必ずプレビューを確認し、Android公式の確認画面で承認した項目のみ処理されます。</p>
+      </details>
     </section>
   </main>
 
-  <footer class="wrap">
-    <div>&copy; 2026 Midiastore (com.rdf112.midiastore). All rights reserved.</div>
-    <div style="display:flex;gap:14px;flex-wrap:wrap;">
-      <a href="/guides/">📚 整理ガイド</a>
-      <a href="/diagnostico.html">📱 容量診断</a>
-      <a href="/privacy.html">プライバシーポリシー</a>
+  <footer>
+    <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>&copy; 2026 Midiastore (com.rdf112.midiastore)</div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <a href="/guides/">ガイド</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore" target="_blank" rel="noopener">Google Play</a>
+      </div>
     </div>
   </footer>
 
   <script>
-    const timeEl = document.getElementById('timeSelect');
-    const groupEl = document.getElementById('groupSelect');
-    const calcGbEl = document.getElementById('calcGb');
-
-    function updateClutterEstimate() {
-      const base = parseFloat(timeEl.value) || 8.8;
-      const mult = parseFloat(groupEl.value) || 1.4;
-      const total = (base * mult).toFixed(1);
-      if (calcGbEl) calcGbEl.innerText = total;
-    }
-
-    if (timeEl && groupEl) {
-      timeEl.addEventListener('change', updateClutterEstimate);
-      groupEl.addEventListener('change', updateClutterEstimate);
-      updateClutterEstimate();
-    }
-
-    const testerForm = document.getElementById("testerForm");
-    const emailInput = document.getElementById("testerEmail");
-    const submitBtn = document.getElementById("testerSubmitBtn");
-    const feedback = document.getElementById("feedbackMsg");
-    const onboardingSteps = document.getElementById("onboardingSteps");
-    const SUPABASE_URL = "https://usmqtnlsaavxqguwrtix.supabase.co";
-    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU";
-
-    testerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = emailInput.value.trim().toLowerCase();
-      if (!email || !email.includes("@")) return;
-
-      submitBtn.disabled = true;
-      submitBtn.innerText = "...";
-      feedback.className = "feedback-msg";
-      feedback.style.display = "none";
-
+    (function(){
+      var endpoint = "https://usmqtnlsaavxqguwrtix.supabase.co/functions/v1/ingest-product-event";
+      var vid = "";
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/beta_testers`, {
-          method: "POST",
-          headers: {
-            "apikey": ANON_KEY,
-            "Authorization": `Bearer ${ANON_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify({ email: email, source: "landing_page_ja" })
+        vid = localStorage.getItem("ms_anon_vid") || "";
+        if (!/^[a-f0-9]{16,64}$/i.test(vid)) {
+          var arr = new Uint8Array(16);
+          (window.crypto || window.msCrypto).getRandomValues(arr);
+          vid = Array.from(arr, function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+          localStorage.setItem("ms_anon_vid", vid);
+        }
+      } catch(_) { vid = "a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5"; }
+
+      var p = new URLSearchParams(window.location.search);
+      var rawSrc = (p.get("utm_source") || p.get("src") || "").toLowerCase();
+      var rawMed = (p.get("utm_medium") || "").toLowerCase();
+      var rawCamp = (p.get("utm_campaign") || "").toLowerCase();
+      var rawCont = (p.get("utm_content") || "").toLowerCase();
+      var ref = (document.referrer || "").toLowerCase();
+      var joined = [rawSrc, rawMed, rawCamp, rawCont, ref].join(" ");
+      var isSocial = /(instagram|\big\b|bio|story|stories|reels|shorts|tiktok|youtu\.be|youtube)/.test(joined);
+      if (isSocial) {
+        var b = document.getElementById("igWelcomeBanner");
+        if (b) b.style.display = "block";
+      }
+      var utmSource = rawSrc || (joined.indexOf("instagram") !== -1 ? "instagram" : joined.indexOf("tiktok") !== -1 ? "tiktok" : "midiastore_web");
+      var utmMedium = rawMed || (isSocial ? "social" : "landing_page");
+      var utmCampaign = rawCamp || (isSocial ? "aconteceunobr" : "bigtech_home");
+
+      function sendEvt(name, extra) {
+        var payload = JSON.stringify({
+          installHash: vid,
+          eventName: name,
+          appVersion: "web-bigtech-2.9",
+          locale: "ja",
+          properties: Object.assign({ path: window.location.pathname || "/", utm_source: utmSource, utm_medium: utmMedium, utm_campaign: utmCampaign }, extra || {})
         });
-
-        if (res.ok || res.status === 201 || res.status === 204) {
-          feedback.className = "feedback-msg success";
-          feedback.innerText = "🎉 クローズドテスト用にメールアドレスを登録しました！続いて下のステップ2（ウェブ招待の承認）とステップ3（Google Playでインストール）へ進んでください。";
-          emailInput.value = "";
-          if (onboardingSteps) onboardingSteps.classList.add("highlighted");
-          if (window.MidiastoreTelemetry) {
-            window.MidiastoreTelemetry.trackEvent("waitlist_submit", "landing_page_ja");
-            window.MidiastoreTelemetry.refreshPrelaunchStats();
+        try {
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(endpoint, new Blob([payload], { type: "text/plain;charset=UTF-8" }));
+            return;
           }
-        } else if (res.status === 409) {
-          feedback.className = "feedback-msg success";
-          feedback.innerText = "✅ このメールアドレスは既にクローズドテストリストに登録済みです！下のステップ2とステップ3へ進んでください。";
-          if (onboardingSteps) onboardingSteps.classList.add("highlighted");
-        } else {
-          feedback.className = "feedback-msg error";
-          feedback.innerText = "現在登録できませんでした。メールアドレスを確認してもう一度お試しください。";
-        }
-      } catch (err) {
-        feedback.className = "feedback-msg error";
-        feedback.innerText = "通信エラーが発生しました。インターネット接続を確認して再度お試しください。";
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "1. Google Play メールアドレスを登録";
-        feedback.style.display = "block";
+        } catch(_) {}
+        try { fetch(endpoint, { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: payload }).catch(function(){}); } catch(_) {}
       }
-    });
 
-    const shareFunnelBtn = document.getElementById("shareFunnelBtn");
-    const shareFeedback = document.getElementById("shareFeedback");
-    if (shareFunnelBtn) {
-      shareFunnelBtn.addEventListener("click", () => {
-        if (window.MidiastoreTelemetry) {
-          const nativeUsed = window.MidiastoreTelemetry.sharePage("Midiastore — 軽量7.2MB Androidストレージ整理アプリ", "Androidの大容量動画やSHA-256完全重複ファイルを100%端末内で安全に整理できるMidiastoreをチェック！");
-          if (!nativeUsed && shareFeedback) {
-            shareFeedback.style.display = "inline-block";
-            setTimeout(() => { shareFeedback.style.display = "none"; }, 4000);
-          }
-          window.MidiastoreTelemetry.refreshPrelaunchStats();
-        }
-      });
-    }
+      sendEvt("page_view");
 
-    const searchCatalog = [{"title":"2-Tap Visual Cleanup & Exact SHA-256 Duplicates (7.2 MB)","desc":"Scans >10 MB videos, 30d+ old screenshots, and byte-exact SHA-256 duplicates 100% on-device while always keeping 1 original safe.","url":"#calculator","tags":"offline duplicatas duplicate sha-256 sha256 storage cleaner videos large memoria phone cleaner مكرر дубликаты डुप्लीकेट duplikat ডুপ্লিকেট 중복 重複 重复"},{"title":"Blurry Photo Review & Unused Apps Finder (+90 Days)","desc":"Spot out-of-focus photos locally and optionally review apps not opened in 90+ days via explicit Android Prominent Disclosure.","url":"#vip-testers","tags":"blurry blur photos screenshots unused apps 90 days pro cleanup ضبابية размытые धुंधली buram ঝাপসা 흐릿한 ブレ 模糊"},{"title":"Practical Guide: Fix WhatsApp Storage Full on Android","desc":"How to review heavy forwarded videos, voice notes, and duplicate copies safely without losing important memories.","url":"/guides/en-us/whatsapp-storage-full/","tags":"whatsapp videos audio clutter storage full guide واتساب मेमोरी"},{"title":"Practical Guide: Remove Exact Duplicate Photos (SHA-256)","desc":"Why streaming byte-by-byte SHA-256 hashing prevents accidental deletion of similar burst shots and protects your original.","url":"/guides/en-us/remove-duplicate-photos-android/","tags":"duplicate photos sha-256 exact hash original safe gallery"},{"title":"Practical Guide: Android Storage Full — Reclaim Gigabytes Fast","desc":"Step-by-step workflow to clear large videos (>10 MB) and old screenshots (+30 days) using official Android Trash & Scoped Storage.","url":"/guides/en-us/android-storage-full-fix/","tags":"android storage full large videos screenshots trash clean fast 7.2 mb"},{"title":"Free Storage Clutter Estimator & Google Play Closed Test","desc":"Estimate gigabytes of media clutter on your phone and join the official 14-day Google Play Closed Test in 3 steps.","url":"/diagnostico.html","tags":"estimator quiz diagnostico closed test google play opt-in android"},{"title":"100% On-Device Privacy & Data Safety Policy","desc":"Zero photo/video uploads, zero MANAGE_EXTERNAL_STORAGE, zero Advertising ID (AD_ID), and Google Play Billing verification.","url":"/privacy.html","tags":"privacy policy data safety scoped storage permissions security trash محلياً локально गोपनीयता 개인정보 プライバシー 隐私"}];
-    const searchInput = document.getElementById("siteSearchInput");
-    const siteSearchForm = document.getElementById("siteSearchForm");
-    const searchResultsEl = document.getElementById("searchResults");
-    const searchMetaEl = document.getElementById("searchMeta");
-    const googleBtn = document.getElementById("googleSiteSearchBtn");
+      var btn = document.getElementById("heroPlayBtn");
+      if (btn) {
+        var refStr = "utm_source=" + encodeURIComponent(utmSource) + "&utm_medium=" + encodeURIComponent(utmMedium) + "&utm_campaign=" + encodeURIComponent(utmCampaign);
+        btn.href = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore&referrer=" + encodeURIComponent(refStr);
+        btn.addEventListener("click", function(){ sendEvt("play_store_click", { cta: "hero_play_store" }); });
+      }
 
-    function runSiteSearch(rawQuery) {
-      const q = (rawQuery || "").trim().toLowerCase();
-      const terms = q ? q.split(/\s+/).filter(Boolean) : [];
-      const matched = terms.length === 0
-        ? searchCatalog.slice(0, 6)
-        : searchCatalog.filter((item) => {
-            const hay = (item.title + " " + item.desc + " " + item.tags).toLowerCase();
-            return terms.every((term) => hay.includes(term));
+      var form = document.getElementById("testerForm");
+      if (form) {
+        form.addEventListener("submit", function(ev){
+          ev.preventDefault();
+          var email = (document.getElementById("testerEmail").value || "").trim().toLowerCase();
+          if (!email) return;
+          fetch("https://usmqtnlsaavxqguwrtix.supabase.co/rest/v1/beta_testers", {
+            method: "POST",
+            headers: {
+              "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU",
+              "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXF0bmxzYWF2eHFndXdydGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNzcwNTQsImV4cCI6MjEwOTY1MzA1NH0.N7XIpn3lGJM7V8clfU8uKe-7v-N3qKPkIgv3sCKv2VU",
+              "Content-Type": "application/json",
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify({ email: email, source: utmSource })
+          }).then(function(){
+            var m = document.getElementById("vipMsg");
+            if (m) m.style.display = "block";
+            form.reset();
+          }).catch(function(){
+            var m = document.getElementById("vipMsg");
+            if (m) m.style.display = "block";
           });
-
-      if (searchMetaEl) {
-        searchMetaEl.textContent = matched.length > 0
-          ? matched.length + " " + "results found"
-          : "一致する項目がありません — duplicate, sha-256, whatsapp, videos, screenshots, privacy をお試しください。";
+        });
       }
-      if (searchResultsEl) {
-        searchResultsEl.innerHTML = matched.map((item) =>
-          '<a class="search-result-card" href="' + item.url + '"><strong>' + item.title + '</strong><span>' + item.desc + '</span></a>'
-        ).join("");
-      }
-    }
-
-    if (searchInput) {
-      const urlQ = new URLSearchParams(window.location.search).get("q") || "";
-      if (urlQ) searchInput.value = urlQ;
-      runSiteSearch(searchInput.value);
-      searchInput.addEventListener("input", () => runSiteSearch(searchInput.value));
-    }
-    if (siteSearchForm && searchInput) {
-      siteSearchForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        runSiteSearch(searchInput.value);
-      });
-    }
-    document.querySelectorAll("#searchChips .search-chip").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        if (!searchInput) return;
-        const val = chip.getAttribute("data-chip") || "";
-        searchInput.value = val;
-        runSiteSearch(val);
-      });
-    });
-    if (googleBtn) {
-      googleBtn.addEventListener("click", () => {
-        const q = (searchInput && searchInput.value ? searchInput.value.trim() : "Midiastore Android storage cleaner");
-        window.open("https://www.google.com/search?q=" + encodeURIComponent("site:midiastory-df6a0.web.app " + q), "_blank", "noopener");
-      });
-    }
+    })();
   </script>
-  <script src="/telemetry.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Midiastore — conceito 2027</title>
+  <style>
+    :root{color-scheme:dark;--black:#000;--surface:#1c1c1e;--surface2:#111113;--line:#29292d;--blue:#0a84ff;--white:#f5f5f7;--muted:#98989f;--green:#32d74b;--orange:#ff9f0a;--red:#ff453a}
+    *{box-sizing:border-box}body{margin:0;background:#111;color:var(--white);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;display:grid;place-items:center;min-height:100vh;padding:24px}
+    button{font:inherit;color:inherit;border:0;cursor:pointer}.stage{display:grid;grid-template-columns:minmax(300px,390px) minmax(220px,300px);gap:30px;align-items:center}.phone{height:min(844px,calc(100vh - 40px));min-height:680px;aspect-ratio:390/844;background:var(--black);border:1px solid #3c3c41;border-radius:42px;overflow:hidden;box-shadow:0 30px 100px #000a;position:relative;display:flex;flex-direction:column}.status{height:42px;flex:none;padding:13px 28px 0;font-size:12px;color:#ddd;display:flex;justify-content:space-between}.top{height:61px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 23px}.brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.3px}.mark{width:30px;height:30px;border-radius:10px;background:var(--blue);display:grid;place-items:center;font-weight:800;font-size:15px}.pro-pill{background:#131d2b;color:#8fc5ff;border:1px solid #1d3550;padding:8px 13px;border-radius:18px;font-size:12px;font-weight:650}.pages{position:relative;overflow:auto;flex:1;scrollbar-width:none}.pages::-webkit-scrollbar{display:none}.page{display:none;padding:12px 21px 24px;animation:fade .18s ease}.page.active{display:block}@keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}.eyebrow{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}.title{font-size:29px;line-height:1.12;letter-spacing:-.8px;font-weight:700;margin:5px 0 17px}.storage{background:var(--surface);border:1px solid #252528;border-radius:27px;padding:20px;margin:12px 0 15px}.storage-head{display:flex;justify-content:space-between;align-items:center}.storage-head span{font-size:13px;color:var(--muted)}.capacity{font-size:15px;font-weight:650}.used{font-size:38px;letter-spacing:-1.5px;font-weight:720;margin:13px 0 1px}.used small{font-size:15px;color:var(--muted);font-weight:500;letter-spacing:0}.bar{height:12px;border-radius:8px;overflow:hidden;background:#303034;display:flex;gap:2px;margin:15px 0 12px}.bar i:nth-child(1){width:38%;background:#0a84ff}.bar i:nth-child(2){width:19%;background:#5e5ce6}.bar i:nth-child(3){width:8%;background:#64d2ff}.bar i:nth-child(4){width:15%;background:#8e8e93}.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;color:#c5c5ca;font-size:11px}.legend span{display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}.legend span:nth-child(2) .dot{background:#5e5ce6}.legend span:nth-child(3) .dot{background:#64d2ff}.legend span:nth-child(4) .dot{background:#8e8e93}.primary{background:var(--blue);width:100%;min-height:57px;border-radius:18px;font-size:16px;font-weight:680;box-shadow:0 7px 25px #0a84ff30}.primary:active{filter:brightness(1.15);transform:scale(.99)}.subtle{color:var(--muted);text-align:center;font-size:11px;margin:10px 0 19px}.section{font-size:17px;font-weight:650;margin:22px 0 11px;letter-spacing:-.2px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{min-height:112px;background:var(--surface);border:1px solid #252528;border-radius:20px;padding:15px;text-align:left}.ico{width:31px;height:31px;background:#102039;color:#60adff;border-radius:10px;display:grid;place-items:center;font-size:16px;margin-bottom:10px}.card b{display:block;font-size:13px}.card small{color:var(--muted);font-size:11px}.row{display:flex;align-items:center;gap:13px;background:var(--surface2);border-bottom:1px solid var(--line);padding:15px 2px}.row .ico{flex:none;margin:0}.row-main{flex:1}.row-main b{display:block;font-size:14px}.row-main small{color:var(--muted);font-size:12px}.chev{color:#666;font-size:20px}.tabs{height:78px;flex:none;background:#09090a;border-top:1px solid #1c1c1e;display:grid;grid-template-columns:repeat(3,1fr);padding:8px 14px 14px}.tab{background:transparent;color:#86868b;display:grid;justify-items:center;align-content:center;gap:4px;font-size:10px;font-weight:550}.tab .tabico{font-size:19px;line-height:1}.tab.active{color:var(--blue)}.pro-hero{background:linear-gradient(145deg,#121c2a,#080b11);border:1px solid #21344d;border-radius:25px;padding:22px;margin:14px 0}.pro-hero h2{font-size:24px;margin:10px 0 6px}.pro-hero p,.muted{color:var(--muted);font-size:13px}.benefit{display:flex;gap:12px;align-items:center;padding:13px 2px;border-bottom:1px solid var(--line)}.check{color:var(--green);font-weight:700}.plan{background:var(--surface);border:1px solid #28282d;border-radius:17px;padding:15px;margin-top:10px;display:flex;justify-content:space-between;align-items:center}.plan strong{font-size:14px}.plan span{font-size:12px;color:var(--muted)}.note{color:#777;font-size:10px;text-align:center;margin:15px 0}.side h1{font-size:24px;line-height:1.16;letter-spacing:-.5px;margin:0 0 12px}.side p{color:#aaa;line-height:1.6;font-size:14px}.side ul{padding-left:18px;color:#bbb;line-height:1.8;font-size:13px}.side .tag{display:inline-block;color:#91c9ff;border:1px solid #23456a;border-radius:20px;padding:6px 10px;font-size:11px;margin-bottom:15px}.demo{font-size:11px;color:#777;border-top:1px solid #333;padding-top:14px;margin-top:18px}.sheet-back{display:none;position:absolute;inset:0;background:#0009;align-items:flex-end;z-index:4}.sheet-back.show{display:flex}.sheet{background:#202023;border:1px solid #39393e;border-radius:27px 27px 0 0;padding:23px 22px 28px;width:100%;box-shadow:0 -20px 60px #0009}.handle{height:4px;width:38px;border-radius:5px;background:#5c5c60;margin:0 auto 18px}.sheet h2{font-size:21px;margin:0 0 5px}.sheet p{color:var(--muted);font-size:13px;margin:0 0 18px}.sheet-actions{display:flex;gap:10px;margin-top:12px}.secondary{flex:1;background:#343438;border-radius:15px;min-height:49px;color:#ddd}.sheet .primary{flex:1;min-height:49px;border-radius:15px;font-size:14px}
+    @media(max-width:760px){body{padding:0;background:#000}.stage{display:block}.phone{width:100vw;height:100dvh;max-height:none;min-height:0;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none}.side{display:none}.status{height:49px;padding-top:16px}.top{height:60px}.pages{padding-bottom:0}}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="phone" aria-label="Protótipo do Midiastore">
+      <div class="status"><span>9:41</span><span>● ● ●　▰</span></div>
+      <header class="top"><div class="brand"><div class="mark">M</div><span>Midiastore</span></div><button class="pro-pill" onclick="show('pro')">Conhecer Pro</button></header>
+      <div class="pages">
+        <section class="page active" id="limpar">
+          <div class="eyebrow">Seu armazenamento</div><h1 class="title">Mais espaço.<br>Sem complicação.</h1>
+          <article class="storage">
+            <div class="storage-head"><span>Este aparelho</span><span class="capacity">256 GB</span></div>
+            <div class="used">159,7 <small>GB usados</small></div>
+            <div class="bar"><i></i><i></i><i></i><i></i></div>
+            <div class="legend"><span><i class="dot"></i>Fotos</span><span><i class="dot"></i>Vídeos</span><span><i class="dot"></i>Áudio</span><span><i class="dot"></i>Outros</span></div>
+          </article>
+          <button class="primary" onclick="openSheet('scan')">Analisar meu espaço <span aria-hidden="true">→</span></button>
+          <p class="subtle">A análise acontece no aparelho. Você decide o que remover.</p>
+          <h2 class="section">Limpeza rápida</h2>
+          <div class="cards">
+            <button class="card" onclick="openSheet('category')"><span class="ico">◉</span><b>Duplicatas exatas</b><small>Comparadas por conteúdo</small></button>
+            <button class="card" onclick="openSheet('category')"><span class="ico">▤</span><b>Arquivos grandes</b><small>Revise antes de remover</small></button>
+            <button class="card" onclick="openSheet('category')"><span class="ico">▧</span><b>Capturas antigas</b><small>Mais de 30 dias</small></button>
+            <button class="card" onclick="openSheet('category')"><span class="ico">◷</span><b>Mídias antigas</b><small>Escolha o que manter</small></button>
+          </div>
+          <h2 class="section">Sua última análise</h2>
+          <div class="row"><span class="ico">✓</span><div class="row-main"><b>Nenhuma análise ainda</b><small>Toque em “Analisar meu espaço” para começar</small></div></div>
+        </section>
+        <section class="page" id="arquivos">
+          <div class="eyebrow">Organize com clareza</div><h1 class="title">Seus arquivos</h1>
+          <button class="primary" onclick="openSheet('review')">Ver sugestões da análise <span>→</span></button>
+          <h2 class="section">Categorias</h2>
+          <button class="row" onclick="openSheet('category')"><span class="ico">▧</span><span class="row-main"><b>Fotos</b><small>Biblioteca de imagens</small></span><span class="chev">›</span></button>
+          <button class="row" onclick="openSheet('category')"><span class="ico">▷</span><span class="row-main"><b>Vídeos</b><small>Ordenar por tamanho ou data</small></span><span class="chev">›</span></button>
+          <button class="row" onclick="openSheet('category')"><span class="ico">♫</span><span class="row-main"><b>Áudios</b><small>Gravações e mídias</small></span><span class="chev">›</span></button>
+          <h2 class="section">Encontrar rapidamente</h2>
+          <button class="row" onclick="openSheet('category')"><span class="ico">◉</span><span class="row-main"><b>Duplicatas exatas</b><small>SHA-256 confirmado</small></span><span class="chev">›</span></button>
+          <button class="row" onclick="openSheet('category')"><span class="ico">▤</span><span class="row-main"><b>Arquivos grandes</b><small>Você revisa cada item</small></span><span class="chev">›</span></button>
+          <button class="row" onclick="openSheet('category')"><span class="ico">▧</span><span class="row-main"><b>Capturas antigas</b><small>Filtro de data</small></span><span class="chev">›</span></button>
+        </section>
+        <section class="page" id="pro">
+          <div class="eyebrow">Midiastore</div><h1 class="title">Mais controle.<br>Mais tranquilidade.</h1>
+          <article class="pro-hero"><div class="mark">M</div><h2>Midiastore Pro</h2><p>Recursos extras para cuidar do armazenamento, com a mesma revisão segura.</p></article>
+          <div class="benefit"><span class="check">✓</span><span>Relatórios detalhados da limpeza</span></div>
+          <div class="benefit"><span class="check">✓</span><span>Recursos Pro disponíveis na sua conta</span></div>
+          <h2 class="section">Escolha seu plano</h2>
+          <button class="plan"><strong>Mensal</strong><span>Ver preço na Google Play　›</span></button>
+          <button class="plan"><strong>Anual</strong><span>Ver preço na Google Play　›</span></button>
+          <button class="plan"><strong>Vitalício</strong><span>Ver preço na Google Play　›</span></button>
+          <p class="note">Planos e valores devem vir do catálogo ativo da Google Play.</p>
+        </section>
+      </div>
+      <nav class="tabs" aria-label="Navegação principal">
+        <button class="tab active" data-page="limpar"><span class="tabico">⌂</span><span>Limpar</span></button>
+        <button class="tab" data-page="arquivos"><span class="tabico">▤</span><span>Arquivos</span></button>
+        <button class="tab" data-page="pro"><span class="tabico">✦</span><span>Pro</span></button>
+      </nav>
+      <div class="sheet-back" id="sheet" onclick="if(event.target===this)closeSheet()"><section class="sheet"><div class="handle"></div><h2 id="sheet-title">Analisar armazenamento</h2><p id="sheet-copy">Vamos verificar os tipos de mídia disponíveis. Você poderá revisar as sugestões antes de qualquer ação.</p><div class="sheet-actions"><button class="secondary" onclick="closeSheet()">Agora não</button><button class="primary" onclick="closeSheet()" id="sheet-cta">Começar análise</button></div></section></div>
+    </section>
+    <aside class="side"><span class="tag">PLANTA VISUAL • LIMPADOR PURO</span><h1>Midiastore<br>Cleaner 2027</h1><p>Uma proposta visual para as três abas que você já definiu: Limpar, Arquivos e Pro. Interface Android nova, com Compose, identidade OLED e foco total em liberar espaço com controle.</p><ul><li>Preto OLED + grafite + azul</li><li>Sem Studio, jogos ou jornal</li><li>Barra segmentada de armazenamento</li><li>Revisão em bottom sheet</li><li>Navegação de três abas</li></ul><div class="demo">Mockup com números demonstrativos. Nenhuma análise real foi executada. O código do app ainda não foi alterado.</div></aside>
+  </main>
+  <script>
+    const tabs=[...document.querySelectorAll('.tab')];
+    function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));tabs.forEach(t=>t.classList.toggle('active',t.dataset.page===id));document.querySelector('.pages').scrollTop=0}
+    tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.page)));
+    function openSheet(type){const copy={scan:['Analisar armazenamento','A análise verifica as mídias acessíveis neste aparelho. Você verá a cobertura e revisará cada sugestão antes de escolher qualquer ação.','Começar análise'],category:['Categoria pronta para revisar','Os resultados e a cobertura desta categoria aparecerão aqui depois da análise. Nenhum item é selecionado automaticamente.','Entendi'],review:['Revisar antes de agir','Selecione manualmente os itens que deseja enviar à confirmação do Android. O original de cada grupo duplicado fica protegido.','Abrir revisão']}[type]||['Midiastore','', 'Continuar'];document.getElementById('sheet-title').textContent=copy[0];document.getElementById('sheet-copy').textContent=copy[1];document.getElementById('sheet-cta').textContent=copy[2];document.getElementById('sheet').classList.add('show')}
+    function closeSheet(){document.getElementById('sheet').classList.remove('show')}
+  </script>
+</body>
+</html>

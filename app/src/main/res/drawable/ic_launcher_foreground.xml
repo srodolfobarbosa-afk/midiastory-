@@ -4,30 +4,32 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:scaleX="0.76"
-        android:scaleY="0.76">
-        <!-- Dark graphite inner circle -->
-        <path
-            android:fillColor="#0D1526"
-            android:pathData="M54,14 A40,40 0 1,1 53.99,14 Z" />
-        <!-- Outer electric blue storage gauge ring -->
-        <path
-            android:fillColor="#0A84FF"
-            android:pathData="M54,11 A43,43 0 1,1 14.5,71 L21.5,67.5 A35,35 0 1,0 54,19 Z" />
-        <!-- Cyan highlight arc at top-left -->
-        <path
-            android:fillColor="#38BDF8"
-            android:pathData="M21.5,67.5 A35,35 0 0,1 54,19 L54,11 A43,43 0 0,0 14.5,71 Z" />
-        <!-- Bold geometric 'M' monogram in pure white -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M32,68 L32,39 L41,39 L54,54.5 L67,39 L76,39 L76,68 L67.5,68 L67.5,51.5 L54,67 L40.5,51.5 L40.5,68 Z" />
-        <!-- Clean sparkle star top-right -->
-        <path
-            android:fillColor="#30D158"
-            android:pathData="M82,15 L84.8,22.2 L92,25 L84.8,27.8 L82,35 L79.2,27.8 L72,25 L79.2,22.2 Z" />
-    </group>
+    <!-- Adaptive icon safe zone: center (54,54), radius 24, strokeWidth 8.2 (outer radius 28.1 <= 33 safe zone) -->
+    <!-- Subtle dark sapphire track ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,30 A24,24 0 1,1 53.99,30"
+        android:strokeColor="#1E293B"
+        android:strokeWidth="8.2" />
+    <!-- Primary sapphire storage arc (8 deg to 242 deg clockwise from 12 o'clock) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M57.34,30.23 A24,24 0 1,1 32.81,65.27"
+        android:strokeColor="#0A84FF"
+        android:strokeLineCap="round"
+        android:strokeWidth="8.2" />
+    <!-- Top-right cyan highlight blend (8 deg to 85 deg) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M57.34,30.23 A24,24 0 0,1 77.91,51.91"
+        android:strokeColor="#38BDF8"
+        android:strokeLineCap="round"
+        android:strokeWidth="8.2" />
+    <!-- Pure white freed-storage precision segment (292 deg to 338 deg) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M31.75,45.01 A24,24 0 0,1 45.01,31.75"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="8.2" />
 </vector>

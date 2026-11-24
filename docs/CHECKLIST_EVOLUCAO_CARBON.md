@@ -1,50 +1,37 @@
-# 🧠 CHECKLIST MESTRA DE EVOLUÇÃO CARBON — MIDIASTORE & MARIA 2.0
+# 🚀 CHECKLIST MESTRA UNIFICADA — SUPER PACOTE `v2.9.0 BIG-TECH` ("TUDO DE UMA VEZ")
 > 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`AGENTS.md`**](../AGENTS.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`**](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md) · [**`LINHA_DO_TEMPO_AUTONOMA.md`**](LINHA_DO_TEMPO_AUTONOMA.md)
-**Criada em:** `2026-11-24` | **Motor:** Gemini 4 Carbon | **Ordem Oficial Aprovada:** **Fase 0 (`26/11`) ➔ Frente B (`feat/v2.9.0-motor-app`: Fotos Parecidas IA + SQLite Instantâneo + Compressor Vídeo Pro) ➔ Frente A (Maria Humana Fotorrealista de Última Geração — ZERO 3D e SOMENTE com aprovação prévia do Rodolfo)** | **Regra Suprema:** Protocolo Catraca (Zero Regressão)
+**Atualizada em:** `2026-11-24 10:06 BRT` | **Motor:** Gemini 4 Carbon | **Branch Isolada:** `feat/v2.9.0-motor-app` | **Baseline Protegida (26/11):** `tag v2.8.2-carbon-baseline`
 
 ---
 
-## 🛡️ PROTOCOLO CATRACA CARBON (ZERO REGRESSÃO)
-1. **Baseline Travada no Git (`tag v2.8.2-carbon-baseline` -> commit `cd0a661`):** o AAB assinado `v2.8.2 (vc 34)` (`7,26 MB`, SHA-256 `5151aa51ac753efb78427d90591d6faaa13d7bdc16038642cda2704f017634f1`) é o piso mínimo imutável de qualidade.
-2. **Isolamento Total por Branch:** toda melhoria nova nasce em branch dedicada (`feat/similar-photos`, `feat/sqlite-hash-cache`, `feat/maria-2.0`), nunca misturada na build de abertura de Produção (`26/11`).
-3. **Validação Lado a Lado no Moto G84 (`0085353748`):** testar sempre `.debug` lado a lado com o pacote oficial `com.rdf112.midiastore` antes de subir `versionCode`.
-4. **4 Portões Obrigatórios de Merge:** (1) Testes JVM + CI API 29/35 verdes, (2) `bundletool` sem permissões proibidas e `< 10 MB`, (3) `14/14` idiomas 100% sincronizados, (4) Aprovação visual do Rodolfo.
+## 🛡️ TRAVAS INEGOCIÁVEIS ATIVAS
+1. **Baseline `v2.8.2-carbon-baseline` + 23 Testadores Intactos:** nenhuma alteração toca na versão candidata de quinta-feira (`26/11`) nem nas faixas `internal`/`alpha` até abrirmos Produção.
+2. **Trava Sagrada da Maria (`Diretriz 12`):** **PROIBIDO Maria 3D / boneco**. A Maria atual permanece **100% intocada** (no App e no PC) até existir protótipo isolado fotorrealista nível humano real aprovado pelo Rodolfo.
+3. **Zero Python + Comparação Lado a Lado no Moto G84 (`0085353748`):** todo o Super Pacote `v2.9.0` instala como `.debug` ao lado do app oficial para aprovação visual na mão do fundador.
 
 ---
 
-## 🏁 FASE 0 — PORTÃO DE PRODUÇÃO & CAIXA IMEDIATO (`24/11` a `26/11`)
-- [x] App `v2.8.2 (vc 34)` auditado e validado no Moto G84 (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, zero `ACTION_SEND`, `631/631` strings em 14 idiomas).
-- [x] Edge Functions `verify-play-purchase` (`v9`) + `play-rtdn-webhook` (`v5`) ativas no Supabase.
-- [x] Relógio do Teste Fechado corrigido em `public.play_console_sync_state` + `get_prelaunch_stats()` (`23 testadores`, `Dia 12 de 14` dinâmico).
-- [x] Políticas `/privacidade.html` e `/privacy.html` sincronizadas (zero menção a Estúdio + e-mail `srodolfobarbosa@gmail.com`) no Firebase Hosting (`Release 1795515742674000`, `HTTP 200`).
-- [x] Sincronização final das 14 fichas da Play Store (`Edit 15816757970827593747`, `HTTP 200`: `< 8 MB`, correção `bn-BD`, 56 screenshots `v2.8.2` `1080x1920` + 14 `featureGraphic` `1024x500` verificados ao vivo na API v3).
-- [x] Faxina documental + criação de [`docs/INDICE_MESTRE.md`](INDICE_MESTRE.md) (`167` documentos históricos movidos para `docs/archive/` com bloqueio no deploy Firebase).
-- [ ] **Quinta `26/11`:** Solicitar acesso à Produção na Google Play Console com respostas auditadas de `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`.
-- [ ] **Dia 1 de Produção:** Ligar funil orgânico `@aconteceunobr` + Google Ads (`pt-BR` / `en-US`) e confirmar 1ª venda real de Produção em `public.play_purchases`.
+## ✅ PARTE A — CONCLUÍDO E NO AR (`24/11/2026`)
+- [x] **A1. Nova Marca Big-Tech (`Precision Storage Ring` — Opção 1 aprovada pelo Rodolfo, zero estrelinha de IA):** gerada em `docs/icon-512.png`, `docs/og-banner.png` (`1200x630`) e vetores Android (`ic_launcher_foreground.xml`, `ic_launcher_monochrome.xml`, `ic_apple_clean.xml`, `MidiastoreApp.kt`).
+- [x] **A2. Novo Site OLED Big-Tech na Bio (`Release 1795525424784000` — `HTTP 200`):** publicado nas 13+1 rotas de idioma (`https://midiastory-df6a0.web.app/`), script legado `generate-multilang-pages.mjs` aposentado em definitivo.
+- [x] **A3. Google Play Store 14 Idiomas Sincronizada (`Edit 07345625292712612742` — `HTTP 200`):** 14 fichas com novo ícone `Precision Storage Ring` + 14 `featureGraphic` `1024x500` + 56 `phoneScreenshots` `1080x1920`.
+- [x] **A4. Governança Documental (`167` docs em `docs/archive/` + `docs/INDICE_MESTRE.md`) + Relógio Supabase (`23 testadores`, `Dia 12/14`).**
+- [x] **A5. Núcleo `PerceptualImageHasher.kt` (`dHash 64-bit`) + `AndroidMediaFingerprintStore.kt` (`SQLite WAL`) + `AndroidSimilarPhotoScanner.kt`:** aprovados no CI (`Run 45388401408`).
 
 ---
 
-## 🚀 FASE 1 (FRENTE B — PRIORIDADE #1 DE CONVERSÃO PRO) — MOTOR DO APP (`feat/v2.9.0-motor-app`)
-- [x] **1.1 Núcleo Fotos Parecidas / Similares On-Device (`PerceptualImageHasher.kt` — `dHash 64-bit` + Burst Anti-Falso-Positivo):** agrupar fotos quase idênticas protegendo automaticamente a mais nítida (`isProtected = true, isSelectable = false`).
-- [x] **1.2 Cache Incremental SQLite WAL de Hashes (`AndroidMediaFingerprintStore.kt` + `AndroidSimilarPhotoScanner.kt`):** reabertura instantânea sem reprocessar miniaturas intactas (`0 KB` de dependências externas).
-- [ ] **1.3 Integração UI Fotos Parecidas + Preview Tela Cheia & Comparador Lado a Lado:** conectar no painel `Limpar`/`Pro` + zoom rápido antes de excluir + QA lado a lado no Moto G84.
-- [ ] **1.4 Compressor de Vídeos Hardware-Accelerated (`Media3 Transformer H.265/HEVC` — Recurso Pro):** comprimir vídeos grandes sem perda visível (100% na GPU local, zero custo cloud) com segurança pela Lixeira Android.
-- [ ] **1.5 Refatoração Modular da `MainActivity.kt` (`361 KB`) + Remoção de Código Morto (`~170 KB`):** eliminar `presentation/studio/*` (jogos/jornal/estúdio descontinuados) e `MariaLipSyncEnvelopes.kt`, extraindo `CleanViewModel`, `FilesViewModel` e `BillingViewModel`.
-- [ ] **1.6 Histórico Acumulado de GB Liberados + `InAppReview` Pós-Limpeza:** prova de valor contínua na Home + pedido nativo de 5 estrelas no pico de satisfação.
+## 🛠️ PARTE B — SUPER PACOTE ÚNICO DE ENGENHARIA (`8 BLOCOS DE UMA VEZ` NA `feat/v2.9.0-motor-app`)
+- [ ] **Bloco 1 — UI Completa de Fotos Parecidas / Burst IA (14 Idiomas):** cards nas abas `Limpar` e `Pro` + revisão agrupada com selo `MELHOR FOTO PROTEGIDA` na foto mais nítida.
+- [ ] **Bloco 2 — Preview Tela Cheia (Zoom em Foto + Mini-Player em Vídeo) antes de Excluir:** inspeção visual instantânea ao tocar na miniatura.
+- [ ] **Bloco 3 — Compressor Inteligente de Vídeos na GPU (`Media3 Transformer H.265/HEVC` — Pro):** reduzir vídeos pesados (`500 MB -> 85 MB` sem perda visível, 100% local, zero custo cloud) com segurança via Lixeira Android.
+- [ ] **Bloco 4 — Cache `SQLite WAL` Integrado ao Scanner Global `SHA-256`:** 2ª abertura do app em `< 0,3s` sem re-hashear arquivos intactos.
+- [ ] **Bloco 5 — Limpeza Total de Estrelinhas/Emojis Legados + Paridade 14 Idiomas (`strings.xml`):** zero `✨`/`✦` e 100% das chaves novas traduzidas nos 14 idiomas.
+- [ ] **Bloco 6 — Histórico Acumulado de GB Recuperados + Gatilho `InAppReview` 5 Estrelas:** métrica vitalícia na Home + convite nativo de avaliação pós-limpeza.
+- [ ] **Bloco 7 — Remoção dos `170 KB` de Código Morto (`presentation/studio/*` + `MariaLipSyncEnvelopes.kt`) & Modularização Limpa:** código enxuto sem tocar na Maria atual.
+- [ ] **Bloco 8 — Build Cloud 7 GB RAM + Instalação `.debug` Lado a Lado no Moto G84 (`0085353748`) + Prova Visual no ADB.**
 
 ---
 
-## 👩‍💼 FASE 2 (FRENTE A) — MARIA DE ÚLTIMA GERAÇÃO (100% HUMANA FOTORREALISTA • ZERO 3D)
-> 🔒 **TRAVA INEGOCIÁVEL DO FUNDADOR (`24/11/2026`):** **PROIBIDO Maria 3D / boneco / avatar artificial.** A Maria é o nosso grande diferencial e **NÃO PODE SER ALTERADA** (nem no App, nem no PC) sem antes atingir **perfeição igual a uma mulher humana real** em protótipo isolado e receber **aprovação visual explícita do Rodolfo**. Enquanto não estiver nesse nível, manter 100% como está hoje.
-
-- [ ] **2.1 Protótipo Isolado de Vídeo Neural Humano Hiper-Realista (Geração Frontier: `Veo 3 / Kling / Hedra Character-3 / Avatar IV`):** testar fora do app oficial até atingir naturalidade 100% humana (olhar, sorriso, dentes, respiração e fala indistinguíveis de vídeo real) para avaliação do Rodolfo.
-- [ ] **2.2 TTS Neural Dinâmico nos 14 Idiomas:** somente após aprovação de voz e naturalidade humana pelo fundador.
-- [ ] **2.3 Consultora Local Híbrida (`Gemini Nano AICore` + Motor Determinístico MediaStore):** respostas contextuais inteligentes 100% privadas no aparelho sem mexer no visual aprovado da Maria.
-
----
-
-## 💰 FASE 3 — ESCALA RUMO A R$ 1.000.000,00 & PILAR 2 (REGRA 50/50)
-- [ ] **3.1 Otimização A/B de Paywall (`get-paywall-variant`):** maximizar LTV entre Anual (`R$ 79,99`) e Vitalício (`R$ 149,99`) por país.
-- [ ] **3.2 Domínio `midiastore.app` + Escala pSEO Internacional (139 páginas):** financiado pelos 50% de reinvestimento das primeiras vendas.
-- [ ] **3.3 Máquina Orgânica Multicanal (`@aconteceunobr` + Shorts + TikTok):** ativação pós-aprovação de Produção.
-- [ ] **3.4 Fábrica Multiproduto FRIDAY (Pilar 2):** replicar a base blindada para novos apps utilitários de alta conversão após tração do Midiastore.
+## 🏁 PARTE C — PÓS-26/11 (ESCALA R$ 1.000.000,00 & LABORATÓRIO MARIA HUMANA)
+- [ ] **Quinta `26/11`:** Solicitar Produção na Play Console (`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`) + ligar `@aconteceunobr` & Google Ads.
+- [ ] **Laboratório Isolado Maria Humana de Última Geração:** testar geração neural hiper-realista fora do app e só apresentar quando estiver 100% igual humana real.

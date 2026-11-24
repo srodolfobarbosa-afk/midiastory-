@@ -90,10 +90,10 @@ function renderBoardHtml(state) {
   .bullet .dot { width: 8px; height: 8px; border-radius: 50%; background: #0A84FF; margin-top: 9px; flex-shrink: 0; }
   strong { color: #FFFFFF; }
   .media-card {
-    background: #101014; border: 1px solid #2C2C2E; border-radius: 18px;
-    padding: 14px; text-align: center;
+    background: #101014; border: 2px solid #0A84FF; border-radius: 18px;
+    padding: 14px; text-align: center; margin-bottom: 20px;
   }
-  .media-card img { max-width: 100%; max-height: 520px; border-radius: 12px; object-fit: contain; }
+  .media-card img { width: 100%; max-height: 580px; border-radius: 12px; object-fit: contain; }
 </style>
 </head>
 <body>
@@ -103,10 +103,10 @@ function renderBoardHtml(state) {
   </div>
   <h1>${escapeHtml(state.title)}</h1>
   ${state.subtitle ? `<div class="subtitle">${escapeHtml(state.subtitle)}</div>` : ""}
+  ${imgHtml}
   <div class="card">
     ${formatBodyHtml(state.body)}
   </div>
-  ${imgHtml}
 </body>
 </html>`;
 }

@@ -1133,7 +1133,7 @@ fun ProGeminiNanoBottomCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    text = "✦ " + MariaI18n.assistantBadge() + " • ON-DEVICE (0 MB)",
+                    text = MariaI18n.assistantBadge() + " • ON-DEVICE (0 MB)",
                     color = Color(0xFF64D2FF),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.ExtraBold,

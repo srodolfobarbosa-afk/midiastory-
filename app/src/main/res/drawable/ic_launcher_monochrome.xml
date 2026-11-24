@@ -4,21 +4,17 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:scaleX="0.72"
-        android:scaleY="0.72">
-        <path
-            android:fillColor="#00000000"
-            android:strokeColor="#FFFFFFFF"
-            android:strokeWidth="7"
-            android:pathData="M40,13 L68,13 Q82,13 82,27 L82,81 Q82,95 68,95 L40,95 Q26,95 26,81 L26,27 Q26,13 40,13 Z" />
-        <path
-            android:fillColor="#FFFFFFFF"
-            android:pathData="M43,45 L49,51 L63,37 L68,42 L49,61 L38,50 Z" />
-        <path
-            android:fillColor="#FFFFFFFF"
-            android:pathData="M79,16 L82,23 L89,26 L82,29 L79,36 L76,29 L69,26 L76,23 Z" />
-    </group>
+    <!-- Android 13+ Monochrome Themed Icon: Precision Storage Ring (zero AI sparkle) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M57.34,30.23 A24,24 0 1,1 32.81,65.27"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="8.2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M31.75,45.01 A24,24 0 0,1 45.01,31.75"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="8.2" />
 </vector>

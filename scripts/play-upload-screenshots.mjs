@@ -280,11 +280,6 @@ async function main() {
       }
     }
 
-    if (process.argv.includes("--skip-screenshots")) {
-      console.log(`${lang}: title='${listing.title}' + icon 512x512 atualizados`);
-      continue;
-    }
-
     const dir = path.join(projectRoot, "docs", "campaigns", "store-screenshots", lang);
     if (!fs.existsSync(dir)) {
       throw new Error(`Pasta ausente para ${lang}: ${dir}`);
@@ -311,6 +306,11 @@ async function main() {
       totalFeatureGraphics += 1;
     } else {
       throw new Error(`Falha upload featureGraphic ${lang}: HTTP ${fgRes.status} ${await fgRes.text()}`);
+    }
+
+    if (process.argv.includes("--skip-screenshots")) {
+      console.log(`${lang}: listing + icon 512x512 + featureGraphic 1024x500 atualizados`);
+      continue;
     }
 
     // 3. Upload 4 phoneScreenshots (1080x1920) — filter strictly /^0[1-4]_.*\.png$/i

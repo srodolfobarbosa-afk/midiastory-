@@ -234,15 +234,27 @@ private fun TabVectorIcon(tab: MidiastoreTab, active: Boolean) {
         val stroke = Stroke(width = 1.9.dp.toPx())
         when (tab) {
             MidiastoreTab.Clean -> {
-                val path = Path().apply {
-                    moveTo(size.width * 0.5f, size.height * 0.14f)
-                    lineTo(size.width * 0.88f, size.height * 0.48f)
-                    lineTo(size.width * 0.88f, size.height * 0.88f)
-                    lineTo(size.width * 0.12f, size.height * 0.88f)
-                    lineTo(size.width * 0.12f, size.height * 0.48f)
-                    close()
-                }
-                drawPath(path = path, color = tint, style = stroke)
+                val inset = size.width * 0.14f
+                val arcSize = androidx.compose.ui.geometry.Size(size.width - inset * 2f, size.height - inset * 2f)
+                val ringStroke = Stroke(width = 2.0.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                drawArc(
+                    color = tint,
+                    startAngle = -82f,
+                    sweepAngle = 234f,
+                    useCenter = false,
+                    topLeft = Offset(inset, inset),
+                    size = arcSize,
+                    style = ringStroke,
+                )
+                drawArc(
+                    color = tint,
+                    startAngle = 202f,
+                    sweepAngle = 46f,
+                    useCenter = false,
+                    topLeft = Offset(inset, inset),
+                    size = arcSize,
+                    style = ringStroke,
+                )
             }
             MidiastoreTab.Files -> {
                 drawRoundRect(

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Midiastore — Redesign Compose Moderno (Proposta Visual)</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #121214;
+      --surface-2: #1C1C1E;
+      --surface-3: #262629;
+      --stroke: rgba(255, 255, 255, 0.08);
+      --text: #F5F5F7;
+      --muted: #8E8E93;
+      --blue: #0A84FF;
+      --blue-soft: rgba(10, 132, 255, 0.14);
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --red: #FF453A;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #070708;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+      gap: 18px;
+    }
+
+    .header-meta {
+      text-align: center;
+      max-width: 460px;
+    }
+    .header-meta h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .header-meta p {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* Phone Frame */
+    .phone {
+      width: 380px;
+      max-width: 100%;
+      height: 780px;
+      background: var(--bg);
+      border-radius: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85), 0 0 0 6px #0f0f11;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .status-bar {
+      padding: 14px 26px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .screen-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 20px 104px;
+      scrollbar-width: none;
+    }
+    .screen-container::-webkit-scrollbar { display: none; }
+
+    .tab-view { display: none; animation: fadeIn 0.2s ease; }
+    .tab-view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+
+    /* Hero Card */
+    .hero-card {
+      background: linear-gradient(180deg, #18181B 0%, #111113 100%);
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .hero-used {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .hero-used span {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .hero-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .pill-badge {
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 11px;
+      border-radius: 999px;
+    }
+
+    /* Segmented Storage Bar */
+    .seg-bar {
+      height: 10px;
+      background: var(--surface-3);
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      gap: 2px;
+      margin-bottom: 14px;
+    }
+    .seg { height: 100%; border-radius: 999px; }
+    .seg.photos { width: 42%; background: var(--blue); }
+    .seg.videos { width: 24%; background: var(--purple); }
+    .seg.audio  { width: 8%;  background: var(--green); }
+    .seg.other  { width: 9%;  background: var(--amber); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* Primary CTA */
+    .cta-primary {
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      padding: 16px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      margin-bottom: 22px;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .cta-primary:active { transform: scale(0.985); opacity: 0.92; }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    /* 2x2 Modern Grid */
+    .mission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .mission-card {
+      background: var(--surface-2);
+      border: 1px solid var(--stroke);
+      border-radius: 22px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 124px;
+    }
+    .mission-card:hover { background: #222225; border-color: rgba(255,255,255,0.15); }
+
+    .icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .mission-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 3px;
+    }
+    .mission-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mission-wide {
+      background: var(--surface-2);
+      border: 1px solid var(--stroke);
+      border-radius: 20px;
+      padding: 15px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .mission-wide-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Files Tab */
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .chip {
+      background: var(--surface-2);
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+      font-weight: 600;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .media-tile {
+      aspect-ratio: 1;
+      background: var(--surface-2);
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 7px;
+      overflow: hidden;
+    }
+    .media-tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.06), transparent 70%);
+    }
+    .tile-size {
+      position: relative;
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(0,0,0,0.72);
+      padding: 3px 6px;
+      border-radius: 6px;
+      color: var(--text);
+    }
+    .check-circle {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.55);
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .media-tile.selected {
+      outline: 2px solid var(--blue);
+      outline-offset: -2px;
+    }
+    .media-tile.selected .check-circle {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .floating-action {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 84px;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+    }
+    .floating-action.visible { display: flex; }
+    .btn-danger-sm {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Pro Tab */
+    .pro-card {
+      background: var(--surface-2);
+      border: 1px solid var(--stroke);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+    .pro-card.featured {
+      border-color: var(--blue);
+      background: linear-gradient(180deg, rgba(10,132,255,0.14) 0%, #1C1C1E 100%);
+    }
+    .pro-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .pro-name { font-size: 17px; font-weight: 600; }
+    .pro-price { font-size: 18px; font-weight: 700; color: var(--text); }
+    .pro-desc { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .pro-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 74px;
+      background: rgba(14, 14, 16, 0.92);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid var(--stroke);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding-bottom: 8px;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 18px;
+    }
+    .nav-btn.active {
+      color: var(--blue);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-meta">
+    <h1>Midiastore — Proposta Visual Compose 100% Puro</h1>
+    <p>Mockup interativo demonstrativo (3 abas: Limpar, Arquivos, Pro). Clique nas abas e toque nos itens de Arquivos para testar a barra de seleção segura.</p>
+  </div>
+
+  <div class="phone">
+    <div class="status-bar">
+      <span>01:32</span>
+      <span>5G • 94%</span>
+    </div>
+
+    <div class="screen-container">
+      <!-- ABA LIMPAR -->
+      <section id="tab-clean" class="tab-view active">
+        <div class="eyebrow">Armazenamento</div>
+        <h2 class="page-title">Limpar espaço</h2>
+
+        <div class="hero-card">
+          <div class="hero-top">
+            <div>
+              <div class="hero-used">94,2 GB <span>de 128 GB</span></div>
+              <div class="hero-sub">33,8 GB livres no dispositivo</div>
+            </div>
+            <div class="pill-badge">~6,4 GB revisáveis</div>
+          </div>
+
+          <div class="seg-bar">
+            <div class="seg photos"></div>
+            <div class="seg videos"></div>
+            <div class="seg audio"></div>
+            <div class="seg other"></div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item"><span class="dot" style="background: var(--blue)"></span>Fotos</div>
+            <div class="legend-item"><span class="dot" style="background: var(--purple)"></span>Vídeos</div>
+            <div class="legend-item"><span class="dot" style="background: var(--green)"></span>Áudio</div>
+            <div class="legend-item"><span class="dot" style="background: var(--amber)"></span>Outros</div>
+          </div>
+        </div>
+
+        <button class="cta-primary" onclick="alert('Inicia varredura segura em segundo plano via MediaStore + SHA-256')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Analisar armazenamento
+        </button>
+
+        <div class="section-label">Revisão rápida</div>
+        <div class="mission-grid">
+          <div class="mission-card" onclick="switchTab('files')">
+            <div class="icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+            </div>
+            <div>
+              <div class="mission-title">Duplicatas exatas</div>
+              <div class="mission-meta">SHA-256 • 2,1 GB</div>
+            </div>
+          </div>
+
+          <div class="mission-card" onclick="switchTab('files')">
+            <div class="icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+            </div>
+            <div>
+              <div class="mission-title">Arquivos grandes</div>
+              <div class="mission-meta">Vídeos &gt; 50 MB • 3,4 GB</div>
+            </div>
+          </div>
+
+          <div class="mission-card" onclick="switchTab('files')">
+            <div class="icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/></svg>
+            </div>
+            <div>
+              <div class="mission-title">Capturas &gt; 30 dias</div>
+              <div class="mission-meta">Screenshots • 580 MB</div>
+            </div>
+          </div>
+
+          <div class="mission-card" onclick="switchTab('files')">
+            <div class="icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <div class="mission-title">Mídia WhatsApp</div>
+              <div class="mission-meta">Encaminhados • 340 MB</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mission-wide" onclick="switchTab('files')">
+          <div class="mission-wide-left">
+            <div class="icon-box" style="margin-bottom: 0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+            </div>
+            <div>
+              <div class="mission-title">Fotos possivelmente borradas</div>
+              <div class="mission-meta">Revisão manual assistida • Sem exclusão automática</div>
+            </div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+      </section>
+
+      <!-- ABA ARQUIVOS -->
+      <section id="tab-files" class="tab-view">
+        <div class="eyebrow">MediaStore</div>
+        <h2 class="page-title">Arquivos</h2>
+
+        <div class="chips">
+          <div class="chip active">Todos</div>
+          <div class="chip">Duplicatas</div>
+          <div class="chip">Grandes</div>
+          <div class="chip">Capturas</div>
+          <div class="chip">Vídeos</div>
+        </div>
+
+        <div class="media-grid" id="mediaGrid">
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">18 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">42 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">6,4 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">128 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">9,1 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">74 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">4,2 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">215 MB</span><span class="check-circle"></span></div>
+          <div class="media-tile" onclick="toggleTile(this)"><span class="tile-size">11 MB</span><span class="check-circle"></span></div>
+        </div>
+      </section>
+
+      <!-- ABA PRO -->
+      <section id="tab-pro" class="tab-view">
+        <div class="eyebrow">Midiastore Pro</div>
+        <h2 class="page-title">Planos</h2>
+
+        <div class="pro-card featured">
+          <div class="pro-row">
+            <span class="pro-name">Pro Anual</span>
+            <span class="pro-price">R$ 79,99/ano</span>
+          </div>
+          <div class="pro-desc">Varredura global ilimitada de duplicatas SHA-256, filtros avançados e revisão em lote sem limites.</div>
+        </div>
+
+        <div class="pro-card">
+          <div class="pro-row">
+            <span class="pro-name">Pro Mensal</span>
+            <span class="pro-price">R$ 14,99/mês</span>
+          </div>
+          <div class="pro-desc">Acesso completo aos recursos Pro com renovação mensal flexível.</div>
+        </div>
+
+        <div class="pro-card">
+          <div class="pro-row">
+            <span class="pro-name">Pro Vitalício</span>
+            <span class="pro-price">R$ 149,99</span>
+          </div>
+          <div class="pro-desc">Pagamento único sem assinatura. Acesso permanente via Google Play Billing.</div>
+        </div>
+
+        <button class="cta-primary" style="margin-top: 8px" onclick="alert('Fluxo oficial Google Play Billing + verificação fail-closed')">
+          Continuar com Google Play
+        </button>
+
+        <p class="pro-note">
+          Assinaturas renovam automaticamente até serem canceladas na Google Play Store. Nenhuma mídia é apagada sem sua confirmação.
+        </p>
+      </section>
+    </div>
+
+    <div class="floating-action" id="selectionBar">
+      <span id="selectionCount" style="font-size: 13px; font-weight: 600;">0 selecionados</span>
+      <button class="btn-danger-sm" onclick="alert('Abre diálogo oficial do Android (createDeleteRequest / RecoverableSecurityException)')">Mover para lixeira</button>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="nav-clean" onclick="switchTab('clean')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+        Limpar
+      </button>
+      <button class="nav-btn" id="nav-files" onclick="switchTab('files')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
+        Arquivos
+      </button>
+      <button class="nav-btn" id="nav-pro" onclick="switchTab('pro')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.5-.8Z"/></svg>
+        Pro
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('nav-' + tab).classList.add('active');
+      updateSelectionBar();
+    }
+
+    function toggleTile(tile) {
+      tile.classList.toggle('selected');
+      updateSelectionBar();
+    }
+
+    function updateSelectionBar() {
+      const filesActive = document.getElementById('tab-files').classList.contains('active');
+      const count = document.querySelectorAll('.media-tile.selected').length;
+      const bar = document.getElementById('selectionBar');
+      if (filesActive && count > 0) {
+        bar.classList.add('visible');
+        document.getElementById('selectionCount').textContent = count + (count === 1 ? ' item selecionado' : ' itens selecionados');
+      } else {
+        bar.classList.remove('visible');
+      }
+    }
+  </script>
+</body>
+</html>

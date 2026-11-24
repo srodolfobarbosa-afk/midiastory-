@@ -104,41 +104,42 @@ async function main() {
   const gitHead = safeExec("git log -1 --oneline", 3000) || "";
   const session = getActiveSessionMetrics();
 
+  const closedTestDay = Math.min(14, Math.max(1, Math.floor((Date.now() - Date.parse("2026-11-12T03:00:00Z")) / 86400000)));
+  const activeVisualPath = path.join(PROJECT_ROOT, ".tmp", "hud-propostas-logo-bigtech.png");
+  const hudImage = fs.existsSync(activeVisualPath) ? activeVisualPath : "";
+
   const body = [
-    "## 🚀 Telemetria Ao Vivo do Ecossistema Midiastore",
+    "## ✅ MARCA APROVADA E PUBLICADA AO VIVO (PRECISION STORAGE RING)",
+    "- **Site da Bio (14 idiomas):** https://midiastory-df6a0.web.app/ atualizado com layout OLED Big-Tech + nova logo sem estrelinha (`Release 1795525424784000`, HTTP 200).",
+    "- **Google Play Console (14 idiomas):** novo ícone 512x512 + 14 banners 1024x500 ativos (`Edit 07345625292712612742`, HTTP 200, 23 testadores intactos).",
+    "",
+    "## 🚀 CHECKLIST ÚNICA — SUPER PACOTE v2.9.0 (FAZER TUDO DE UMA VEZ NA BRANCH ISOLADA)",
+    "- **[ ] Bloco 1:** Tela de **Fotos Parecidas / Burst IA** (protege a foto mais nítida automaticamente nos 14 idiomas).",
+    "- **[ ] Bloco 2:** **Preview Tela Cheia** (zoom em fotos + play rápido em vídeos antes de mandar para a Lixeira).",
+    "- **[ ] Bloco 3:** **Compressor de Vídeos H.265 na GPU (Pro)** — reduz vídeos grandes (500 MB -> 85 MB) sem apagar memórias.",
+    "- **[ ] Bloco 4:** **Varredura Instantânea (< 0,3s)** ligando o banco `SQLite WAL` ao scanner global `SHA-256`.",
+    "- **[ ] Bloco 5:** **Zero Estrelinhas/Emojis** residuais + 100% das chaves novas nos **14 idiomas**.",
+    "- **[ ] Bloco 6:** **Contador Vitalício de GB Economizados** na Home + pedido automático de **5 estrelas** pós-limpeza.",
+    "- **[ ] Bloco 7:** **Limpeza de 170 KB de código morto** (jogos/estúdio antigos) sem tocar na Maria atual.",
+    "- **[ ] Bloco 8:** **Build na Nuvem (7 GB RAM) + instalar `.debug` no seu Moto G84** ao lado do oficial para você aprovar!",
+    "",
+    "## 📊 Telemetria Ao Vivo do Ecossistema",
     `- **GitHub CI/CD:** ${ci}`,
-    `- **Branch & Último Commit:** ${gitBranch} — ${gitHead}`,
-    `- **Supabase Ao Vivo:** ${supa.testers} registros em beta_testers | ${supa.purchases} compras verificadas em play_purchases`,
-    `- **Hardware Motorola USB:** ${moto}`,
-    `- **Saúde do PC Local:** ${pc.freeGb} GB livres de ${pc.totalGb} GB (${pc.freePct}% livre)`,
-    "",
-    "## 🧠 Guardião de Cota & Sessão Antigravity (Tempo Real)",
-    `- **Peso da Conversa Atual:** ${session.userTurns ?? 0} falas suas | ${session.sizeKb ?? 0} KB (~${session.estTokens ?? 0} tokens no log)`,
-    `- **Semáforo de Cota:** ${session.level || "N/D"}`,
-    `- **Motor de Voz Ativo:** ${session.ttsMode || "Francisca Neural"}`,
-    "",
-    "## 🎯 Meta Suprema: R$ 1.000.000,00 na Google Play (Escada 50/50)",
-    "- **Score de Prontidão Comercial:** **75/100** (únicos 25 pts pendentes = liberação de Produção em **26/11**, Dia 10/14).",
-    "- **Google Play Console:** `v2.8.0 (vc 32) [completed]` em internal + alpha (**23 testadores intactos**) | 3 Planos ATIVOS (Mensal R$ 14,99, Anual R$ 79,99, Vitalício R$ 149,99).",
-    "- **Versão Candidata Final:** `v2.8.2 (vc 34)` (`7,26 MB` AAB R8 verde no CI, 14 idiomas `630/630`, retrato natural Maria + anel neon 60 FPS, zero modal bloqueador).",
-    "- **Escada Financeira (Regra 50/50):** Marco 1 (Produção 26/11 + 1ª venda real) -> Marco 2 (R$ 5k/mês: financia VPS 24/7 + APIs + Ads) -> Marco 3 (R$ 50k/mês: escala 14 idiomas) -> Marco 4 (**R$ 1.000.000,00**).",
-    "",
-    "## ✅ Checklist Viva de Execução (Próximos Passos Reais)",
-    "- [ ] **1. Moto G84 USB:** plugar cabo para instalar e validar visualmente `v2.8.2 (vc 34)` nas 3 abas.",
-    "- [ ] **2. Quinta-feira 26/11:** clicar em **'Solicitar a produção'** colando `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`.",
-    "- [ ] **3. Dia 1 de Produção:** publicar Reels/Shorts prontos (`marketing/videos/`) + importar `google-ads-editor-lote-14-idiomas.zip` no Ads Editor.",
+    `- **Play Console & Supabase:** Dia ${closedTestDay}/14 (Produção quinta **26/11**) | 23 testadores | ${supa.purchases} venda validada`,
+    `- **Hardware Motorola USB:** ${moto} | **RAM Livre PC:** ${pc.freeGb} GB / ${pc.totalGb} GB`,
+    `- **Guardião de Cota:** ${session.level || "N/D"} (${session.sizeKb ?? 0} KB no log)`,
   ].join("\n");
 
   const boardArgs = [
     path.join(PROJECT_ROOT, "scripts", "antigravity-board.mjs"),
     "--title",
-    "FRIDAY Mission HUD — Midiastore Ao Vivo",
+    "SUPER PACOTE v2.9.0 BIG-TECH — CHECKLIST COMPLETA DE EXECUÇÃO ÚNICA",
     "--subtitle",
-    `Verificado em tempo real às ${new Date().toLocaleTimeString("pt-BR")} (Zero dado velho)`,
+    `Nova Logo & Site 14 Idiomas NO AR • Diga 'Pode executar tudo' para rodar os 8 Blocos de uma vez!`,
     "--body",
     body,
     "--image",
-    "",
+    hudImage,
   ];
   if (openBoard) boardArgs.push("--open");
   spawnSync(process.execPath, boardArgs, { cwd: PROJECT_ROOT, stdio: "inherit" });
