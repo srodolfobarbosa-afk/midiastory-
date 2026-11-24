@@ -435,6 +435,70 @@ object MariaI18n {
         else -> "Blurry Photos AI"
     }
 
+    fun similarPhotosTitle(): String = when (lang()) {
+        "pt" -> "Fotos Parecidas IA"
+        "es" -> "Fotos Similares IA"
+        "fr" -> "Photos Similaires IA"
+        "de" -> "Ähnliche Fotos KI"
+        "zh" -> "相似连拍照片 AI"
+        "ja" -> "類似・連写写真 AI"
+        "ko" -> "유사·연사 사진 AI"
+        "ru" -> "Похожие фото ИИ"
+        "ar" -> "الصور المتشابهة AI"
+        "hi" -> "मिलती-जुलती फ़ोटो AI"
+        "bn" -> "একই রকম ছবি AI"
+        "in", "id" -> "Foto Mirip AI"
+        else -> "Similar Photos AI"
+    }
+
+    fun bestShotProtectedSub(): String = when (lang()) {
+        "pt" -> "Melhor foto protegida"
+        "es" -> "Mejor foto protegida"
+        "fr" -> "Meilleure photo gardée"
+        "de" -> "Bestes Foto geschützt"
+        "zh" -> "自动保留最清晰一张"
+        "ja" -> "ベストショット保護"
+        "ko" -> "베스트 사진 자동 보호"
+        "ru" -> "Лучший кадр защищён"
+        "ar" -> "حماية أفضل لقطة"
+        "hi" -> "सबसे साफ़ फ़ोटो सुरक्षित"
+        "bn" -> "সেরা ছবিটি সুরক্ষিত"
+        "in", "id" -> "Foto terbaik dilindungi"
+        else -> "Best shot protected"
+    }
+
+    fun videoCompressorTitle(): String = when (lang()) {
+        "pt" -> "Compressor H.265"
+        "es" -> "Compresor H.265"
+        "fr" -> "Compresseur H.265"
+        "de" -> "H.265-Kompressor"
+        "zh" -> "H.265 视频压缩"
+        "ja" -> "H.265 動画圧縮"
+        "ko" -> "H.265 동영상 압축"
+        "ru" -> "Сжатие видео H.265"
+        "ar" -> "ضاغط الفيديو H.265"
+        "hi" -> "H.265 वीडियो कंप्रेसर"
+        "bn" -> "H.265 ভিডিও কমপ্রেসর"
+        "in", "id" -> "Kompresor H.265"
+        else -> "H.265 Compressor"
+    }
+
+    fun videoCompressorSub(): String = when (lang()) {
+        "pt" -> "Reduz vídeo sem nuvem"
+        "es" -> "Reduce sin perder nitidez"
+        "fr" -> "Réduit sur l'appareil"
+        "de" -> "Lokal verkleinern"
+        "zh" -> "本地无损画质瘦身"
+        "ja" -> "端末内で高画質圧縮"
+        "ko" -> "기기 내 고화질 압축"
+        "ru" -> "Локальное сжатие GPU"
+        "ar" -> "ضغط محلي بجودة عالية"
+        "hi" -> "बिना क्लाउड आकार घटाएँ"
+        "bn" -> "ডিভাইসেই ভিডিও ছোট করুন"
+        "in", "id" -> "Kecilkan ukuran lokal"
+        else -> "On-device GPU shrink"
+    }
+
     fun proBannerTitle(): String = when (lang()) {
         "pt" -> "Apps sem uso (+90d), Fotos Borradas e Relatórios Auditados"
         "es" -> "Apps sin uso (+90d), Fotos Borrosas e Informes Auditados"
@@ -1009,6 +1073,8 @@ fun ProMariaHeaderSection(
     isActive: Boolean,
     isProActive: Boolean,
     onRunSmartDiagnosis: () -> Unit = {},
+    onRunSimilarPhotos: () -> Unit = {},
+    onRunVideoCompressor: () -> Unit = {},
     onRunBlurScan: () -> Unit = {},
     onRunWhatsAppClean: () -> Unit = {},
     onRunUnusedApps: () -> Unit = {},
@@ -1034,6 +1100,37 @@ fun ProMariaHeaderSection(
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                MariaSquareTile(
+                    label = MariaI18n.similarPhotosTitle(),
+                    highlight = "dHash",
+                    highlightColor = Color(0xFF0A84FF),
+                    subtitle = MariaI18n.bestShotProtectedSub(),
+                    onClick = {
+                        caption = MariaI18n.similarPhotosTitle() + " • " + MariaI18n.bestShotProtectedSub()
+                        activeAudioRes = R.raw.maria_dup
+                        speechNonce++
+                        onRunSimilarPhotos()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+                MariaSquareTile(
+                    label = MariaI18n.videoCompressorTitle(),
+                    highlight = "H.265",
+                    highlightColor = Color(0xFF30D158),
+                    subtitle = MariaI18n.videoCompressorSub(),
+                    onClick = {
+                        caption = MariaI18n.videoCompressorTitle() + " • " + MariaI18n.videoCompressorSub()
+                        activeAudioRes = R.raw.maria_videos
+                        speechNonce++
+                        onRunVideoCompressor()
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

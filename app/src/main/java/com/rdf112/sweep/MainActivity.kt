@@ -72,11 +72,16 @@ import com.rdf112.sweep.data.WhatsAppMediaItem
 import com.rdf112.sweep.data.billing.AndroidPlayBillingGateway
 import com.rdf112.sweep.data.billing.PlayCatalogProductUi
 import com.rdf112.sweep.data.media.AndroidBlurPhotoScanner
+import com.rdf112.sweep.data.media.AndroidHardwareVideoCompressor
 import com.rdf112.sweep.data.media.AndroidMediaBreakdownReader
 import com.rdf112.sweep.data.media.AndroidMediaPageRepository
+import com.rdf112.sweep.data.media.AndroidSimilarPhotoScanner
 import com.rdf112.sweep.data.media.AndroidTrashOperationCoordinator
 import com.rdf112.sweep.data.media.Api29DeleteAttempt
+import com.rdf112.sweep.data.media.VideoCompressionOutcome
 import com.rdf112.sweep.data.oaas.AndroidOutcomeTelemetryStore
+import com.rdf112.sweep.domain.analysis.SimilarPhotoGroup
+import com.rdf112.sweep.domain.analysis.VideoCompressionPlanner
 import com.rdf112.sweep.util.InAppReviewCoordinator
 import com.rdf112.sweep.domain.billing.BillingStatePolicy
 import com.rdf112.sweep.domain.billing.ProAccessSummaryState
@@ -99,6 +104,8 @@ import com.rdf112.sweep.presentation.ui.CleanMission
 import com.rdf112.sweep.presentation.ui.CleanerHomeScreen
 import com.rdf112.sweep.presentation.ui.FilesMariaHeaderSection
 import com.rdf112.sweep.presentation.ui.HomeUiState
+import com.rdf112.sweep.presentation.ui.MariaI18n
+import com.rdf112.sweep.presentation.ui.MediaFullscreenPreviewDialog
 import com.rdf112.sweep.presentation.ui.ProGeminiNanoBottomCard
 import com.rdf112.sweep.presentation.ui.ProMariaHeaderSection
 import com.rdf112.sweep.presentation.ui.StorageBarSegment
@@ -160,8 +167,12 @@ class MainActivity : AppCompatActivity() {
         val homeCleanupPending = pendingOutcomeMission == DesiredOutcomeMission.FREE_MAX_SPACE_NOW
         val whatsAppPending = pendingWhatsAppCleanerAfterPermission
         val blurPending = pendingBlurScanAfterPermission
+        val similarPending = pendingSimilarScanAfterPermission
+        val videoCompressPending = pendingVideoCompressAfterPermission
         pendingWhatsAppCleanerAfterPermission = false
         pendingBlurScanAfterPermission = false
+        pendingSimilarScanAfterPermission = false
+        pendingVideoCompressAfterPermission = false
         homeComposeState.value = homeComposeState.value.copy(needsMediaPermissionPrompt = !hasFullVisualAccess())
         if (hasAnyMediaPermission()) {
             // The user saw the system sheet and decided; never nag again with our own sheet in this session.
@@ -173,6 +184,8 @@ class MainActivity : AppCompatActivity() {
             when {
                 whatsAppPending -> openWhatsAppCleanerFlow()
                 blurPending -> openBlurCleanerFlow()
+                similarPending -> openSimilarPhotosCleanerFlow()
+                videoCompressPending -> openVideoCompressorCandidatesSheet()
             }
         } else {
             pendingKindAfterPermission = null
@@ -281,12 +294,14 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 sessionAuthorizedBytes += totalBatchBytes
             }
+            var reviewPrompted = false
             if (confirmedBytes > 0L) {
                 try {
                     window.decorView.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
                 } catch (_: Exception) {}
                 outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
-                inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes)
+                val lifetimeBytesNow = outcomeTelemetry.loadSnapshot().totalConfirmedFreedBytes
+                reviewPrompted = inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes, lifetimeBytesNow)
             }
             refreshStorageStats()
             refreshFlywheelSummary()
@@ -312,7 +327,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.clearSelection()
                 viewModel.startSession()
                 Toast.makeText(this@MainActivity, getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt), Toast.LENGTH_LONG).show()
-                showPostCleanupReliefOffer(confirmedBytes, confirmedDeleted)
+                if (!reviewPrompted) {
+                    showPostCleanupReliefOffer(confirmedBytes, confirmedDeleted)
+                }
             }
             statusText.text = getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt)
         }
@@ -485,7 +502,11 @@ class MainActivity : AppCompatActivity() {
     private var renderedPageKey: String? = null
     private var storageBreakdownJob: Job? = null
     private var blurScanJob: Job? = null
+    private var similarScanJob: Job? = null
+    private var videoCompressJob: Job? = null
     private var pendingBlurScanAfterPermission = false
+    private var pendingSimilarScanAfterPermission = false
+    private var pendingVideoCompressAfterPermission = false
     private val thumbnailJobs = mutableListOf<Job>()
     private val thumbnailDispatcher by lazy { Dispatchers.IO.limitedParallelism(4) }
     private val thumbnailCache: LruCache<String, Bitmap> by lazy {
@@ -567,6 +588,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        similarScanJob?.cancel()
+        blurScanJob?.cancel()
+        videoCompressJob?.cancel()
         if (::billingGateway.isInitialized) billingGateway.endConnection()
         super.onDestroy()
     }
@@ -1488,6 +1512,8 @@ class MainActivity : AppCompatActivity() {
                             openInteractiveDialogOnMissionFinish = true
                             runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
                         },
+                        onRunSimilarPhotos = { openSimilarPhotosCleanerFlow() },
+                        onRunVideoCompressor = { runWithProAccess { openVideoCompressorCandidatesSheet() } },
                         onRunBlurScan = { openBlurCleanerFlow() },
                         onRunWhatsAppClean = { openWhatsAppCleanerFlow() },
                         onRunUnusedApps = { runWithProAccess { requestUnusedAppSuggestions() } },
@@ -1569,13 +1595,21 @@ class MainActivity : AppCompatActivity() {
         stylePlanPurchaseButton(planLifetimeButton, isProductAvailable = false)
         addView(planLifetimeButton, top(10))
 
+        val videoCompressProButton = button(getString(R.string.video_compress_pro_button)) {
+            runWithProAccess { openVideoCompressorCandidatesSheet() }
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            setTextColor(color(R.color.sweep_text))
+        }
+        addView(videoCompressProButton, top(12))
+
         val unusedAppsButton = button(getString(R.string.pro_unused_apps_button)) {
             runWithProAccess { requestUnusedAppSuggestions() }
         }.apply {
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
             setTextColor(color(R.color.sweep_text))
         }
-        addView(unusedAppsButton, top(12))
+        addView(unusedAppsButton, top(8))
 
         // Console Interativo do Modelo IA Nativa (Gemini Nano Android — LIBERADO PARA USO) posicionado lá no final da aba Pro
         val proGeminiNanoBottomView = ComposeView(this@MainActivity).apply {
@@ -1702,6 +1736,7 @@ class MainActivity : AppCompatActivity() {
     private fun onCleanMissionClick(mission: CleanMission) {
         when (mission) {
             CleanMission.WHATSAPP -> openWhatsAppCleanerFlow()
+            CleanMission.SIMILAR_PHOTOS -> openSimilarPhotosCleanerFlow()
             CleanMission.DUPLICATES -> {
                 openInteractiveDialogOnMissionFinish = true
                 runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
@@ -1727,6 +1762,13 @@ class MainActivity : AppCompatActivity() {
             itemCount = 0,
         ),
         CleanCollectionUiModel(
+            mission = CleanMission.SIMILAR_PHOTOS,
+            title = getString(R.string.cleaner_home_fallback_similar_title),
+            subtitle = getString(R.string.cleaner_home_fallback_similar_sub),
+            sizeLabel = "dHash",
+            itemCount = 0,
+        ),
+        CleanCollectionUiModel(
             mission = CleanMission.LARGE_VIDEOS,
             title = getString(R.string.cleaner_home_fallback_large_videos_title),
             subtitle = getString(R.string.cleaner_home_fallback_large_videos_sub),
@@ -1734,17 +1776,17 @@ class MainActivity : AppCompatActivity() {
             itemCount = 0,
         ),
         CleanCollectionUiModel(
-            mission = CleanMission.WHATSAPP,
-            title = getString(R.string.cleaner_home_fallback_whatsapp_title),
-            subtitle = getString(R.string.cleaner_home_fallback_whatsapp_sub),
-            sizeLabel = "MediaStore",
-            itemCount = 0,
-        ),
-        CleanCollectionUiModel(
             mission = CleanMission.OLD_SCREENSHOTS,
             title = getString(R.string.cleaner_home_fallback_screenshots_title),
             subtitle = getString(R.string.cleaner_home_fallback_screenshots_sub),
             sizeLabel = "> 30d",
+            itemCount = 0,
+        ),
+        CleanCollectionUiModel(
+            mission = CleanMission.WHATSAPP,
+            title = getString(R.string.cleaner_home_fallback_whatsapp_title),
+            subtitle = getString(R.string.cleaner_home_fallback_whatsapp_sub),
+            sizeLabel = "MediaStore",
             itemCount = 0,
         ),
         CleanCollectionUiModel(
@@ -2211,6 +2253,8 @@ class MainActivity : AppCompatActivity() {
             pendingOutcomeMission = null
             pendingWhatsAppCleanerAfterPermission = false
             pendingBlurScanAfterPermission = false
+            pendingSimilarScanAfterPermission = false
+            pendingVideoCompressAfterPermission = false
             openInteractiveDialogOnMissionFinish = false
             sheet.dismiss()
         }.apply {
@@ -2460,6 +2504,9 @@ class MainActivity : AppCompatActivity() {
                 scaleType = ImageView.ScaleType.CENTER_CROP
                 setBackgroundColor(color(R.color.sweep_background))
                 tag = record.uri
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { openMediaPreview(record) }
             }
             if (record.kind == MediaKind.AUDIO) {
                 thumb.setImageResource(android.R.drawable.ic_media_play)
@@ -2907,20 +2954,592 @@ class MainActivity : AppCompatActivity() {
                 ).show()
                 return@launch
             }
-            val blurRecords = result.candidates.map { it.record }
-            val blurBytes = blurRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+            updateInteractiveCleanupReviewAfterBlur(result.candidates.map { it.record }, !result.capReached)
+        }
+    }
+
+    private fun updateInteractiveCleanupReviewAfterBlur(blurRecords: List<MediaRecord>, coverageComplete: Boolean) {
+        val blurBytes = blurRecords.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+        updateHomeMissionCollection(
+            mission = CleanMission.BLURRY_PHOTOS,
+            itemCount = blurRecords.size,
+            sizeLabel = Formatter.formatFileSize(this@MainActivity, blurBytes),
+        )
+        openInteractiveCleanupReviewDialog(
+            records = blurRecords,
+            isFallbackList = false,
+            mission = null,
+            coverageComplete = coverageComplete,
+            customSubtitle = getString(R.string.blur_sheet_subtitle),
+        )
+    }
+
+    private fun openMediaPreview(record: MediaRecord) {
+        MediaFullscreenPreviewDialog.show(
+            activity = this,
+            record = record,
+            onCompressVideoRequested = { videoRecord ->
+                runWithProAccess { startHardwareVideoCompressionFlow(videoRecord) }
+            },
+        )
+    }
+
+    private fun openSimilarPhotosCleanerFlow() {
+        if (!hasFullVisualAccess() && !limitedAccessAcknowledged) {
+            pendingSimilarScanAfterPermission = true
+            if (hasAnyMediaPermission()) {
+                showLimitedAccessPromptSheet {
+                    pendingSimilarScanAfterPermission = false
+                    openSimilarPhotosCleanerFlow()
+                }
+            } else {
+                requestMediaPermissions(allowSettingsFallback = true)
+            }
+            return
+        }
+        similarScanJob?.cancel()
+        val (progressSheet, progressRoot) = createAppleBottomSheet(
+            title = getString(R.string.similar_scan_title),
+            subtitle = getString(R.string.similar_scan_subtitle),
+        )
+        val statusLabel = label(getString(R.string.similar_scan_progress, 0, 0), 13f, R.color.sweep_primary_glow, true)
+        progressRoot.addView(statusLabel, top(12))
+        val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            isIndeterminate = true
+            indeterminateTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        progressRoot.addView(bar, top(12))
+        val cancelBtn = button(getString(android.R.string.cancel)) {
+            similarScanJob?.cancel()
+            progressSheet.dismiss()
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        progressRoot.addView(cancelBtn, top(12))
+        progressSheet.setOnCancelListener { similarScanJob?.cancel() }
+        progressSheet.show()
+
+        similarScanJob = lifecycleScope.launch {
+            val result = try {
+                AndroidSimilarPhotoScanner.scanSimilarPhotos(
+                    context = this@MainActivity,
+                    onProgress = { inspected, cacheHits ->
+                        if (progressSheet.isShowing) {
+                            statusLabel.text = getString(R.string.similar_scan_progress, inspected, cacheHits)
+                        }
+                    },
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            } finally {
+                if (progressSheet.isShowing) progressSheet.dismiss()
+            }
+            if (result == null) return@launch
+            if (result.groups.isEmpty()) {
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.similar_scan_empty, result.photosInspected),
+                    Toast.LENGTH_LONG,
+                ).show()
+                return@launch
+            }
+            val candidateCount = result.groups.sumOf { it.candidatesToReview.size }
             updateHomeMissionCollection(
-                mission = CleanMission.BLURRY_PHOTOS,
-                itemCount = blurRecords.size,
-                sizeLabel = Formatter.formatFileSize(this@MainActivity, blurBytes),
+                mission = CleanMission.SIMILAR_PHOTOS,
+                itemCount = candidateCount,
+                sizeLabel = Formatter.formatFileSize(this@MainActivity, result.totalRecoverableBytes),
             )
-            openInteractiveCleanupReviewDialog(
-                records = blurRecords,
-                isFallbackList = false,
-                mission = null,
+            openSimilarPhotosGroupReviewSheet(
+                groups = result.groups,
                 coverageComplete = !result.capReached,
-                customSubtitle = getString(R.string.blur_sheet_subtitle),
             )
+        }
+    }
+
+    private fun openSimilarPhotosGroupReviewSheet(
+        groups: List<SimilarPhotoGroup>,
+        coverageComplete: Boolean,
+    ) {
+        val cappedGroups = groups.take(60)
+        val allCandidates = cappedGroups.flatMap { g -> g.candidatesToReview.map { it.record } }.take(200)
+        if (allCandidates.isEmpty()) {
+            showEmptyCleanupBottomSheet()
+            return
+        }
+        val indexByUri = allCandidates.withIndex().associate { it.value.uri to it.index }
+        val checked = BooleanArray(allCandidates.size) { coverageComplete }
+        val boxByIndex = arrayOfNulls<CheckBox>(allCandidates.size)
+
+        val (dialog, root) = createAppleBottomSheet(
+            title = getString(R.string.similar_scan_title),
+            subtitle = getString(R.string.similar_sheet_subtitle),
+        )
+        val summaryLabel = label("", 13f, R.color.sweep_primary_glow, true)
+        root.addView(summaryLabel, top(10))
+        var deleteActionBtn: MaterialButton? = null
+
+        fun refreshSimilarSummary() {
+            var count = 0
+            var bytes = 0L
+            for (i in allCandidates.indices) {
+                if (checked[i]) {
+                    count++
+                    bytes += allCandidates[i].sizeBytes.coerceAtLeast(0L)
+                }
+            }
+            val sizeFmt = Formatter.formatFileSize(this, bytes)
+            summaryLabel.text = getString(R.string.cleanup_dialog_selected_summary, count, allCandidates.size, sizeFmt)
+            deleteActionBtn?.text = if (count > 0 && bytes > 0L) {
+                "${getString(R.string.permanent_delete_button)} ($sizeFmt)"
+            } else {
+                getString(R.string.permanent_delete_button)
+            }
+        }
+
+        val listContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(6), 0, dp(6))
+        }
+
+        cappedGroups.forEachIndexed { groupIdx, group ->
+            val groupBytesFmt = Formatter.formatFileSize(this, group.recoverableBytes)
+            listContainer.addView(
+                label(
+                    getString(R.string.similar_group_header, groupIdx + 1, group.totalPhotos, groupBytesFmt),
+                    12f,
+                    R.color.google_blue_primary,
+                    true,
+                ),
+                top(if (groupIdx == 0) 2 else 10),
+            )
+
+            // 1. Best shot row: locked, protected, unchecked, green badge
+            val bestRec = group.bestKeep.record
+            val bestRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(8), dp(8), dp(10), dp(8))
+                background = borderedPill(Color.parseColor("#10291A"), Color.parseColor("#30D158"), dp(12), dp(1))
+            }
+            val lockedBox = CheckBox(this).apply {
+                isChecked = false
+                isEnabled = false
+                minWidth = dp(48)
+                minHeight = dp(48)
+            }
+            bestRow.addView(lockedBox, LinearLayout.LayoutParams(-2, -2))
+            val bestThumb = ImageView(this).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setBackgroundColor(color(R.color.sweep_background))
+                tag = bestRec.uri
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { openMediaPreview(bestRec) }
+            }
+            loadThumbnail(bestThumb, bestRec)
+            bestRow.addView(bestThumb, LinearLayout.LayoutParams(dp(48), dp(48)).apply { marginStart = dp(4); marginEnd = dp(8) })
+
+            val bestMeta = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            val bestBadge = TextView(this).apply {
+                text = getString(R.string.similar_best_photo_badge)
+                textSize = 10f
+                typeface = Typeface.DEFAULT_BOLD
+                setTextColor(Color.parseColor("#30D158"))
+            }
+            bestMeta.addView(bestBadge)
+            bestMeta.addView(
+                label(
+                    bestRec.displayName?.takeIf(String::isNotBlank) ?: getString(R.string.unnamed_file),
+                    12f,
+                    R.color.sweep_text,
+                    true,
+                ).apply {
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
+                },
+                top(2),
+            )
+            bestMeta.addView(
+                label(Formatter.formatFileSize(this, bestRec.sizeBytes), 11f, R.color.sweep_muted, false),
+                top(1),
+            )
+            bestRow.addView(bestMeta, LinearLayout.LayoutParams(0, -2, 1f))
+            bestRow.setOnClickListener { openMediaPreview(bestRec) }
+            listContainer.addView(bestRow, top(4))
+
+            // 2. Reviewable candidate shots in this burst group
+            for (candFp in group.candidatesToReview) {
+                val rec = candFp.record
+                val flatIdx = indexByUri[rec.uri] ?: continue
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(dp(8), dp(6), dp(10), dp(6))
+                    background = roundedBackground(color(R.color.sweep_surface_alt), dp(12))
+                }
+                val box = CheckBox(this).apply {
+                    isChecked = checked[flatIdx]
+                    minWidth = dp(48)
+                    minHeight = dp(48)
+                    setOnCheckedChangeListener { _, isChecked ->
+                        checked[flatIdx] = isChecked
+                        refreshSimilarSummary()
+                    }
+                }
+                boxByIndex[flatIdx] = box
+                row.addView(box, LinearLayout.LayoutParams(-2, -2))
+
+                val thumb = ImageView(this).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setBackgroundColor(color(R.color.sweep_background))
+                    tag = rec.uri
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener { openMediaPreview(rec) }
+                }
+                loadThumbnail(thumb, rec)
+                row.addView(thumb, LinearLayout.LayoutParams(dp(48), dp(48)).apply { marginStart = dp(4); marginEnd = dp(8) })
+
+                val meta = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+                meta.addView(
+                    label(
+                        rec.displayName?.takeIf(String::isNotBlank) ?: getString(R.string.unnamed_file),
+                        12f,
+                        R.color.sweep_text,
+                        true,
+                    ).apply {
+                        maxLines = 1
+                        ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
+                    },
+                )
+                meta.addView(
+                    label(Formatter.formatFileSize(this, rec.sizeBytes), 11f, R.color.sweep_primary_glow, false),
+                    top(2),
+                )
+                row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f))
+                row.setOnClickListener { box.isChecked = !box.isChecked }
+                listContainer.addView(row, top(4))
+            }
+        }
+
+        val maxListHeight = (resources.displayMetrics.heightPixels * 0.44f).toInt().coerceIn(dp(220), dp(380))
+        root.addView(
+            ScrollView(this).apply { addView(listContainer, ViewGroup.LayoutParams(-1, -2)) },
+            LinearLayout.LayoutParams(-1, maxListHeight).apply { topMargin = dp(8) },
+        )
+
+        fun chosenSimilarRecords(): List<MediaRecord> =
+            allCandidates.indices.filter { checked[it] }.map { allCandidates[it] }
+
+        val supportsTrash = trashCoordinator.supportsSystemTrash()
+        deleteActionBtn = button(getString(R.string.permanent_delete_button)) {
+            val chosen = chosenSimilarRecords()
+            if (chosen.isEmpty()) {
+                Toast.makeText(this, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                return@button
+            }
+            dialog.dismiss()
+            viewModel.prepareExternalReviewSelection(chosen)
+            requestPermanentDeleteSelected(chosen)
+        }.apply {
+            minHeight = dp(52)
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
+        }
+        root.addView(deleteActionBtn, top(12))
+        refreshSimilarSummary()
+
+        if (supportsTrash) {
+            val trashBtn = button(getString(R.string.move_to_trash_button)) {
+                val chosen = chosenSimilarRecords()
+                if (chosen.isEmpty()) {
+                    Toast.makeText(this, R.string.cleanup_dialog_select_none_toast, Toast.LENGTH_SHORT).show()
+                    return@button
+                }
+                dialog.dismiss()
+                viewModel.prepareExternalReviewSelection(chosen)
+                requestMoveSelectedToTrash(chosen)
+            }.apply {
+                minHeight = dp(48)
+                setTextColor(color(R.color.sweep_text))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_surface_alt))
+            }
+            root.addView(trashBtn, top(8))
+        }
+
+        val closeBtn = button(getString(android.R.string.cancel)) {
+            dialog.dismiss()
+        }.apply {
+            minHeight = dp(46)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        root.addView(closeBtn, top(4))
+        dialog.show()
+    }
+
+    private fun openVideoCompressorCandidatesSheet() {
+        if (!hasFullVisualAccess() && !limitedAccessAcknowledged) {
+            pendingVideoCompressAfterPermission = true
+            if (hasAnyMediaPermission()) {
+                showLimitedAccessPromptSheet {
+                    pendingVideoCompressAfterPermission = false
+                    openVideoCompressorCandidatesSheet()
+                }
+            } else {
+                requestMediaPermissions(allowSettingsFallback = true)
+            }
+            return
+        }
+        lifecycleScope.launch {
+            val heavyVideos = withContext(Dispatchers.IO) { queryHeavyVideosForCompression() }
+            if (heavyVideos.isEmpty()) {
+                Toast.makeText(this@MainActivity, R.string.video_compress_empty, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            val (sheet, root) = createAppleBottomSheet(
+                title = getString(R.string.video_compress_sheet_title),
+                subtitle = getString(R.string.video_compress_sheet_subtitle),
+            )
+            val listContainer = LinearLayout(this@MainActivity).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(6), 0, dp(6))
+            }
+            for (video in heavyVideos) {
+                val row = LinearLayout(this@MainActivity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(dp(8), dp(8), dp(8), dp(8))
+                    background = roundedBackground(color(R.color.sweep_surface_alt), dp(12))
+                }
+                val thumb = ImageView(this@MainActivity).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setBackgroundColor(color(R.color.sweep_background))
+                    tag = video.uri
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener { openMediaPreview(video) }
+                }
+                loadThumbnail(thumb, video)
+                row.addView(thumb, LinearLayout.LayoutParams(dp(50), dp(50)).apply { marginEnd = dp(10) })
+
+                val meta = LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL }
+                meta.addView(
+                    label(
+                        video.displayName?.takeIf(String::isNotBlank) ?: getString(R.string.unnamed_file),
+                        12.5f,
+                        R.color.sweep_text,
+                        true,
+                    ).apply {
+                        maxLines = 1
+                        ellipsize = android.text.TextUtils.TruncateAt.MIDDLE
+                    },
+                )
+                meta.addView(
+                    label(Formatter.formatFileSize(this@MainActivity, video.sizeBytes), 11f, R.color.sweep_primary_glow, true),
+                    top(2),
+                )
+                row.addView(meta, LinearLayout.LayoutParams(0, -2, 1f).apply { marginEnd = dp(8) })
+
+                val compressBtn = button(getString(R.string.video_compress_action_btn)) {
+                    sheet.dismiss()
+                    startHardwareVideoCompressionFlow(video)
+                }.apply {
+                    minHeight = dp(42)
+                    textSize = 12f
+                    typeface = Typeface.DEFAULT_BOLD
+                    setPadding(dp(12), dp(6), dp(12), dp(6))
+                    setTextColor(Color.WHITE)
+                    backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+                }
+                row.addView(compressBtn, LinearLayout.LayoutParams(-2, -2))
+                listContainer.addView(row, bottom(6))
+            }
+
+            val maxHeight = (resources.displayMetrics.heightPixels * 0.45f).toInt().coerceIn(dp(220), dp(380))
+            root.addView(
+                ScrollView(this@MainActivity).apply { addView(listContainer, ViewGroup.LayoutParams(-1, -2)) },
+                LinearLayout.LayoutParams(-1, maxHeight).apply { topMargin = dp(8) },
+            )
+            val closeBtn = button(getString(android.R.string.cancel)) {
+                sheet.dismiss()
+            }.apply {
+                minHeight = dp(46)
+                setTextColor(color(R.color.sweep_muted))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+            }
+            root.addView(closeBtn, top(6))
+            sheet.show()
+        }
+    }
+
+    private fun queryHeavyVideosForCompression(limit: Int = 50): List<MediaRecord> {
+        val volumes = runCatching { android.provider.MediaStore.getExternalVolumeNames(this) }
+            .getOrElse { setOf(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY) }
+        val projection = arrayOf(
+            android.provider.BaseColumns._ID,
+            android.provider.MediaStore.MediaColumns.DISPLAY_NAME,
+            android.provider.MediaStore.MediaColumns.SIZE,
+            android.provider.MediaStore.MediaColumns.MIME_TYPE,
+            android.provider.MediaStore.MediaColumns.DATE_MODIFIED,
+            android.provider.MediaStore.MediaColumns.RELATIVE_PATH,
+            android.provider.MediaStore.MediaColumns.IS_PENDING,
+        ) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            arrayOf(android.provider.MediaStore.MediaColumns.IS_TRASHED)
+        } else {
+            emptyArray()
+        }
+
+        val found = ArrayList<MediaRecord>(limit)
+        for (vol in volumes) {
+            val collection = android.provider.MediaStore.Video.Media.getContentUri(vol)
+            val selection = "${android.provider.MediaStore.MediaColumns.SIZE} >= ?"
+            val selectionArgs = arrayOf(VideoCompressionPlanner.MIN_COMPRESSIBLE_VIDEO_BYTES.toString())
+            val sortOrder = "${android.provider.MediaStore.MediaColumns.SIZE} DESC"
+            val cursor = runCatching {
+                contentResolver.query(collection, projection, selection, selectionArgs, sortOrder)
+            }.getOrNull() ?: continue
+
+            cursor.use { c ->
+                val idCol = c.getColumnIndex(android.provider.BaseColumns._ID)
+                val nameCol = c.getColumnIndex(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+                val sizeCol = c.getColumnIndex(android.provider.MediaStore.MediaColumns.SIZE)
+                val mimeCol = c.getColumnIndex(android.provider.MediaStore.MediaColumns.MIME_TYPE)
+                val modCol = c.getColumnIndex(android.provider.MediaStore.MediaColumns.DATE_MODIFIED)
+                val relCol = c.getColumnIndex(android.provider.MediaStore.MediaColumns.RELATIVE_PATH)
+                val pendCol = c.getColumnIndex(android.provider.MediaStore.MediaColumns.IS_PENDING)
+                val trashCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    c.getColumnIndex(android.provider.MediaStore.MediaColumns.IS_TRASHED)
+                } else -1
+                if (idCol < 0 || sizeCol < 0 || mimeCol < 0) return@use
+
+                while (c.moveToNext() && found.size < limit) {
+                    val pending = pendCol >= 0 && !c.isNull(pendCol) && c.getInt(pendCol) != 0
+                    val trashed = trashCol >= 0 && !c.isNull(trashCol) && c.getInt(trashCol) != 0
+                    val name = if (nameCol >= 0 && !c.isNull(nameCol)) c.getString(nameCol) else null
+                    if (pending || trashed || name?.endsWith("_compact.mp4", ignoreCase = true) == true) continue
+                    val id = c.getLong(idCol)
+                    val size = c.getLong(sizeCol)
+                    val mime = c.getString(mimeCol) ?: continue
+                    if (id <= 0L || size < VideoCompressionPlanner.MIN_COMPRESSIBLE_VIDEO_BYTES) continue
+                    val uri = android.content.ContentUris.withAppendedId(collection, id).toString()
+                    found += MediaRecord(
+                        uri = uri,
+                        volumeName = vol,
+                        kind = MediaKind.VIDEO,
+                        displayName = name,
+                        mimeType = mime,
+                        sizeBytes = size,
+                        dateModifiedEpochSeconds = if (modCol >= 0 && !c.isNull(modCol)) c.getLong(modCol) else null,
+                        relativePath = if (relCol >= 0 && !c.isNull(relCol)) c.getString(relCol) else null,
+                    )
+                }
+            }
+        }
+        return found.sortedByDescending { it.sizeBytes }.take(limit)
+    }
+
+    private fun startHardwareVideoCompressionFlow(video: MediaRecord) {
+        videoCompressJob?.cancel()
+        val displayName = video.displayName?.takeIf(String::isNotBlank) ?: getString(R.string.unnamed_file)
+        val (progressSheet, progressRoot) = createAppleBottomSheet(
+            title = getString(R.string.video_compress_sheet_title),
+            subtitle = displayName,
+        )
+        val pctLabel = label(getString(R.string.video_compress_running_status, 0), 13.5f, R.color.sweep_primary_glow, true)
+        progressRoot.addView(pctLabel, top(12))
+        val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            isIndeterminate = false
+            max = 100
+            progress = 0
+            progressTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+        }
+        progressRoot.addView(bar, top(10))
+        val cancelBtn = button(getString(android.R.string.cancel)) {
+            videoCompressJob?.cancel()
+            progressSheet.dismiss()
+        }.apply {
+            minHeight = dp(48)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        progressRoot.addView(cancelBtn, top(12))
+        progressSheet.setOnCancelListener { videoCompressJob?.cancel() }
+        progressSheet.show()
+
+        videoCompressJob = lifecycleScope.launch {
+            val outcome = try {
+                AndroidHardwareVideoCompressor.compressToMediaStore(
+                    context = this@MainActivity,
+                    source = video,
+                    onProgressPercent = { pct ->
+                        if (progressSheet.isShowing) {
+                            bar.progress = pct
+                            pctLabel.text = getString(R.string.video_compress_running_status, pct)
+                        }
+                    },
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                VideoCompressionOutcome.Failed("unexpected_error")
+            } finally {
+                if (progressSheet.isShowing) progressSheet.dismiss()
+            }
+
+            when (outcome) {
+                is VideoCompressionOutcome.Success -> {
+                    refreshStorageStats()
+                    viewModel.startSession()
+                    val origFmt = Formatter.formatFileSize(this@MainActivity, outcome.originalBytes)
+                    val compFmt = Formatter.formatFileSize(this@MainActivity, outcome.compressedBytes)
+                    val savedFmt = Formatter.formatFileSize(this@MainActivity, outcome.savedBytes)
+                    val (doneSheet, doneRoot) = createAppleBottomSheet(
+                        title = getString(R.string.video_compress_done_title),
+                        subtitle = getString(R.string.video_compress_done_body, origFmt, compFmt, savedFmt),
+                    )
+                    val supportsTrash = trashCoordinator.supportsSystemTrash()
+                    val moveOrigBtn = button(
+                        if (supportsTrash) getString(R.string.move_to_trash_button)
+                        else getString(R.string.permanent_delete_button),
+                    ) {
+                        doneSheet.dismiss()
+                        viewModel.prepareExternalReviewSelection(listOf(video))
+                        if (supportsTrash) {
+                            requestMoveSelectedToTrash(listOf(video))
+                        } else {
+                            requestPermanentDeleteSelected(listOf(video))
+                        }
+                    }.apply {
+                        minHeight = dp(52)
+                        setTextColor(Color.WHITE)
+                        backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
+                    }
+                    doneRoot.addView(moveOrigBtn, top(14))
+
+                    val keepBothBtn = button(getString(R.string.post_cleanup_relief_later)) {
+                        doneSheet.dismiss()
+                    }.apply {
+                        minHeight = dp(46)
+                        setTextColor(color(R.color.sweep_muted))
+                        backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+                    }
+                    doneRoot.addView(keepBothBtn, top(4))
+                    doneSheet.show()
+                }
+
+                is VideoCompressionOutcome.IneligibleOrAlreadyCompact -> {
+                    Toast.makeText(this@MainActivity, R.string.video_compress_already_compact, Toast.LENGTH_LONG).show()
+                }
+
+                is VideoCompressionOutcome.Failed -> {
+                    Toast.makeText(this@MainActivity, R.string.video_compress_failed, Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
@@ -3333,6 +3952,9 @@ class MainActivity : AppCompatActivity() {
             setBackgroundColor(color(R.color.sweep_background))
             contentDescription = getString(R.string.thumbnail_description, index + 1)
             tag = record.uri
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { openMediaPreview(record) }
         }
         row.addView(thumbnail, LinearLayout.LayoutParams(dp(60), dp(60)).apply { marginEnd = dp(12) })
         if (record.kind == MediaKind.AUDIO) {
@@ -3909,12 +4531,14 @@ class MainActivity : AppCompatActivity() {
         val attempted = pendingApi29TotalCount
         val verifiedUris = trashCoordinator.verifyPostDeleteUris(pendingApi29DeletedUris)
         val confirmedBytes = verifiedUris.sumOf { pendingApi29BytesByUri[it] ?: 0L }
+        var reviewPrompted = false
         if (confirmedBytes > 0L) {
             try {
                 window.decorView.performHapticFeedback(android.view.HapticFeedbackConstants.CONFIRM)
             } catch (_: Exception) {}
             outcomeTelemetry.recordConfirmedFreedBytes(confirmedBytes)
-            inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes)
+            val lifetimeBytesNow = outcomeTelemetry.loadSnapshot().totalConfirmedFreedBytes
+            reviewPrompted = inAppReviewCoordinator.requestReviewIfAppropriate(confirmedBytes, lifetimeBytesNow)
         }
         refreshStorageStats()
         refreshFlywheelSummary()
@@ -3945,7 +4569,9 @@ class MainActivity : AppCompatActivity() {
             )
             viewModel.clearSelection()
             viewModel.startSession()
-            showPostCleanupReliefOffer(confirmedBytes, verifiedUris.size)
+            if (!reviewPrompted) {
+                showPostCleanupReliefOffer(confirmedBytes, verifiedUris.size)
+            }
         }
         val resultMsg = getString(
             R.string.delete_operation_result,
@@ -4034,12 +4660,20 @@ class MainActivity : AppCompatActivity() {
             val usedFmt = android.text.format.Formatter.formatFileSize(this, usage.usedBytes)
             val freeFmt = android.text.format.Formatter.formatFileSize(this, usage.availableBytes)
             val totalFmt = android.text.format.Formatter.formatFileSize(this, usage.totalBytes)
+            val lifetimeFreed = if (::outcomeTelemetry.isInitialized) {
+                outcomeTelemetry.loadSnapshot().totalConfirmedFreedBytes
+            } else 0L
+            val lifetimeFreedFmt = if (lifetimeFreed > 0L) {
+                android.text.format.Formatter.formatFileSize(this, lifetimeFreed)
+            } else ""
             homeComposeState.value = homeComposeState.value.copy(
                 usedLabel = usedFmt,
                 freeLabel = freeFmt,
                 totalLabel = totalFmt,
                 usedPercent = usage.usedPercent,
                 usedFraction = usage.usedFraction.toFloat().coerceIn(0f, 1f),
+                lifetimeFreedBytes = lifetimeFreed,
+                lifetimeFreedLabel = lifetimeFreedFmt,
                 collections = homeComposeState.value.collections.ifEmpty { buildDefaultHomeCollections() },
             )
             if (::storageText.isInitialized) {

@@ -136,6 +136,10 @@ fun CleanerHomeScreen(
                         customCaption = MariaI18n.duplicatesTitle()
                         activeAudioRes = R.raw.maria_dup
                     }
+                    CleanMission.SIMILAR_PHOTOS -> {
+                        customCaption = MariaI18n.similarPhotosTitle() + " • " + MariaI18n.bestShotProtectedSub()
+                        activeAudioRes = R.raw.maria_dup
+                    }
                     CleanMission.LARGE_VIDEOS -> {
                         customCaption = MariaI18n.largeVideosTitle() + " (> 10 MB)"
                         activeAudioRes = R.raw.maria_videos
@@ -246,7 +250,7 @@ private fun QuickMissionGrid(
     onMissionClick: (CleanMission) -> Unit,
 ) {
     val quickItems = if (collections.isNotEmpty()) {
-        collections.take(4)
+        collections.take(6)
     } else {
         listOf(
             CleanCollectionUiModel(
@@ -254,6 +258,13 @@ private fun QuickMissionGrid(
                 stringResource(R.string.cleaner_home_fallback_duplicates_title),
                 stringResource(R.string.cleaner_home_fallback_duplicates_sub),
                 "SHA-256",
+                0,
+            ),
+            CleanCollectionUiModel(
+                CleanMission.SIMILAR_PHOTOS,
+                MariaI18n.similarPhotosTitle(),
+                MariaI18n.bestShotProtectedSub(),
+                "dHash",
                 0,
             ),
             CleanCollectionUiModel(
@@ -277,6 +288,13 @@ private fun QuickMissionGrid(
                 stringResource(R.string.cleaner_home_fallback_whatsapp_sub),
                 0,
             ),
+            CleanCollectionUiModel(
+                CleanMission.BLURRY_PHOTOS,
+                MariaI18n.blurryPhotosTitle(),
+                MariaI18n.quickReviewSub(),
+                "Local",
+                0,
+            ),
         )
     }
 
@@ -289,6 +307,7 @@ private fun QuickMissionGrid(
                 rowItems.forEach { item ->
                     val accentColor = when (item.mission) {
                         CleanMission.DUPLICATES -> Color(0xFFFF9F0A)
+                        CleanMission.SIMILAR_PHOTOS -> Color(0xFF0A84FF)
                         CleanMission.LARGE_VIDEOS -> Color(0xFFBF5AF2)
                         CleanMission.OLD_SCREENSHOTS -> Color(0xFF64D2FF)
                         CleanMission.WHATSAPP -> Color(0xFF30D158)
@@ -296,11 +315,13 @@ private fun QuickMissionGrid(
                     }
                     val tileTitle = when (item.mission) {
                         CleanMission.WHATSAPP -> MariaI18n.socialChatTileTitle()
+                        CleanMission.SIMILAR_PHOTOS -> MariaI18n.similarPhotosTitle()
                         else -> item.title
                     }
                     val tileSub = when {
                         item.itemCount > 0 -> stringResource(R.string.cleaner_home_items_count, item.itemCount)
                         item.mission == CleanMission.WHATSAPP -> MariaI18n.socialChatTileSub()
+                        item.mission == CleanMission.SIMILAR_PHOTOS -> MariaI18n.bestShotProtectedSub()
                         else -> item.subtitle
                     }
                     MariaSquareTile(
@@ -477,6 +498,26 @@ private fun StorageNowBanner(
 
             Spacer(Modifier.height(10.dp))
             SegmentedBar(fractions = state.categoryFractions)
+            if (state.lifetimeFreedBytes > 0L && state.lifetimeFreedLabel.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0x1A30D158),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0x4D30D158), RoundedCornerShape(8.dp)),
+                ) {
+                    Text(
+                        text = stringResource(R.string.lifetime_freed_home_badge, state.lifetimeFreedLabel),
+                        color = Color(0xFF30D158),
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    )
+                }
+            }
             Spacer(Modifier.height(10.dp))
 
             Button(
@@ -600,6 +641,7 @@ private fun MixCarouselCard(
 
 private fun missionBrush(mission: CleanMission): Brush = when (mission) {
     CleanMission.DUPLICATES -> Brush.linearGradient(listOf(Color(0xFF0A84FF), Color(0xFF003B7A)))
+    CleanMission.SIMILAR_PHOTOS -> Brush.linearGradient(listOf(Color(0xFF0284C7), Color(0xFF082F49)))
     CleanMission.LARGE_VIDEOS -> Brush.linearGradient(listOf(Color(0xFF9333EA), Color(0xFF3B0764)))
     CleanMission.WHATSAPP -> Brush.linearGradient(listOf(Color(0xFF10B981), Color(0xFF064E3B)))
     CleanMission.OLD_SCREENSHOTS -> Brush.linearGradient(listOf(Color(0xFFF59E0B), Color(0xFF78350F)))
@@ -608,6 +650,7 @@ private fun missionBrush(mission: CleanMission): Brush = when (mission) {
 
 private fun missionShortTag(mission: CleanMission): String = when (mission) {
     CleanMission.DUPLICATES -> "2X"
+    CleanMission.SIMILAR_PHOTOS -> "SIM"
     CleanMission.LARGE_VIDEOS -> "MP4"
     CleanMission.WHATSAPP -> "WA"
     CleanMission.OLD_SCREENSHOTS -> "30D"

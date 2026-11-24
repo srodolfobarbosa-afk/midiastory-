@@ -2,7 +2,7 @@ package com.rdf112.sweep.presentation.ui
 
 enum class MidiastoreTab { Clean, Files, Pro }
 
-enum class CleanMission { DUPLICATES, LARGE_VIDEOS, WHATSAPP, OLD_SCREENSHOTS, BLURRY_PHOTOS }
+enum class CleanMission { DUPLICATES, SIMILAR_PHOTOS, LARGE_VIDEOS, WHATSAPP, OLD_SCREENSHOTS, BLURRY_PHOTOS }
 
 enum class FilesFilter { ALL, DUPLICATES, LARGE, SCREENSHOTS, WHATSAPP }
 
@@ -30,6 +30,9 @@ data class HomeUiState(
     val statusMessage: String? = null,
     /** Overrides the primary button label, e.g. "Review 12 files · 1.2 GB" once candidates are ready. */
     val primaryActionLabel: String? = null,
+    /** Cumulative bytes confirmed freed on this device across sessions. */
+    val lifetimeFreedBytes: Long = 0L,
+    val lifetimeFreedLabel: String = "",
 )
 
 data class MediaItemUiModel(
