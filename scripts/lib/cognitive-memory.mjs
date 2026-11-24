@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getSupabaseToken, SUPABASE_PROJECT_REF } from "./supabase-auth.mjs";
+import { attendMemories, estimateTokens, requiresLiveVerification } from "./friday-attention-gate.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..", "..");
@@ -402,13 +403,15 @@ export async function retrieveRelevantContext({
       FROM public.memories
       WHERE is_active = true
         AND content !~ '\\[Ciclo #[0-9]+\\]'
+        AND content !~ '^\\[Podcast '
       ORDER BY id DESC
-      LIMIT ${safeLimit}
+      LIMIT ${Math.min(20, safeLimit * 2)}
     `;
 
     if (cleanQuery) {
       const qEmb = await computeEmbedding(cleanQuery);
       queryEmbeddingModel = qEmb.model;
+      const poolLimit = Math.min(24, safeLimit * 2);
 
       relevantSql = `
         SELECT
@@ -427,12 +430,12 @@ export async function retrieveRelevantContext({
           '${escapeSqlString(cleanQuery)}',
           '${qEmb.vectorLiteral}'::vector,
           '${escapeSqlString(qEmb.model)}',
-          ${safeLimit},
+          ${poolLimit},
           60
         ) h
         WHERE h.fts_rank > 0 OR h.vec_sim >= ${safeMinSim} OR h.rrf_score >= 0.015
         ORDER BY h.rrf_score DESC, h.id DESC
-        LIMIT ${safeLimit}
+        LIMIT ${poolLimit}
       `;
     }
 
@@ -516,22 +519,43 @@ export async function retrieveRelevantContext({
     const learnings = Array.isArray(p.learnings) ? p.learnings : [];
     const docs = Array.isArray(p.docs) ? p.docs : [];
 
+    const groundingGate = requiresLiveVerification(cleanQuery);
     const seenIds = new Set();
-    const memories = [];
+    const rawPool = [];
     for (const row of [...relevantMemories, ...coreMemories]) {
       if (!seenIds.has(row.id)) {
         seenIds.add(row.id);
-        memories.push(row);
+        const baseSim = cleanQuery
+          ? Number(row.vec_sim ?? 0.48) + Math.min(0.08, Number(row.rrf_score ?? 0) * 2.5)
+          : /^\[Podcast /i.test(row.content)
+          ? 0.25
+          : 0.58;
+        rawPool.push({
+          ...row,
+          similarity: baseSim,
+          createdAt: row.created_at,
+        });
       }
     }
 
+    const memories = attendMemories({
+      queryVector: null,
+      memories: rawPool,
+      maxTokens: 900,
+    }).slice(0, safeLimit);
+
     const lines = [];
+    if (groundingGate.requiresLiveCheck) {
+      lines.push(
+        `⚠️ [GATE ANTI-ALUCINAÇÃO ATIVO]: ${groundingGate.reason} Valide na ferramenta/API ao vivo ou cite o timestamp exato.`
+      );
+    }
     if (memories.length > 0) {
-      lines.push("### MEMÓRIAS RELEVANTES & REGRAS ATIVAS");
+      lines.push("### MEMÓRIAS RELEVANTES & REGRAS ATIVAS (Attention-Ranked)");
       for (const m of memories) {
         const simLabel = m.vec_sim !== undefined ? ` | sim:${Number(m.vec_sim).toFixed(2)}` : "";
         lines.push(
-          `- [#${m.id} | ${m.categoria} v${m.versao} | conf:${m.confianca}${simLabel} | ${String(m.created_at).slice(0, 10)}] ${String(m.content).replace(/\s+/g, " ").slice(0, 320)}`
+          `- [#${m.id} | ${m.categoria} v${m.versao} | w:${m.attentionWeight} | conf:${m.confianca}${simLabel} | ${String(m.created_at).slice(0, 10)}] ${String(m.content).replace(/\s+/g, " ").slice(0, 320)}`
         );
       }
     }
@@ -562,15 +586,18 @@ export async function retrieveRelevantContext({
       }
     }
 
+    const formattedContext = lines.join("\n");
     return {
       source: "supabase_live",
       embeddingModel: queryEmbeddingModel,
+      groundingGate,
+      tokenCount: estimateTokens(formattedContext),
       memories,
       coreMemories,
       conversations,
       pendingTasks,
       learnings,
-      formattedContext: lines.join("\n"),
+      formattedContext,
     };
   } catch (err) {
     const timelinePath = path.join(projectRoot, "docs", "LINHA_DO_TEMPO_AUTONOMA.md");
@@ -606,34 +633,22 @@ function parseJsonSafe(rawText) {
 
 function deterministicFallbackExtraction(question, answer) {
   const q = String(question || "").trim();
-  const isCorrection =
-    /\b(errado|corrija|corre[çc][ãa]o|n[ãa]o fa[çc]a|nunca mais|regra permanente|regra fixa|a partir de agora)\b/i.test(
-      q
-    );
-  const facts = [];
-  if (isCorrection && q.length >= 20 && !isSpeculativeStatement(q)) {
+  // Só grava fallback determinístico se for regra permanente explícita (evita transformar desabafos ou perguntas em 'correction' conf 0.99)
+  const isExplicitRule =
+    /\b(regra permanente|regra fixa|a partir de agora nunca|nunca mais fa[çc]a|grave na mem[óo]ria)\b/i.test(q) &&
+    !q.includes("?");
+  if (isExplicitRule && q.length >= 25 && !isSpeculativeStatement(q)) {
     return {
       should_learn: true,
-      user_correction: { is_correction: true, content: `[Correção do Fundador] ${q.slice(0, 420)}`, supersedes_id: null },
-      facts,
+      user_correction: { is_correction: true, content: `[Diretriz do Fundador] ${q.slice(0, 420)}`, supersedes_id: null },
+      facts: [],
       extractor_source: "deterministic_fallback",
     };
   }
-  const hasDurableDecision =
-    /\b(decidido|aprovado|migration|implementado|corrigido|validado|passou|bloqueio|v\d+\.\d+\.\d+)\b/i.test(answer) &&
-    answer.length >= 80;
-  if (hasDurableDecision && !isSpeculativeStatement(answer.slice(0, 280))) {
-    facts.push({
-      content: `Resumo técnico (${q.slice(0, 90)}): ${answer.replace(/\s+/g, " ").slice(0, 260)}`,
-      categoria: classifyMemoryCategory(`${q} ${answer}`, "semantic"),
-      confianca: 0.85,
-      supersedes_id: null,
-    });
-  }
   return {
-    should_learn: facts.length > 0,
+    should_learn: false,
     user_correction: null,
-    facts,
+    facts: [],
     extractor_source: "deterministic_fallback",
   };
 }
@@ -648,7 +663,7 @@ export async function extractTurnKnowledgeWithLlm({ question, answer, candidateM
   const extractorPrompt = `Analise o turno abaixo e extraia TODOS os conhecimentos duráveis, regras declaradas, parâmetros técnicos, decisões confirmadas, preferências permanentes ou correções explícitas do usuário — mesmo que sejam de experimento ou fora do app Android.
 REGRAS ESTRITAS:
 1. NUNCA invente e NUNCA registre afirmações especulativas ("talvez", "acho que", "suponho", "provavelmente", "hipótese").
-2. Extraia qualquer regra explícita, protocolo ou conhecimento técnico informado pelo usuário para permanecer na memória entre sessões; só retorne should_learn=false se for conversa trivial/saudação ou fato já idêntico às memórias listadas abaixo.
+2. Extraia apenas conhecimentos técnicos, arquiteturais ou decisões permanentes; retorne should_learn=false para conversas triviais, comandos efêmeros de sessão ("feche o narrador", "/model", "olhe minha tela", "teste o microfone") e NUNCA registre regras de revisão de português do usuário (foi revogada em definitivo).
 3. Se um novo fato/correção contradizer ou atualizar uma memória listada abaixo, informe o ID numérico exato em "supersedes_id" (use APENAS IDs da lista abaixo ou null).
 4. Categorias permitidas: "semantic", "procedural", "strategic", "preference", "correction", "episodic".
 5. Responda SOMENTE em JSON válido no formato:
@@ -674,7 +689,11 @@ ${String(answer || "").slice(0, 2200)}`;
             signal: AbortSignal.timeout(6500),
             body: JSON.stringify({
               contents: [{ parts: [{ text: extractorPrompt }] }],
-              generationConfig: { responseMimeType: "application/json", maxOutputTokens: 600 },
+              generationConfig: {
+                responseMimeType: "application/json",
+                maxOutputTokens: 700,
+                thinkingConfig: { thinkingBudget: 0 },
+              },
             }),
           }
         );

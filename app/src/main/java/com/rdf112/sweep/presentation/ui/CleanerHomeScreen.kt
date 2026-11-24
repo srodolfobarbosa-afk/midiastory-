@@ -208,7 +208,7 @@ private fun SalesPsychologyProCard(
                     color = MidiastoreColors.AccentBlue,
                 ) {
                     Text(
-                        text = "PRO + IA NATIVA",
+                        text = MariaI18n.proCardBadge(),
                         color = Color.White,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -252,29 +252,29 @@ private fun QuickMissionGrid(
             CleanCollectionUiModel(
                 CleanMission.DUPLICATES,
                 stringResource(R.string.cleaner_home_fallback_duplicates_title),
-                "WhatsApp & Galeria",
+                stringResource(R.string.cleaner_home_fallback_duplicates_sub),
                 "SHA-256",
                 0,
             ),
             CleanCollectionUiModel(
                 CleanMission.LARGE_VIDEOS,
-                "Vídeos grandes",
-                "Revisão rápida",
+                MariaI18n.largeVideosTitle(),
+                MariaI18n.quickReviewSub(),
                 "> 10 MB",
                 0,
             ),
             CleanCollectionUiModel(
                 CleanMission.OLD_SCREENSHOTS,
-                "Capturas antigas",
-                "Mais de 30 dias",
-                "+30 dias",
+                MariaI18n.oldScreenshotsTitle(),
+                MariaI18n.moreThan30DaysSub(),
+                MariaI18n.plus30DaysBadge(),
                 0,
             ),
             CleanCollectionUiModel(
                 CleanMission.WHATSAPP,
-                stringResource(R.string.cleaner_home_fallback_whatsapp_title),
-                "Fotos, vídeos e áudios",
-                "Mídias",
+                MariaI18n.socialChatTileTitle(),
+                MariaI18n.socialChatTileSub(),
+                stringResource(R.string.cleaner_home_fallback_whatsapp_sub),
                 0,
             ),
         )

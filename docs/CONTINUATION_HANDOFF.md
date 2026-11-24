@@ -118,7 +118,7 @@ Atualizado: 04/11/2026
 - Package/Application ID: `com.rdf112.midiastore`.
 - O proprietário confirmou o package olhando a ficha de teste interno da Play Console.
 - Namespace e pastas Kotlin ainda usam `com.rdf112.sweep`; isso é legado técnico e não altera o Application ID.
-- `versionCode=17` e `versionName=2.2.1` são os valores atualmente configurados no código-fonte. O maior versionCode publicado precisa ser consultado; o script de Release agora exige que o source seja estritamente maior.
+- `versionCode=34` e `versionName=2.8.2` são os valores atualmente configurados no código-fonte (`app/build.gradle.kts`); na Play Console (`internal`/`alpha`), a versão publicada atual é `2.8.0 (vc 32)`.
 - minSdk 29, targetSdk 36, compileSdk 36, JDK 17 e Gradle 8.13.
 - O proprietário informa que habilitou o perfil financeiro/recebimento em 03/11/2026. Isso não confirma cadastro ou ativação dos produtos de Billing.
 

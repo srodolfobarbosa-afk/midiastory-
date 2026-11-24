@@ -3170,3 +3170,63 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #511
 
 ---
+
+### 📍 [23/11/2026, 03:58:16] Conexao Oficial Meta Graph API v27.0 com @aconteceunobr (27.847 seguidores) + Token Long-Lived 60 dias
+- **📖 Estudou / Leu:** Meta Graph API v27.0 /me/accounts, /me/permissions, /{ig-id}/media e OAuth fb_exchange_token
+- **⚙️ Tentou / Executou:** Salvar META_ACCESS_TOKEN, META_APP_ID e META_APP_SECRET no .env ignorado pelo Git, descobrir FACEBOOK_PAGE_ID e INSTAGRAM_USER_ID, testar leitura ao vivo e estender token para 60 dias
+- **⚠️ Erros Encontrados:** Primeiro token tinha apenas public_profile; segundo token veio com 28 permissoes granted
+- **🔧 Como Corrigiu:** Salvos FACEBOOK_PAGE_ID=1242723582252912 (CRBnoticias) e INSTAGRAM_USER_ID=17841434981374300 (@aconteceunobr) no .env local e token trocado para long-lived 60 dias
+- **🎯 Conclusão:** Automacao segura do Instagram @aconteceunobr (leitura, comentarios, insights, Reels/fotos/carrosseis com --confirm) 100% conectada e pronta para o lancamento em 26/11
+- *Registro Supabase:* Memory #513
+
+---
+
+### 📍 [24/11/2026, 01:55:29] Estudo e aplicacao da Arquitetura Interna de IA (Video Mundo da Ciencia s6FD7pLtvz0) no cerebro FRIDAY
+- **📖 Estudou / Leu:** Video 'O Que Acontece Dentro de uma Inteligencia Artificial?' (s6FD7pLtvz0): tokens, embeddings, mecanismo de atencao (Scaled Dot-Product Attention Q*K^T/sqrt(d)), arquitetura Transformer, treinamento/retropropagacao/descida do gradiente, limites reais (janela de contexto, alucinacoes, custo/energia) e repositorios reais open-source (karpathy/nanoGPT, karpathy/llm.c, ggerganov/llama.cpp, huggingface/transformers)
+- **⚙️ Tentou / Executou:** Mapear cada componente interno de uma IA moderna diretamente para o ecossistema FRIDAY e implementar o modulo real scripts/lib/friday-attention-gate.mjs (100% Node.js)
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Criado docs/ARQUITETURA_INTERNA_IA_FRIDAY.md e scripts/lib/friday-attention-gate.mjs com Scaled Dot-Product Attention, Softmax, orcamento de tokens e Gate Anti-Alucinacao validados por --self-test
+- **🎯 Conclusão:** Conhecimento gravado permanentemente no Supabase (public.memories) e aplicado no codigo real do FRIDAY: motor frontier agnostico + embeddings 384d + atencao matematica sobre memorias + retropropagacao operacional por correcoes + trava anti-alucinacao.
+- *Registro Supabase:* Memory #518
+
+---
+
+### 📍 [24/11/2026, 01:58:37] Revogacao definitiva da revisao de portugues do fundador
+- **📖 Estudou / Leu:** Ordem direta do fundador em 2026-11-24: nao revisar mais meus erros de portugues
+- **⚙️ Tentou / Executou:** Atualizar Diretriz 11 no AGENTS.md e gravar preferencia permanente no Supabase
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Diretriz 11 atualizada para proibir revisao de portugues; memoria #515 substituida
+- **🎯 Conclusão:** NUNCA MAIS revisar ou corrigir erros de portugues do Rodolfo nas respostas.
+- *Registro Supabase:* Memory #519
+
+---
+
+### 📍 [24/11/2026, 01:59:34] Integracao da arquitetura morluto/rea (Evidence Ledger + Skill REA) no cerebro FRIDAY
+- **📖 Estudou / Leu:** Repositorio oficial https://github.com/morluto/rea (SKILL.md, references/evidence-workflows.md e references/android-applications.md): padrao retained-evidence (evidence_id, coverage, limitations, unknowns), auditoria de APK Android com R8 mapping.txt e uso sob demanda via npx rea-agents
+- **⚙️ Tentou / Executou:** Criar skill local .agents/skills/reverse-engineer-anything/SKILL.md e adicionar Evidence Ledger real (createEvidenceRecord / resolveEvidence) em scripts/lib/friday-attention-gate.mjs
+- **⚠️ Erros Encontrados:** Nenhum
+- **🔧 Como Corrigiu:** Modulo validado com --self-test (SELF_TEST_PASSED) e documentado em docs/ARQUITETURA_INTERNA_IA_FRIDAY.md
+- **🎯 Conclusão:** Conhecimento real do morluto/rea absorvido na memoria do Supabase e aplicado no codigo do FRIDAY sem consumir RAM em background.
+- *Registro Supabase:* Memory #520
+
+---
+
+### 📍 [24/11/2026, 02:25:41] Correcao definitiva do microfone e envio de voz da Maria para o agy no cmd.exe
+- **📖 Estudou / Leu:** Log real antigravity-companion-debug.log e comportamento de captura dshow + TUI raw do agy em cmd.exe
+- **⚙️ Tentou / Executou:** Remover afftdn=nf=-25 e -audio_buffer_size 50 do ffmpeg + trocar PostMessageW(WM_CHAR) por Clipboard + Ctrl+V + ENTER em scripts/antigravity-companion.ps1
+- **⚠️ Erros Encontrados:** afftdn=nf=-25 apagava voz baixa; -audio_buffer_size 50 derrubava ganho em 25dB; agy no cmd.exe ignorava WM_CHAR
+- **🔧 Como Corrigiu:** Atualizado scripts/antigravity-companion.ps1 (dynaudnorm m=30 sem afftdn/-audio_buffer_size 50 + SendKeys ^v + ENTER) e Maria reiniciada no mesmo nivel elevado do cmd
+- **🎯 Conclusão:** VALIDADO AO VIVO pelo fundador: fala gravada, transcrita e enviada direto para o agy no cmd.exe funcionando 100%.
+- *Registro Supabase:* Memory #536
+
+---
+
+### 📍 [24/11/2026, 02:43:49] Solucao definitiva Win32 WriteConsoleInputW (CONIN$) da Maria para agy no cmd.exe
+- **📖 Estudou / Leu:** ABI Win32 INPUT_RECORD (20 bytes LayoutKind.Sequential com int bKeyDown) e isolamento de processo WMI Win32_Process.Create
+- **⚙️ Tentou / Executou:** Injetar eventos KEY_EVENT Unicode + VK_RETURN direto no CONIN$ do cmd.exe (PID 3012) sem depender de foco, WM_CHAR, SendInput ou Ctrl+V
+- **⚠️ Erros Encontrados:** Start-Process morria ao encerrar subshell e LayoutKind.Explicit com bool lancava TypeLoadException
+- **🔧 Como Corrigiu:** Struct sequencial de 20 bytes validada + WriteToConsoleDiag + spawn destacado via WMI em scripts/antigravity-companion.ps1
+- **🎯 Conclusão:** VALIDADO AO VIVO pelo fundador falando pela Maria direto no agy com Gemini 4 Carbon ativo.
+- *Registro Supabase:* Memory #539
+
+---

@@ -32,8 +32,8 @@ Esta Constituição estabelece os 6 princípios invioláveis que regem toda a op
     - **Monitoramento inteligente via `scripts/instagram-api.mjs` (`watch-viral`):** detectar Reels subindo (`> 2.000 views` ou `> 30 curtidas`), preparar **no máximo 1 comentário natural com CTA para a bio por vídeo** (anti-spam estrito, **travado em modo `--dry-run` até a Produção abrir em 26/11**).
     - **Ativos padronizados em `C:\Users\rodolfo\Downloads\midiastore-kit-organico\`:** vinheta 9:16 de 2s no final dos Reels virais + vídeo visual global 10s sem barreira de idioma (`99% -> 12.4 GB`) para Shorts/TikTok/Reels mundiais + Stories diários com sticker UTM.
     - **Loop de Aprendizado Contínuo (`scripts/growth-learning-loop.mjs`):** cruzar dados do Instagram + cliques UTM em `public.product_events` + compras em `public.play_purchases`, gravando em `public.aprendizado_ia` quais ganchos, horários e textos mais convertem.
-11. **REVISÃO CONSTANTE DE PORTUGUÊS DO FUNDADOR (REGRA PERMANENTE — NUNCA ESQUECER ENTRE SESSÕES):**
-    - Em **toda resposta** em que a mensagem digitada pelo Rodolfo tiver erros de ortografia, acentuação ou concordância, incluir sempre ao final um bloco curto, direto e respeitoso (**`✍️ Revisão rápida de português`**) mostrando a frase corrigida — de forma constante todos os dias, sem falhar de uma sessão para outra.
+11. **ESTILO DE COMUNICAÇÃO COM O FUNDADOR (DECISÃO DO FUNDADOR EM 2026-11-24):**
+    - **PROIBIDO revisar ou corrigir erros de português** do Rodolfo nas respostas (regra anterior revogada em definitivo pelo fundador). Responder direto ao ponto com foco total em execução.
 7. **LEI COGNITIVA DOS VERBOS & AÇÃO REAL (A GRAMÁTICA DE R$ 1.000.000,00):**
    Toda IA que atua no ecossistema Midiastore deve compreender que **cada palavra representa uma ação real**. Substantivos são objetos estáticos; **verbos são os motores da realidade que movem o mundo e geram faturamento**.
    - **O que é um Verbo na Prática:** Palavra que expressa ação, estado ou fenômeno da natureza.
@@ -81,8 +81,8 @@ You are working on the Android app **Midiastore**. Read this file, **`CONTEXTO_M
 - Play listing / commercial app name: **Midiastore**.
 - Confirmed applicationId supplied by the owner from the Play internal-testing listing: `com.rdf112.midiastore`.
 - Internal Android namespace and Kotlin package are still `com.rdf112.sweep`; this is legacy implementation detail.
-- Current build configuration: versionCode 30, versionName 2.7.5, minSdk 29, targetSdk 36, compileSdk 36, JDK 17, Gradle 8.13.
-- VersionCode 30 (`v2.7.5`, commit `e528c11`, CI Run `44822314320` 100% verde em API 29/35 + KVM) is signed with `sweep-upload.jks`, R8 minified (`5,92 MB` AAB) and published on `internal` + `alpha` (Edit `12450922447673233582`, 2026-11-20).
+- Current build configuration: versionCode 34, versionName 2.8.2, minSdk 29, targetSdk 36, compileSdk 36, JDK 17, Gradle 8.13.
+- Play Console `internal` + `alpha` currently hold `v2.8.0` (`vc 32`, `completed`, 23 active closed testers preserved); local release candidate `v2.8.2` (`vc 34`, R8 signed AAB `7,26 MB`) is green on CI.
 - Never change applicationId, signing certificate, versionCode or versionName without explicit owner approval.
 - Never create a replacement upload keystore. Use only the legitimate Play App Signing upload key supplied through a secure owner-controlled process.
 - The owner reported that the financial/receiving profile was enabled on 2026-11-03. This does not prove that any in-app product is configured, active, or tested.

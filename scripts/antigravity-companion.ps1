@@ -60,20 +60,127 @@ public class WinFocusHelper {
     }
   }
 
-  public static void SendTextFast(IntPtr hWnd, string text) {
-    int i = 0;
-    foreach (char c in text) {
-      if (c == '\r' || c == '\n') {
-        PostMessageW(hWnd, WM_CHAR, (IntPtr)' ', IntPtr.Zero);
-      } else {
-        PostMessageW(hWnd, WM_CHAR, (IntPtr)c, IntPtr.Zero);
-      }
-      i++;
-      if ((i % 25) == 0) System.Threading.Thread.Sleep(4);
+  [DllImport("kernel32.dll", SetLastError = true)]
+  public static extern bool FreeConsole();
+  [DllImport("kernel32.dll", SetLastError = true)]
+  public static extern bool AttachConsole(uint dwProcessId);
+  [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+  public static extern IntPtr CreateFileW(string lpFileName, uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, IntPtr hTemplateFile);
+  [DllImport("kernel32.dll", SetLastError = true)]
+  public static extern bool CloseHandle(IntPtr hObject);
+  [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+  public static extern bool WriteConsoleInputW(IntPtr hConsoleInput, INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsWritten);
+
+  [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+  public struct INPUT_RECORD {
+    public ushort EventType;
+    public ushort Padding;
+    public int bKeyDown;
+    public ushort wRepeatCount;
+    public ushort wVirtualKeyCode;
+    public ushort wVirtualScanCode;
+    public char UnicodeChar;
+    public uint dwControlKeyState;
+  }
+
+  public static string WriteToConsoleDiag(uint targetPid, string text) {
+    FreeConsole();
+    if (!AttachConsole(targetPid)) return "ATTACH_FAIL:" + Marshal.GetLastWin32Error();
+    IntPtr hConIn = CreateFileW("CONIN$", 0xC0000000u, 3u, IntPtr.Zero, 3u, 0u, IntPtr.Zero);
+    if (hConIn == IntPtr.Zero || hConIn == new IntPtr(-1)) {
+      int err = Marshal.GetLastWin32Error();
+      FreeConsole();
+      return "CONIN_FAIL:" + err;
     }
-    System.Threading.Thread.Sleep(200);
-    PostMessageW(hWnd, WM_KEYDOWN, (IntPtr)VK_RETURN, IntPtr.Zero);
-    PostMessageW(hWnd, WM_KEYUP, (IntPtr)VK_RETURN, IntPtr.Zero);
+    try {
+      var list = new System.Collections.Generic.List<INPUT_RECORD>();
+      foreach (char raw in text) {
+        char c = (raw == '\r' || raw == '\n') ? ' ' : raw;
+        list.Add(new INPUT_RECORD { EventType = 1, bKeyDown = 1, wRepeatCount = 1, wVirtualKeyCode = 0, wVirtualScanCode = 0, UnicodeChar = c, dwControlKeyState = 0 });
+        list.Add(new INPUT_RECORD { EventType = 1, bKeyDown = 0, wRepeatCount = 1, wVirtualKeyCode = 0, wVirtualScanCode = 0, UnicodeChar = c, dwControlKeyState = 0 });
+      }
+      uint written = 0;
+      uint totalWritten = 0;
+      int idx = 0;
+      while (idx < list.Count) {
+        int take = Math.Min(64, list.Count - idx);
+        var chunk = list.GetRange(idx, take).ToArray();
+        if (WriteConsoleInputW(hConIn, chunk, (uint)chunk.Length, out written)) totalWritten += written;
+        idx += take;
+      }
+      System.Threading.Thread.Sleep(150);
+      var enter = new INPUT_RECORD[] {
+        new INPUT_RECORD { EventType = 1, bKeyDown = 1, wRepeatCount = 1, wVirtualKeyCode = 0x0D, wVirtualScanCode = 0x1C, UnicodeChar = '\r', dwControlKeyState = 0 },
+        new INPUT_RECORD { EventType = 1, bKeyDown = 0, wRepeatCount = 1, wVirtualKeyCode = 0x0D, wVirtualScanCode = 0x1C, UnicodeChar = '\r', dwControlKeyState = 0 }
+      };
+      bool enterOk = WriteConsoleInputW(hConIn, enter, 2, out written);
+      return "OK:chars=" + totalWritten + ",enter=" + enterOk + ",ew=" + written;
+    } finally {
+      CloseHandle(hConIn);
+      FreeConsole();
+    }
+  }
+
+  [DllImport("user32.dll", SetLastError = true)]
+  public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+  [StructLayout(LayoutKind.Sequential)]
+  public struct INPUT {
+    public uint type;
+    public InputUnion u;
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public struct InputUnion {
+    [FieldOffset(0)] public MOUSEINPUT mi;
+    [FieldOffset(0)] public KEYBDINPUT ki;
+    [FieldOffset(0)] public HARDWAREINPUT hi;
+  }
+  [StructLayout(LayoutKind.Sequential)]
+  public struct MOUSEINPUT {
+    public int dx; public int dy; public uint mouseData; public uint dwFlags; public uint time; public IntPtr dwExtraInfo;
+  }
+  [StructLayout(LayoutKind.Sequential)]
+  public struct HARDWAREINPUT {
+    public uint uMsg; public ushort wParamL; public ushort wParamH;
+  }
+  [StructLayout(LayoutKind.Sequential)]
+  public struct KEYBDINPUT {
+    public ushort wVk;
+    public ushort wScan;
+    public uint dwFlags;
+    public uint time;
+    public IntPtr dwExtraInfo;
+  }
+
+  public const uint INPUT_KEYBOARD = 1;
+  public const uint KEYEVENTF_KEYUP = 0x0002;
+  public const uint KEYEVENTF_UNICODE = 0x0004;
+  public const ushort VK_RETURN_U16 = 0x0D;
+
+  public static void SendTextFast(IntPtr hWnd, string text) {
+    int cb = Marshal.SizeOf(typeof(INPUT));
+    foreach (char raw in text) {
+      char c = (raw == '\r' || raw == '\n') ? ' ' : raw;
+      INPUT[] pair = new INPUT[2];
+      pair[0].type = INPUT_KEYBOARD;
+      pair[0].u.ki.wVk = 0;
+      pair[0].u.ki.wScan = (ushort)c;
+      pair[0].u.ki.dwFlags = KEYEVENTF_UNICODE;
+      pair[1].type = INPUT_KEYBOARD;
+      pair[1].u.ki.wVk = 0;
+      pair[1].u.ki.wScan = (ushort)c;
+      pair[1].u.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+      SendInput(2, pair, cb);
+    }
+    System.Threading.Thread.Sleep(160);
+    INPUT[] enter = new INPUT[2];
+    enter[0].type = INPUT_KEYBOARD;
+    enter[0].u.ki.wVk = VK_RETURN_U16;
+    enter[0].u.ki.dwFlags = 0;
+    enter[1].type = INPUT_KEYBOARD;
+    enter[1].u.ki.wVk = VK_RETURN_U16;
+    enter[1].u.ki.dwFlags = KEYEVENTF_KEYUP;
+    SendInput(2, enter, cb);
   }
 }
 "@
@@ -625,20 +732,27 @@ function Write-DebugLog([string]$msg) {
 function Send-TextToTerminal([string]$text) {
   $clean = $text.Trim()
   if (-not $clean) { return }
+  # Put text in clipboard (preserves 100% UTF-8 accents & works with raw-mode TUIs like agy in cmd.exe!)
+  try { [System.Windows.Forms.Clipboard]::SetText($clean) } catch {}
   # Find the interactive cmd.exe / WindowsTerminal window (Antigravity CLI)
   $targets = Get-Process -Name "WindowsTerminal","cmd","powershell","pwsh" -ErrorAction SilentlyContinue |
     Where-Object { $_.MainWindowHandle -ne 0 -and $_.Id -ne $PID } |
-    Sort-Object { if ($_.MainWindowTitle -match "cmd\.exe|Antigravity|Terminal") { 0 } else { 1 } }, StartTime -Descending
+    Sort-Object { if ($_.ProcessName -match "WindowsTerminal|cmd" -or $_.MainWindowTitle -match "cmd\.exe|Antigravity|Terminal|midiastory|playwright") { 0 } else { 1 } }, StartTime -Descending
   if ($targets) {
     $target = $targets[0]
     $hWnd = $target.MainWindowHandle
-    Write-DebugLog "Focusing PID=$($target.Id) Title='$($target.MainWindowTitle)'"
-    [WinFocusHelper]::ForceFocus($hWnd)
-    Start-Sleep -Milliseconds 140
-    [WinFocusHelper]::SendTextFast($hWnd, $clean)
-    Write-DebugLog "Sent Unicode text + ENTER via WM_CHAR in <100ms"
+    Write-DebugLog "Targeting PID=$($target.Id) Title='$($target.MainWindowTitle)'"
+    $diag = ""
+    try { $diag = [WinFocusHelper]::WriteToConsoleDiag([uint32]$target.Id, $clean) } catch { $diag = "EX:$($_.Exception.Message)" }
+    Write-DebugLog "WriteToConsoleDiag(PID=$($target.Id)) -> $diag"
+    if (-not $diag.StartsWith("OK:")) {
+      [WinFocusHelper]::ForceFocus($hWnd)
+      Start-Sleep -Milliseconds 180
+      [WinFocusHelper]::SendTextFast($hWnd, $clean)
+      Write-DebugLog "Fallback SendInput(KEYEVENTF_UNICODE)+ENTER into terminal"
+    }
   } else {
-    Write-DebugLog "No target terminal window found"
+    Write-DebugLog "No target terminal window found (text saved in clipboard)"
   }
 }
 
@@ -651,8 +765,8 @@ $btnMic.Add_Click({
     $script:recAudioPath = Join-Path $env:TEMP ("antigravity-mic-" + [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() + ".mp3")
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = $FfmpegPath
-    # Studio DSP pipeline: highpass 100Hz + lowpass 7500Hz + FFT noise reduction + dynamic voice boost -> 32kbps MP3 (~4 KB/sec!)
-    $psi.Arguments = "-y -f dshow -audio_buffer_size 50 -i `"audio=$MicDevice`" -t 60 -ar 16000 -ac 1 -af `"highpass=f=100,lowpass=f=7500,afftdn=nf=-25,dynaudnorm=f=150:g=15`" -c:a libmp3lame -b:a 32k `"$($script:recAudioPath)`" -loglevel error"
+    # Clean capture without -audio_buffer_size 50 (preserves full mic level) + voice boost -> 32kbps MP3
+    $psi.Arguments = "-y -f dshow -i `"audio=$MicDevice`" -t 60 -ar 16000 -ac 1 -af `"highpass=f=85,lowpass=f=7500,dynaudnorm=f=150:g=15:m=30:p=0.9`" -c:a libmp3lame -b:a 32k `"$($script:recAudioPath)`" -loglevel error"
     $psi.UseShellExecute = $false
     $psi.CreateNoWindow = $true
     $psi.RedirectStandardInput = $true

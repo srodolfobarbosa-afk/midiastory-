@@ -261,19 +261,19 @@ object MariaI18n {
     }
 
     fun proDefaultGreeting(): String = when (lang()) {
-        "pt" -> "Olá! Eu sou a Maria! Destrave a limpeza ilimitada + Chat Midiastore IA com 56% OFF no Anual!"
-        "es" -> "¡Hola! Soy Maria. ¡Desbloquea limpieza ilimitada + Chat Midiastore IA con 56% OFF anual!"
-        "fr" -> "Bonjour ! Débloquez le nettoyage illimité + Chat Midiastore IA (-56% sur l'annuel) !"
-        "de" -> "Hallo! Unbegrenzte Bereinigung + Chat Midiastore KI mit 56% Rabatt im Jahresabo!"
-        "zh" -> "您好！解锁无限清理 + Chat Midiastore 智能助手（年付立省56%）！"
-        "ja" -> "無制限クリーンアップ＋Chat Midiastore AIを年間プラン56%OFFで解放！"
-        "ko" -> "무제한 정리 + Chat Midiastore AI를 연간 플랜 56% 할인으로 잠금 해제하세요!"
-        "ru" -> "Разблокируйте безлимитную очистку + Chat Midiastore ИИ со скидкой 56% на год!"
-        "ar" -> "افتح التنظيف غير المحدود + محادثة الذكاء الاصطناعي بخصم 56% سنوياً!"
-        "hi" -> "वार्षिक प्लान पर 56% छूट के साथ असीमित क्लीनअप + Chat Midiastore AI अनलॉक करें!"
-        "bn" -> "বার্ষিক প্ল্যানে ৫৬% ছাড়ে আনলিমিটেড ক্লিনআপ + Chat Midiastore AI আনলক করুন!"
-        "in", "id" -> "Buka pembersihan tanpa batas + Chat Midiastore AI hemat 56% di paket Tahunan!"
-        else -> "Hi! I'm Maria! Unlock unlimited cleanup + Chat Midiastore AI with 56% OFF Annual!"
+        "pt" -> "Olá! Eu sou a Maria! Destrave Apps sem uso (+90d), Fotos Borradas e Relatórios Auditados com 56% OFF no Anual!"
+        "es" -> "¡Hola! Soy Maria. ¡Desbloquea Apps sin uso (+90d), Fotos Borrosas e Informes Auditados con 56% OFF anual!"
+        "fr" -> "Bonjour ! Débloquez Apps inutilisées (+90j), Photos floues et Rapports audités (-56% sur l'annuel) !"
+        "de" -> "Hallo! Unbenutzte Apps (+90T), Unscharfe Fotos & Prüfberichte mit 56% Rabatt im Jahresabo!"
+        "zh" -> "您好！解锁闲置应用（+90天）、模糊照片检测与审计报告（年付立省56%）！"
+        "ja" -> "未使用アプリ(+90日)・ブレ写真診断・監査レポートを年間プラン56%OFFで解放！"
+        "ko" -> "미사용 앱(+90일), 흐린 사진 진단 및 감사 보고서를 연간 플랜 56% 할인으로 이용하세요!"
+        "ru" -> "Откройте поиск неиспользуемых приложений (+90 дн.), размытых фото и отчёты со скидкой 56% на год!"
+        "ar" -> "افتح كشف التطبيقات غير المستخدمة (+90 يوماً) والصور الضبابية والتقارير المدققة بخصم 56% سنوياً!"
+        "hi" -> "वार्षिक प्लान पर 56% छूट के साथ अप्रयुक्त ऐप्स (+90d), धुंधली फ़ोटो जाँच और ऑडिट रिपोर्ट अनलॉक करें!"
+        "bn" -> "বার্ষিক প্ল্যানে ৫৬% ছাড়ে অব্যবহৃত অ্যাপ (+৯০ দিন), ঝাপসা ছবি যাচাই ও অডিট রিপোর্ট আনলক করুন!"
+        "in", "id" -> "Buka deteksi aplikasi tak terpakai (+90h), foto buram & laporan audit hemat 56% di paket Tahunan!"
+        else -> "Hi! I'm Maria! Unlock Unused Apps (90d+), Blurry Photos & Audited Reports with 56% OFF Annual!"
     }
 
     fun cameraPhotosTitle(): String = when (lang()) {
@@ -436,19 +436,67 @@ object MariaI18n {
     }
 
     fun proBannerTitle(): String = when (lang()) {
-        "pt" -> "Libere limpeza completa + Chat Midiastore IA"
-        "es" -> "Libera limpieza completa + Chat Midiastore IA"
-        "fr" -> "Débloquez nettoyage complet + Chat Midiastore IA"
-        "de" -> "Vollständige Bereinigung + Chat Midiastore KI"
-        "zh" -> "解锁完整清理 + Chat Midiastore 智能助手"
-        "ja" -> "完全クリーンアップ＋Chat Midiastore AIを解放"
-        "ko" -> "전체 정리 + Chat Midiastore AI 잠금 해제"
-        "ru" -> "Полная очистка + Chat Midiastore ИИ"
-        "ar" -> "افتح التنظيف الكامل + محادثة الذكاء الاصطناعي"
-        "hi" -> "पूर्ण क्लीनअप + Chat Midiastore AI अनलॉक करें"
-        "bn" -> "সম্পূর্ণ ক্লিনআপ + Chat Midiastore AI আনলক করুন"
-        "in", "id" -> "Buka pembersihan penuh + Chat Midiastore AI"
-        else -> "Unlock full cleanup + Chat Midiastore AI"
+        "pt" -> "Apps sem uso (+90d), Fotos Borradas e Relatórios Auditados"
+        "es" -> "Apps sin uso (+90d), Fotos Borrosas e Informes Auditados"
+        "fr" -> "Apps inutilisées (+90j), Photos floues et Rapports audités"
+        "de" -> "Unbenutzte Apps (+90T), Unscharfe Fotos & Prüfberichte"
+        "zh" -> "闲置应用（+90天）、模糊照片检测与审计报告"
+        "ja" -> "未使用アプリ(+90日)・ブレ写真診断・監査レポート"
+        "ko" -> "미사용 앱(+90일), 흐린 사진 진단 및 감사 보고서"
+        "ru" -> "Неиспользуемые приложения (+90 дн.), размытые фото и отчёты"
+        "ar" -> "تطبيقات غير مستخدمة (+90 يوماً) وصور ضبابية وتقارير مدققة"
+        "hi" -> "अप्रयुक्त ऐप्स (+90d), धुंधली फ़ोटो और ऑडिट रिपोर्ट"
+        "bn" -> "অব্যবহৃত অ্যাপ (+৯০ দিন), ঝাপসা ছবি ও অডিট রিপোর্ট"
+        "in", "id" -> "Aplikasi tak terpakai (+90h), Foto Buram & Laporan Audit"
+        else -> "Unused Apps (90d+), Blurry Photos & Audited Reports"
+    }
+
+    fun proCardBadge(): String = when (lang()) {
+        "pt" -> "MIDIASTORE PRO • -56% NO ANUAL"
+        "es" -> "MIDIASTORE PRO • -56% ANUAL"
+        "fr" -> "MIDIASTORE PRO • -56% ANNUEL"
+        "de" -> "MIDIASTORE PRO • -56% JÄHRLICH"
+        "zh" -> "MIDIASTORE PRO • 年付省56%"
+        "ja" -> "MIDIASTORE PRO • 年額56%OFF"
+        "ko" -> "MIDIASTORE PRO • 연간 56% 할인"
+        "ru" -> "MIDIASTORE PRO • -56% НА ГОД"
+        "ar" -> "MIDIASTORE PRO • خصم 56% سنوياً"
+        "hi" -> "MIDIASTORE PRO • वार्षिक पर 56% छूट"
+        "bn" -> "MIDIASTORE PRO • বার্ষিকে ৫৬% ছাড়"
+        "in", "id" -> "MIDIASTORE PRO • HEMAT 56%"
+        else -> "MIDIASTORE PRO • SAVE 56%"
+    }
+
+    fun plus30DaysBadge(): String = when (lang()) {
+        "pt" -> "+30 dias"
+        "es" -> "+30 días"
+        "fr" -> "+30j"
+        "de" -> "+30T"
+        "zh" -> "+30天"
+        "ja" -> "+30日"
+        "ko" -> "+30일"
+        "ru" -> "+30 дн."
+        "ar" -> "+30 يوماً"
+        "hi" -> "+30 दिन"
+        "bn" -> "+৩০ দিন"
+        "in", "id" -> "+30 hari"
+        else -> "+30d"
+    }
+
+    fun onDeviceAiSummary(): String = when (lang()) {
+        "pt" -> "Análise inteligente de fotos borradas, duplicatas SHA-256 e voz neural 100% privada no seu aparelho."
+        "es" -> "Análisis inteligente de fotos borrosas, duplicados SHA-256 y voz neural 100% privada en tu dispositivo."
+        "fr" -> "Analyse intelligente des photos floues, doublons SHA-256 et voix neurale 100 % privée sur votre appareil."
+        "de" -> "Lokale Analyse unscharfer Fotos, SHA-256-Duplikate und 100 % private Sprachassistentin auf Ihrem Gerät."
+        "zh" -> "本地智能检测模糊照片、SHA-256 重复文件，配备 100% 隐私保护的语音助手。"
+        "ja" -> "端末内でのブレ写真検出、SHA-256重複分析、100%プライベートな音声アシスタント。"
+        "ko" -> "기기 내 흐린 사진 분석, SHA-256 중복 파일 검사 및 100% 개인정보 보호 음성 어시스턴트."
+        "ru" -> "Локальный поиск размытых фото, дубликатов SHA-256 и 100% приватный голосовой ассистент на устройстве."
+        "ar" -> "فحص ذكي للصور الضبابية والملفات المكررة SHA-256 ومساعدة صوتية خاصة 100% على جهازك."
+        "hi" -> "डिवाइस पर धुंधली फ़ोटो की स्मार्ट जाँच, SHA-256 डुप्लिकेट और 100% निजी वॉइस असिस्टेंट।"
+        "bn" -> "ডিভাইসে ঝাপসা ছবি বিশ্লেষণ, SHA-256 ডুপ্লিকেট শনাক্তকরণ এবং ১০০% গোপনীয় ভয়েস সহকারী।"
+        "in", "id" -> "Analisis cerdas foto buram di perangkat, duplikat SHA-256, dan asisten suara 100% privat."
+        else -> "Smart on-device blurry photo check, SHA-256 duplicates, and 100% private neural voice assistant."
     }
 
     fun proBannerSub(): String = when (lang()) {
@@ -824,11 +872,33 @@ fun MariaHeroBanner(
                         }
                     }
                 } else {
-                    Text(
-                        text = if (isMuted) "🔇" else "🔊",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                    )
+                    Canvas(modifier = Modifier.size(16.dp)) {
+                        val barColor = if (isMuted) Color(0xFF8E8E93) else Color.White
+                        val strokePx = 1.8.dp.toPx()
+                        val centerY = size.height / 2f
+                        val barHeights = floatArrayOf(0.32f, 0.68f, 0.48f, 0.30f)
+                        val stepX = size.width / 5f
+                        for (i in barHeights.indices) {
+                            val x = stepX * (i + 1)
+                            val halfH = (size.height * barHeights[i]) / 2f
+                            drawLine(
+                                color = barColor,
+                                start = Offset(x, centerY - halfH),
+                                end = Offset(x, centerY + halfH),
+                                strokeWidth = strokePx,
+                                cap = StrokeCap.Round,
+                            )
+                        }
+                        if (isMuted) {
+                            drawLine(
+                                color = Color(0xFFFF453A),
+                                start = Offset(size.width * 0.15f, size.height * 0.85f),
+                                end = Offset(size.width * 0.85f, size.height * 0.15f),
+                                strokeWidth = strokePx,
+                                cap = StrokeCap.Round,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -960,7 +1030,7 @@ fun ProMariaHeaderSection(
             rawAudioResId = activeAudioRes,
             isActive = isActive,
             speechNonce = speechNonce,
-            isProBadgeActive = true,
+            isProBadgeActive = isProActive,
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1069,11 +1139,7 @@ fun ProGeminiNanoBottomCard(
                     fontWeight = FontWeight.ExtraBold,
                 )
                 Text(
-                    text = if (MariaI18n.isPt()) {
-                        "Análise inteligente de fotos borradas, duplicatas SHA-256 e voz neural 100% privada no seu aparelho."
-                    } else {
-                        "Smart on-device blurry photo check, SHA-256 duplicates, and 100% private neural voice assistant."
-                    },
+                    text = MariaI18n.onDeviceAiSummary(),
                     color = MidiastoreColors.TextMuted,
                     fontSize = 12.sp,
                     lineHeight = 16.sp,

@@ -44,6 +44,12 @@ interface RtdnPayload {
     purchaseToken?: string;
     sku?: string;
   };
+  voidedPurchaseNotification?: {
+    purchaseToken?: string;
+    orderId?: string;
+    productType?: number; // 1 = PRODUCT_TYPE_SUBSCRIPTION, 2 = PRODUCT_TYPE_ONE_TIME
+    refundType?: number;  // 1 = REFUND_TYPE_FULL_REFUND, 2 = REFUND_TYPE_QUANTITY_BASED_PARTIAL_REFUND
+  };
   testNotification?: {
     version?: string;
   };
@@ -106,6 +112,7 @@ async function getGoogleCertCryptoKey(kid: string): Promise<CryptoKey | null> {
 async function verifyPubSubBearerJwt(
   authHeader: string,
   expectedAudience: string | undefined,
+  expectedSaEmail?: string | undefined,
 ): Promise<{ valid: boolean; reason?: string }> {
   const match = authHeader.match(/^Bearer\s+([A-Za-z0-9\-_]+)\.([A-Za-z0-9\-_]+)\.([A-Za-z0-9\-_]+)$/i);
   if (!match) return { valid: false, reason: "INVALID_BEARER_FORMAT" };
@@ -118,6 +125,7 @@ async function verifyPubSubBearerJwt(
     const iss = String(payload.iss || "");
     const exp = Number(payload.exp || 0);
     const aud = String(payload.aud || "");
+    const email = String(payload.email || "").trim().toLowerCase();
     const nowSec = Math.floor(Date.now() / 1000);
 
     if (header.alg !== "RS256" || !kid) return { valid: false, reason: "UNSUPPORTED_JWT_ALG" };
@@ -127,8 +135,14 @@ async function verifyPubSubBearerJwt(
     if (!exp || exp < nowSec - 60) {
       return { valid: false, reason: "EXPIRED_JWT" };
     }
-    if (expectedAudience && aud !== expectedAudience) {
+    if (!aud || (expectedAudience && aud !== expectedAudience)) {
       return { valid: false, reason: "INVALID_JWT_AUDIENCE" };
+    }
+    if (payload.email_verified !== true) {
+      return { valid: false, reason: "UNVERIFIED_JWT_EMAIL" };
+    }
+    if (expectedSaEmail && email !== expectedSaEmail.trim().toLowerCase()) {
+      return { valid: false, reason: "UNEXPECTED_JWT_SA_EMAIL" };
     }
 
     const cryptoKey = await getGoogleCertCryptoKey(kid);
@@ -189,6 +203,7 @@ Deno.serve(async (req: Request) => {
   // 1. Fail-closed auth: requires either RTDN_WEBHOOK_TOKEN or verified Google Pub/Sub OIDC JWT
   const expectedToken = Deno.env.get("RTDN_WEBHOOK_TOKEN");
   const expectedAud = Deno.env.get("RTDN_EXPECTED_AUDIENCE");
+  const expectedSaEmail = Deno.env.get("RTDN_EXPECTED_SA_EMAIL");
   const requireJwt = Deno.env.get("RTDN_VERIFY_PUBSUB_JWT") === "true";
 
   if (!expectedToken && !requireJwt && !expectedAud) {
@@ -200,7 +215,8 @@ Deno.serve(async (req: Request) => {
 
   if (requireJwt || expectedAud) {
     const authHeader = req.headers.get("authorization") || "";
-    const jwtCheck = await verifyPubSubBearerJwt(authHeader, expectedAud);
+    const effectiveAudience = expectedAud || req.url.split("?")[0];
+    const jwtCheck = await verifyPubSubBearerJwt(authHeader, effectiveAudience, expectedSaEmail);
     if (!jwtCheck.valid) {
       return new Response(
         JSON.stringify({ ok: false, reason: jwtCheck.reason || "UNAUTHORIZED_JWT", requestId }),
@@ -254,12 +270,16 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const subNotif = rtdn.subscriptionNotification;
     const otpNotif = rtdn.oneTimeProductNotification;
-    const purchaseToken = String(subNotif?.purchaseToken || otpNotif?.purchaseToken || "").trim();
+    const voidedNotif = rtdn.voidedPurchaseNotification;
+    const purchaseToken = String(
+      subNotif?.purchaseToken || otpNotif?.purchaseToken || voidedNotif?.purchaseToken || "",
+    ).trim();
     const productId = String(subNotif?.subscriptionId || otpNotif?.sku || "").trim() || null;
-    const notificationType = subNotif?.notificationType ?? otpNotif?.notificationType ?? null;
+    const notificationType =
+      subNotif?.notificationType ?? otpNotif?.notificationType ?? voidedNotif?.refundType ?? null;
     const tokenHash = purchaseToken ? await sha256Hex(purchaseToken) : null;
 
-    // 2. Strict idempotency by message_id
+    // 2. Strict idempotency by message_id — only deduplicate when processed === true
     const { error: insertErr } = await supabase.from("rtdn_events").insert({
       message_id: messageId,
       notification_type: notificationType,
@@ -273,25 +293,40 @@ Deno.serve(async (req: Request) => {
 
     if (insertErr) {
       if (insertErr.code === "23505") {
-        return new Response(
-          JSON.stringify({
-            ok: true,
-            deduplicated: true,
-            messageId,
-            requestId,
-            latencyMs: Math.round(performance.now() - startedAt),
-          }),
-          { status: 200, headers: { "Content-Type": "application/json" } },
-        );
+        const { data: existingEvent, error: selectErr } = await supabase
+          .from("rtdn_events")
+          .select("processed")
+          .eq("message_id", messageId)
+          .maybeSingle();
+        if (selectErr) {
+          throw new Error(`RTDN_DEDUP_CHECK_FAILED: ${selectErr.message}`);
+        }
+        if (existingEvent?.processed === true) {
+          return new Response(
+            JSON.stringify({
+              ok: true,
+              deduplicated: true,
+              messageId,
+              requestId,
+              latencyMs: Math.round(performance.now() - startedAt),
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          );
+        }
+        // processed === false: transient Play API or DB failure on prior attempt — continue reprocessing!
+      } else {
+        throw new Error(`RTDN_PERSIST_FAILED: ${insertErr.message}`);
       }
-      throw new Error(`RTDN_PERSIST_FAILED: ${insertErr.message}`);
     }
 
     if (rtdn.testNotification) {
-      await supabase
+      const { error: testUpdateErr } = await supabase
         .from("rtdn_events")
         .update({ processed: true, processing_result: "TEST_NOTIFICATION_ACK" })
         .eq("message_id", messageId);
+      if (testUpdateErr) {
+        throw new Error(`RTDN_TEST_ACK_FAILED: ${testUpdateErr.message}`);
+      }
       return new Response(
         JSON.stringify({
           ok: true,
@@ -316,10 +351,6 @@ Deno.serve(async (req: Request) => {
     }
 
     const saRaw = Deno.env.get("PLAY_SERVICE_ACCOUNT_JSON");
-    if (!saRaw) throw new Error("MISSING_SERVICE_ACCOUNT");
-
-    const sa = JSON.parse(saRaw);
-    const { accessToken } = await getCachedGoogleAccessToken(sa, EXTERNAL_TIMEOUT_MS);
     const nowIso = new Date().toISOString();
 
     let entitlementActive = false;
@@ -329,50 +360,156 @@ Deno.serve(async (req: Request) => {
     let rawStatus = "UNKNOWN";
     let resolvedProductId = productId || "unknown";
     let isTestPurchase = false;
-    const productType: "SUBS" | "INAPP" = subNotif ? "SUBS" : "INAPP";
+    let productType: "SUBS" | "INAPP" = subNotif ? "SUBS" : "INAPP";
+    let voidedLedgerAmountCents: number | null = null;
+    let voidedLedgerBrlCents: number | null = null;
 
-    if (subNotif) {
-      const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
-        CANONICAL_PACKAGE,
-      )}/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`;
-      const playRes = await fetch(url, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        signal: AbortSignal.timeout(EXTERNAL_TIMEOUT_MS),
-      });
-      if (!playRes.ok) throw new Error(`PLAY_API_${playRes.status}`);
+    if (voidedNotif) {
+      entitlementActive = false;
+      rawStatus = "VOIDED_PURCHASE";
+      const voidedOrderId = String(voidedNotif.orderId || "").trim() || null;
+      // Google Play VoidedPurchaseNotification.productType: 1 = SUBSCRIPTION, 2 = ONE_TIME
+      productType = voidedNotif.productType === 1 ? "SUBS" : "INAPP";
 
-      const subData = await playRes.json();
-      rawStatus = String(subData?.subscriptionState || "UNKNOWN");
-      isTestPurchase = Boolean(subData?.testPurchase);
-      const lineItems = Array.isArray(subData?.lineItems) ? subData.lineItems : [];
-      const primaryItem = lineItems[0];
-      if (primaryItem?.productId) resolvedProductId = String(primaryItem.productId);
-      expiryTime = primaryItem?.expiryTime || null;
-      entitlementActive =
-        SUBS_PRODUCTS.has(resolvedProductId) &&
-        isSubscriptionEntitlementActive(rawStatus, expiryTime);
-      acknowledged = subData?.acknowledgementState === "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED";
-      orderId = subData?.latestOrderId || null;
-    } else if (otpNotif && productId && INAPP_PRODUCTS.has(productId)) {
-      const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
-        CANONICAL_PACKAGE,
-      )}/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}`;
-      const playRes = await fetch(url, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        signal: AbortSignal.timeout(EXTERNAL_TIMEOUT_MS),
-      });
-      if (!playRes.ok) throw new Error(`PLAY_API_${playRes.status}`);
+      const [{ data: existingPurchase }, { data: existingEntitlement }, { data: existingSale }] =
+        await Promise.all([
+          supabase
+            .from("play_purchases")
+            .select("product_id, product_type, order_id, acknowledged, expiry_time")
+            .eq("purchase_token_hash", tokenHash)
+            .maybeSingle(),
+          supabase
+            .from("entitlements")
+            .select("product_id, product_type, latest_order_id, acknowledged, expiry_time")
+            .eq("subject_key", tokenHash)
+            .maybeSingle(),
+          voidedOrderId
+            ? supabase
+                .from("financial_ledger")
+                .select("product_id, amount_cents, amount_brl_cents, is_test_transaction")
+                .eq("order_id", voidedOrderId)
+                .eq("event_type", "GROSS_SALE")
+                .maybeSingle()
+            : Promise.resolve({ data: null }),
+        ]);
 
-      const prodData = await playRes.json();
-      const purchaseState = typeof prodData?.purchaseState === "number" ? prodData.purchaseState : null;
-      rawStatus = purchaseState !== null ? `PURCHASE_STATE_${purchaseState}` : "UNKNOWN";
-      isTestPurchase = prodData?.purchaseType === 0; // 0 = Test purchase in Play API
-      entitlementActive = purchaseState === 0;
-      acknowledged = prodData?.acknowledgementState === 1;
-      orderId = prodData?.orderId || null;
+      if (voidedNotif.productType !== 1 && voidedNotif.productType !== 2) {
+        if (existingPurchase?.product_type === "SUBS" || existingEntitlement?.product_type === "SUBS") {
+          productType = "SUBS";
+        }
+      }
+
+      orderId =
+        voidedOrderId ||
+        existingPurchase?.order_id ||
+        existingEntitlement?.latest_order_id ||
+        null;
+      acknowledged = Boolean(
+        existingPurchase?.acknowledged ?? existingEntitlement?.acknowledged ?? false,
+      );
+      expiryTime = existingPurchase?.expiry_time || existingEntitlement?.expiry_time || null;
+      isTestPurchase = Boolean(existingSale?.is_test_transaction);
+
+      if (typeof existingSale?.amount_cents === "number") {
+        voidedLedgerAmountCents = existingSale.amount_cents;
+      }
+      if (typeof existingSale?.amount_brl_cents === "number") {
+        voidedLedgerBrlCents = existingSale.amount_brl_cents;
+      }
+
+      const knownProduct =
+        existingPurchase?.product_id ||
+        existingEntitlement?.product_id ||
+        existingSale?.product_id ||
+        null;
+
+      if (knownProduct && knownProduct !== "unknown") {
+        resolvedProductId = String(knownProduct);
+      } else if (productType === "SUBS" && saRaw) {
+        try {
+          const sa = JSON.parse(saRaw);
+          const { accessToken } = await getCachedGoogleAccessToken(sa, EXTERNAL_TIMEOUT_MS);
+          const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
+            CANONICAL_PACKAGE,
+          )}/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`;
+          const playRes = await fetch(url, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            signal: AbortSignal.timeout(EXTERNAL_TIMEOUT_MS),
+          });
+          if (playRes.ok) {
+            const subData = await playRes.json();
+            isTestPurchase = Boolean(subData?.testPurchase);
+            const lineItems = Array.isArray(subData?.lineItems) ? subData.lineItems : [];
+            if (lineItems[0]?.productId) {
+              resolvedProductId = String(lineItems[0].productId);
+            }
+            if (!expiryTime && lineItems[0]?.expiryTime) {
+              expiryTime = String(lineItems[0].expiryTime);
+            }
+            if (!orderId && subData?.latestOrderId) {
+              orderId = String(subData.latestOrderId);
+            }
+          }
+        } catch {
+          // Best-effort lookup only; proceed with fail-closed revocation
+        }
+      } else if (productType === "INAPP" && INAPP_PRODUCTS.size === 1) {
+        resolvedProductId = Array.from(INAPP_PRODUCTS)[0];
+      }
+    } else {
+      if (!saRaw) throw new Error("MISSING_SERVICE_ACCOUNT");
+      const sa = JSON.parse(saRaw);
+      const { accessToken } = await getCachedGoogleAccessToken(sa, EXTERNAL_TIMEOUT_MS);
+
+      if (subNotif) {
+        const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
+          CANONICAL_PACKAGE,
+        )}/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`;
+        const playRes = await fetch(url, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          signal: AbortSignal.timeout(EXTERNAL_TIMEOUT_MS),
+        });
+        if (!playRes.ok) throw new Error(`PLAY_API_${playRes.status}`);
+
+        const subData = await playRes.json();
+        rawStatus = String(subData?.subscriptionState || "UNKNOWN");
+        isTestPurchase = Boolean(subData?.testPurchase);
+        const lineItems = Array.isArray(subData?.lineItems) ? subData.lineItems : [];
+        const matchedItem = subNotif.subscriptionId
+          ? lineItems.find(
+              (item: { productId?: string; expiryTime?: string }) =>
+                item?.productId === subNotif.subscriptionId,
+            )
+          : undefined;
+        const primaryItem = matchedItem || lineItems[0];
+        if (primaryItem?.productId) resolvedProductId = String(primaryItem.productId);
+        expiryTime = primaryItem?.expiryTime || null;
+        entitlementActive =
+          SUBS_PRODUCTS.has(resolvedProductId) &&
+          isSubscriptionEntitlementActive(rawStatus, expiryTime);
+        acknowledged = subData?.acknowledgementState === "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED";
+        orderId = subData?.latestOrderId || null;
+      } else if (otpNotif && productId && INAPP_PRODUCTS.has(productId)) {
+        const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(
+          CANONICAL_PACKAGE,
+        )}/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}`;
+        const playRes = await fetch(url, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          signal: AbortSignal.timeout(EXTERNAL_TIMEOUT_MS),
+        });
+        if (!playRes.ok) throw new Error(`PLAY_API_${playRes.status}`);
+
+        const prodData = await playRes.json();
+        const purchaseState = typeof prodData?.purchaseState === "number" ? prodData.purchaseState : null;
+        rawStatus = purchaseState !== null ? `PURCHASE_STATE_${purchaseState}` : "UNKNOWN";
+        isTestPurchase = prodData?.purchaseType === 0; // 0 = Test purchase in Play API
+        entitlementActive = purchaseState === 0;
+        acknowledged = prodData?.acknowledgementState === 1;
+        orderId = prodData?.orderId || null;
+      }
     }
 
-    const writes: Promise<unknown>[] = [
+    const writes: Promise<{ error?: { message?: string } | null }>[] = [
       supabase.from("play_purchases").upsert(
         {
           package_name: CANONICAL_PACKAGE,
@@ -407,29 +544,47 @@ Deno.serve(async (req: Request) => {
       ),
     ];
 
-    // 3. Append-only financial_ledger entry (idempotent by rtdn messageId)
-    const ledgerClass = classifyLedgerEvent(Boolean(subNotif), notificationType);
+    // 3. Append-only financial_ledger entry (idempotent)
+    const ledgerClass = voidedNotif
+      ? ({ eventType: "REFUND", direction: "DEBIT" } as const)
+      : classifyLedgerEvent(Boolean(subNotif), notificationType);
     const catalogCents = CATALOG_BRL_CENTS[resolvedProductId] || 0;
-    if (ledgerClass && catalogCents > 0) {
+    const ledgerAmountCents = voidedNotif
+      ? (voidedLedgerAmountCents ?? catalogCents)
+      : catalogCents;
+    const ledgerBrlCents = voidedNotif
+      ? (voidedLedgerBrlCents ?? ledgerAmountCents)
+      : catalogCents;
+
+    if (ledgerClass && (Boolean(voidedNotif) || ledgerAmountCents > 0)) {
+      const idempotencyKey = voidedNotif
+        ? `rtdn:voided:${orderId || tokenHash}`
+        : `rtdn:${messageId}:${ledgerClass.eventType}`;
       writes.push(
         supabase.from("financial_ledger").upsert(
           {
-            idempotency_key: `rtdn:${messageId}:${ledgerClass.eventType}`,
+            idempotency_key: idempotencyKey,
             event_type: ledgerClass.eventType,
             source: "GOOGLE_PLAY",
             order_id: orderId,
             product_id: resolvedProductId,
             direction: ledgerClass.direction,
-            amount_cents: catalogCents,
+            amount_cents: ledgerAmountCents,
             currency: "BRL",
             fx_rate_to_brl: 1.0,
-            amount_brl_cents: catalogCents,
+            amount_brl_cents: ledgerBrlCents,
             is_test_transaction: isTestPurchase,
             occurred_at: nowIso,
             metadata: {
               messageId,
               notificationType,
               rawStatus,
+              ...(voidedNotif
+                ? {
+                    voidedProductType: voidedNotif.productType ?? null,
+                    refundType: voidedNotif.refundType ?? null,
+                  }
+                : {}),
             },
           },
           { onConflict: "idempotency_key", ignoreDuplicates: true },
@@ -437,17 +592,23 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    writes.push(
-      supabase
-        .from("rtdn_events")
-        .update({
-          processed: true,
-          processing_result: `SYNCED_${rawStatus}_ACTIVE_${entitlementActive}_LEDGER_${ledgerClass?.eventType || "NONE"}`,
-        })
-        .eq("message_id", messageId),
-    );
+    const writeResults = await Promise.all(writes);
+    for (const r of writeResults) {
+      if (r?.error) {
+        throw new Error(`RTDN_DB_WRITE_FAILED: ${r.error.message || "unknown"}`);
+      }
+    }
 
-    await Promise.all(writes);
+    const { error: markErr } = await supabase
+      .from("rtdn_events")
+      .update({
+        processed: true,
+        processing_result: `SYNCED_${rawStatus}_ACTIVE_${entitlementActive}_LEDGER_${ledgerClass?.eventType || "NONE"}`,
+      })
+      .eq("message_id", messageId);
+    if (markErr) {
+      throw new Error(`RTDN_MARK_PROCESSED_FAILED: ${markErr.message}`);
+    }
 
     return new Response(
       JSON.stringify({

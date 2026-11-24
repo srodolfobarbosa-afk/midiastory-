@@ -88,9 +88,9 @@ Total: %3$s</string>
     <string name="pro_status_free">Plano atual: Grátis · Análise e limpeza essenciais incluídas.</string>
     <string name="pro_status_active">Midiastore Pro ativo</string>
     <string name="pro_status_pending">Compra pendente de confirmação na Google Play</string>
-    <string name="pro_card_subtitle">Limpeza essencial grátis para sempre. Escolha um dos 3 planos Pro para recursos extras.</string>
-    <string name="pro_free_included">GRÁTIS PARA SEMPRE · WhatsApp, Duplicatas, Arquivos Grandes, Prints/Antigos e Lixeira Segura 100% liberados.</string>
-    <string name="pro_paid_included">Suporte prioritário e recursos avançados</string>
+    <string name="pro_card_subtitle">Limpeza essencial grátis para sempre. Escolha um plano Pro para apps sem uso (+90d), diagnóstico de fotos borradas e relatórios auditados.</string>
+    <string name="pro_free_included">GRÁTIS PARA SEMPRE · WhatsApp, Duplicatas SHA-256, Arquivos Grandes (&gt;10 MB), Prints Antigos (+30d) e Lixeira Segura.</string>
+    <string name="pro_paid_included">PRO · Detector de Apps sem uso (+90d), Diagnóstico de Fotos Borradas, Relatórios Auditados e Suporte Prioritário.</string>
     <string name="home_cleanup_primary">Analisar e Limpar</string>
     <string name="home_welcome_title">Mais espaço. Mais tranquilidade.</string>
     <string name="home_illustration_description">Mulher negra sorrindo, de cabelo loiro, usando o Midiastore</string>
@@ -425,7 +425,7 @@ Total: %3$s</string>
     <string name="quick_pro_open_tab_btn">Ver Planos Pro</string>
     <string name="quick_pro_restore_btn">Restaurar Compra</string>
     <string name="top_pro_active_pill">Pro</string>
-    <string name="brand_tagline_pro">MIDIASTORE PRO · TEMA VIP DOURADO ATIVO</string>
+    <string name="brand_tagline_pro">MIDIASTORE PRO · ATIVO</string>
     <string name="pro_suite_section_title">👑 SUÍTE EXCLUSIVA PRO (PRODUTIVIDADE &amp; SEGURANÇA)</string>
     <string name="pro_suite_notepad_btn">📝 Cofre de Notas Rápidas Pro</string>
     <string name="pro_suite_calculator_btn">🧮 Calculadora Pro &amp; Conversor de Espaço</string>
@@ -631,4 +631,5 @@ Total: %3$s</string>
     <string name="limited_access_allow_all">Permitir acesso a todas as mídias</string>
     <string name="limited_access_continue_selected">Continuar com as mídias selecionadas</string>
     <string name="limited_access_settings_hint">O Android não exibiu o pedido. Abra Permissões › Fotos e vídeos e escolha \"Permitir tudo\".</string>
+    <string name="privacy_policy_button">Política de Privacidade</string>
 </resources>

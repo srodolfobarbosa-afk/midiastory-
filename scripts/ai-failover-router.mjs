@@ -179,7 +179,11 @@ async function callGitHubModels(modelId, prompt, maxTokens = 1200, responseForma
 async function callOpenRouter(modelId, prompt, maxTokens = 1200, reasoningEffort = "medium", responseFormatJson = false, systemPrompt = RODOLFO_BRAIN_SYSTEM_PROMPT) {
   if (!openRouterKey) throw new Error("Chave OPENROUTER_API_KEY não encontrada.");
   
-  const isReasoningModel = modelId.includes("carbon") || modelId.includes("argon") || modelId.includes("nano-omni");
+  const isReasoningModel =
+    modelId.includes("neon") ||
+    modelId.includes("carbon") ||
+    modelId.includes("argon") ||
+    modelId.includes("nano-omni");
   const isFreeModel = modelId.endsWith(":free") || modelId === "openrouter/free";
 
   let res = await fetch("https://openrouter.ai/api/v1/chat/completions", {

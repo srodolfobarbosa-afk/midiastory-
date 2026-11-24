@@ -53,6 +53,7 @@ function isCompanionAlive() {
 }
 
 const TTS_MODELS = [
+  "gemini-2.5-flash-preview-tts",
   "gemini-3.8-flash-lite-tts",
   "gemini-3.1-flash-tts-preview",
   "gemini-3.8-flash-tts",
@@ -61,7 +62,7 @@ const TTS_MODELS = [
 const DEFAULT_CONFIG = {
   enabled: true,
   voiceName: "Kore", // Natural female voice
-  maxChars: 3500,
+  maxChars: 750,
   showAvatar: true,
 };
 
@@ -105,6 +106,9 @@ function cleanTextForSpeech(markdown, maxChars = 750) {
   text = text.replace(/[*_~|]/g, " ");
   // Remove bullet dashes at line start
   text = text.replace(/^\s*[-+•]\s+/gm, "");
+  // Sanitize arrows & XML-sensitive characters so MsEdgeTTS SSML never breaks
+  text = text.replace(/->|=>/g, " para ");
+  text = text.replace(/[<>&]/g, " ");
   // Collapse whitespace and newlines into natural pauses
   text = text.replace(/\r?\n+/g, ". ");
   text = text.replace(/\.\s*\./g, ".");

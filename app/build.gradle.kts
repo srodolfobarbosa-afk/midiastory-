@@ -149,7 +149,3 @@ dependencies {
     androidTestImplementation("androidx.test:core-ktx:1.7.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.4.1")
 }
-
-tasks.matching { it.name == "connectedDebugAndroidTest" }.configureEach {
-    dependsOn(":mediaOwnerTest:installDebug")
-}

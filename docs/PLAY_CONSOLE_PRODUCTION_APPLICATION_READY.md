@@ -6,7 +6,7 @@
 
 ## PARTE 1 — Respostas Prontas para o Formulário "Solicitar Acesso à Produção"
 
-*(Todas as respostas abaixo refletem fatos reais e verificáveis do nosso ciclo de teste fechado `v2.7.3 -> v2.7.5 -> v2.7.6`, respeitando o limite de 300 caracteres por campo da Google Play Console.)*
+*(Todas as respostas abaixo refletem fatos reais e verificáveis do nosso ciclo de teste fechado `v2.7.3 -> v2.8.0 -> v2.8.2`, respeitando o limite de 300 caracteres por campo da Google Play Console.)*
 
 ### Seção 1: Sobre o teste fechado
 1. **Como você recrutou testadores para o teste fechado?** *(máx. 300 chars)*
@@ -30,8 +30,8 @@
    *(246 chars)*
 
 6. **Descreva como seu app agrega valor aos usuários:** *(máx. 300 chars)*
-   > O Midiastore é um limpador leve (6 MB) que roda 100% no aparelho usando Scoped Storage e SHA-256 para identificar duplicatas exatas byte a byte. O usuário visualiza todas as miniaturas e confirma cada exclusão no diálogo oficial do Android, sem risco de perda.
-   *(260 chars)*
+   > O Midiastore é um limpador ultraleve (< 8 MB) que roda 100% no aparelho usando Scoped Storage e SHA-256 para identificar duplicatas exatas byte a byte. O usuário visualiza todas as miniaturas e confirma cada exclusão no diálogo oficial do Android, sem risco de perda.
+   *(268 chars)*
 
 7. **Quantas instalações você espera que seu app tenha no primeiro ano?**
    > Selecione **10.000 a 50.000** *(ou **50.000 a 100.000**, realista para lançamento global nos 14 idiomas com Google Ads).*

@@ -1399,7 +1399,7 @@ class MainActivity : AppCompatActivity() {
                         },
                         onSelectLargeVideos = {
                             viewModel.selectKind(MediaKind.VIDEO)
-                            viewModel.selectSmartFilter(SmartFilterMode.ALL_ITEMS)
+                            viewModel.selectSmartFilter(SmartFilterMode.LARGE_FILES_10MB)
                         },
                         onSelectWhatsApp = {
                             openWhatsAppCleanerFlow()
@@ -1811,6 +1811,11 @@ class MainActivity : AppCompatActivity() {
         }
         root.addView(lifetimeBtn, top(8))
 
+        root.addView(
+            label(getString(R.string.pro_billing_terms_disclosure), 10.5f, R.color.sweep_muted, false),
+            top(10),
+        )
+
         val laterBtn = button(getString(R.string.post_cleanup_relief_later)) {
             sheet.dismiss()
         }.apply {
@@ -1841,11 +1846,11 @@ class MainActivity : AppCompatActivity() {
                         isProActive = isProNow,
                         onRunSmartDiagnosis = {
                             openInteractiveDialogOnMissionFinish = true
-                            runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+                            runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
                         },
                         onRunBlurScan = { openBlurCleanerFlow() },
                         onRunWhatsAppClean = { openWhatsAppCleanerFlow() },
-                        onRunUnusedApps = { requestUnusedAppSuggestions() },
+                        onRunUnusedApps = { runWithProAccess { requestUnusedAppSuggestions() } },
                     )
                 }
             }
@@ -1941,11 +1946,11 @@ class MainActivity : AppCompatActivity() {
                     ProGeminiNanoBottomCard(
                         onRunSmartDiagnosis = {
                             openInteractiveDialogOnMissionFinish = true
-                            runOutcomeMission(DesiredOutcomeMission.FREE_MAX_SPACE_NOW)
+                            runOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
                         },
                         onRunBlurScan = { openBlurCleanerFlow() },
                         onRunWhatsAppClean = { openWhatsAppCleanerFlow() },
-                        onRunUnusedApps = { requestUnusedAppSuggestions() },
+                        onRunUnusedApps = { runWithProAccess { requestUnusedAppSuggestions() } },
                     )
                 }
             }
@@ -1975,6 +1980,24 @@ class MainActivity : AppCompatActivity() {
         linksRow.addView(restorePurchasesButton, LinearLayout.LayoutParams(0, -2, 1f))
         linksRow.addView(manageSubscriptionButton, LinearLayout.LayoutParams(0, -2, 1f))
         addView(linksRow, top(12))
+
+        val privacyPolicyButton = button(getString(R.string.privacy_policy_button)) {
+            val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+            val privacyUrl = if (isPt) {
+                "https://midiastory-df6a0.web.app/privacidade.html"
+            } else {
+                "https://midiastory-df6a0.web.app/privacy.html"
+            }
+            runCatching {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(privacyUrl)))
+            }
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+            setTextColor(color(R.color.sweep_muted))
+            textSize = 11.5f
+            minHeight = dp(38)
+        }
+        addView(privacyPolicyButton, top(2))
 
         addView(label(getString(R.string.pro_billing_terms_disclosure), 10.5f, R.color.sweep_muted, false), top(8))
         if (!billingGateway.securePurchaseVerificationAvailable()) {
@@ -5214,64 +5237,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleIncomingSendIntent(incomingIntent: Intent?) {
-        val action = incomingIntent?.action ?: return
-        if (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE) {
-            val sharedText = incomingIntent.getStringExtra(Intent.EXTRA_TEXT)
-            if (!sharedText.isNullOrBlank() && (sharedText.startsWith("http://") || sharedText.startsWith("https://") || sharedText.contains("http"))) {
-                val url = Regex("""https?://[^\s]+""").find(sharedText)?.value ?: sharedText
-                val actions = arrayOf(
-                    getString(R.string.incoming_link_download),
-                    getString(R.string.incoming_link_qr)
-                )
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.incoming_link_title)
-                    .setItems(actions) { _, which ->
-                        if (which == 0) openVideoDownloaderStudio(url)
-                        else openQrCodeGeneratorStudio(url)
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
-                return
-            }
-            if (action == Intent.ACTION_SEND_MULTIPLE) {
-                val multipleUris: List<Uri> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    incomingIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java).orEmpty()
-                } else {
-                    @Suppress("DEPRECATION")
-                    incomingIntent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM).orEmpty()
-                }
-                if (multipleUris.isNotEmpty()) {
-                    Toast.makeText(this, R.string.media_studio_incoming_media, Toast.LENGTH_SHORT).show()
-                    val firstUri = multipleUris.first()
-                    val options = arrayOf(
-                        getString(R.string.incoming_convert_pdf, multipleUris.size),
-                        getString(R.string.incoming_filter_first),
-                        getString(R.string.incoming_exif_first)
-                    )
-                    AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.incoming_medias_title, multipleUris.size))
-                        .setItems(options) { _, which ->
-                            when (which) {
-                                0 -> processPhotosToPdf(multipleUris)
-                                1 -> openInteractivePhotoFilterEditor(firstUri)
-                                2 -> openInteractiveExifCleaner(firstUri)
-                            }
-                        }
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show()
-                    return
-                }
-            }
-            val sharedUri: Uri? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                incomingIntent.getParcelableExtra(Intent.EXTRA_STREAM)
-            }
-            Toast.makeText(this, R.string.media_studio_incoming_media, Toast.LENGTH_SHORT).show()
-            showMediaStudioDialog(sharedUri, sharedText)
-        }
+    private fun handleIncomingSendIntent(@Suppress("UNUSED_PARAMETER") incomingIntent: Intent?) {
+        // ACTION_SEND / ACTION_SEND_MULTIPLE removidos do manifesto e neutralizados aqui
+        // para jamais expor downloader externo ou estúdio desativado.
+        return
     }
 
     private fun showMediaStudioDialog(initialUri: Uri? = null, initialText: String? = null) {

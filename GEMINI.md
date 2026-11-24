@@ -28,7 +28,7 @@ Toda IA operando neste repositório incorpora as **10 Leis Invioláveis + 5 Dire
 ## 1. Escopo & Arquitetura Geral
 
 - **Norte Estratégico & Memória (Canônico):** [`docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md`](docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md) (4 camadas de memória: norte estável, decisões do proprietário, estado operacional mutável verificado na fonte e evidência/aprendizado).
-- **Aplicativo Android:** `com.rdf112.midiastore` (`v2.7.5`, `versionCode 30`, publicado em `internal`/`alpha` em 2026-11-20 após CI 100% verde com KVM no Run `44822314320`).
+- **Aplicativo Android:** `com.rdf112.midiastore` (código atual em `v2.8.2`, `versionCode 34`; `internal`/`alpha` na Play Console em `v2.8.0`, `vc 32`, com 23 testadores ativos preservados).
   - Stack: Kotlin, Android Views (Material Components OLED `#000000` / `#1C1C1E` / `#0A84FF`), AndroidX MediaStore API, Google Play Billing `8.3.0` + Edge Function fail-closed `verify-play-purchase`.
   - Missão (direção aprovada): **100% limpador de armazenamento on-device** com 3 abas (**Limpar, Arquivos, Pro**), limpeza real em até 2 cliques com miniaturas e consentimento oficial Android, duplicatas exatas por SHA-256 streaming, arquivos grandes e mídias antigas. (Não restaurar Studio, jogos ou hubs genéricos.)
 - **Funil Web Internacional:**
