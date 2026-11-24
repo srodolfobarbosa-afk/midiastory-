@@ -3311,3 +3311,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #556
 
 ---
+
+### 📍 [24/11/2026, 20:16:54] Gerado e projetado no HUD video neural real da Maria 2.0 falando sincronizada (MoDA Diffusion Talking-Head via API Gradio 5 gratuita, 174,3 KB em H.265 hvc1 com audio AAC de estudio)
+- **📖 Estudou / Leu:** API Gradio 5 /gradio_api/call/generate_motion no multimodalart-moda-fast-talking-head.hf.space + remux libx265 hvc1 512x512
+- **⚙️ Tentou / Executou:** Gerar sincronia labial humana fotorrealista real (labios, dentes, mandibula, bochechas, olhar e inclinacao de cabeca) sincronizada quadro a quadro com pt-BR-FranciscaNeural fora do app
+- **⚠️ Erros Encontrados:** Segunda chamada consecutiva em <1s sofreu cooldown ZeroGPU no clip bonus EN
+- **🔧 Como Corrigiu:** Reutilizado clip neural PT-BR completo (564 KB raw -> 174,3 KB H.265 Android + H.264 HUD com autoplay sonoro) e validada prancha de 4 quadros reais em .tmp/prototipo-maria-2-humana/maria2_neural_frames_proof.png
+- **🎯 Conclusão:** Descoberta rota 100% gratuita e fotorrealista nivel cinema (zero 3D, zero gambiarra 2D, 174 KB por fala H.265) pronta na tela do fundador para aprovacao visual conforme Diretriz 12
+- *Registro Supabase:* Memory #558
+
+---
