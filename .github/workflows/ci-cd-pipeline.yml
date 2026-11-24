@@ -86,7 +86,6 @@ jobs:
           mkdir -p .secrets
           if [ -n "$FIREBASE_ADMIN_KEY_JSON" ]; then
             echo "$FIREBASE_ADMIN_KEY_JSON" > .secrets/firebase-admin.json
-            node scripts/generate-multilang-pages.mjs
             node scripts/firebase-deploy-site.mjs
           else
             echo "Aviso: FIREBASE_ADMIN_KEY_JSON não configurada no repositório. Deploy ignorado."
