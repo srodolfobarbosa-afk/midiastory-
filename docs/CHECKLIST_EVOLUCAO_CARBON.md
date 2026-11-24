@@ -33,5 +33,7 @@
 ---
 
 ## 🏁 PARTE C — PÓS-26/11 (ESCALA R$ 1.000.000,00 & LABORATÓRIO MARIA HUMANA)
-- [ ] **Quinta `26/11`:** Solicitar Produção na Play Console (`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`) + ligar `@aconteceunobr` & Google Ads.
-- [ ] **Laboratório Isolado Maria Humana de Última Geração:** testar geração neural hiper-realista fora do app e só apresentar quando estiver 100% igual humana real.
+- [ ] **Quinta `26/11`:** Solicitar Produção na Play Console (`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`, contador oficial em `12/14 dias` em `24/11`) + ligar `@aconteceunobr` & Google Ads.
+- [x] **Voz da Maria no PC (`3,93 GB RAM`):** travada em `pt-BR-FranciscaNeural`/`pt-BR-ThalitaMultilingualNeural` com cache SHA-1 e **0% fallback SAPI5 robótico** (`scripts/voice-narrator.mjs`).
+- [ ] **Laboratório Isolado Maria 2.0 Humana (`Opção 1: Micro-Vídeo Neural H.265`):** protótipo isolado gerado em `.tmp/prototipo-maria-2-humana/` e projetado no HUD para aprovação visual do Rodolfo antes de qualquer mudança no app (`Diretriz 12`).
+- [ ] **Growth Pack `v2.9.1` Planejado (`docs/PLANO_CRESCIMENTO_V291_TRIAL_RETENCAO_SHARE.md`):** (1) Free Trial `3 dias` exclusivo no Plano Anual `R$ 79,99/ano`; (2) Notificação Semanal Inteligente `>= 300 MB` (máx. 1x/semana); (3) Botão Nativo de Compartilhar Conquista/Link (WhatsApp, Telegram e Instagram Stories/Direct com UTM).

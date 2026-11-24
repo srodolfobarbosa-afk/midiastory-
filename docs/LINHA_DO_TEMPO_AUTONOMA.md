@@ -3301,3 +3301,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #555
 
 ---
+
+### 📍 [24/11/2026, 20:02:10] Aplicada trava definitiva da voz neural no PC (scripts/voice-narrator.mjs sem SAPI5 robotico, testada ao vivo no Companion Widget), projetado prototipo isolado Maria 2.0 H.265 (25,7 KB) no HUD e criado docs/PLANO_CRESCIMENTO_V291_TRIAL_RETENCAO_SHARE.md
+- **📖 Estudou / Leu:** Prints oficiais Play Console 24/11 19:45 BRT (Envio 18 Publicado + 12 testadores continuos ha 12 dias), scripts/voice-narrator.mjs, libx265 hvc1 512x512 e AndroidPlayBillingGateway.kt / FileProvider
+- **⚙️ Tentou / Executou:** Travar FranciscaNeural/ThalitaMultilingualNeural com cache SHA-1 e remover 100% System.Speech, gerar container H.265 real fora do app para o HUD e planejar Free Trial 3d Anual + Notificacao Semanal >=300 MB + Share Nativo WhatsApp/Telegram/Instagram
+- **⚠️ Erros Encontrados:** Endpoints gratuitos gemini-*-image retornaram HTTP 429 na cota diaria
+- **🔧 Como Corrigiu:** Usado retrato mestre fotorrealista de estudio sem gambiarra 2D para codificar container H.265 real (26.333 bytes = 25,7 KB) + amostras neurais PT-BR/EN-US interativas no HUD e validada fala ao vivo na fila companion_queue (623 KB WAV)
+- **🎯 Conclusão:** Zero voz robotica no PC de 3,93 GB RAM, Maria atual 100% intocada no App/PC (Diretriz 12), Envio 18 aprovado na Google Play (faltam 2 dias p/ 26/11) e plano v2.9.1 Growth Pack pronto para aprovacao
+- *Registro Supabase:* Memory #556
+
+---

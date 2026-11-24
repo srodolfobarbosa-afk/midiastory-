@@ -14,11 +14,12 @@
  *   node scripts/voice-narrator.mjs --hook-stop   (called by .agents/hooks.json Stop hook)
  */
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync, execSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "..");
@@ -52,17 +53,16 @@ function isCompanionAlive() {
   }
 }
 
-const TTS_MODELS = [
-  "gemini-2.5-flash-preview-tts",
-  "gemini-3.8-flash-lite-tts",
-  "gemini-3.1-flash-tts-preview",
-  "gemini-3.8-flash-tts",
+const TTS_CACHE_DIR = path.join(os.tmpdir(), "antigravity-tts-cache");
+const NEURAL_VOICES_PT = [
+  "pt-BR-FranciscaNeural",
+  "pt-BR-ThalitaMultilingualNeural",
 ];
 
 const DEFAULT_CONFIG = {
   enabled: true,
-  voiceName: "Kore", // Natural female voice
-  maxChars: 750,
+  voiceName: "pt-BR-FranciscaNeural", // Mesma voz neural de estúdio da Maria no Android (zero robô!)
+  maxChars: 560,
   showAvatar: true,
 };
 
@@ -161,142 +161,123 @@ function pcmToWav(pcmBuffer, sampleRate = 24000, numChannels = 1, bitsPerSample 
 }
 
 const FFMPEG_PATH = "C:\\Users\\rodolfo\\tools\\ffmpeg\\bin\\ffmpeg.exe";
+const MSEDGE_MODULE_URL = pathToFileURL(
+  path.join(__dirname, "node_modules", "msedge-tts", "dist", "index.js")
+).href;
 
-async function synthesizeEdgeNeuralWav(text) {
-  const { MsEdgeTTS, OUTPUT_FORMAT } = await import("./node_modules/msedge-tts/dist/index.js");
+function sleepMs(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizeNeuralVoice(voiceName) {
+  const v = String(voiceName || "").trim();
+  if (v === "pt-BR-ThalitaMultilingualNeural" || v === "Thalita") {
+    return "pt-BR-ThalitaMultilingualNeural";
+  }
+  return "pt-BR-FranciscaNeural";
+}
+
+function pruneTtsCache(maxFiles = 80) {
+  try {
+    if (!fs.existsSync(TTS_CACHE_DIR)) return;
+    const entries = fs
+      .readdirSync(TTS_CACHE_DIR)
+      .filter((f) => f.endsWith(".wav"))
+      .map((f) => {
+        const full = path.join(TTS_CACHE_DIR, f);
+        return { full, mtimeMs: fs.statSync(full).mtimeMs };
+      })
+      .sort((a, b) => b.mtimeMs - a.mtimeMs);
+    for (let i = maxFiles; i < entries.length; i++) {
+      try { fs.unlinkSync(entries[i].full); } catch {}
+    }
+  } catch {}
+}
+
+async function synthesizeEdgeNeuralOnce(text, targetVoice) {
+  const { MsEdgeTTS, OUTPUT_FORMAT } = await import(MSEDGE_MODULE_URL);
   const tts = new MsEdgeTTS();
-  await tts.setMetadata("pt-BR-FranciscaNeural", OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+  await tts.setMetadata(targetVoice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
   const { audioStream } = tts.toStream(text);
   const chunks = [];
   for await (const chunk of audioStream) {
     chunks.push(chunk);
   }
   const mp3Buf = Buffer.concat(chunks);
-  if (mp3Buf.length < 100) throw new Error("Edge Neural retornou áudio vazio.");
+  if (mp3Buf.length < 120) {
+    throw new Error(`Edge Neural (${targetVoice}) retornou áudio vazio.`);
+  }
 
-  const tmpMp3 = path.join(os.tmpdir(), `antigravity-edge-${Date.now()}.mp3`);
-  const tmpWav = path.join(os.tmpdir(), `antigravity-edge-${Date.now()}.wav`);
+  const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  const tmpMp3 = path.join(os.tmpdir(), `antigravity-edge-${stamp}.mp3`);
+  const tmpWav = path.join(os.tmpdir(), `antigravity-edge-${stamp}.wav`);
   fs.writeFileSync(tmpMp3, mp3Buf);
   const conv = spawnSync(
     FFMPEG_PATH,
     ["-y", "-i", tmpMp3, "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", tmpWav, "-loglevel", "error"],
-    { stdio: "ignore", windowsHide: true, timeout: 10000 }
+    { stdio: "ignore", windowsHide: true, timeout: 25000 }
   );
   try { fs.unlinkSync(tmpMp3); } catch {}
   if (conv.status === 0 && fs.existsSync(tmpWav)) {
     const wavBuf = fs.readFileSync(tmpWav);
     try { fs.unlinkSync(tmpWav); } catch {}
-    return { buffer: wavBuf, model: "edge-neural-pt-BR-FranciscaNeural" };
+    return { buffer: wavBuf, model: `edge-neural-${targetVoice}` };
   }
-  throw new Error("Falha ao converter Edge Neural MP3 para WAV.");
+  throw new Error(`Falha ao converter MP3 neural (${targetVoice}) para WAV.`);
 }
 
-function synthesizeLocalWindowsWav(text) {
-  const outWav = path.join(os.tmpdir(), `antigravity-local-tts-${Date.now()}.wav`);
-  const txtFile = path.join(os.tmpdir(), `antigravity-local-tts-${Date.now()}.txt`);
-  fs.writeFileSync(txtFile, text, "utf8");
-  const psScript = `
-    Add-Type -AssemblyName System.Speech;
-    $s = New-Object System.Speech.Synthesis.SpeechSynthesizer;
-    $v = $s.GetInstalledVoices() | Where-Object { $_.Enabled -and $_.VoiceInfo.Culture.Name -like 'pt*' } | Select-Object -First 1;
-    if ($v) { $s.SelectVoice($v.VoiceInfo.Name) };
-    $s.Rate = 1;
-    $s.SetOutputToWaveFile('${outWav.replace(/'/g, "''")}');
-    $txt = Get-Content -LiteralPath '${txtFile.replace(/'/g, "''")}' -Raw -Encoding UTF8;
-    $s.Speak($txt);
-    $s.Dispose();
-  `;
-  const r = spawnSync("powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", psScript], {
-    stdio: "ignore",
-    windowsHide: true,
-    timeout: 20000,
-  });
-  try { fs.unlinkSync(txtFile); } catch {}
-  if (r.status === 0 && fs.existsSync(outWav)) {
-    const buf = fs.readFileSync(outWav);
-    try { fs.unlinkSync(outWav); } catch {}
-    return { buffer: buf, model: "windows-local-ptbr-fallback" };
-  }
-  throw new Error("Falha no fallback local Windows TTS.");
-}
+/**
+ * Síntese 100% travada em Voz Neural de Estúdio (FranciscaNeural -> ThalitaMultilingualNeural)
+ * com cache em disco por SHA-1 e ZERO fallback SAPI5 robótico (banido em definitivo).
+ */
+async function synthesizeWav(text, requestedVoice) {
+  const primaryVoice = normalizeNeuralVoice(requestedVoice);
+  const candidateVoices = [
+    primaryVoice,
+    ...NEURAL_VOICES_PT.filter((v) => v !== primaryVoice),
+  ];
 
-async function synthesizeWav(text, voiceName) {
-  const key = loadGoogleApiKey();
-  const prompt = `Leia em português do Brasil de forma natural, calorosa, clara e objetiva (sem ler pontuação ou símbolos):\n\n${text}`;
-  let lastError = null;
-  let hitRateLimit = false;
-
-  // Circuit-breaker: if Google TTS recently hit 429, jump straight to fast unlimited Francisca Neural (0ms wasted!)
-  let inCooldown = false;
-  try {
-    if (fs.existsSync(TTS_COOLDOWN_FILE)) {
-      const until = Number(fs.readFileSync(TTS_COOLDOWN_FILE, "utf8").trim());
-      if (until > Date.now()) inCooldown = true;
-    }
-  } catch {}
-
-  if (key && !inCooldown) {
-    for (const model of TTS_MODELS) {
-      try {
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal: AbortSignal.timeout(15000),
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: {
-                  voiceConfig: {
-                    prebuiltVoiceConfig: { voiceName },
-                  },
-                },
-              },
-            }),
-          }
-        );
-
-        if (!res.ok) {
-          if (res.status === 429) hitRateLimit = true;
-          const errBody = await res.text();
-          lastError = new Error(`${model} HTTP ${res.status}: ${errBody.slice(0, 180)}`);
-          continue;
-        }
-
-        const data = await res.json();
-        const inline = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-        if (!inline?.data) {
-          lastError = new Error(`${model}: resposta sem áudio`);
-          continue;
-        }
-
-        const audioBuf = Buffer.from(inline.data, "base64");
-        const mime = String(inline.mimeType || "").toLowerCase();
-        if (mime.includes("wav")) {
-          return { buffer: audioBuf, model };
-        }
-        const rateMatch = mime.match(/rate=(\d+)/);
-        const rate = rateMatch ? Number(rateMatch[1]) : 24000;
-        return { buffer: pcmToWav(audioBuf, rate), model };
-      } catch (err) {
-        lastError = err;
+  fs.mkdirSync(TTS_CACHE_DIR, { recursive: true });
+  const cacheHash = crypto
+    .createHash("sha1")
+    .update(`${primaryVoice}|${text}`, "utf8")
+    .digest("hex");
+  const cacheFile = path.join(TTS_CACHE_DIR, `${cacheHash}.wav`);
+  if (fs.existsSync(cacheFile)) {
+    try {
+      const cached = fs.readFileSync(cacheFile);
+      if (cached.length > 200) {
+        return { buffer: cached, model: `cache-neural-${primaryVoice}` };
       }
-    }
-    if (hitRateLimit) {
-      // 30-minute fast-path cooldown so we never waste 4s retrying 429s
-      try { fs.writeFileSync(TTS_COOLDOWN_FILE, String(Date.now() + 30 * 60 * 1000), "utf8"); } catch {}
+    } catch {}
+  }
+
+  let lastErr = null;
+  const retryDelays = [0, 350, 800];
+  for (let attempt = 0; attempt < retryDelays.length; attempt++) {
+    if (retryDelays[attempt] > 0) await sleepMs(retryDelays[attempt]);
+    const voice = candidateVoices[attempt % candidateVoices.length];
+    try {
+      const result = await synthesizeEdgeNeuralOnce(text, voice);
+      try {
+        fs.writeFileSync(cacheFile, result.buffer);
+        pruneTtsCache(80);
+      } catch {}
+      return result;
+    } catch (err) {
+      lastErr = err;
     }
   }
 
-  // 2nd tier: Unlimited free high-craft Neural PT-BR voice (Microsoft Edge Neural Francisca)
+  // Fallback SAPI5 robótico (Microsoft Maria Desktop) 100% REMOVIDO por decisão do fundador:
+  // se a internet cair completamente, registra log silencioso em vez de falar com voz robótica.
   try {
-    return await synthesizeEdgeNeuralWav(text);
+    fs.appendFileSync(
+      path.join(os.tmpdir(), "antigravity-voice-tts.log"),
+      `${new Date().toISOString()} NEURAL_OFFLINE_SKIP: ${lastErr?.message || lastErr}\n`
+    );
   } catch {}
-
-  // 3rd tier: Offline emergency fallback only if internet is down
-  return synthesizeLocalWindowsWav(text);
+  return { buffer: null, model: "neural-offline-muted" };
 }
 
 async function speakText(rawText, opts = {}) {
@@ -306,8 +287,15 @@ async function speakText(rawText, opts = {}) {
   const cleaned = cleanTextForSpeech(rawText, cfg.maxChars);
   if (!cleaned || cleaned.length < 3) return { skipped: true, reason: "empty" };
 
-  const voiceName = opts.voiceName || cfg.voiceName || "Kore";
+  const voiceName = normalizeNeuralVoice(opts.voiceName || cfg.voiceName);
+  if (cfg.voiceName !== voiceName) {
+    cfg.voiceName = voiceName;
+    try { saveConfig(cfg); } catch {}
+  }
   const { buffer, model } = await synthesizeWav(cleaned, voiceName);
+  if (!buffer || buffer.length < 100) {
+    return { skipped: true, reason: "neural_offline_no_robot", model };
+  }
 
   // If the persistent floating companion widget is open, drop the WAV into its queue and return immediately!
   if (isCompanionAlive()) {
