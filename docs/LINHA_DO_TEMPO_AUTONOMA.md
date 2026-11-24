@@ -3251,3 +3251,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #546
 
 ---
+
+### 📍 [24/11/2026, 08:58:40] Trava Sagrada da Maria (Zero 3D, 100% Humana de Ultima Geracao sob Aprovacao Previa) + Faxina 167 Docs (INDICE_MESTRE.md) + Frente B Motor v2.9.0 (dHash 64-bit + SQLite WAL) CI Verde
+- **📖 Estudou / Leu:** Decisao explicita do fundador Rodolfo em 24/11/2026 sobre a Maria, estrutura de 217 docs do repositorio, BlurVarianceEstimator.kt e MediaDomain.kt
+- **⚙️ Tentou / Executou:** 1. Gravar Diretriz 12 (Trava Sagrada da Maria: proibido 3D, somente humana fotorrealista perfeita e somente com aprovacao previa do Rodolfo); 2. Mover 167 docs antigos para docs/archive/ e criar docs/INDICE_MESTRE.md; 3. Criar branch feat/v2.9.0-motor-app com PerceptualImageHasher.kt, AndroidMediaFingerprintStore.kt (SQLite WAL), AndroidSimilarPhotoScanner.kt e PerceptualImageHasherTest.kt
+- **⚠️ Erros Encontrados:** Gradle local travou inicializando daemon por limite de 3.93 GB RAM no PC
+- **🔧 Como Corrigiu:** Cancelado processo local para liberar RAM e validado no runner Linux 7 GB RAM do GitHub Actions (Run 45388401408: Auditoria + :domain:test + :app:testDebugUnitTest + :app:compileDebugKotlin 100% verdes em 1m37s, sem disparar deploy web)
+- **🎯 Conclusão:** Regra permanente da Maria blindada no AGENTS.md e Supabase (Maria permanece 100% intocada ate prototipo humano perfeito aprovado pelo Rodolfo); v2.8.2-carbon-baseline intacta para 26/11; primeira entrega real do Motor v2.9.0 compilada e aprovada na nuvem.
+- *Registro Supabase:* Memory #547
+
+---

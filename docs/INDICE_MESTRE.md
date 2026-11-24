@@ -26,7 +26,7 @@
 ## 🛠️ 3. Evolução Tecnológica (`v2.9.0+`), Produto & Crescimento
 1. [**CHECKLIST_EVOLUCAO_CARBON.md**](CHECKLIST_EVOLUCAO_CARBON.md) — **Plano Diretor Pós-Produção (Protocolo Catraca Zero-Regressão):**
    - **Frente B (`feat/v2.9.0-motor-app` — Prioridade #1 de Conversão Pro):** Fotos Parecidas IA (`dHash 64-bit` + Melhor Foto IA), Cache SQLite Incremental Instantâneo (`WAL`), Compressor de Vídeo H.265/HEVC Pro e modularização da `MainActivity.kt`.
-   - **Frente A (`feat/v2.9.x-maria-2.0` — Etapa Seguinte):** Expressões faciais neurais reais (`LivePortrait / Hallo3 / Veo` `< 1,5 MB`), TTS Neural dinâmico nos 14 idiomas e Avatar 3D `52 blendshapes` no PC Desktop.
+   - **Frente A (Maria Humana de Última Geração — SOMENTE COM APROVAÇÃO PRÉVIA DO RODOLFO):** **Zero 3D / zero boneco**; evolução exclusiva para vídeo/retrato neural fotorrealista nível humano real, mantendo a Maria atual 100% intocada até aprovação explícita de amostra.
 2. [**PLAYBOOK_CONVERSAO_INSTAGRAM.md**](PLAYBOOK_CONVERSAO_INSTAGRAM.md) — Funil orgânico `@aconteceunobr` (`2M views/mês`) -> Site -> Google Play -> Pro sem derrubar alcance.
 3. [**ARQUITETURA_INTERNA_IA_FRIDAY.md**](ARQUITETURA_INTERNA_IA_FRIDAY.md) — Motor cognitivo FRIDAY (`Scaled Dot-Product Attention`, `Evidence Ledger` e Gate Anti-Alucinação).
 4. [**PRODUCT_TRUST_AND_PRIVACY.md**](PRODUCT_TRUST_AND_PRIVACY.md) · [**FEATURE_IMPLEMENTATION_MATRIX.md**](FEATURE_IMPLEMENTATION_MATRIX.md) · [**RELEASE_BLOCKERS.md**](RELEASE_BLOCKERS.md) — Referências de engenharia de segurança MediaStore e histórico de bloqueadores superados.

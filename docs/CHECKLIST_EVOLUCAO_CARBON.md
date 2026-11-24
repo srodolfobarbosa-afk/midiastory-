@@ -1,6 +1,6 @@
 # 🧠 CHECKLIST MESTRA DE EVOLUÇÃO CARBON — MIDIASTORE & MARIA 2.0
 > 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`AGENTS.md`**](../AGENTS.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`**](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md) · [**`LINHA_DO_TEMPO_AUTONOMA.md`**](LINHA_DO_TEMPO_AUTONOMA.md)
-**Criada em:** `2026-11-24` | **Motor:** Gemini 4 Carbon | **Ordem Oficial Aprovada:** **Fase 0 (`26/11`) ➔ Frente B (`feat/v2.9.0-motor-app`: Fotos Parecidas IA + SQLite Instantâneo + Compressor Vídeo Pro) ➔ Frente A (Maria 2.0 Neural/3D)** | **Regra Suprema:** Protocolo Catraca (Zero Regressão)
+**Criada em:** `2026-11-24` | **Motor:** Gemini 4 Carbon | **Ordem Oficial Aprovada:** **Fase 0 (`26/11`) ➔ Frente B (`feat/v2.9.0-motor-app`: Fotos Parecidas IA + SQLite Instantâneo + Compressor Vídeo Pro) ➔ Frente A (Maria Humana Fotorrealista de Última Geração — ZERO 3D e SOMENTE com aprovação prévia do Rodolfo)** | **Regra Suprema:** Protocolo Catraca (Zero Regressão)
 
 ---
 
@@ -34,11 +34,12 @@
 
 ---
 
-## 👩‍💼 FASE 2 — MARIA 2.0 (EXPRESSÕES FACIAIS NEURAIS REAIS & VOZ 14 IDIOMAS)
-- [ ] **2.1 Micro-Loops Neurais Reais no App (`LivePortrait / Hallo3 / Veo` em WebP/H.265 `< 1,5 MB`):** expressões faciais humanas naturais (olhar, sobrancelhas, respiração, sorriso e articulação labial real) substituindo qualquer recorte 2D de boca.
-- [ ] **2.2 TTS Neural Dinâmico nos 14 Idiomas (`Android Neural TTS` + Visemas):** falar em todos os 14 idiomas com os números exatos de MB/GB encontrados no aparelho do usuário.
-- [ ] **2.3 Avatar 3D/Neural 60 FPS no Desktop (`FRIDAY Companion 2.0`):** evoluir do warp 2D atual para rig facial completo de **52 blendshapes ARKit + Oculus Visemes** (`friday-core/avatar-3d/talkinghead.mjs`) ou renderização neural dedicada.
-- [ ] **2.4 Consultora Local Híbrida (`Gemini Nano AICore` + Motor Determinístico MediaStore):** respostas contextuais inteligentes 100% privadas no aparelho.
+## 👩‍💼 FASE 2 (FRENTE A) — MARIA DE ÚLTIMA GERAÇÃO (100% HUMANA FOTORREALISTA • ZERO 3D)
+> 🔒 **TRAVA INEGOCIÁVEL DO FUNDADOR (`24/11/2026`):** **PROIBIDO Maria 3D / boneco / avatar artificial.** A Maria é o nosso grande diferencial e **NÃO PODE SER ALTERADA** (nem no App, nem no PC) sem antes atingir **perfeição igual a uma mulher humana real** em protótipo isolado e receber **aprovação visual explícita do Rodolfo**. Enquanto não estiver nesse nível, manter 100% como está hoje.
+
+- [ ] **2.1 Protótipo Isolado de Vídeo Neural Humano Hiper-Realista (Geração Frontier: `Veo 3 / Kling / Hedra Character-3 / Avatar IV`):** testar fora do app oficial até atingir naturalidade 100% humana (olhar, sorriso, dentes, respiração e fala indistinguíveis de vídeo real) para avaliação do Rodolfo.
+- [ ] **2.2 TTS Neural Dinâmico nos 14 Idiomas:** somente após aprovação de voz e naturalidade humana pelo fundador.
+- [ ] **2.3 Consultora Local Híbrida (`Gemini Nano AICore` + Motor Determinístico MediaStore):** respostas contextuais inteligentes 100% privadas no aparelho sem mexer no visual aprovado da Maria.
 
 ---
 

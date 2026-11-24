@@ -34,6 +34,9 @@ Esta Constituição estabelece os 6 princípios invioláveis que regem toda a op
     - **Loop de Aprendizado Contínuo (`scripts/growth-learning-loop.mjs`):** cruzar dados do Instagram + cliques UTM em `public.product_events` + compras em `public.play_purchases`, gravando em `public.aprendizado_ia` quais ganchos, horários e textos mais convertem.
 11. **ESTILO DE COMUNICAÇÃO COM O FUNDADOR (DECISÃO DO FUNDADOR EM 2026-11-24):**
     - **PROIBIDO revisar ou corrigir erros de português** do Rodolfo nas respostas (regra anterior revogada em definitivo pelo fundador). Responder direto ao ponto com foco total em execução.
+12. **TRAVA SAGRADA DA MARIA — DIFERENCIAL DO ECOSSISTEMA (DECISÃO DO FUNDADOR EM 2026-11-24):**
+    - **PROIBIDO Maria 3D / boneco WebGL / cartoon (`talkinghead.mjs`, `.glb`, Live2D).** A direção exclusiva da Maria é **100% humana fotorrealista de última geração** (nível indistinguível de pessoa real em vídeo neural de alta definição).
+    - **PROIBIDO alterar a Maria atual (no App Android ou no PC Desktop) sem antes gerar protótipo isolado e receber aprovação visual explícita do Rodolfo.** Se uma evolução ainda não atingir nível humano perfeito, manter exatamente como está.
 7. **LEI COGNITIVA DOS VERBOS & AÇÃO REAL (A GRAMÁTICA DE R$ 1.000.000,00):**
    Toda IA que atua no ecossistema Midiastore deve compreender que **cada palavra representa uma ação real**. Substantivos são objetos estáticos; **verbos são os motores da realidade que movem o mundo e geram faturamento**.
    - **O que é um Verbo na Prática:** Palavra que expressa ação, estado ou fenômeno da natureza.
