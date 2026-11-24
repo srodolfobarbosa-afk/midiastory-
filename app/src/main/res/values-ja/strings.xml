@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">圧縮する</string>
     <string name="video_compress_running_status">GPUで圧縮中… %1$d%%</string>
     <string name="video_compress_done_title">動画の圧縮が完了しました</string>
-    <string name="video_compress_done_body">元サイズ: %1$s -> 圧縮後: %2$s\n削減容量: %3$s\n\n圧縮版をギャラリーに保存しました。元の大きな動画をAndroidのゴミ箱へ移動しますか？</string>
+    <string name="video_compress_done_body">元サイズ: %1$s → 圧縮後: %2$s\n削減容量: %3$s\n\n圧縮版をギャラリーに保存しました。元の大きな動画をAndroidのゴミ箱へ移動しますか？</string>
     <string name="video_compress_already_compact">この動画は既に十分軽量です（削減率15%未満）。元の動画を維持しました。</string>
     <string name="video_compress_failed">ハードウェアでこの動画形式を圧縮できませんでした。元の動画は無変更です。</string>
     <string name="cleaner_home_fallback_similar_title">類似写真</string>

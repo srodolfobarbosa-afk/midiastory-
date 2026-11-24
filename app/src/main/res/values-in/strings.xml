@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">Kompres</string>
     <string name="video_compress_running_status">Mengompres di GPU… %1$d%%</string>
     <string name="video_compress_done_title">Video berhasil dikompres</string>
-    <string name="video_compress_done_body">Asli: %1$s -> Ringkas: %2$s\nHemat ruang: %3$s\n\nVideo ringkas telah disimpan di Galeri. Pindahkan video asli yang besar ke Sampah Android?</string>
+    <string name="video_compress_done_body">Asli: %1$s → Ringkas: %2$s\nHemat ruang: %3$s\n\nVideo ringkas telah disimpan di Galeri. Pindahkan video asli yang besar ke Sampah Android?</string>
     <string name="video_compress_already_compact">Video ini sudah ringkas (penghematan di bawah 15%). File asli tetap utuh.</string>
     <string name="video_compress_failed">Tidak dapat mengompres format video ini di perangkat keras. File asli utuh.</string>
     <string name="cleaner_home_fallback_similar_title">Foto Mirip</string>

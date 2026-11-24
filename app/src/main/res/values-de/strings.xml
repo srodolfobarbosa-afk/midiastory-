@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">Komprimieren</string>
     <string name="video_compress_running_status">GPU-Komprimierung… %1$d%%</string>
     <string name="video_compress_done_title">Video erfolgreich komprimiert</string>
-    <string name="video_compress_done_body">Original: %1$s -> Kompakt: %2$s\nGespart: %3$s\n\nDas kompakte Video wurde in der Galerie gespeichert. Großes Original in den Android-Papierkorb verschieben?</string>
+    <string name="video_compress_done_body">Original: %1$s → Kompakt: %2$s\nGespart: %3$s\n\nDas kompakte Video wurde in der Galerie gespeichert. Großes Original in den Android-Papierkorb verschieben?</string>
     <string name="video_compress_already_compact">Dieses Video ist bereits kompakt (unter 15% Ersparnis). Original unverändert.</string>
     <string name="video_compress_failed">Hardware-Komprimierung für dieses Format nicht möglich. Original unverändert.</string>
     <string name="cleaner_home_fallback_similar_title">Ähnliche Fotos</string>

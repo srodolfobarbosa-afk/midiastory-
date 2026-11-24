@@ -93,6 +93,17 @@ for (const folder of resValuesFolders) {
   const keys = extractKeys(raw);
   const exactParity = keys.length === baseKeySet.size && keys.every((k) => baseKeySet.has(k));
   const noSparkles = !/[\u2728\u2726\u2727]/u.test(raw);
+  const stringBodies = [...raw.matchAll(/<string\s+name="([^"]+)"[^>]*>([\s\S]*?)<\/string>/g)];
+  const aaptInvalid = stringBodies
+    .filter(([, , val]) => {
+      const trimmed = val.trim();
+      const quoted = trimmed.startsWith('"') && trimmed.endsWith('"');
+      const unescapedApostrophe = !quoted && /(?<!\\)'/.test(val);
+      const rawAngleBracket = /[<>]/.test(val);
+      const unescapedAmp = /&(?!amp;|lt;|gt;|quot;|apos;|#\d+;|#x[0-9a-fA-F]+;)/.test(val);
+      return unescapedApostrophe || rawAngleBracket || unescapedAmp;
+    })
+    .map(([, name]) => name);
   check(
     `Android Locale Resources [${folder}] (${keys.length} keys)`,
     raw.includes("home_cleanup_confirm_prompt") &&
@@ -101,8 +112,9 @@ for (const folder of resValuesFolders) {
       raw.includes("nav_pro") &&
       raw.includes("pro_billing_terms_disclosure") &&
       exactParity &&
-      noSparkles,
-    `Chaves obrigatórias ausentes, divergência de paridade (${keys.length}/${baseKeySet.size}) ou estrelinha legada em ${folder}/strings.xml.`
+      noSparkles &&
+      aaptInvalid.length === 0,
+    `Chaves obrigatórias ausentes, divergência de paridade (${keys.length}/${baseKeySet.size}), estrelinha legada ou escape inválido AAPT2 (${aaptInvalid.join(", ")}) em ${folder}/strings.xml.`
   );
 }
 

@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">압축</string>
     <string name="video_compress_running_status">GPU 압축 중… %1$d%%</string>
     <string name="video_compress_done_title">동영상 압축 완료</string>
-    <string name="video_compress_done_body">원본: %1$s -> 압축본: %2$s\n절약 용량: %3$s\n\n압축된 동영상이 갤러리에 저장되었습니다. 원본 대용량 동영상을 Android 휴지통으로 이동할까요?</string>
+    <string name="video_compress_done_body">원본: %1$s → 압축본: %2$s\n절약 용량: %3$s\n\n압축된 동영상이 갤러리에 저장되었습니다. 원본 대용량 동영상을 Android 휴지통으로 이동할까요?</string>
     <string name="video_compress_already_compact">이미 충분히 압축된 동영상입니다(절약률 15% 미만). 원본을 그대로 유지했습니다.</string>
     <string name="video_compress_failed">하드웨어에서 이 동영상 형식을 압축할 수 없습니다. 원본이 유지됩니다.</string>
     <string name="cleaner_home_fallback_similar_title">유사 사진</string>

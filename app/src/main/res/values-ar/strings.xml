@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">ضغط</string>
     <string name="video_compress_running_status">جارٍ الضغط عبر GPU… %1$d%%</string>
     <string name="video_compress_done_title">تم ضغط الفيديو بنجاح</string>
-    <string name="video_compress_done_body">الأصلي: %1$s -> المضغوط: %2$s\nالتوفير الفعلي: %3$s\n\nتم حفظ الفيديو المضغوط في المعرض. هل تريد نقل الفيديو الأصلي إلى سلة محذوفات Android؟</string>
+    <string name="video_compress_done_body">الأصلي: %1$s → المضغوط: %2$s\nالتوفير الفعلي: %3$s\n\nتم حفظ الفيديو المضغوط في المعرض. هل تريد نقل الفيديو الأصلي إلى سلة محذوفات Android؟</string>
     <string name="video_compress_already_compact">هذا الفيديو مضغوط بالفعل (أقل من 15% توفير). بقي الملف الأصلي دون تغيير.</string>
     <string name="video_compress_failed">تعذر ضغط هذا التنسيق عبر العتاد. بقي الملف الأصلي دون تغيير.</string>
     <string name="cleaner_home_fallback_similar_title">صور متشابهة</string>

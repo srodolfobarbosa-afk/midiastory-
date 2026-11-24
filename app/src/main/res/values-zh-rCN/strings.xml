@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">压缩</string>
     <string name="video_compress_running_status">GPU 正在压缩… %1$d%%</string>
     <string name="video_compress_done_title">视频压缩成功</string>
-    <string name="video_compress_done_body">原视频：%1$s -> 压缩后：%2$s\n节省空间：%3$s\n\n精简版已保存至相册。是否将原大视频移至 Android 回收站？</string>
+    <string name="video_compress_done_body">原视频：%1$s → 压缩后：%2$s\n节省空间：%3$s\n\n精简版已保存至相册。是否将原大视频移至 Android 回收站？</string>
     <string name="video_compress_already_compact">该视频已足够精简（节省不足 15%），原视频保持不变。</string>
     <string name="video_compress_failed">硬件无法压缩此视频格式，原视频保持不变。</string>
     <string name="cleaner_home_fallback_similar_title">相似照片</string>

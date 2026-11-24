@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">कंप्रेस करें</string>
     <string name="video_compress_running_status">GPU पर कंप्रेस हो रहा है… %1$d%%</string>
     <string name="video_compress_done_title">वीडियो सफलतापूर्वक कंप्रेस हुआ</string>
-    <string name="video_compress_done_body">मूल: %1$s -> कॉम्पैक्ट: %2$s\nबचत: %3$s\n\nनया वीडियो गैलरी में सहेजा गया है। क्या मूल बड़े वीडियो को Android ट्रैश में भेजें?</string>
+    <string name="video_compress_done_body">मूल: %1$s → कॉम्पैक्ट: %2$s\nबचत: %3$s\n\nनया वीडियो गैलरी में सहेजा गया है। क्या मूल बड़े वीडियो को Android ट्रैश में भेजें?</string>
     <string name="video_compress_already_compact">यह वीडियो पहले से छोटा है (15% से कम बचत)। मूल फ़ाइल सुरक्षित रखी गई।</string>
     <string name="video_compress_failed">हार्डवेयर पर यह वीडियो कंप्रेस नहीं हो सका। मूल फ़ाइल सुरक्षित है।</string>
     <string name="cleaner_home_fallback_similar_title">मिलती-जुलती फ़ोटो</string>

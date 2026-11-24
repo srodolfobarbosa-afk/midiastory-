@@ -284,7 +284,7 @@ Total: %3$s</string>
     <string name="video_compress_action_btn">কমপ্রেস</string>
     <string name="video_compress_running_status">GPU-তে কমপ্রেস হচ্ছে… %1$d%%</string>
     <string name="video_compress_done_title">ভিডিও সফলভাবে কমপ্রেস হয়েছে</string>
-    <string name="video_compress_done_body">মূল: %1$s -> কমপ্যাক্ট: %2$s\nসাশ্রয়: %3$s\n\nনতুন ছোট ভিডিওটি গ্যালারিতে সংরক্ষিত হয়েছে। মূল বড় ভিডিওটি কি Android ট্র্যাশে সরাবেন?</string>
+    <string name="video_compress_done_body">মূল: %1$s → কমপ্যাক্ট: %2$s\nসাশ্রয়: %3$s\n\nনতুন ছোট ভিডিওটি গ্যালারিতে সংরক্ষিত হয়েছে। মূল বড় ভিডিওটি কি Android ট্র্যাশে সরাবেন?</string>
     <string name="video_compress_already_compact">এই ভিডিওটি ইতিমধ্যেই ছোট (১৫%-এর কম সাশ্রয়)। মূল ফাইল অক্ষত আছে।</string>
     <string name="video_compress_failed">হার্ডওয়্যারে এই ভিডিও ফরম্যাট কমপ্রেস করা যায়নি। মূল ফাইল অক্ষত আছে।</string>
     <string name="cleaner_home_fallback_similar_title">একই রকম ছবি</string>
