@@ -1,0 +1,45 @@
+name: Autonomous Growth & Sales Engine 24/7 (IndexNow, Funnel Doctor & Thompson Sampling)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Roda diariamente às 09:15 UTC (06:15 BRT) — 100% Custo Zero em repositório público
+    - cron: '15 9 * * *'
+
+concurrency:
+  group: autonomous-growth-engine
+  cancel-in-progress: false
+
+jobs:
+  growth-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 1. Submeter todas as URLs do Sitemap ao IndexNow (Bing/DuckDuckGo/Yandex/ChatGPT)
+        run: node scripts/submit-indexnow.mjs
+
+      - name: 2. Relatório de Tráfego Real pSEO
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/traffic-report.mjs
+
+      - name: 3. Diagnóstico Automático de Gargalo de Vendas (Sales Funnel Doctor)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/sales-funnel-doctor.mjs
+
+      - name: 4. Aprendizado Autônomo de Vendas (Thompson Sampling + Goodhart)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/sales-learning-engine.mjs
+
+      - name: 5. Gerar Pacote Diário de Roteiros Virais
+        run: node scripts/viral-content-factory.mjs

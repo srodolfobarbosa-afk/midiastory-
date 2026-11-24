@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-23",
+  "generatedAt": "2026-11-23T05:59:11.123Z",
+  "languages": [
+    "pt-BR",
+    "en-US",
+    "es-419"
+  ],
+  "packsCount": 2,
+  "totalScripts": 6,
+  "files": [
+    "01_whatsapp_hidden_gb.md",
+    "02_anti_bloatware_5_9mb.md"
+  ]
+}

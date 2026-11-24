@@ -1,0 +1,65 @@
+name: Autonomous Ops Guard (AppSec, RTDN/Voided, Memory Graph & Goodhart 24/7)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Roda a cada 6 horas na nuvem (100% Custo Zero em repositório público)
+    - cron: '17 */6 * * *'
+
+concurrency:
+  group: autonomous-ops-guard
+  cancel-in-progress: false
+
+jobs:
+  ops-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Configurar credenciais em ambiente efêmero
+        env:
+          AI_MEDIA_KEYS_JSON: ${{ secrets.AI_MEDIA_KEYS_JSON }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          mkdir -p .secrets
+          if [ -n "$AI_MEDIA_KEYS_JSON" ]; then
+            printf '%s' "$AI_MEDIA_KEYS_JSON" > .secrets/ai-media-keys.json
+          fi
+          if [ -n "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
+            printf '%s' "$PLAY_SERVICE_ACCOUNT_JSON" > .secrets/play-service-account.json
+          fi
+
+      - name: 1. AppSec PenTest RLS (anon key)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/security-rls-pentest.mjs
+
+      - name: 2. Anti-Fraude Google Play Voided Purchases
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/play-voided-purchases-guard.mjs --days 28
+
+      - name: 3. Sleep-Time Consolidation & Knowledge Graph
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          AI_MEDIA_KEYS_JSON: ${{ secrets.AI_MEDIA_KEYS_JSON }}
+        run: node scripts/memory-consolidator.mjs --limit 80
+
+      - name: 4. Relatório Financeiro 50/50
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/financial-50-50-report.mjs
+
+      - name: 5. Auditoria Growth, Vitals, ASO & Goodhart Guardrails
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: node scripts/aso-vitals-audit.mjs
