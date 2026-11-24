@@ -3230,3 +3230,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #539
 
 ---
+
+### 📍 [24/11/2026, 03:53:50] Operacao Completa Gemini 4 Carbon: Blindagem P0 Android/14 Idiomas + Site 13 Idiomas + RTDN Webhook v5 + Upgrade Cognitivo FRIDAY + QA Real Moto G84
+- **📖 Estudou / Leu:** Auditoria 360 graus com 3 subagentes Carbon em paralelo sobre Kotlin/Android, Supabase Edge Functions, Funil Web Firebase e Infraestrutura FRIDAY/Maria
+- **⚙️ Tentou / Executou:** Eliminar todos os riscos de reprovacao da Play Store para 26/11, corrigir bugs funcionais do app, ativar secrets/idempotencia/voidedPurchase no play-rtdn-webhook, limpar 13 paginas web + publicar /privacy.html, integrar Attention Gate no cognitive-memory.mjs e validar no Moto G84 via ADB
+- **⚠️ Erros Encontrados:** gemini-2.5-flash bateu 429 no STT da Maria; Moto G84 estava em paisagem na 1a captura
+- **🔧 Como Corrigiu:** Atualizado STT_MODELS com gemini-3-flash-preview + gemini-3.6-flash (HTTP 200), commit cd0a661 verde nos 2 workflows CI/AAB, deploy Firebase e Supabase Edge v5 concluidos e QA retrato validado no Moto G84 (zero erros logcat, zero MANAGE_EXTERNAL_STORAGE/AD_ID/ACTION_SEND no bundletool)
+- **🎯 Conclusão:** Ecossistema inteiro (Pilar 1 Midiastore v2.8.2 vc 34 + Pilar 2 FRIDAY/Maria) sincronizado, limpo e validado ao vivo para abertura de Producao em 26/11 rumo a R$ 1.000.000,00.
+- *Registro Supabase:* Memory #545
+
+---
