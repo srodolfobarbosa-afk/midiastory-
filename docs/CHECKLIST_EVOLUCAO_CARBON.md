@@ -18,15 +18,16 @@
 - [x] Relógio do Teste Fechado corrigido em `public.play_console_sync_state` + `get_prelaunch_stats()` (`23 testadores`, `Dia 12 de 14` dinâmico).
 - [x] Políticas `/privacidade.html` e `/privacy.html` sincronizadas (zero menção a Estúdio + e-mail `srodolfobarbosa@gmail.com`) no Firebase Hosting (`Release 1795515742674000`, `HTTP 200`).
 - [x] Sincronização final das 14 fichas da Play Store (`Edit 15816757970827593747`, `HTTP 200`: `< 8 MB`, correção `bn-BD`, 56 screenshots `v2.8.2` `1080x1920` + 14 `featureGraphic` `1024x500` verificados ao vivo na API v3).
+- [x] Faxina documental + criação de [`docs/INDICE_MESTRE.md`](INDICE_MESTRE.md) (`167` documentos históricos movidos para `docs/archive/` com bloqueio no deploy Firebase).
 - [ ] **Quinta `26/11`:** Solicitar acesso à Produção na Google Play Console com respostas auditadas de `docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`.
 - [ ] **Dia 1 de Produção:** Ligar funil orgânico `@aconteceunobr` + Google Ads (`pt-BR` / `en-US`) e confirmar 1ª venda real de Produção em `public.play_purchases`.
 
 ---
 
-## 🚀 FASE 1 — SALTO TECNOLÓGICO DO APP (`v2.9.0` — PÓS-PRODUÇÃO)
-- [ ] **1.1 Fotos Parecidas / Similares On-Device (`dHash/pHash 64-bit` + Burst Temporal):** agrupar fotos quase idênticas tiradas em sequência protegendo automaticamente a mais nítida (*"Melhor Foto IA"*).
-- [ ] **1.2 Cache Incremental SQLite de Hashes (`(media_id, date_modified, size)`):** reabertura instantânea (< 0,3s em galerias de 50.000+ arquivos) sem reprocessar SHA-256/blur de arquivos intactos.
-- [ ] **1.3 Preview Tela Cheia & Comparador Lado a Lado:** zoom rápido em fotos e player leve em vídeos dentro da tela *Revisar e Limpar* antes de confirmar exclusão.
+## 🚀 FASE 1 (FRENTE B — PRIORIDADE #1 DE CONVERSÃO PRO) — MOTOR DO APP (`feat/v2.9.0-motor-app`)
+- [x] **1.1 Núcleo Fotos Parecidas / Similares On-Device (`PerceptualImageHasher.kt` — `dHash 64-bit` + Burst Anti-Falso-Positivo):** agrupar fotos quase idênticas protegendo automaticamente a mais nítida (`isProtected = true, isSelectable = false`).
+- [x] **1.2 Cache Incremental SQLite WAL de Hashes (`AndroidMediaFingerprintStore.kt` + `AndroidSimilarPhotoScanner.kt`):** reabertura instantânea sem reprocessar miniaturas intactas (`0 KB` de dependências externas).
+- [ ] **1.3 Integração UI Fotos Parecidas + Preview Tela Cheia & Comparador Lado a Lado:** conectar no painel `Limpar`/`Pro` + zoom rápido antes de excluir + QA lado a lado no Moto G84.
 - [ ] **1.4 Compressor de Vídeos Hardware-Accelerated (`Media3 Transformer H.265/HEVC` — Recurso Pro):** comprimir vídeos grandes sem perda visível (100% na GPU local, zero custo cloud) com segurança pela Lixeira Android.
 - [ ] **1.5 Refatoração Modular da `MainActivity.kt` (`361 KB`) + Remoção de Código Morto (`~170 KB`):** eliminar `presentation/studio/*` (jogos/jornal/estúdio descontinuados) e `MariaLipSyncEnvelopes.kt`, extraindo `CleanViewModel`, `FilesViewModel` e `BillingViewModel`.
 - [ ] **1.6 Histórico Acumulado de GB Liberados + `InAppReview` Pós-Limpeza:** prova de valor contínua na Home + pedido nativo de 5 estrelas no pico de satisfação.

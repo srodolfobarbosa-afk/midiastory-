@@ -44,6 +44,8 @@ object AndroidBlurPhotoScanner {
         onProgress: ((analyzed: Int, candidatesFound: Int) -> Unit)? = null,
     ): BlurScanResult = withContext(Dispatchers.IO) {
         val resolver = context.contentResolver
+        val fingerprintStore = AndroidMediaFingerprintStore.getInstance(context)
+        val pendingCacheWrites = ArrayList<CachedMediaFingerprint>(64)
         val volumes = runCatching { MediaStore.getExternalVolumeNames(context) }
             .getOrElse { setOf(MediaStore.VOLUME_EXTERNAL_PRIMARY) }
             .sortedWith(compareBy<String> { it != MediaStore.VOLUME_EXTERNAL_PRIMARY }.thenBy { it })
@@ -135,6 +137,22 @@ object AndroidBlurPhotoScanner {
                         relativePath = relPath,
                     )
 
+                    val cachedHit = fingerprintStore.getValidBatch(
+                        mapOf(record.uri to Pair(size, modified ?: -1L)),
+                    )[record.uri]
+                    if (cachedHit?.laplacianVariance != null) {
+                        analyzed++
+                        if (cachedHit.laplacianVariance < BlurVarianceEstimator.DEFAULT_BLUR_VARIANCE_THRESHOLD) {
+                            candidates += BlurryPhotoCandidate(record, cachedHit.laplacianVariance)
+                        }
+                        if (analyzed % 25 == 0) {
+                            withContext(Dispatchers.Main) {
+                                onProgress?.invoke(analyzed, candidates.size)
+                            }
+                        }
+                        continue
+                    }
+
                     val thumbSignal = CancellationSignal()
                     val bitmap: Bitmap? = try {
                         resolver.loadThumbnail(uri, Size(SAMPLE_SIZE_PX, SAMPLE_SIZE_PX), thumbSignal)
@@ -167,8 +185,22 @@ object AndroidBlurPhotoScanner {
                                 softBitmap.getPixels(pixelBuffer, 0, w, 0, 0, w, h)
                                 analyzed++
                                 val analysis = BlurVarianceEstimator.analyzeArgbPixels(pixelBuffer, w, h)
-                                if (analysis != null && analysis.isBlurryCandidate) {
-                                    candidates += BlurryPhotoCandidate(record, analysis.laplacianVariance)
+                                val dHash = com.rdf112.sweep.domain.analysis.PerceptualImageHasher.computeDHash64FromArgb(pixelBuffer, w, h)
+                                if (analysis != null) {
+                                    pendingCacheWrites += CachedMediaFingerprint(
+                                        uri = record.uri,
+                                        sizeBytes = size,
+                                        dateModifiedEpochSeconds = modified ?: -1L,
+                                        dHash64 = dHash,
+                                        laplacianVariance = analysis.laplacianVariance,
+                                    )
+                                    if (pendingCacheWrites.size >= 64) {
+                                        fingerprintStore.upsertBatch(pendingCacheWrites)
+                                        pendingCacheWrites.clear()
+                                    }
+                                    if (analysis.isBlurryCandidate) {
+                                        candidates += BlurryPhotoCandidate(record, analysis.laplacianVariance)
+                                    }
                                 }
                                 if (analyzed % 15 == 0) {
                                     withContext(Dispatchers.Main) {
@@ -185,6 +217,11 @@ object AndroidBlurPhotoScanner {
                     }
                 }
             }
+        }
+
+        if (pendingCacheWrites.isNotEmpty()) {
+            fingerprintStore.upsertBatch(pendingCacheWrites)
+            pendingCacheWrites.clear()
         }
 
         val sorted = candidates.sortedWith(

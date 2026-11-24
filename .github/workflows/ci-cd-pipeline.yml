@@ -6,6 +6,7 @@ on:
       - main
       - 'codex/**'
       - 'fix/**'
+      - 'feat/**'
   pull_request:
     branches:
       - main
