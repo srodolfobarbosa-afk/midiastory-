@@ -63,7 +63,7 @@ for (const loc of requiredLocales) {
   );
 }
 
-// 5. Verificação das Strings Android nos 14 Idiomas Globais
+// 5. Verificação das Strings Android nos 14 Idiomas Globais (Paridade Exata + Zero Estrelinhas)
 const resValuesFolders = [
   "values",
   "values-pt-rBR",
@@ -80,13 +80,29 @@ const resValuesFolders = [
   "values-bn",
   "values-ko",
 ];
+const extractKeys = (xml) => [...xml.matchAll(/<string\s+name="([^"]+)"/g)].map((m) => m[1]);
+const baseStringsRaw = fs.readFileSync(
+  path.join(projectRoot, "app", "src", "main", "res", "values", "strings.xml"),
+  "utf8"
+);
+const baseKeySet = new Set(extractKeys(baseStringsRaw));
+
 for (const folder of resValuesFolders) {
   const stringsPath = path.join(projectRoot, "app", "src", "main", "res", folder, "strings.xml");
   const raw = fs.existsSync(stringsPath) ? fs.readFileSync(stringsPath, "utf8") : "";
+  const keys = extractKeys(raw);
+  const exactParity = keys.length === baseKeySet.size && keys.every((k) => baseKeySet.has(k));
+  const noSparkles = !/[\u2728\u2726\u2727]/u.test(raw);
   check(
-    `Android Locale Resources [${folder}]`,
-    raw.includes("home_cleanup_confirm_prompt") && raw.includes("snake_dialog_title") && raw.includes("travel_title"),
-    `Chaves obrigatórias ausentes em ${folder}/strings.xml.`
+    `Android Locale Resources [${folder}] (${keys.length} keys)`,
+    raw.includes("home_cleanup_confirm_prompt") &&
+      raw.includes("nav_home") &&
+      raw.includes("nav_files") &&
+      raw.includes("nav_pro") &&
+      raw.includes("pro_billing_terms_disclosure") &&
+      exactParity &&
+      noSparkles,
+    `Chaves obrigatórias ausentes, divergência de paridade (${keys.length}/${baseKeySet.size}) ou estrelinha legada em ${folder}/strings.xml.`
   );
 }
 

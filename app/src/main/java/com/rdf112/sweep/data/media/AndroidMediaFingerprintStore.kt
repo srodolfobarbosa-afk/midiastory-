@@ -115,11 +115,23 @@ class AndroidMediaFingerprintStore private constructor(context: Context) :
                     INSERT INTO $TABLE_NAME (uri, size_bytes, date_modified_sec, dhash64, laplacian_variance, sha256, updated_at_ms)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(uri) DO UPDATE SET
+                        dhash64 = CASE
+                            WHEN $TABLE_NAME.size_bytes = excluded.size_bytes AND $TABLE_NAME.date_modified_sec = excluded.date_modified_sec
+                            THEN COALESCE(excluded.dhash64, $TABLE_NAME.dhash64)
+                            ELSE excluded.dhash64
+                        END,
+                        laplacian_variance = CASE
+                            WHEN $TABLE_NAME.size_bytes = excluded.size_bytes AND $TABLE_NAME.date_modified_sec = excluded.date_modified_sec
+                            THEN COALESCE(excluded.laplacian_variance, $TABLE_NAME.laplacian_variance)
+                            ELSE excluded.laplacian_variance
+                        END,
+                        sha256 = CASE
+                            WHEN $TABLE_NAME.size_bytes = excluded.size_bytes AND $TABLE_NAME.date_modified_sec = excluded.date_modified_sec
+                            THEN COALESCE(excluded.sha256, $TABLE_NAME.sha256)
+                            ELSE excluded.sha256
+                        END,
                         size_bytes = excluded.size_bytes,
                         date_modified_sec = excluded.date_modified_sec,
-                        dhash64 = COALESCE(excluded.dhash64, $TABLE_NAME.dhash64),
-                        laplacian_variance = COALESCE(excluded.laplacian_variance, $TABLE_NAME.laplacian_variance),
-                        sha256 = COALESCE(excluded.sha256, $TABLE_NAME.sha256),
                         updated_at_ms = excluded.updated_at_ms
                     """.trimIndent(),
                 )
@@ -159,6 +171,15 @@ class AndroidMediaFingerprintStore private constructor(context: Context) :
 
         @Volatile
         private var instance: AndroidMediaFingerprintStore? = null
+
+        fun isValidSha256Hex(value: String?): Boolean {
+            if (value == null || value.length != 64) return false
+            for (ch in value) {
+                val ok = ch in '0'..'9' || ch in 'a'..'f' || ch in 'A'..'F'
+                if (!ok) return false
+            }
+            return true
+        }
 
         fun getInstance(context: Context): AndroidMediaFingerprintStore =
             instance ?: synchronized(this) {

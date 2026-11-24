@@ -534,13 +534,22 @@ class MediaScanViewModel(
                             warningCount++
                             emptyList()
                         } else {
+                            val allCandidates = ArrayList<MediaRecord>(candidateRows)
+                            for (group in groups) {
+                                allCandidates.addAll(group)
+                            }
+                            val cachedHashesByUri = runCatching {
+                                repository.getCachedSha256Batch(allCandidates)
+                            }.getOrDefault(emptyMap())
                             val hashed = ArrayList<MediaRecord>(candidateRows)
+                            val newlyHashed = ArrayList<MediaRecord>(candidateRows)
                             var bytesHashed = 0L
                             var hashBudgetReached = false
                             duplicateHashLoop@ for (group in groups) {
                                 for (record in group) {
                                     coroutineContext.ensureActive()
                                     val existingHash = record.contentSha256?.takeIf(String::isNotBlank)
+                                        ?: cachedHashesByUri[record.uri]?.takeIf(String::isNotBlank)
                                     if (existingHash != null) {
                                         hashed += record.copy(contentSha256 = existingHash)
                                         continue
@@ -570,9 +579,14 @@ class MediaScanViewModel(
                                         warningCount++
                                         hashed += record.copy(contentSha256 = null)
                                     } else {
-                                        hashed += record.copy(contentSha256 = hash)
+                                        val enriched = record.copy(contentSha256 = hash)
+                                        hashed += enriched
+                                        newlyHashed += enriched
                                     }
                                 }
+                            }
+                            if (newlyHashed.isNotEmpty()) {
+                                runCatching { repository.cacheVerifiedSha256Batch(newlyHashed) }
                             }
                             if (hashBudgetReached) {
                                 // Partial hashing can never produce an automatic duplicate cleanup proposal.

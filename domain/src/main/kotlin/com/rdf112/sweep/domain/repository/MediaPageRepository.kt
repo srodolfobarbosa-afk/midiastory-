@@ -2,6 +2,7 @@ package com.rdf112.sweep.domain.repository
 
 import com.rdf112.sweep.domain.model.MediaPage
 import com.rdf112.sweep.domain.model.MediaPageRequest
+import com.rdf112.sweep.domain.model.MediaRecord
 import com.rdf112.sweep.domain.model.MediaScanSession
 import com.rdf112.sweep.domain.model.SessionFreshness
 
@@ -10,6 +11,17 @@ interface MediaPageRepository {
     suspend fun createSession(): MediaScanSession
     suspend fun loadPage(session: MediaScanSession, request: MediaPageRequest): MediaPage
     suspend fun assessSession(session: MediaScanSession): SessionFreshness
+
+    /**
+     * Looks up cached verified SHA-256 digests for records whose live MediaStore
+     * `(uri, sizeBytes, dateModifiedEpochSeconds)` still match the local fingerprint store.
+     */
+    suspend fun getCachedSha256Batch(records: Collection<MediaRecord>): Map<String, String> = emptyMap()
+
+    /**
+     * Persists verified SHA-256 digests keyed by `(uri, sizeBytes, dateModifiedEpochSeconds)`.
+     */
+    suspend fun cacheVerifiedSha256Batch(recordsWithSha256: Collection<MediaRecord>) = Unit
 
     /**
      * Computes a content hash from a content:// URI using bounded streaming I/O.

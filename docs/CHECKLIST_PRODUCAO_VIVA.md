@@ -31,4 +31,4 @@
 2. **[PÓS-APROVAÇÃO DE PRODUÇÃO — DIA 1 DE VENDAS] Ligar Aquisição Orgânica + Paga (Regra 50/50):**
    - Ativar comentários/Stories no `@aconteceunobr` + publicar Reels/Shorts globais e importar lote no Google Ads Editor (`649-729-9513`), validando a 1ª compra real de Produção em `public.play_purchases`.
 3. **[EM BRANCH ISOLADA — ZERO RISCO À `v2.8.2`] Executar Roadmap `v2.9.0` + Maria 2.0 ([`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md)):**
-   - Fotos Parecidas IA (`dHash/pHash`), Cache SQLite Instantâneo, Compressor de Vídeo H.265 Pro, modularização da `MainActivity.kt` e **Maria 2.0** (micro-loops faciais neurais reais + TTS neural 14 idiomas + avatar 3D 52 blendshapes no Desktop).
+   - Fotos Parecidas IA (`dHash/pHash`), Cache SQLite Instantâneo, Compressor de Vídeo H.265 Pro, modularização da `MainActivity.kt` e **Laboratório Maria Humana de Última Geração** (**PROIBIDO 3D/boneco**; Maria atual 100% intocada até protótipo humano fotorrealista aprovado pelo Rodolfo — `Diretriz 12`).

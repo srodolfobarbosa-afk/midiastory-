@@ -8,10 +8,6 @@
 -keep class com.rdf112.sweep.** { *; }
 -keep class com.rdf112.sweep.domain.** { *; }
 
-# Preserva motor de QR Code oficial ZXing
--keep class com.google.zxing.** { *; }
--dontwarn com.google.zxing.**
-
 # Preserva componentes do AndroidX e ViewModels
 -keepclassmembers class * extends androidx.lifecycle.ViewModel {
     <init>(...);

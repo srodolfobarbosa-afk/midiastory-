@@ -297,11 +297,36 @@ class MediaScanViewModelTest {
             revisionsByVolume = mapOf(volume to MediaSourceRevision("test-provider", 1L)),
         )
 
+        var computeSha256CallCount: Int = 0
+        val cachedShaByUriAndMeta = mutableMapOf<Triple<String, Long, Long>, String>()
+        val persistedShaRecords = mutableListOf<MediaRecord>()
+
         override suspend fun createSession(): MediaScanSession = session
         override suspend fun assessSession(session: MediaScanSession): SessionFreshness =
             SessionFreshness.REVISION_UNCHANGED
 
-        override suspend fun computeSha256(uri: String): String? = "f".repeat(64)
+        override suspend fun getCachedSha256Batch(records: Collection<MediaRecord>): Map<String, String> =
+            buildMap {
+                for (rec in records) {
+                    val mod = rec.dateModifiedEpochSeconds ?: continue
+                    val hit = cachedShaByUriAndMeta[Triple(rec.uri, rec.sizeBytes, mod)]
+                    if (hit != null) put(rec.uri, hit)
+                }
+            }
+
+        override suspend fun cacheVerifiedSha256Batch(recordsWithSha256: Collection<MediaRecord>) {
+            for (rec in recordsWithSha256) {
+                val mod = rec.dateModifiedEpochSeconds ?: continue
+                val sha = rec.contentSha256 ?: continue
+                persistedShaRecords += rec
+                cachedShaByUriAndMeta[Triple(rec.uri, rec.sizeBytes, mod)] = sha
+            }
+        }
+
+        override suspend fun computeSha256(uri: String): String? {
+            computeSha256CallCount++
+            return "f".repeat(64)
+        }
 
         override suspend fun loadPage(
             session: MediaScanSession,
@@ -468,48 +493,67 @@ class MediaScanViewModelTest {
     }
 
     @Test
-    fun mediaStudioTools_rejectsHtmlAndExtractsDirectVideoUrls() {
-        val htmlBytes = "<!DOCTYPE html><html><body>Login required</body></html>".toByteArray(Charsets.UTF_8)
-        assertEquals(
-            true,
-            com.rdf112.sweep.presentation.studio.MediaStudioTools.isLikelyHtmlOrInvalidMediaStream(
-                htmlBytes,
-                htmlBytes.size,
-                "application/octet-stream",
-            ),
-        )
-        assertEquals(
-            true,
-            com.rdf112.sweep.presentation.studio.MediaStudioTools.isLikelyHtmlOrInvalidMediaStream(
-                ByteArray(0),
-                0,
-                "video/mp4",
-            ),
-        )
-        val mp4Header = byteArrayOf(
-            0x00, 0x00, 0x00, 0x18,
-            'f'.code.toByte(), 't'.code.toByte(), 'y'.code.toByte(), 'p'.code.toByte(),
-            'm'.code.toByte(), 'p'.code.toByte(), '4'.code.toByte(), '2'.code.toByte(),
-        )
-        assertEquals(
-            false,
-            com.rdf112.sweep.presentation.studio.MediaStudioTools.isLikelyHtmlOrInvalidMediaStream(
-                mp4Header,
-                mp4Header.size,
-                "video/mp4",
-            ),
-        )
+    fun globalDuplicateMissionUsesCachedSha256WithoutRehashingUnchangedFiles() = runTest {
+        val repository = GlobalMissionFakeRepository()
+        val viewModel = MediaScanViewModel(repository)
 
-        val sampleHtml = """
-            <html><head>
-            <meta content="https://cdn.example.com/media/clip.mp4?token=1&amp;hd=1" property="og:video:secure_url" />
-            </head></html>
-        """.trimIndent()
-        val extracted = com.rdf112.sweep.presentation.studio.MediaStudioTools.extractDirectVideoUrlFromHtml(
-            sampleHtml,
-            "https://example.com/post/123",
+        viewModel.startSession()
+        advanceUntilIdle()
+
+        // Cold run: streams SHA-256 for both same-size candidates and persists to SQLite WAL cache
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+        assertEquals(2, repository.computeSha256CallCount)
+        assertEquals(2, repository.persistedShaRecords.size)
+
+        // Warm run: 0 streaming I/O calls because both candidates match (uri, sizeBytes, dateModified)
+        repository.computeSha256CallCount = 0
+        repository.persistedShaRecords.clear()
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        assertEquals(0, repository.computeSha256CallCount)
+        assertEquals(0, repository.persistedShaRecords.size)
+        val plan = requireNotNull(viewModel.state.value.missionProgress?.plan)
+        assertEquals(1, plan.protectedReferencesKept)
+        assertEquals(1, plan.autoSelectedRecords.size)
+    }
+
+    @Test
+    fun globalDuplicateMissionRehashesWhenMetadataChangesAndUpdatesCache() = runTest {
+        val repository = GlobalMissionFakeRepository()
+        // Pre-seed cache with valid entry for /first, but stale dateModified (999L != 101L) for /second
+        val sizeBytes = 12L * 1024L * 1024L
+        repository.cachedShaByUriAndMeta[Triple("content://media/external_primary/images/first", sizeBytes, 100L)] =
+            "f".repeat(64)
+        repository.cachedShaByUriAndMeta[Triple("content://media/external_primary/images/second", sizeBytes, 999L)] =
+            "a".repeat(64)
+
+        val viewModel = MediaScanViewModel(repository)
+        viewModel.startSession()
+        advanceUntilIdle()
+
+        viewModel.executeGlobalOutcomeMission(DesiredOutcomeMission.ELIMINATE_DUPLICATE_COPIES)
+        advanceUntilIdle()
+
+        // Only /second missed the cache and triggered streaming SHA-256
+        assertEquals(1, repository.computeSha256CallCount)
+        assertEquals(1, repository.persistedShaRecords.size)
+        assertTrue(repository.persistedShaRecords.single().uri.endsWith("/second"))
+        val plan = requireNotNull(viewModel.state.value.missionProgress?.plan)
+        assertEquals(1, plan.autoSelectedRecords.size)
+    }
+
+    @Test
+    fun fingerprintStoreSha256HexValidatorRejectsInvalidDigests() {
+        assertTrue(com.rdf112.sweep.data.media.AndroidMediaFingerprintStore.isValidSha256Hex("a0f9".repeat(16)))
+        assertTrue(com.rdf112.sweep.data.media.AndroidMediaFingerprintStore.isValidSha256Hex("A0F9".repeat(16)))
+        org.junit.Assert.assertFalse(com.rdf112.sweep.data.media.AndroidMediaFingerprintStore.isValidSha256Hex(null))
+        org.junit.Assert.assertFalse(com.rdf112.sweep.data.media.AndroidMediaFingerprintStore.isValidSha256Hex(""))
+        org.junit.Assert.assertFalse(com.rdf112.sweep.data.media.AndroidMediaFingerprintStore.isValidSha256Hex("abc"))
+        org.junit.Assert.assertFalse(
+            com.rdf112.sweep.data.media.AndroidMediaFingerprintStore.isValidSha256Hex("g".repeat(64)),
         )
-        assertEquals("https://cdn.example.com/media/clip.mp4?token=1&hd=1", extracted)
     }
 
     class MainDispatcherRule(

@@ -50,6 +50,8 @@ import kotlin.coroutines.resumeWithException
 class AndroidMediaPageRepository(
     context: Context,
     private val resolver: ContentResolver = context.contentResolver,
+    private val fingerprintStore: AndroidMediaFingerprintStore? =
+        runCatching { AndroidMediaFingerprintStore.getInstance(context.applicationContext) }.getOrNull(),
 ) : MediaPageRepository {
     private val appContext = context.applicationContext
 
@@ -482,31 +484,99 @@ class AndroidMediaPageRepository(
             .filterValues { it.size >= 2 }
             .keys
         if (candidateSizes.isEmpty()) return records
+
+        val candidates = records.filter { it.sizeBytes in candidateSizes }
+        val cachedHashesByUri = getCachedSha256Batch(candidates)
+        val newlyHashed = ArrayList<MediaRecord>(candidates.size)
         var pageBytesHashed = 0L
-        return records.map { record ->
+
+        val enriched = records.map { record ->
             if (record.sizeBytes !in candidateSizes) {
                 record
             } else {
-                val remainingPageBudget = PAGE_HASH_BUDGET_BYTES - pageBytesHashed
-                if (
-                    record.sizeBytes <= 0L ||
-                    record.sizeBytes > PAGE_HASH_MAX_FILE_BYTES ||
-                    record.sizeBytes > remainingPageBudget
-                ) {
-                    record
+                val cachedHash = cachedHashesByUri[record.uri]
+                if (cachedHash != null) {
+                    record.copy(contentSha256 = cachedHash)
                 } else {
-                    val allowedBytes = minOf(PAGE_HASH_MAX_FILE_BYTES, remainingPageBudget)
-                    pageBytesHashed += record.sizeBytes
-                    val hash = computeStreamingSha256(
-                        Uri.parse(record.uri),
-                        maxBytes = allowedBytes,
-                        expectedBytes = record.sizeBytes,
-                    )
-                    if (hash != null) record.copy(contentSha256 = hash) else record
+                    val remainingPageBudget = PAGE_HASH_BUDGET_BYTES - pageBytesHashed
+                    if (
+                        record.sizeBytes <= 0L ||
+                        record.sizeBytes > PAGE_HASH_MAX_FILE_BYTES ||
+                        record.sizeBytes > remainingPageBudget
+                    ) {
+                        record
+                    } else {
+                        val allowedBytes = minOf(PAGE_HASH_MAX_FILE_BYTES, remainingPageBudget)
+                        pageBytesHashed += record.sizeBytes
+                        val hash = computeStreamingSha256(
+                            Uri.parse(record.uri),
+                            maxBytes = allowedBytes,
+                            expectedBytes = record.sizeBytes,
+                        )
+                        if (hash != null) {
+                            val updated = record.copy(contentSha256 = hash)
+                            newlyHashed += updated
+                            updated
+                        } else {
+                            record
+                        }
+                    }
                 }
             }
         }
+        if (newlyHashed.isNotEmpty()) {
+            cacheVerifiedSha256Batch(newlyHashed)
+        }
+        return enriched
     }
+
+    override suspend fun getCachedSha256Batch(records: Collection<MediaRecord>): Map<String, String> =
+        withContext(Dispatchers.IO) {
+            val store = fingerprintStore ?: return@withContext emptyMap()
+            if (records.isEmpty()) return@withContext emptyMap()
+            val expectedMeta = HashMap<String, Pair<Long, Long>>(records.size)
+            for (rec in records) {
+                val modSec = rec.dateModifiedEpochSeconds ?: continue
+                if (rec.sizeBytes > 0L && modSec > 0L) {
+                    expectedMeta[rec.uri] = Pair(rec.sizeBytes, modSec)
+                }
+            }
+            if (expectedMeta.isEmpty()) return@withContext emptyMap()
+            val cached = store.getValidBatch(expectedMeta)
+            if (cached.isEmpty()) return@withContext emptyMap()
+            buildMap(cached.size) {
+                for ((uri, fp) in cached) {
+                    val sha = fp.sha256
+                    if (AndroidMediaFingerprintStore.isValidSha256Hex(sha)) {
+                        put(uri, sha!!.lowercase())
+                    }
+                }
+            }
+        }
+
+    override suspend fun cacheVerifiedSha256Batch(recordsWithSha256: Collection<MediaRecord>) =
+        withContext(Dispatchers.IO) {
+            val store = fingerprintStore ?: return@withContext
+            if (recordsWithSha256.isEmpty()) return@withContext
+            val entries = ArrayList<CachedMediaFingerprint>(recordsWithSha256.size)
+            for (rec in recordsWithSha256) {
+                val modSec = rec.dateModifiedEpochSeconds ?: continue
+                val sha = rec.contentSha256
+                if (rec.sizeBytes > 0L && modSec > 0L && AndroidMediaFingerprintStore.isValidSha256Hex(sha)) {
+                    entries += CachedMediaFingerprint(
+                        uri = rec.uri,
+                        sizeBytes = rec.sizeBytes,
+                        dateModifiedEpochSeconds = modSec,
+                        dHash64 = null,
+                        laplacianVariance = null,
+                        sha256 = sha!!.lowercase(),
+                    )
+                }
+            }
+            if (entries.isNotEmpty()) {
+                store.upsertBatch(entries)
+            }
+        }
 
     override suspend fun computeSha256(uri: String): String? =
         computeSha256(uri, GLOBAL_HASH_MAX_FILE_BYTES)

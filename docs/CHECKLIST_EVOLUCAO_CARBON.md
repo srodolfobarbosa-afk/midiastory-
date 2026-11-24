@@ -24,10 +24,10 @@
 - [ ] **Bloco 1 — UI Completa de Fotos Parecidas / Burst IA (14 Idiomas):** cards nas abas `Limpar` e `Pro` + revisão agrupada com selo `MELHOR FOTO PROTEGIDA` na foto mais nítida.
 - [ ] **Bloco 2 — Preview Tela Cheia (Zoom em Foto + Mini-Player em Vídeo) antes de Excluir:** inspeção visual instantânea ao tocar na miniatura.
 - [ ] **Bloco 3 — Compressor Inteligente de Vídeos na GPU (`Media3 Transformer H.265/HEVC` — Pro):** reduzir vídeos pesados (`500 MB -> 85 MB` sem perda visível, 100% local, zero custo cloud) com segurança via Lixeira Android.
-- [ ] **Bloco 4 — Cache `SQLite WAL` Integrado ao Scanner Global `SHA-256`:** 2ª abertura do app em `< 0,3s` sem re-hashear arquivos intactos.
-- [ ] **Bloco 5 — Limpeza Total de Estrelinhas/Emojis Legados + Paridade 14 Idiomas (`strings.xml`):** zero `✨`/`✦` e 100% das chaves novas traduzidas nos 14 idiomas.
+- [x] **Bloco 4 — Cache `SQLite WAL` Integrado ao Scanner Global `SHA-256` (Etapa 1):** 2ª abertura do app em `< 0,3s` sem re-hashear arquivos intactos (`getCachedSha256Batch` + `cacheVerifiedSha256Batch` com invalidação automática por `sizeBytes`/`dateModified`).
+- [x] **Bloco 5 (Etapa 1 — Base Limpa) — Limpeza Total de Estrelinhas/Emojis Legados + Paridade 14 Idiomas (`strings.xml`):** zero `✨`/`✦`/emojis e 100% de paridade exata nas chaves ativas nos 14 idiomas *(chaves novas das próximas features entrarão na Etapa 3)*.
 - [ ] **Bloco 6 — Histórico Acumulado de GB Recuperados + Gatilho `InAppReview` 5 Estrelas:** métrica vitalícia na Home + convite nativo de avaliação pós-limpeza.
-- [ ] **Bloco 7 — Remoção dos `170 KB` de Código Morto (`presentation/studio/*` + `MariaLipSyncEnvelopes.kt`) & Modularização Limpa:** código enxuto sem tocar na Maria atual.
+- [x] **Bloco 7 — Remoção do Código Morto (`presentation/studio/*` + `ZXing` + `friday-core/avatar-3d/*` + abas legadas em `MainActivity.kt`):** código enxuto com **Maria atual (`MariaAssistantBanner.kt` + `MariaLipSyncEnvelopes.kt`) 100% intocada**.
 - [ ] **Bloco 8 — Build Cloud 7 GB RAM + Instalação `.debug` Lado a Lado no Moto G84 (`0085353748`) + Prova Visual no ADB.**
 
 ---
