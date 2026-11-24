@@ -1,6 +1,6 @@
 # 🚀 CHECKLIST MESTRA UNIFICADA — SUPER PACOTE `v2.9.0 BIG-TECH` ("TUDO DE UMA VEZ")
 > 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`AGENTS.md`**](../AGENTS.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) · [**`CONTINUATION_HANDOFF.md`**](CONTINUATION_HANDOFF.md) · [**`PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`**](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md) · [**`LINHA_DO_TEMPO_AUTONOMA.md`**](LINHA_DO_TEMPO_AUTONOMA.md)
-**Atualizada em:** `2026-11-24 19:01 BRT` | **Motor:** Gemini 4 Carbon | **Branch Isolada:** `feat/v2.9.0-motor-app` (`CI Run 45496347206` 100% verde) | **Baseline Protegida (26/11):** `tag v2.8.2-carbon-baseline`
+**Atualizada em:** `2026-11-24 19:38 BRT` | **Motor:** Gemini 4 Carbon | **Branch Isolada:** `feat/v2.9.0-motor-app` (`CI Run 45500927976` 100% verde + `.debug` no Moto G84) | **Baseline Protegida (26/11):** `tag v2.8.2-carbon-baseline`
 
 ---
 
@@ -28,7 +28,7 @@
 - [x] **Bloco 5 — Limpeza Total de Estrelinhas/Emojis Legados + Paridade 14 Idiomas (`strings.xml`):** zero `✨`/`✦`/emojis e `288/288` chaves ativas traduzidas em paridade 100% nos 14 idiomas.
 - [x] **Bloco 6 — Histórico Acumulado de GB Recuperados + Gatilho `InAppReview` 5 Estrelas:** selo vitalício verde na Home (`lifetime_freed_home_badge`) + `InAppReviewCoordinator` com limiar real (`5 MB` único / `25 MB` acumulado + cooldown 7d sem sobrepor bottom sheet).
 - [x] **Bloco 7 — Remoção do Código Morto (`presentation/studio/*` + `ZXing` + `friday-core/avatar-3d/*` + abas legadas em `MainActivity.kt`):** código enxuto com **Maria atual (`MariaAssistantBanner.kt` + `MariaLipSyncEnvelopes.kt`) 100% intocada**.
-- [ ] **Bloco 8 — Build Cloud 7 GB RAM + Instalação `.debug` Lado a Lado no Moto G84 (`0085353748`) + Prova Visual no ADB.**
+- [x] **Bloco 8 — Build Cloud 7 GB RAM + Instalação `.debug` Lado a Lado no Moto G84 (`0085353748`) + Prova Visual no ADB (`Run 45500927976` — 8/8 Blocos Concluídos).**
 
 ---
 

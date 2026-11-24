@@ -3291,3 +3291,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #554
 
 ---
+
+### 📍 [24/11/2026, 19:39:58] Concluida Etapa 3 (Bloco 8/8 da v2.9.0 instalado lado a lado como com.rdf112.midiastore.debug no Moto G84 0085353748 via Run 45500927976) e entregue estudo tecnico docs/ESTUDO_MARIA_2_HUMANA_E_ESCALA.md sem tocar na Maria atual
+- **📖 Estudou / Leu:** ci-cd-pipeline.yml, scripts/voice-narrator.mjs, AndroidPlayBillingGateway.kt, WorkManager POST_NOTIFICATIONS Android 15 API 35 e benchmarks de Free Trial P3D vs P7D
+- **⚙️ Tentou / Executou:** Empacotar app-debug.apk no GitHub Actions Linux 7 GB RAM, instalar lado a lado com com.rdf112.midiastore oficial no Moto G84, validar visualmente Home 3x2 + Fotos Parecidas IA (MELHOR FOTO PROTEGIDA) + Preview OLED + aba Pro e diagnosticar voz robotica no PC
+- **⚠️ Erros Encontrados:** INSTALL_FAILED_UPDATE_INCOMPATIBLE apenas no pacote .debug antigo assinado em runner anterior
+- **🔧 Como Corrigiu:** Reinstalado exclusivamente com.rdf112.midiastore.debug preservando 100% com.rdf112.midiastore oficial; capturadas 5 provas PNG limpas via ADB (0 erros AndroidRuntime:E) e diagnosticado cooldown 429 + fallback SAPI5 Microsoft Maria Desktop em voice-narrator.mjs
+- **🎯 Conclusão:** 8/8 blocos da CHECKLIST_EVOLUCAO_CARBON.md concluidos e validados ao vivo no Moto G84 com tag v2.8.2-carbon-baseline (cd0a661) e Maria atual 100% intocadas; aguardando escolha do fundador sobre Maria 2.0, correcao de voz PC e Free Trial Anual P3D
+- *Registro Supabase:* Memory #555
+
+---
