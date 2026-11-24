@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planta Oficial Big-Tech v4 — Nova Logo + Landing Page Bio Instagram (Midiastore)</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #141416;
+      --card: #1C1C1E;
+      --border: #2C2C2E;
+      --text: #F5F5F7;
+      --muted: #8E8E93;
+      --blue: #0A84FF;
+      --cyan: #5AC8FA;
+      --green: #30D158;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    .topbar-blueprint {
+      background: rgba(20,20,22,0.92);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .bp-tag {
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+    .logo-switcher {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .logo-btn {
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .logo-btn.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+    .nav-preview {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0 36px;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .brand-row span { color: var(--blue); }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 44px;
+      align-items: center;
+    }
+    @media (max-width: 820px) {
+      .hero-grid { grid-template-columns: 1fr; text-align: center; }
+      .trust-pills { justify-content: center; }
+    }
+    .eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      margin: 0 0 18px;
+      font-weight: 800;
+    }
+    .lead {
+      font-size: 1.12rem;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0 0 28px;
+      max-width: 520px;
+    }
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 12px 32px rgba(10, 132, 255, 0.35);
+    }
+    .trust-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    .pill {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 999px;
+    }
+    .phone-frame {
+      max-width: 320px;
+      margin: 0 auto;
+      background: #0D0D0F;
+      border: 2px solid #2C2C2E;
+      border-radius: 40px;
+      padding: 18px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.85);
+    }
+    .phone-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .metric-big {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 4px 0;
+    }
+    .seg-bar {
+      height: 7px;
+      background: #2C2C2E;
+      border-radius: 999px;
+      display: flex;
+      overflow: hidden;
+      margin: 12px 0 16px;
+    }
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .bento-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px;
+    }
+    .bento-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+    }
+    .bento-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-blueprint">
+    <div class="bp-tag">PLANTA BIG-TECH v4 (AGUARDANDO APROVAÇÃO DO RODOLFO — ZERO ESTRELINHA DE IA)</div>
+    <div class="logo-switcher">
+      <button class="logo-btn active" onclick="setLogo(1, this)">Logo 1: Precision Ring</button>
+      <button class="logo-btn" onclick="setLogo(2, this)">Logo 2: M-Ribbon</button>
+      <button class="logo-btn" onclick="setLogo(3, this)">Logo 3: Dual-Disc</button>
+      <button class="logo-btn" onclick="setLogo(4, this)">Logo 4: Titanium Core</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="nav-preview">
+      <div class="brand-row">
+        <span id="brandIconHolder" style="display:inline-flex;width:40px;height:40px;"></span>
+        <div>Midia<span>store</span></div>
+      </div>
+      <div style="font-size:0.84rem;color:var(--muted);">14 Idiomas • Android 10+</div>
+    </div>
+
+    <section class="hero-grid">
+      <div>
+        <div class="eyebrow">ENGENHARIA ON-DEVICE • ZERO NUVEM</div>
+        <h1>Armazenamento limpo com precisão cirúrgica.</h1>
+        <p class="lead">Localize vídeos pesados, fotos parecidas e cópias idênticas SHA-256 diretamente no seu Android. Sem anúncios, sem enviar fotos à nuvem e em menos de 8 MB.</p>
+        <a href="#play" class="cta-primary">Baixar Grátis na Google Play</a>
+        <div class="trust-pills">
+          <span class="pill">7,2 MB OLED</span>
+          <span class="pill">Hash Criptográfico SHA-256</span>
+          <span class="pill">100% No Aparelho</span>
+        </div>
+      </div>
+
+      <div class="phone-frame">
+        <div class="phone-card">
+          <div style="font-size:0.72rem;color:var(--muted);font-weight:700;letter-spacing:0.05em;">ESPAÇO RECUPERÁVEL</div>
+          <div class="metric-big">12,4 GB</div>
+          <div style="font-size:0.82rem;color:var(--muted);">Revisão segura com miniaturas reais</div>
+          <div class="seg-bar">
+            <span style="width:45%;background:#0A84FF;"></span>
+            <span style="width:22%;background:#5AC8FA;"></span>
+            <span style="width:15%;background:#30D158;"></span>
+          </div>
+          <div style="background:var(--blue);color:#fff;text-align:center;padding:11px;border-radius:11px;font-weight:700;font-size:0.88rem;">Revisar Arquivos</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="phone-card" style="margin:0;padding:14px;">
+            <div style="font-size:0.78rem;color:var(--muted);">Duplicatas</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#FF9F0A;margin-top:4px;">SHA-256</div>
+          </div>
+          <div class="phone-card" style="margin:0;padding:14px;">
+            <div style="font-size:0.78rem;color:var(--muted);">Vídeos &gt;10 MB</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#5AC8FA;margin-top:4px;">8,2 GB</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bento">
+      <div class="bento-card">
+        <h3>Verificação Byte a Byte</h3>
+        <p>Enquanto limpadores comuns chutam pelo nome do arquivo, o Midiastore calcula SHA-256 em streaming e mantém sempre 1 original protegido.</p>
+      </div>
+      <div class="bento-card">
+        <h3>Fotos Parecidas &amp; Nitidez IA</h3>
+        <p>Agrupa sequências de fotos quase iguais no processador do celular e destaca automaticamente o clique mais nítido.</p>
+      </div>
+      <div class="bento-card">
+        <h3>Privacidade Nível Big Tech</h3>
+        <p>Zero permissão invasiva, zero ID de publicidade e confirmação oficial da Lixeira do Android em cada ação.</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const LOGOS = {
+      1: `<svg viewBox="0 0 184 184" width="40" height="40"><rect width="184" height="184" rx="42" fill="#12161F"/><circle cx="92" cy="92" r="56" fill="none" stroke="#243042" stroke-width="18"/><path d="M92,36 A56,56 0 1,1 41,115" fill="none" stroke="#0A84FF" stroke-width="18" stroke-linecap="round"/><path d="M47,58 A56,56 0 0,1 72,40" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round"/></svg>`,
+      2: `<svg viewBox="0 0 184 184" width="40" height="40"><rect width="184" height="184" rx="42" fill="#12161F"/><path d="M44,134 L44,54 L68,54 L92,88 L92,118 L66,82 L66,134 Z" fill="#FFFFFF"/><path d="M92,88 L116,54 L140,54 L140,134 L118,134 L118,82 L92,118 Z" fill="#0A84FF"/></svg>`,
+      3: `<svg viewBox="0 0 184 184" width="40" height="40"><rect width="184" height="184" rx="42" fill="#12161F"/><circle cx="76" cy="92" r="42" fill="#0A84FF"/><circle cx="108" cy="92" r="42" fill="rgba(90,200,250,0.18)" stroke="#FFFFFF" stroke-width="14"/></svg>`,
+      4: `<svg viewBox="0 0 184 184" width="40" height="40"><rect width="184" height="184" rx="42" fill="#12161F"/><path d="M52,132 A56,56 0 1,1 132,132" fill="none" stroke="#0A84FF" stroke-width="16" stroke-linecap="round"/><circle cx="92" cy="92" r="22" fill="#FFFFFF"/></svg>`
+    };
+    function setLogo(n, btn) {
+      document.getElementById("brandIconHolder").innerHTML = LOGOS[n];
+      document.querySelectorAll(".logo-btn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+    }
+    setLogo(1);
+  </script>
+</body>
+</html>
