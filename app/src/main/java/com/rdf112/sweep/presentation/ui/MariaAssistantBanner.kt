@@ -71,6 +71,7 @@ import com.rdf112.sweep.data.maria.MariaCdnVideoCache
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
 import java.io.File
+import java.io.FileInputStream
 import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -775,7 +776,9 @@ fun MariaHeroBanner(
                 videoPlayerRef = mp
                 isNeuralVideoSpeaking = true
                 mp.setSurface(surface)
-                mp.setDataSource(neuralClipFile.absolutePath)
+                FileInputStream(neuralClipFile).use { fis ->
+                    mp.setDataSource(fis.fd)
+                }
                 mp.isLooping = false
                 mp.setVolume(1f, 1f)
                 mp.setOnInfoListener { _, what, _ ->
@@ -915,17 +918,17 @@ fun MariaHeroBanner(
     }
 
     val bannerHeight by animateDpAsState(
-        targetValue = if (isSpeaking) 128.dp else 80.dp,
+        targetValue = if (isSpeaking) 122.dp else 80.dp,
         animationSpec = tween(durationMillis = 260),
         label = "maria2BannerHeight",
     )
     val avatarRingSize by animateDpAsState(
-        targetValue = if (isSpeaking) 104.dp else 56.dp,
+        targetValue = if (isSpeaking) 88.dp else 56.dp,
         animationSpec = tween(durationMillis = 260),
         label = "maria2AvatarRingSize",
     )
     val avatarInnerSize by animateDpAsState(
-        targetValue = if (isSpeaking) 94.dp else 48.dp,
+        targetValue = if (isSpeaking) 80.dp else 48.dp,
         animationSpec = tween(durationMillis = 260),
         label = "maria2AvatarInnerSize",
     )
@@ -1071,7 +1074,7 @@ fun MariaHeroBanner(
                 ) {
                     Text(
                         text = brandAnnotated,
-                        fontSize = 16.sp,
+                        fontSize = if (isSpeaking) 14.5.sp else 16.sp,
                         letterSpacing = (-0.3).sp,
                         maxLines = 1,
                     )

@@ -712,7 +712,7 @@ class MainActivity : AppCompatActivity() {
                 val catalogMap by billingGateway.catalog.collectAsStateWithLifecycle()
                 val annualItem = catalogMap[BillingStatePolicy.PRODUCT_ANNUAL]
                 val hasAnnualTrialNow = (annualItem?.hasFreeTrialOffer == true) ||
-                    (annualItem == null && isDevelopmentBuild)
+                    (isDevelopmentBuild && (annualItem == null || !annualItem.isAvailable))
                 val isProNow = billingAccessState == ProAccessSummaryState.PRO_GRANTED ||
                     isTesterVipProEnabled() ||
                     (isDevelopmentBuild && debugProPreviewEnabled)
@@ -2148,9 +2148,10 @@ class MainActivity : AppCompatActivity() {
             stylePlanPurchaseButton(button, (product?.isAvailable == true) || isDevelopmentBuild)
         }
 
-        val hasTrialOffer = (annual?.hasFreeTrialOffer == true) || (annual == null && isDevelopmentBuild)
+        val isDevFallbackPreview = isDevelopmentBuild && (annual == null || !annual.isAvailable)
+        val hasTrialOffer = (annual?.hasFreeTrialOffer == true) || isDevFallbackPreview
         val displayAnnualPrice = annual?.formattedPrice?.takeIf { it.isNotBlank() }
-            ?: if (isDevelopmentBuild) "R$ 79,99" else null
+            ?: if (isDevFallbackPreview) "R$ 79,99" else null
         latestAnnualHasFreeTrial = hasTrialOffer && !displayAnnualPrice.isNullOrBlank()
         latestAnnualFormattedPrice = displayAnnualPrice
 
