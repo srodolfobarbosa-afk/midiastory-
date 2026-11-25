@@ -3351,3 +3351,13 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #561
 
 ---
+
+### 📍 [25/11/2026, 01:08:29] Concluida integracao completa da Maria 2.0 MoDA H.265 via CDN Firebase + cache local SHA-256 + fallback offline e das 3 frentes do Growth Pack v2.9.1 na branch feat/v2.9.0-motor-app (CI Run 45543787553 100% verde, AAB R8 6,79 MB < 8 MB, instalado e validado ao vivo no Moto G84 0085353748 mantendo v2.8.2-carbon-baseline intocada)
+- **📖 Estudou / Leu:** CONTINUATION_HANDOFF.md, PLANO_CRESCIMENTO_V291_TRIAL_RETENCAO_SHARE.md, MariaAssistantBanner.kt, AndroidPlayBillingGateway.kt, verify-play-purchase
+- **⚙️ Tentou / Executou:** Player nativo TextureView H.265 CDN + SubscriptionOfferSelector P3D + WeeklyStorageDigestWorker >=300MB + ShareAchievementCardRenderer Canvas OLED + 14 idiomas (307 chaves)
+- **⚠️ Erros Encontrados:** 1) scanViaMediaStore exigia suspend em estimateRecoverableBytesFast; 2) MediaPlayer.setDataSource(path) em filesDir privado no Android 15 exigia FileDescriptor (FileInputStream.fd)
+- **🔧 Como Corrigiu:** Adicionado suspend e trocado para FileInputStream(neuralClipFile).use { mp.setDataSource(it.fd) }, ativando reproducao neural MoDA H.265 real (anel verde MARIA) no Moto G84
+- **🎯 Conclusão:** AAB R8 caiu de 7,26 MB para 6,79 MB com Maria 2.0 + Growth Pack prontos lado a lado em .debug no Moto G84 e baseline de quinta 26/11 100% preservada
+- *Registro Supabase:* Memory #569
+
+---
