@@ -1,6 +1,22 @@
 # Midiastore — CONTINUIDADE DO PROJETO
 > 🧭 **Navegação Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) | **Checklist Produção (`26/11`):** [**`docs/CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) | **Roadmap `v2.9.0` & Maria 2.0:** [**`docs/CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) | **Histórico Arquivado:** [`docs/archive/`](archive/README.md)
 
+## Checkpoint Oficial Verificado Ao Vivo — 2026-11-25 (Maria 2.0 MoDA H.265 CDN + Growth Pack v2.9.1 Concluídos e Instalados no Moto G84 · Baseline 26/11 Intocada)
+
+- **Baseline Protegida para Quinta-Feira (`26/11`):** `tag v2.8.2-carbon-baseline` (`cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4`) **100% intocada**; faixas `internal`/`alpha` na Play Console preservadas em `v2.8.0 (vc 32)` com os **23 testadores fechados intactos**.
+- **Maria 2.0 Humana Fotorrealista (MoDA Diffusion H.265 CDN + Cache Local + Fallback Offline) na `feat/v2.9.0-motor-app`:**
+  - **CDN Firebase Hosting (`Release 1795577272160000`, `HTTP 200`):** publicado `https://midiastory-df6a0.web.app/cdn/maria2/manifest.json` + `idle.mp4` (`25,7 KB` H.265 `hvc1`) + `pt/clean.mp4` (`174,3 KB`, SHA-256 `36dbd80b...`) + pipeline incremental Node.js em `scripts/generate-maria2-moda-pipeline.mjs` (zero Python, zero 3D, zero boca 2D artificial).
+  - **Player Nativo Leve (`MariaAssistantBanner.kt` + `MariaCdnVideoCache.kt`):** `TextureView` hardware + cache local LRU limitado (`<= 24 MB` em `files/maria2_cdn_cache` com verificação de assinatura `ftyp` e SHA-256) + passagem segura via `FileDescriptor` para `MediaPlayer` no Android 15 + `res/raw/maria2_idle.mp4` (`25,7 KB`) para abertura instantânea (`0 ms`) e fallback seguro offline.
+- **Growth Pack `v2.9.1` (3 Frentes Concluídas nos 14 Idiomas — `307/307` chaves em paridade 100%):**
+  1. **Free Trial 3 Dias Exclusivo no Plano Anual (`sweep_pro_annual`):** `SubscriptionOfferSelector.kt` + `AndroidPlayBillingGateway.kt` + Edge Function `verify-play-purchase` (`v10 ACTIVE` no Supabase) validando `annual-trial-3d` com renovação/expiração `fail-closed`.
+  2. **Notificação Semanal Inteligente (`WeeklyStorageDigestWorker.kt`):** `WorkManager` periódico de 7 dias (`setRequiresBatteryNotLow(true)`), silêncio absoluto se `< 300 MB` (`314.572.800 bytes`) ou app aberto há `< 48h`, e convite `POST_NOTIFICATIONS` somente pós-1ª limpeza.
+  3. **Botão Nativo de Compartilhar + Card OLED `1080x1350` (`ShareAchievementCardRenderer.kt`, `+0 KB`):** renderização pura em `Canvas` com `Precision Storage Ring` + `FileProvider` + preview `ClipData` e link UTM (`?utm_source=app_share&utm_medium=viral_card`) para WhatsApp, Telegram e Instagram Stories/Direct (zero `<intent-filter>` `ACTION_SEND` no manifesto).
+- **CI Linux 7 GB RAM (`Run 45543787553` — `100% verde` em `6df50eb`) + QA Real no Moto G84 (`0085353748`):**
+  - **AAB Release R8 Assinado Medido no CI:** **`6,79 MB`** (`7.120.223 bytes` — **`-470 KB` menor** que os `7,26 MB` da `v2.8.2`, cumprindo com folga o teto `< 8 MB`).
+  - **APK `.debug` (`com.rdf112.midiastore.debug`, SHA-256 `21139805cf1f5587afb0a5125f8fb7cd211341c109ab5983d65668d8de2783b8`):** instalado lado a lado no **Motorola Moto G84 5G (`0085353748`, API 35)** com `pt_clean_v291.mp4` (`178.505 bytes`) confirmado no cache local e `0` erros `AndroidRuntime:E`.
+
+---
+
 ## Checkpoint Oficial Verificado Ao Vivo — 2026-11-24 (Blindagem 360° Carbon Concluída — Pronto para Produção 26/11 + Roadmap v2.9.0/Maria 2.0)
 
 - **Fonte Única de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md), [`docs/CONTINUATION_UPDATE_2026-11-24.md`](CONTINUATION_UPDATE_2026-11-24.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).

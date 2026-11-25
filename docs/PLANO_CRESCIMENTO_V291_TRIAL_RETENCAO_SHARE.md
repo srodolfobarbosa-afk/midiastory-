@@ -1,6 +1,6 @@
 # 📈 PLANO EXECUTIVO & ARQUITETURAL (`v2.9.1 GROWTH PACK` — `feat/v2.9.0-motor-app`)
 > 🧭 **Índice Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) · [**`CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) · [**`ESTUDO_MARIA_2_HUMANA_E_ESCALA.md`**](ESTUDO_MARIA_2_HUMANA_E_ESCALA.md) · [**`CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md)
-**Status:** Planejado e Auditado (Aguardando comando `"Pode codar o Growth Pack"` pós-abertura de Produção em `26/11` ou na `feat/v2.9.0-motor-app`, mantendo `tag v2.8.2-carbon-baseline` 100% intocada).
+**Status:** ✅ **Implementado, Auditado nos 14 Idiomas (`307/307` chaves), Aprovado no CI (`Run 45543787553`, AAB R8 `6,79 MB < 8 MB`) e Instalado Lado a Lado (`.debug`) no Moto G84 (`0085353748`)** na branch `feat/v2.9.0-motor-app` (mantendo `tag v2.8.2-carbon-baseline` 100% intocada para `26/11`).
 
 ---
 
