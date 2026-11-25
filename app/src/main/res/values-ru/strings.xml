@@ -308,8 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">БЕЗОПАСНО ОЧИЩЕНО</string>
     <string name="share_card_headline_freed">Больше свободного места без потери фото.</string>
     <string name="share_card_trust_footer">100% на устройстве • Android Scoped Storage</string>
-    <string name="app_language_button">????</string>
-    <string name="app_language_title">???? ??????????</string>
-    <string name="app_language_system_default">???????????? ???? ??????????</string>
-    <string name="cleanup_dialog_mission_action">?????????? %1$s ??????</string>
+    <string name="app_language_button">Язык</string>
+    <string name="app_language_title">Язык приложения</string>
+    <string name="app_language_system_default">Язык устройства</string>
+    <string name="cleanup_dialog_mission_action">Очистить %1$s сейчас</string>
 </resources>

@@ -308,8 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">안전하게 확보됨</string>
     <string name="share_card_headline_freed">소중한 추억은 지키고 저장공간은 넉넉하게.</string>
     <string name="share_card_trust_footer">100% 기기 내 처리 • Android Scoped Storage</string>
-    <string name="app_language_button">??</string>
-    <string name="app_language_title">? ??</string>
-    <string name="app_language_system_default">?? ?? ??</string>
-    <string name="cleanup_dialog_mission_action">?? %1$s ??</string>
+    <string name="app_language_button">언어</string>
+    <string name="app_language_title">앱 언어</string>
+    <string name="app_language_system_default">기기 언어 사용</string>
+    <string name="cleanup_dialog_mission_action">지금 %1$s 정리</string>
 </resources>

@@ -308,8 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">सुरक्षित रूप से खाली किया</string>
     <string name="share_card_headline_freed">यादें खोए बिना अधिक खाली स्टोरेज।</string>
     <string name="share_card_trust_footer">100% ऑन-डिवाइस • Android Scoped Storage</string>
-    <string name="app_language_button">????</string>
-    <string name="app_language_title">?? ?? ????</string>
-    <string name="app_language_system_default">?????? ?? ???? ???????? ????</string>
-    <string name="cleanup_dialog_mission_action">??? %1$s ???? ????</string>
+    <string name="app_language_button">भाषा</string>
+    <string name="app_language_title">ऐप की भाषा</string>
+    <string name="app_language_system_default">डिवाइस की भाषा उपयोग करें</string>
+    <string name="cleanup_dialog_mission_action">अभी %1$s साफ़ करें</string>
 </resources>

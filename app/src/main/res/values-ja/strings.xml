@@ -308,8 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">安全に解放済み</string>
     <string name="share_card_headline_freed">大切な思い出を守りながら容量アップ。</string>
     <string name="share_card_trust_footer">100%端末内処理 • Android Scoped Storage</string>
-    <string name="app_language_button">??</string>
-    <string name="app_language_title">??????</string>
-    <string name="app_language_system_default">????????</string>
-    <string name="cleanup_dialog_mission_action">??? %1$s ????</string>
+    <string name="app_language_button">言語</string>
+    <string name="app_language_title">アプリの言語</string>
+    <string name="app_language_system_default">端末の言語を使用</string>
+    <string name="cleanup_dialog_mission_action">今すぐ %1$s を削除</string>
 </resources>

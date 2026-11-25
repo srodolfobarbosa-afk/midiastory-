@@ -308,8 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">تم تحريرها بأمان</string>
     <string name="share_card_headline_freed">مساحة حرة أكبر دون فقدان ذكرياتك.</string>
     <string name="share_card_trust_footer">100% على الجهاز • Android Scoped Storage</string>
-    <string name="app_language_button">?????</string>
-    <string name="app_language_title">??? ???????</string>
-    <string name="app_language_system_default">??????? ??? ??????</string>
-    <string name="cleanup_dialog_mission_action">???? %1$s ????</string>
+    <string name="app_language_button">اللغة</string>
+    <string name="app_language_title">لغة التطبيق</string>
+    <string name="app_language_system_default">استخدام لغة الجهاز</string>
+    <string name="cleanup_dialog_mission_action">تنظيف %1$s الآن</string>
 </resources>
