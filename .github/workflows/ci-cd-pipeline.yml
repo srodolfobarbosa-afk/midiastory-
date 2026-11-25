@@ -60,10 +60,30 @@ jobs:
       - name: Configurar Permissão do Gradle Wrapper
         run: chmod +x gradlew
 
-      - name: Executar Testes de Domínio, App e Gerar APK Debug
+      - name: Executar Testes de Domínio, App e Gerar APK Debug + Gate AAB < 8 MB
+        env:
+          SWEEP_KEYSTORE_BASE64: ${{ secrets.SWEEP_KEYSTORE_BASE64 }}
+          SWEEP_STORE_PASSWORD: ${{ secrets.SWEEP_STORE_PASSWORD }}
+          SWEEP_KEY_ALIAS: ${{ secrets.SWEEP_KEY_ALIAS }}
+          SWEEP_KEY_PASSWORD: ${{ secrets.SWEEP_KEY_PASSWORD }}
         run: |
           ./gradlew --no-daemon :domain:test :app:testDebugUnitTest :app:assembleDebug
           sha256sum app/build/outputs/apk/debug/app-debug.apk > app/build/outputs/apk/debug/app-debug.apk.sha256
+          if [ -n "$SWEEP_KEYSTORE_BASE64" ] && [ -n "$SWEEP_STORE_PASSWORD" ]; then
+            key_file="$RUNNER_TEMP/sweep-upload.jks"
+            printf '%s' "$SWEEP_KEYSTORE_BASE64" | base64 --decode > "$key_file"
+            chmod 600 "$key_file"
+            SWEEP_STORE_FILE="$key_file" ./gradlew --no-daemon :app:bundleRelease
+            rm -f "$key_file"
+            aab_bytes=$(stat -c%s app/build/outputs/bundle/release/app-release.aab)
+            aab_mb=$(awk "BEGIN {printf \"%.2f\", $aab_bytes / 1048576}")
+            echo "📦 Signed R8 Release AAB Size: ${aab_bytes} bytes (${aab_mb} MB)"
+            if [ "$aab_bytes" -ge 8388608 ]; then
+              echo "❌ ERRO: AAB (${aab_bytes} bytes) ultrapassou o teto de 8 MB (8388608 bytes)!" >&2
+              exit 1
+            fi
+            echo "✅ Gate AAB < 8 MB aprovado com folga (${aab_mb} MB)!"
+          fi
 
       - name: Publicar Artefato APK Debug (.debug Lado a Lado)
         uses: actions/upload-artifact@v4

@@ -1,13 +1,17 @@
 package com.rdf112.sweep.presentation.ui
 
 import android.content.Context
+import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.os.Environment
 import android.os.StatFs
+import android.view.Surface
+import android.view.TextureView
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RawRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -63,8 +67,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rdf112.sweep.R
+import com.rdf112.sweep.data.maria.MariaCdnVideoCache
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
+import java.io.File
 import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -616,68 +622,214 @@ fun MariaHeroBanner(
         mutableStateOf(prefs.getBoolean(KEY_MARIA_MUTED, false))
     }
     var isSpeaking by remember { mutableStateOf(false) }
+    var isNeuralVideoSpeaking by remember { mutableStateOf(false) }
     var userPlayTrigger by remember { mutableIntStateOf(0) }
     var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
     var voiceEnergy by remember { mutableFloatStateOf(0f) }
     var wavePhase by remember { mutableFloatStateOf(0f) }
     var breathScale by remember { mutableFloatStateOf(1.01f) }
-    var mediaPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
 
-    fun stopAndReleaseAudio() {
+    // Maria 2.0 Native H.265 Player State (Hardware TextureView + CDN Cache + Offline Safe Fallback)
+    var surfaceRef by remember { mutableStateOf<Surface?>(null) }
+    var videoPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
+    var fallbackAudioPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
+    var videoFrameReady by remember { mutableStateOf(false) }
+    var videoHardwareSupported by remember { mutableStateOf(true) }
+
+    fun releaseFallbackAudio() {
         runCatching {
-            mediaPlayerRef?.let { mp ->
+            fallbackAudioPlayerRef?.let { mp ->
                 if (mp.isPlaying) mp.stop()
                 mp.release()
             }
         }
-        mediaPlayerRef = null
+        fallbackAudioPlayerRef = null
+    }
+
+    fun releaseVideoPlayer() {
+        runCatching {
+            videoPlayerRef?.let { mp ->
+                if (mp.isPlaying) mp.stop()
+                mp.release()
+            }
+        }
+        videoPlayerRef = null
+    }
+
+    fun startIdleLoopOnSurface(surface: Surface?) {
+        if (!isActive || !videoHardwareSupported || surface == null || !surface.isValid) return
+        releaseVideoPlayer()
+        runCatching {
+            val afd = context.resources.openRawResourceFd(R.raw.maria2_idle) ?: return
+            val mp = MediaPlayer()
+            videoPlayerRef = mp
+            mp.setSurface(surface)
+            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+            afd.close()
+            mp.isLooping = true
+            mp.setVolume(0f, 0f)
+            mp.setOnInfoListener { _, what, _ ->
+                if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                    videoFrameReady = true
+                }
+                false
+            }
+            mp.setOnPreparedListener { prepared ->
+                runCatching {
+                    prepared.start()
+                    videoFrameReady = true
+                }
+            }
+            mp.setOnErrorListener { failedMp, _, _ ->
+                videoHardwareSupported = false
+                videoFrameReady = false
+                runCatching { failedMp.release() }
+                if (videoPlayerRef === failedMp) videoPlayerRef = null
+                true
+            }
+            mp.prepareAsync()
+        }.onFailure {
+            videoHardwareSupported = false
+            videoFrameReady = false
+        }
+    }
+
+    fun stopSpeechAndReturnToIdle() {
+        releaseFallbackAudio()
+        val wasNeural = isNeuralVideoSpeaking
         isSpeaking = false
+        isNeuralVideoSpeaking = false
         voiceEnergy = 0f
+        if (wasNeural) {
+            startIdleLoopOnSurface(surfaceRef)
+        }
+    }
+
+    // Background pre-warm of primary CDN neural clips (<= 24 MB local cache)
+    LaunchedEffect(isActive) {
+        if (isActive) {
+            MariaCdnVideoCache.prefetchPrimaryClips(context)
+        }
+    }
+
+    LaunchedEffect(surfaceRef, isActive, videoHardwareSupported) {
+        if (isActive && videoHardwareSupported && surfaceRef != null && !isNeuralVideoSpeaking) {
+            startIdleLoopOnSurface(surfaceRef)
+        } else if (!isActive) {
+            releaseFallbackAudio()
+            releaseVideoPlayer()
+            isSpeaking = false
+            isNeuralVideoSpeaking = false
+            voiceEnergy = 0f
+        }
     }
 
     DisposableEffect(lifecycleOwner, isActive) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
-                stopAndReleaseAudio()
+                releaseFallbackAudio()
+                releaseVideoPlayer()
+                isSpeaking = false
+                isNeuralVideoSpeaking = false
+                voiceEnergy = 0f
+            } else if (event == Lifecycle.Event.ON_RESUME && isActive && surfaceRef != null && !isSpeaking) {
+                startIdleLoopOnSurface(surfaceRef)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        if (!isActive) {
-            stopAndReleaseAudio()
-        }
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-            stopAndReleaseAudio()
+            releaseFallbackAudio()
+            releaseVideoPlayer()
+            runCatching { surfaceRef?.release() }
+            surfaceRef = null
         }
     }
 
-    // Padrão Apple / Gemini Live: NUNCA começa a falar sozinha sem o usuário pedir!
-    // Só fala quando o usuário toca explicitamente no botão de áudio ou no card da Maria.
+    // Padrão Apple / Gemini Live: fala quando o usuário toca no card ou botão de som.
+    // Toca primeiro o micro-vídeo neural MoDA H.265 sincronizado (do cache local / Firebase CDN),
+    // caindo com segurança para o áudio offline de estúdio se estiver sem internet!
     LaunchedEffect(userPlayTrigger, rawAudioResId, isActive) {
         if (!isActive || userPlayTrigger == 0) {
-            stopAndReleaseAudio()
+            if (!isActive) stopSpeechAndReturnToIdle()
             return@LaunchedEffect
         }
-        stopAndReleaseAudio()
+        stopSpeechAndReturnToIdle()
         if (isMuted) return@LaunchedEffect
 
         isSpeaking = true
+        val lang = MariaCdnVideoCache.normalizedLang()
+        val clipKey = MariaCdnVideoCache.clipKeyForAudioRes(rawAudioResId)
+        val surface = surfaceRef
+        val neuralClipFile: File? = if (videoHardwareSupported && surface != null && surface.isValid) {
+            MariaCdnVideoCache.resolveOrFetchClip(context, lang, clipKey, timeoutMs = 3800L)
+        } else {
+            null
+        }
+
+        if (neuralClipFile != null && surface != null && surface.isValid) {
+            var clipCompleted = false
+            val startedNeural = runCatching {
+                releaseVideoPlayer()
+                val mp = MediaPlayer()
+                videoPlayerRef = mp
+                isNeuralVideoSpeaking = true
+                mp.setSurface(surface)
+                mp.setDataSource(neuralClipFile.absolutePath)
+                mp.isLooping = false
+                mp.setVolume(1f, 1f)
+                mp.setOnInfoListener { _, what, _ ->
+                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                        videoFrameReady = true
+                    }
+                    false
+                }
+                mp.setOnCompletionListener {
+                    clipCompleted = true
+                }
+                mp.setOnErrorListener { _, _, _ ->
+                    clipCompleted = true
+                    true
+                }
+                mp.prepare()
+                mp.start()
+                videoFrameReady = true
+                mp
+            }.getOrNull()
+
+            if (startedNeural != null) {
+                var elapsedMs = 0L
+                while (isSpeaking && !clipCompleted && elapsedMs < 45_000L) {
+                    val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
+                    if (!playing && elapsedMs > 650L) break
+                    delay(90L)
+                    elapsedMs += 90L
+                }
+                stopSpeechAndReturnToIdle()
+                return@LaunchedEffect
+            } else {
+                isNeuralVideoSpeaking = false
+                startIdleLoopOnSurface(surface)
+            }
+        }
+
+        // Safe Offline Fallback: local bundled studio audio (PT-BR) + idle breathing H.265 / editorial portrait
         if (MariaI18n.isPt()) {
             val mpInstance = runCatching {
                 val mp = MediaPlayer.create(context, rawAudioResId)
                 if (mp != null) {
-                    mediaPlayerRef = mp
+                    fallbackAudioPlayerRef = mp
                     mp.setOnCompletionListener {
                         isSpeaking = false
                         voiceEnergy = 0f
                         runCatching { it.release() }
-                        if (mediaPlayerRef === it) mediaPlayerRef = null
+                        if (fallbackAudioPlayerRef === it) fallbackAudioPlayerRef = null
                     }
                     mp.setOnErrorListener { player, _, _ ->
                         isSpeaking = false
                         voiceEnergy = 0f
                         runCatching { player.release() }
-                        if (mediaPlayerRef === player) mediaPlayerRef = null
+                        if (fallbackAudioPlayerRef === player) fallbackAudioPlayerRef = null
                         true
                     }
                     mp.start()
@@ -689,24 +841,23 @@ fun MariaHeroBanner(
 
             if (mpInstance != null) {
                 var elapsedMs = 0L
-                while (isSpeaking && elapsedMs < 40000L) {
+                while (isSpeaking && elapsedMs < 40_000L) {
                     val stillPlaying = runCatching { mpInstance.isPlaying }.getOrDefault(false)
                     if (!stillPlaying && elapsedMs > 500L) break
                     delay(120L)
                     elapsedMs += 120L
                 }
-                if (isSpeaking) stopAndReleaseAudio()
+                if (isSpeaking) stopSpeechAndReturnToIdle()
                 return@LaunchedEffect
             }
         }
 
-        // Em outros 13 idiomas, pulsa a onda viva elegante por um breve ciclo visual sem áudio em idioma trocado
         delay(3200L)
         isSpeaking = false
         voiceEnergy = 0f
     }
 
-    // 60 FPS VSYNC: foto editorial impecável (zero boca 2D falsa!) + piscar natural sutil + anel/onda sonora viva
+    // 60 FPS VSYNC: sincronia do anel/onda sonora + fallback editorial quando necessário
     LaunchedEffect(isActive, rawAudioResId) {
         if (!isActive) {
             currentFrameRes = R.drawable.maria_smile
@@ -744,15 +895,16 @@ fun MariaHeroBanner(
                 }
 
                 if (isSpeaking) {
-                    wavePhase += dtMs * 0.012f
+                    wavePhase += dtMs * 0.013f
+                    val activeAudioPlayer = fallbackAudioPlayerRef
                     val posMs = runCatching {
-                        mediaPlayerRef?.takeIf { it.isPlaying }?.currentPosition
+                        activeAudioPlayer?.takeIf { it.isPlaying }?.currentPosition
                     }.getOrNull()
                     val targetEnergy = if (posMs != null && visemeTrack.isNotEmpty()) {
                         val code = MariaLipSyncEnvelopes.visemeAtMs(visemeTrack, (posMs - 60).coerceAtLeast(0))
-                        if (code in 1..7) (code / 7f) else 0.06f
+                        if (code in 1..7) (code / 7f) else 0.08f
                     } else {
-                        (0.35f + 0.45f * sin(wavePhase.toDouble()).toFloat()).coerceIn(0.1f, 1f)
+                        (0.38f + 0.48f * sin(wavePhase.toDouble()).toFloat()).coerceIn(0.12f, 1f)
                     }
                     voiceEnergy = (voiceEnergy * 0.65f) + (targetEnergy * 0.35f)
                 } else {
@@ -761,6 +913,22 @@ fun MariaHeroBanner(
             }
         }
     }
+
+    val bannerHeight by animateDpAsState(
+        targetValue = if (isSpeaking) 128.dp else 80.dp,
+        animationSpec = tween(durationMillis = 260),
+        label = "maria2BannerHeight",
+    )
+    val avatarRingSize by animateDpAsState(
+        targetValue = if (isSpeaking) 104.dp else 56.dp,
+        animationSpec = tween(durationMillis = 260),
+        label = "maria2AvatarRingSize",
+    )
+    val avatarInnerSize by animateDpAsState(
+        targetValue = if (isSpeaking) 94.dp else 48.dp,
+        animationSpec = tween(durationMillis = 260),
+        label = "maria2AvatarInnerSize",
+    )
 
     val brandAnnotated = remember {
         buildAnnotatedString {
@@ -778,16 +946,20 @@ fun MariaHeroBanner(
         color = MidiastoreColors.CardSurface,
         modifier = modifier
             .fillMaxWidth()
-            .height(76.dp)
+            .height(bannerHeight)
             .border(
-                width = 1.dp,
-                color = if (isSpeaking) Color(0xAA0A84FF) else MidiastoreColors.CardStroke,
+                width = if (isSpeaking) 1.5.dp else 1.dp,
+                color = when {
+                    isNeuralVideoSpeaking -> Color(0xCC30D158)
+                    isSpeaking -> Color(0xAA0A84FF)
+                    else -> MidiastoreColors.CardStroke
+                },
                 shape = RoundedCornerShape(18.dp),
             )
             .clip(RoundedCornerShape(18.dp))
             .clickable {
                 if (isSpeaking) {
-                    stopAndReleaseAudio()
+                    stopSpeechAndReturnToIdle()
                 } else {
                     if (isMuted) {
                         isMuted = false
@@ -804,39 +976,89 @@ fun MariaHeroBanner(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Avatar Editorial da Maria com Anel Luminoso Vivo (estilo Apple Siri / Gemini Live)
+            // Avatar Maria 2.0 (Vídeo Neural MoDA H.265 em TextureView + Fallback Editorial Zero-Flash)
             Box(
-                modifier = Modifier.size(54.dp),
+                modifier = Modifier.size(avatarRingSize),
                 contentAlignment = Alignment.Center,
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val baseRadius = (size.minDimension / 2f) - 2.dp.toPx()
+                    val activeGlowColor = if (isNeuralVideoSpeaking) Color(0xFF30D158) else Color(0xFF0A84FF)
                     if (isSpeaking && voiceEnergy > 0.02f) {
                         drawCircle(
-                            color = Color(0xFF0A84FF).copy(alpha = (0.18f + voiceEnergy * 0.32f).coerceIn(0f, 0.55f)),
-                            radius = baseRadius + (voiceEnergy * 2.5.dp.toPx()),
+                            color = activeGlowColor.copy(alpha = (0.20f + voiceEnergy * 0.34f).coerceIn(0f, 0.58f)),
+                            radius = baseRadius + (voiceEnergy * 2.6.dp.toPx()),
                             style = Stroke(width = (2.2f + voiceEnergy * 2.2f).dp.toPx()),
                         )
                     }
                     drawCircle(
-                        color = if (isSpeaking) Color(0xFF64D2FF) else Color(0x550A84FF),
+                        color = when {
+                            isNeuralVideoSpeaking -> Color(0xFF30D158)
+                            isSpeaking -> Color(0xFF64D2FF)
+                            else -> Color(0x660A84FF)
+                        },
                         radius = baseRadius,
-                        style = Stroke(width = 1.6.dp.toPx()),
+                        style = Stroke(width = 1.8.dp.toPx()),
                     )
                 }
-                Image(
-                    painter = painterResource(id = currentFrameRes),
-                    contentDescription = "Maria",
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.TopCenter,
+                Box(
                     modifier = Modifier
-                        .size(46.dp)
+                        .size(avatarInnerSize)
                         .clip(CircleShape)
-                        .graphicsLayer {
-                            scaleX = breathScale
-                            scaleY = breathScale
-                        },
-                )
+                        .background(Color(0xFF050507)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (videoHardwareSupported) {
+                        AndroidView(
+                            factory = { ctx ->
+                                TextureView(ctx).apply {
+                                    isOpaque = false
+                                    surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                                        override fun onSurfaceTextureAvailable(
+                                            st: SurfaceTexture,
+                                            width: Int,
+                                            height: Int,
+                                        ) {
+                                            runCatching { surfaceRef?.release() }
+                                            surfaceRef = Surface(st)
+                                        }
+
+                                        override fun onSurfaceTextureSizeChanged(
+                                            st: SurfaceTexture,
+                                            width: Int,
+                                            height: Int,
+                                        ) = Unit
+
+                                        override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
+                                            releaseVideoPlayer()
+                                            runCatching { surfaceRef?.release() }
+                                            surfaceRef = null
+                                            videoFrameReady = false
+                                            return true
+                                        }
+
+                                        override fun onSurfaceTextureUpdated(st: SurfaceTexture) = Unit
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+                    if (!videoFrameReady || !videoHardwareSupported) {
+                        Image(
+                            painter = painterResource(id = currentFrameRes),
+                            contentDescription = "Maria",
+                            contentScale = ContentScale.Crop,
+                            alignment = Alignment.TopCenter,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer {
+                                    scaleX = breathScale
+                                    scaleY = breathScale
+                                },
+                        )
+                    }
+                }
             }
 
             Column(
@@ -875,8 +1097,8 @@ fun MariaHeroBanner(
                                 .background(if (isSpeaking) Color(0xFF30D158) else MidiastoreColors.AccentBlue),
                         )
                         Text(
-                            text = "MARIA",
-                            color = Color(0xFF64D2FF),
+                            text = if (isNeuralVideoSpeaking) "MARIA 2.0" else "MARIA",
+                            color = if (isNeuralVideoSpeaking) Color(0xFF30D158) else Color(0xFF64D2FF),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 0.6.sp,
@@ -886,9 +1108,10 @@ fun MariaHeroBanner(
                 }
                 Text(
                     text = captionText,
-                    color = MidiastoreColors.TextMuted,
+                    color = if (isSpeaking) MidiastoreColors.TextPrimary else MidiastoreColors.TextMuted,
                     fontSize = 12.sp,
-                    maxLines = 1,
+                    lineHeight = 16.sp,
+                    maxLines = if (isSpeaking) 3 else 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -906,7 +1129,7 @@ fun MariaHeroBanner(
                     )
                     .clickable {
                         if (isSpeaking) {
-                            stopAndReleaseAudio()
+                            stopSpeechAndReturnToIdle()
                         } else {
                             if (isMuted) {
                                 isMuted = false

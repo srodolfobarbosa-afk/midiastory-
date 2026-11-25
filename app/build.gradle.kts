@@ -140,6 +140,7 @@ dependencies {
     implementation("com.google.android.material:material:1.14.0")
     implementation("com.android.billingclient:billing:8.3.0")
     implementation("com.google.android.play:review-ktx:2.0.2")
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")

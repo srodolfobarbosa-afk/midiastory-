@@ -52,6 +52,8 @@ fun CleanerHomeScreen(
     onMissionClick: (CleanMission) -> Unit,
     onOpenPro: () -> Unit,
     onManagePermissions: () -> Unit = {},
+    onShareResultOrInvite: (Long) -> Unit = {},
+    hasAnnualFreeTrial: Boolean = false,
     modifier: Modifier = Modifier,
     /** The host Activity already renders a Pro pill in its top bar; only standalone hosts should enable this. */
     showProBadge: Boolean = false,
@@ -90,6 +92,7 @@ fun CleanerHomeScreen(
                 speechNonce++
                 onAnalyze()
             },
+            onShareFreed = { bytes -> onShareResultOrInvite(bytes) },
         )
 
         if (state.needsMediaPermissionPrompt) {
@@ -163,7 +166,15 @@ fun CleanerHomeScreen(
         )
 
         // Modelo Pro / IA Nativa sempre disponível lá no final da aba conforme solicitado pelo Rodolfo!
-        SalesPsychologyProCard(onOpenPro = onOpenPro)
+        SalesPsychologyProCard(
+            onOpenPro = onOpenPro,
+            hasAnnualFreeTrial = hasAnnualFreeTrial && !isProActive,
+        )
+
+        ShareViralHomeCard(
+            freedBytes = state.lifetimeFreedBytes,
+            onShareClick = { onShareResultOrInvite(state.lifetimeFreedBytes) },
+        )
 
         Text(
             text = stringResource(R.string.cleaner_home_manual_review),
@@ -176,8 +187,52 @@ fun CleanerHomeScreen(
 }
 
 @Composable
+private fun ShareViralHomeCard(
+    freedBytes: Long,
+    onShareClick: () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = MidiastoreColors.CardSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, MidiastoreColors.CardStroke, RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(onClick = onShareClick),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(
+                    if (freedBytes > 0L) R.string.share_freed_result_button else R.string.share_invite_friend_button,
+                ),
+                color = Color(0xFF30D158),
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = "›",
+                color = Color(0xFF30D158),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
+@Composable
 private fun SalesPsychologyProCard(
     onOpenPro: () -> Unit,
+    hasAnnualFreeTrial: Boolean = false,
 ) {
     Surface(
         shape = RoundedCornerShape(16.dp),
@@ -209,11 +264,15 @@ private fun SalesPsychologyProCard(
             ) {
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = MidiastoreColors.AccentBlue,
+                    color = if (hasAnnualFreeTrial) Color(0xFF30D158) else MidiastoreColors.AccentBlue,
                 ) {
                     Text(
-                        text = MariaI18n.proCardBadge(),
-                        color = Color.White,
+                        text = if (hasAnnualFreeTrial) {
+                            stringResource(R.string.pro_annual_trial_badge)
+                        } else {
+                            MariaI18n.proCardBadge()
+                        },
+                        color = if (hasAnnualFreeTrial) Color.Black else Color.White,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
@@ -399,6 +458,7 @@ private fun QuickTile(
 private fun StorageNowBanner(
     state: HomeUiState,
     onAnalyze: () -> Unit,
+    onShareFreed: (Long) -> Unit = {},
 ) {
     val hasRecoverable = state.recoverableBytes > 0L
     Surface(
@@ -505,17 +565,34 @@ private fun StorageNowBanner(
                     color = Color(0x1A30D158),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color(0x4D30D158), RoundedCornerShape(8.dp)),
+                        .border(1.dp, Color(0x4D30D158), RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onShareFreed(state.lifetimeFreedBytes) },
                 ) {
-                    Text(
-                        text = stringResource(R.string.lifetime_freed_home_badge, state.lifetimeFreedLabel),
-                        color = Color(0xFF30D158),
-                        fontSize = 11.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.lifetime_freed_home_badge, state.lifetimeFreedLabel),
+                            color = Color(0xFF30D158),
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.share_home_pill_action),
+                            color = Color.White,
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(10.dp))

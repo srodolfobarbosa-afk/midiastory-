@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">تعذر ضغط هذا التنسيق عبر العتاد. بقي الملف الأصلي دون تغيير.</string>
     <string name="cleaner_home_fallback_similar_title">صور متشابهة</string>
     <string name="cleaner_home_fallback_similar_sub">حفظ الأفضل</string>
+    <string name="plan_annual_free_trial_cta">جرّب 3 أيام مجاناً · ثم %1$s/سنة (-56%%)</string>
+    <string name="pro_annual_trial_badge">3 أيام مجاناً • الخطة السنوية (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">تجربة مجانية لمدة 3 أيام للمشتركين الجدد المؤهلين في الخطة السنوية، ثم يتجدد تلقائياً بسعر %1$s/سنة عبر Google Play حتى الإلغاء. يمكنك الإلغاء في أي وقت قبل انتهاء التجربة دون رسوم. الخطتان الشهرية ومدى الحياة بدون تجربة مجانية.</string>
+    <string name="weekly_digest_channel_name">تنبيه المساحة الأسبوعي</string>
+    <string name="weekly_digest_channel_desc">تنبيه واحد كحد أقصى أسبوعياً فقط عند تراكم أكثر من 300 ميجابايت.</string>
+    <string name="weekly_digest_notif_title">%1$s جاهزة للمراجعة بأمان</string>
+    <string name="weekly_digest_notif_body">تراكمت فيديوهات كبيرة ووسائط دردشة ولقطات قديمة هذا الأسبوع. اضغط للمراجعة.</string>
+    <string name="weekly_digest_optin_title">تفعيل التنبيه الأسبوعي الذكي؟</string>
+    <string name="weekly_digest_optin_body">استلم إشعاراً واحداً كحد أقصى أسبوعياً فقط عند تراكم أكثر من 300 ميجابايت للتنظيف. بدون إزعاج.</string>
+    <string name="weekly_digest_optin_allow">تفعيل تنبيه 1×/أسبوع</string>
+    <string name="share_freed_result_button">مشاركة الإنجاز (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">مشاركة Midiastore (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">مشاركة</string>
+    <string name="share_freed_result_message">حررت للتو %1$s من مساحة هاتفي بأمان باستخدام Midiastore (أقل من 8 ميجابايت على Google Play): %2$s</string>
+    <string name="share_card_chooser_subtitle">المشاركة عبر WhatsApp أو Telegram أو Instagram</string>
+    <string name="share_card_lightweight_badge">أقل من 8 ميجابايت • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">تم تحريرها بأمان</string>
+    <string name="share_card_headline_freed">مساحة حرة أكبر دون فقدان ذكرياتك.</string>
+    <string name="share_card_trust_footer">100% على الجهاز • Android Scoped Storage</string>
 </resources>

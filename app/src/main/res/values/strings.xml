@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">Could not compress this video format on hardware. Original kept untouched.</string>
     <string name="cleaner_home_fallback_similar_title">Similar Photos</string>
     <string name="cleaner_home_fallback_similar_sub">Best kept</string>
+    <string name="plan_annual_free_trial_cta">Try 3 Days Free · then %1$s/year (-56%%)</string>
+    <string name="pro_annual_trial_badge">3 DAYS FREE • ANNUAL PLAN (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">3-day free trial for eligible new subscribers on the Annual Plan, then %1$s/year auto-renewing on Google Play until cancelled. Cancel anytime in Google Play before the trial ends to avoid charges. Monthly and Lifetime plans have no free trial.</string>
+    <string name="weekly_digest_channel_name">Weekly Storage Alert</string>
+    <string name="weekly_digest_channel_desc">At most 1 alert per week only when over 300 MB can be cleaned.</string>
+    <string name="weekly_digest_notif_title">%1$s ready to review safely</string>
+    <string name="weekly_digest_notif_body">Heavy videos, chats, and old screenshots built up this week. Tap to review safely.</string>
+    <string name="weekly_digest_optin_title">Enable smart weekly alert?</string>
+    <string name="weekly_digest_optin_body">Receive at most 1 notification per week, only when over 300 MB of clutter builds up. Zero spam.</string>
+    <string name="weekly_digest_optin_allow">Enable 1x/week alert</string>
+    <string name="share_freed_result_button">Share achievement (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Share Midiastore (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">Share</string>
+    <string name="share_freed_result_message">I just safely freed %1$s on my phone with Midiastore (under 8 MB on Google Play): %2$s</string>
+    <string name="share_card_chooser_subtitle">Share via WhatsApp, Telegram or Instagram</string>
+    <string name="share_card_lightweight_badge">UNDER 8 MB • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">SAFELY FREED</string>
+    <string name="share_card_headline_freed">More free storage without losing memories.</string>
+    <string name="share_card_trust_footer">100% On-Device • Android Scoped Storage</string>
 </resources>

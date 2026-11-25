@@ -83,6 +83,8 @@ import com.rdf112.sweep.data.oaas.AndroidOutcomeTelemetryStore
 import com.rdf112.sweep.domain.analysis.SimilarPhotoGroup
 import com.rdf112.sweep.domain.analysis.VideoCompressionPlanner
 import com.rdf112.sweep.util.InAppReviewCoordinator
+import com.rdf112.sweep.util.ShareAchievementCardRenderer
+import com.rdf112.sweep.work.WeeklyDigestScheduler
 import com.rdf112.sweep.domain.billing.BillingStatePolicy
 import com.rdf112.sweep.domain.billing.ProAccessSummaryState
 import com.rdf112.sweep.domain.grouping.SmartFilterMode
@@ -139,6 +141,14 @@ class MainActivity : AppCompatActivity() {
         val displayName: String,
         val lastUsedMillis: Long,
     )
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            WeeklyDigestScheduler.recordAppOpenedAndSchedule(this)
+        }
+    }
 
     private val usageAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -328,7 +338,11 @@ class MainActivity : AppCompatActivity() {
                 viewModel.startSession()
                 Toast.makeText(this@MainActivity, getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt), Toast.LENGTH_LONG).show()
                 if (!reviewPrompted) {
-                    showPostCleanupReliefOffer(confirmedBytes, confirmedDeleted)
+                    if (hasEffectiveProAccess()) {
+                        maybePromptWeeklyDigestOptIn()
+                    } else {
+                        showPostCleanupReliefOffer(confirmedBytes, confirmedDeleted)
+                    }
                 }
             }
             statusText.text = getString(R.string.delete_operation_result, confirmedDeleted, uris.size, freedFmt)
@@ -418,9 +432,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeProCtaSubtitle: TextView
     private lateinit var homeProSubscribeButton: MaterialButton
     private var latestAnnualOfferText: String? = null
+    private var latestAnnualHasFreeTrial: Boolean = false
+    private var latestAnnualFormattedPrice: String? = null
     private var latestMonthlyOfferText: String? = null
     private var latestLifetimeOfferText: String? = null
     private var latestHeroPriceBadge: String? = null
+    private var proAnnualSavingsBadgeView: TextView? = null
+    private var proTermsDisclosureView: TextView? = null
     private var homeCleanupCandidateCount = 0
     private var homeInteractiveRecords: List<MediaRecord> = emptyList()
     private var homeInteractiveFallback: Boolean = false
@@ -566,6 +584,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        WeeklyDigestScheduler.recordAppOpenedAndSchedule(this)
         val nowFullVisual = hasFullVisualAccess()
         val gainedVisualAccess = !lastHadFullVisualAccess && nowFullVisual
         val returnedFromSettingsWithAccess = awaitingPermissionSettingsReturn && hasAnyMediaPermission()
@@ -690,6 +709,10 @@ class MainActivity : AppCompatActivity() {
             setContent {
                 val scanState by viewModel.state.collectAsStateWithLifecycle()
                 val billingAccessState by billingGateway.accessState.collectAsStateWithLifecycle()
+                val catalogMap by billingGateway.catalog.collectAsStateWithLifecycle()
+                val annualItem = catalogMap[BillingStatePolicy.PRODUCT_ANNUAL]
+                val hasAnnualTrialNow = (annualItem?.hasFreeTrialOffer == true) ||
+                    (annualItem == null && isDevelopmentBuild)
                 val isProNow = billingAccessState == ProAccessSummaryState.PRO_GRANTED ||
                     isTesterVipProEnabled() ||
                     (isDevelopmentBuild && debugProPreviewEnabled)
@@ -703,6 +726,8 @@ class MainActivity : AppCompatActivity() {
                         onMissionClick = ::onCleanMissionClick,
                         onOpenPro = { onHomeProSubscribeClicked() },
                         onManagePermissions = { requestMediaPermissions(allowSettingsFallback = true) },
+                        onShareResultOrInvite = { bytes -> shareApp(bytes) },
+                        hasAnnualFreeTrial = hasAnnualTrialNow,
                         isTabActive = activeTabComposeState.value == AppTab.HOME,
                     )
                 }
@@ -883,17 +908,45 @@ class MainActivity : AppCompatActivity() {
         homePlanLifetimeButton = button("") { requestPlanPurchase(BillingStatePolicy.PRODUCT_LIFETIME) }.apply { visibility = View.GONE }
     }
 
-    private fun shareApp() {
-        val playStoreLink = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore"
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_message, playStoreLink))
+    private fun shareApp(freedBytes: Long = 0L) {
+        lifecycleScope.launch {
+            ShareAchievementCardRenderer.shareFreedSpaceOrInvite(
+                activity = this@MainActivity,
+                freedBytes = freedBytes,
+            )
         }
-        runCatching {
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app_chooser_title)))
-        }.onFailure {
-            Toast.makeText(this, R.string.share_app_unavailable, Toast.LENGTH_LONG).show()
+    }
+
+    private fun maybePromptWeeklyDigestOptIn() {
+        if (isFinishing || isDestroyed) return
+        if (!WeeklyDigestScheduler.shouldPromptNotificationOptInAfterCleanup(this)) return
+        WeeklyDigestScheduler.markNotificationOptInPromptShown(this)
+        val (sheet, root) = createAppleBottomSheet(
+            title = getString(R.string.weekly_digest_optin_title),
+            subtitle = getString(R.string.weekly_digest_optin_body),
+        )
+        val allowBtn = button(getString(R.string.weekly_digest_optin_allow)) {
+            sheet.dismiss()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }.apply {
+            minHeight = dp(52)
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.WHITE)
+            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
+        root.addView(allowBtn, top(14))
+
+        val skipBtn = button(getString(R.string.post_cleanup_relief_later)) {
+            sheet.dismiss()
+        }.apply {
+            minHeight = dp(46)
+            setTextColor(color(R.color.sweep_muted))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+        }
+        root.addView(skipBtn, top(4))
+        sheet.show()
     }
 
     private fun buildQuickClean2x2Grid(): View {
@@ -1439,7 +1492,9 @@ class MainActivity : AppCompatActivity() {
             subtitle = getString(R.string.post_cleanup_relief_body, freedFmt, confirmedCount),
         )
         val badge = TextView(this).apply {
-            text = getString(R.string.pro_annual_savings_badge)
+            text = getString(
+                if (latestAnnualHasFreeTrial) R.string.pro_annual_trial_badge else R.string.pro_annual_savings_badge,
+            )
             textSize = 10.5f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.parseColor("#30D158"))
@@ -1452,6 +1507,20 @@ class MainActivity : AppCompatActivity() {
         }
         root.addView(badge, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(12) })
 
+        val shareResultBtn = button(getString(R.string.share_freed_result_button)) {
+            sheet.dismiss()
+            shareApp(confirmedBytes)
+        }.apply {
+            minHeight = dp(52)
+            textSize = 13f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#30D158"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#122B1D"))
+            strokeWidth = dp(1)
+            strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#30D158"))
+        }
+        root.addView(shareResultBtn, top(10))
+
         val annualBtn = button(latestAnnualOfferText ?: getString(R.string.post_cleanup_relief_cta)) {
             sheet.dismiss()
             requestPlanPurchase(BillingStatePolicy.PRODUCT_ANNUAL)
@@ -1462,7 +1531,7 @@ class MainActivity : AppCompatActivity() {
             setTextColor(Color.WHITE)
             backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.google_blue_primary))
         }
-        root.addView(annualBtn, top(10))
+        root.addView(annualBtn, top(8))
 
         val lifetimeBtn = button(latestLifetimeOfferText ?: getString(R.string.plan_lifetime_default)) {
             sheet.dismiss()
@@ -1475,13 +1544,19 @@ class MainActivity : AppCompatActivity() {
         }
         root.addView(lifetimeBtn, top(8))
 
+        val termsText = if (latestAnnualHasFreeTrial && !latestAnnualFormattedPrice.isNullOrBlank()) {
+            getString(R.string.pro_annual_trial_terms_disclosure, latestAnnualFormattedPrice)
+        } else {
+            getString(R.string.pro_billing_terms_disclosure)
+        }
         root.addView(
-            label(getString(R.string.pro_billing_terms_disclosure), 10.5f, R.color.sweep_muted, false),
+            label(termsText, 10.5f, R.color.sweep_muted, false),
             top(10),
         )
 
         val laterBtn = button(getString(R.string.post_cleanup_relief_later)) {
             sheet.dismiss()
+            maybePromptWeeklyDigestOptIn()
         }.apply {
             minHeight = dp(46)
             setTextColor(color(R.color.sweep_muted))
@@ -1566,6 +1641,7 @@ class MainActivity : AppCompatActivity() {
                 setStroke(dp(1), Color.parseColor("#30D158"))
             }
         }
+        proAnnualSavingsBadgeView = annualBadge
         addView(
             annualBadge,
             LinearLayout.LayoutParams(-2, -2).apply {
@@ -1610,6 +1686,17 @@ class MainActivity : AppCompatActivity() {
             setTextColor(color(R.color.sweep_text))
         }
         addView(unusedAppsButton, top(8))
+
+        val shareInviteButton = button(getString(R.string.share_invite_friend_button)) {
+            val freed = outcomeTelemetry.loadSnapshot().totalConfirmedFreedBytes
+            shareApp(freed)
+        }.apply {
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#122B1D"))
+            setTextColor(Color.parseColor("#30D158"))
+            strokeWidth = dp(1)
+            strokeColor = android.content.res.ColorStateList.valueOf(Color.parseColor("#30D158"))
+        }
+        addView(shareInviteButton, top(8))
 
         // Console Interativo do Modelo IA Nativa (Gemini Nano Android — LIBERADO PARA USO) posicionado lá no final da aba Pro
         val proGeminiNanoBottomView = ComposeView(this@MainActivity).apply {
@@ -1673,7 +1760,9 @@ class MainActivity : AppCompatActivity() {
         }
         addView(privacyPolicyButton, top(2))
 
-        addView(label(getString(R.string.pro_billing_terms_disclosure), 10.5f, R.color.sweep_muted, false), top(8))
+        val termsDisclosure = label(getString(R.string.pro_billing_terms_disclosure), 10.5f, R.color.sweep_muted, false)
+        proTermsDisclosureView = termsDisclosure
+        addView(termsDisclosure, top(8))
         if (!billingGateway.securePurchaseVerificationAvailable()) {
             addView(label(getString(R.string.pro_purchase_unavailable_notice), 10.5f, R.color.sweep_muted, false), top(6))
         }
@@ -2019,7 +2108,12 @@ class MainActivity : AppCompatActivity() {
         }
         box.addView(lifetimeBtn, top(10))
 
-        box.addView(label(getString(R.string.pro_billing_terms_disclosure), 11f, R.color.sweep_muted, false), top(12))
+        val dialogTerms = if (latestAnnualHasFreeTrial && !latestAnnualFormattedPrice.isNullOrBlank()) {
+            getString(R.string.pro_annual_trial_terms_disclosure, latestAnnualFormattedPrice)
+        } else {
+            getString(R.string.pro_billing_terms_disclosure)
+        }
+        box.addView(label(dialogTerms, 11f, R.color.sweep_muted, false), top(12))
 
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.quick_pro_dialog_title)
@@ -2054,24 +2148,42 @@ class MainActivity : AppCompatActivity() {
             stylePlanPurchaseButton(button, (product?.isAvailable == true) || isDevelopmentBuild)
         }
 
+        val hasTrialOffer = (annual?.hasFreeTrialOffer == true) || (annual == null && isDevelopmentBuild)
+        val displayAnnualPrice = annual?.formattedPrice?.takeIf { it.isNotBlank() }
+            ?: if (isDevelopmentBuild) "R$ 79,99" else null
+        latestAnnualHasFreeTrial = hasTrialOffer && !displayAnnualPrice.isNullOrBlank()
+        latestAnnualFormattedPrice = displayAnnualPrice
+
         val annualLabel = if (annual != null && annual.formattedPrice.isNotBlank()) {
-            val realDiscount = BillingStatePolicy.calculateRealAnnualDiscountPercent(
-                monthlyPriceMicros = monthly?.priceAmountMicros,
-                annualPriceMicros = annual.priceAmountMicros,
-                monthlyCurrencyCode = monthly?.priceCurrencyCode,
-                annualCurrencyCode = annual.priceCurrencyCode,
-            )
-            if (realDiscount != null) {
-                getString(R.string.plan_annual_with_price_and_discount, annual.formattedPrice, realDiscount)
+            if (annual.hasFreeTrialOffer) {
+                getString(R.string.plan_annual_free_trial_cta, annual.formattedPrice)
             } else {
-                getString(R.string.plan_annual_with_price, annual.formattedPrice)
+                val realDiscount = BillingStatePolicy.calculateRealAnnualDiscountPercent(
+                    monthlyPriceMicros = monthly?.priceAmountMicros,
+                    annualPriceMicros = annual.priceAmountMicros,
+                    monthlyCurrencyCode = monthly?.priceCurrencyCode,
+                    annualCurrencyCode = annual.priceCurrencyCode,
+                )
+                if (realDiscount != null) {
+                    getString(R.string.plan_annual_with_price_and_discount, annual.formattedPrice, realDiscount)
+                } else {
+                    getString(R.string.plan_annual_with_price, annual.formattedPrice)
+                }
             }
         } else if (isDevelopmentBuild) {
-            getString(R.string.plan_annual_with_price_and_discount, "R$ 79,99", 56)
+            getString(R.string.plan_annual_free_trial_cta, "R$ 79,99")
         } else if (annual != null && !annual.isAvailable) {
             getString(R.string.plan_annual_unavailable)
         } else {
             null
+        }
+        proAnnualSavingsBadgeView?.text = getString(
+            if (latestAnnualHasFreeTrial) R.string.pro_annual_trial_badge else R.string.pro_annual_savings_badge,
+        )
+        proTermsDisclosureView?.text = if (latestAnnualHasFreeTrial && !displayAnnualPrice.isNullOrBlank()) {
+            getString(R.string.pro_annual_trial_terms_disclosure, displayAnnualPrice)
+        } else {
+            getString(R.string.pro_billing_terms_disclosure)
         }
         annualLabel?.let {
             planAnnualButton.text = it
@@ -4570,7 +4682,11 @@ class MainActivity : AppCompatActivity() {
             viewModel.clearSelection()
             viewModel.startSession()
             if (!reviewPrompted) {
-                showPostCleanupReliefOffer(confirmedBytes, verifiedUris.size)
+                if (hasEffectiveProAccess()) {
+                    maybePromptWeeklyDigestOptIn()
+                } else {
+                    showPostCleanupReliefOffer(confirmedBytes, verifiedUris.size)
+                }
             }
         }
         val resultMsg = getString(

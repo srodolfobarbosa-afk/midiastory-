@@ -161,12 +161,24 @@ Deno.serve(async (req: Request) => {
       rawStatus = String(subData?.subscriptionState || "UNKNOWN");
       const lineItems = Array.isArray(subData?.lineItems) ? subData.lineItems : [];
       const matchedItem = lineItems.find(
-        (item: { productId?: string; expiryTime?: string }) => item?.productId === productId,
+        (item: {
+          productId?: string;
+          expiryTime?: string;
+          offerDetails?: { offerId?: string; basePlanId?: string };
+        }) => item?.productId === productId,
       );
       const matchesProduct = Boolean(matchedItem);
       expiryTime = matchedItem?.expiryTime || lineItems[0]?.expiryTime || null;
+      const offerId = String(matchedItem?.offerDetails?.offerId || "");
+      if (offerId && /trial/i.test(offerId) && rawStatus === "SUBSCRIPTION_STATE_ACTIVE") {
+        rawStatus = "SUBSCRIPTION_STATE_ACTIVE_TRIAL";
+      }
       entitlementActive =
-        matchesProduct && isSubscriptionEntitlementActive(rawStatus, expiryTime);
+        matchesProduct &&
+        isSubscriptionEntitlementActive(
+          String(subData?.subscriptionState || "UNKNOWN"),
+          expiryTime,
+        );
       acknowledged = subData?.acknowledgementState === "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED";
       orderId = subData?.latestOrderId || null;
     } else {

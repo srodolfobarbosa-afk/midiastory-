@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">हार्डवेयर पर यह वीडियो कंप्रेस नहीं हो सका। मूल फ़ाइल सुरक्षित है।</string>
     <string name="cleaner_home_fallback_similar_title">मिलती-जुलती फ़ोटो</string>
     <string name="cleaner_home_fallback_similar_sub">सर्वश्रेष्ठ सुरक्षित</string>
+    <string name="plan_annual_free_trial_cta">3 दिन मुफ़्त आज़माएँ · फिर %1$s/वर्ष (-56%%)</string>
+    <string name="pro_annual_trial_badge">3 दिन मुफ़्त • वार्षिक प्लान (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">वार्षिक प्लान पर पात्र नए सब्सक्राइबर्स के लिए 3 दिन का मुफ़्त ट्रायल, उसके बाद रद्द करने तक Google Play पर %1$s/वर्ष स्वतः नवीनीकरण। शुल्क से बचने के लिए ट्रायल समाप्त होने से पहले कभी भी रद्द करें। मासिक और लाइफटाइम प्लान में ट्रायल नहीं है।</string>
+    <string name="weekly_digest_channel_name">साप्ताहिक स्टोरेज अलर्ट</string>
+    <string name="weekly_digest_channel_desc">केवल 300 MB से अधिक जमा होने पर सप्ताह में अधिकतम 1 अलर्ट।</string>
+    <string name="weekly_digest_notif_title">सुरक्षित समीक्षा के लिए %1$s तैयार</string>
+    <string name="weekly_digest_notif_body">इस सप्ताह बड़े वीडियो, चैट और पुराने स्क्रीनशॉट जमा हुए हैं। समीक्षा के लिए टैप करें।</string>
+    <string name="weekly_digest_optin_title">स्मार्ट साप्ताहिक अलर्ट चालू करें?</string>
+    <string name="weekly_digest_optin_body">सप्ताह में अधिकतम 1 सूचना प्राप्त करें, केवल जब 300 MB से अधिक फ़ाइलें जमा हों। ज़ीरो स्पैम।</string>
+    <string name="weekly_digest_optin_allow">साप्ताहिक अलर्ट चालू करें</string>
+    <string name="share_freed_result_button">उपलब्धि साझा करें (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Midiastore साझा करें (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">शेयर</string>
+    <string name="share_freed_result_message">मैंने अभी Midiastore से अपने फ़ोन में सुरक्षित रूप से %1$s स्पेस खाली किया (Google Play पर 8 MB से कम): %2$s</string>
+    <string name="share_card_chooser_subtitle">WhatsApp, Telegram या Instagram पर साझा करें</string>
+    <string name="share_card_lightweight_badge">8 MB से कम • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">सुरक्षित रूप से खाली किया</string>
+    <string name="share_card_headline_freed">यादें खोए बिना अधिक खाली स्टोरेज।</string>
+    <string name="share_card_trust_footer">100% ऑन-डिवाइस • Android Scoped Storage</string>
 </resources>

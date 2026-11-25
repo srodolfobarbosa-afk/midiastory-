@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">Tidak dapat mengompres format video ini di perangkat keras. File asli utuh.</string>
     <string name="cleaner_home_fallback_similar_title">Foto Mirip</string>
     <string name="cleaner_home_fallback_similar_sub">Terbaik aman</string>
+    <string name="plan_annual_free_trial_cta">Coba Gratis 3 Hari · lalu %1$s/tahun (-56%%)</string>
+    <string name="pro_annual_trial_badge">GRATIS 3 HARI • PAKET TAHUNAN (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">Uji coba gratis 3 hari khusus pelanggan baru yang memenuhi syarat pada Paket Tahunan, lalu diperpanjang otomatis %1$s/tahun di Google Play hingga dibatalkan. Batalkan kapan saja sebelum uji coba berakhir tanpa biaya. Paket Bulanan dan Selamanya tanpa uji coba gratis.</string>
+    <string name="weekly_digest_channel_name">Ringkasan Penyimpanan Mingguan</string>
+    <string name="weekly_digest_channel_desc">Maksimal 1 pengingat per minggu hanya saat menumpuk lebih dari 300 MB.</string>
+    <string name="weekly_digest_notif_title">%1$s siap ditinjau dengan aman</string>
+    <string name="weekly_digest_notif_body">Video besar, chat, dan tangkapan layar lama menumpuk minggu ini. Ketuk untuk meninjau.</string>
+    <string name="weekly_digest_optin_title">Aktifkan pengingat mingguan cerdas?</string>
+    <string name="weekly_digest_optin_body">Terima maksimal 1 notifikasi per minggu, hanya jika lebih dari 300 MB file menumpuk. Tanpa spam.</string>
+    <string name="weekly_digest_optin_allow">Aktifkan 1x/minggu</string>
+    <string name="share_freed_result_button">Bagikan hasil (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Bagikan Midiastore (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">Bagikan</string>
+    <string name="share_freed_result_message">Saya baru saja membebaskan %1$s dengan aman di ponsel memakai Midiastore (di bawah 8 MB di Google Play): %2$s</string>
+    <string name="share_card_chooser_subtitle">Bagikan lewat WhatsApp, Telegram, atau Instagram</string>
+    <string name="share_card_lightweight_badge">DI BAWAH 8 MB • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">DIBERSIHKAN DENGAN AMAN</string>
+    <string name="share_card_headline_freed">Ruang lega kembali tanpa kehilangan kenangan.</string>
+    <string name="share_card_trust_footer">100% di Perangkat • Android Scoped Storage</string>
 </resources>

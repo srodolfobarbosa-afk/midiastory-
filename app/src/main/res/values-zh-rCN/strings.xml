@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">硬件无法压缩此视频格式，原视频保持不变。</string>
     <string name="cleaner_home_fallback_similar_title">相似照片</string>
     <string name="cleaner_home_fallback_similar_sub">保留最佳</string>
+    <string name="plan_annual_free_trial_cta">免费试用 3 天 · 之后 %1$s/年 (-56%%)</string>
+    <string name="pro_annual_trial_badge">免费试用3天 • 年度计划 (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">符合条件的新订阅用户可享年度计划 3 天免费试用，试用期满后将通过 Google Play 按 %1$s/年自动续订直至取消。您可在试用结束前随时在 Google Play 取消且不产生费用。月度与终身计划不含免费试用。</string>
+    <string name="weekly_digest_channel_name">每周存储空间提醒</string>
+    <string name="weekly_digest_channel_desc">仅当可清理空间超过 300 MB 时每周最多提醒 1 次。</string>
+    <string name="weekly_digest_notif_title">发现 %1$s 空间可安全清理</string>
+    <string name="weekly_digest_notif_body">本周积累了大视频、聊天缓存和旧截图，点此安全检查。</string>
+    <string name="weekly_digest_optin_title">开启智能每周提醒？</string>
+    <string name="weekly_digest_optin_body">仅当积累超过 300 MB 可清理文件时，每周最多通知 1 次。零打扰。</string>
+    <string name="weekly_digest_optin_allow">开启每周提醒</string>
+    <string name="share_freed_result_button">分享清理成果 (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">推荐 Midiastore (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">分享</string>
+    <string name="share_freed_result_message">我刚用 Midiastore 安全释放了 %1$s 手机空间（Google Play 超轻量不到 8 MB）：%2$s</string>
+    <string name="share_card_chooser_subtitle">分享到 WhatsApp、Telegram 或 Instagram</string>
+    <string name="share_card_lightweight_badge">小于 8 MB • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">已安全释放</string>
+    <string name="share_card_headline_freed">释放更多空间，珍贵回忆零丢失。</string>
+    <string name="share_card_trust_footer">100% 本地处理 • Android Scoped Storage</string>
 </resources>

@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">ハードウェアでこの動画形式を圧縮できませんでした。元の動画は無変更です。</string>
     <string name="cleaner_home_fallback_similar_title">類似写真</string>
     <string name="cleaner_home_fallback_similar_sub">ベスト保護</string>
+    <string name="plan_annual_free_trial_cta">3日間無料で試す · その後 %1$s/年 (-56%%)</string>
+    <string name="pro_annual_trial_badge">3日間無料 • 年間プラン (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">対象の新規登録者は年間プランを3日間無料でお試しいただけます。期間終了後は解約するまでGoogle Playで%1$s/年で自動更新されます。無料期間中にGoogle Playでいつでも解約可能です。月額・永久プランに無料体験はありません。</string>
+    <string name="weekly_digest_channel_name">週1回ストレージ通知</string>
+    <string name="weekly_digest_channel_desc">300 MB以上たまった時のみ週最大1回通知します。</string>
+    <string name="weekly_digest_notif_title">%1$s の整理候補が見つかりました</string>
+    <string name="weekly_digest_notif_body">大容量動画やチャット、古いスクショがたまっています。タップして安全に確認。</string>
+    <string name="weekly_digest_optin_title">スマート週次通知をオンにしますか？</string>
+    <string name="weekly_digest_optin_body">300 MB以上たまった場合のみ、週最大1回だけお知らせします。スパム通知はありません。</string>
+    <string name="weekly_digest_optin_allow">週1回通知をオンにする</string>
+    <string name="share_freed_result_button">結果をシェア (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Midiastoreを紹介 (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">共有</string>
+    <string name="share_freed_result_message">Midiastoreでスマートフォンの空き容量を安全に %1$s 増やしました（Google Playで8MB未満）: %2$s</string>
+    <string name="share_card_chooser_subtitle">WhatsApp、Telegram、Instagramで共有</string>
+    <string name="share_card_lightweight_badge">8 MB未満 • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">安全に解放済み</string>
+    <string name="share_card_headline_freed">大切な思い出を守りながら容量アップ。</string>
+    <string name="share_card_trust_footer">100%端末内処理 • Android Scoped Storage</string>
 </resources>

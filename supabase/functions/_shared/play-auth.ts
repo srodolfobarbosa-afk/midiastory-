@@ -158,23 +158,28 @@ export function timingSafeEqualStr(a: string, b: string): boolean {
 
 /**
  * Determines whether a Google Play subscription v2 state grants active Pro entitlement.
- * Includes SUBSCRIPTION_STATE_CANCELED while expiryTime is still in the future (paid period not yet ended).
+ * Supports active 3-day Free Trial (`annual-trial-3d` under `SUBSCRIPTION_STATE_ACTIVE`) and
+ * `SUBSCRIPTION_STATE_CANCELED` while `expiryTime` is still in the future; strictly fail-closed
+ * once `expiryTime` passes (`SUBSCRIPTION_STATE_EXPIRED`).
  */
 export function isSubscriptionEntitlementActive(
   subscriptionState: string,
   expiryTime: string | null | undefined,
 ): boolean {
+  const hasFutureExpiry = (() => {
+    if (!expiryTime) return true;
+    const parsedExpiry = Date.parse(expiryTime);
+    return Number.isNaN(parsedExpiry) ? false : parsedExpiry > Date.now();
+  })();
+
   if (
     subscriptionState === "SUBSCRIPTION_STATE_ACTIVE" ||
     subscriptionState === "SUBSCRIPTION_STATE_IN_GRACE_PERIOD"
   ) {
-    return true;
+    return hasFutureExpiry;
   }
   if (subscriptionState === "SUBSCRIPTION_STATE_CANCELED" && expiryTime) {
-    const parsedExpiry = Date.parse(expiryTime);
-    if (!Number.isNaN(parsedExpiry) && parsedExpiry > Date.now()) {
-      return true;
-    }
+    return hasFutureExpiry;
   }
   return false;
 }

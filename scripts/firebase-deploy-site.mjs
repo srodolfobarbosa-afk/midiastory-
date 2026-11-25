@@ -97,7 +97,7 @@ export async function deploySite() {
       "store",
     ]);
     const EXCLUDED_ROOT_FILES = new Set(["painel.html", "terminal.html", "ferramentas.html", "livros.html"]);
-    const ALLOWED_EXTS = new Set([".html", ".xml", ".css", ".js", ".png", ".jpg", ".jpeg", ".svg", ".webp", ".ico"]);
+    const ALLOWED_EXTS = new Set([".html", ".xml", ".css", ".js", ".png", ".jpg", ".jpeg", ".svg", ".webp", ".ico", ".mp4"]);
     const ALLOWED_ROOT_FILES = new Set(["robots.txt", "llms.txt", "live-activity.json", "ab-config.json", "a9f4c2e8b1d740369e5a8c2f1b4d7e90.txt"]);
 
     let results = [];
@@ -114,7 +114,8 @@ export async function deploySite() {
         results = results.concat(getDocsFiles(fullPath, relPath));
       } else {
         const ext = path.extname(file).toLowerCase();
-        if (ALLOWED_EXTS.has(ext) || (!baseDir && ALLOWED_ROOT_FILES.has(file))) {
+        const isCdnJson = relPath.startsWith("cdn/") && ext === ".json";
+        if (ALLOWED_EXTS.has(ext) || isCdnJson || (!baseDir && ALLOWED_ROOT_FILES.has(file))) {
           results.push([`/${relPath}`, relPath]);
         }
       }
@@ -149,6 +150,15 @@ export async function deploySite() {
     body: JSON.stringify({
       config: {
         cleanUrls: true,
+        headers: [
+          {
+            glob: "/cdn/maria2/**",
+            headers: {
+              "Cache-Control": "public, max-age=604800",
+              "Access-Control-Allow-Origin": "*",
+            },
+          },
+        ],
       },
     }),
   });

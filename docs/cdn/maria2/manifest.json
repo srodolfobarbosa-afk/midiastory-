@@ -1,0 +1,20 @@
+{
+  "version": "2.9.1-moda-hevc",
+  "updatedAt": "2026-11-25T03:27:05.775Z",
+  "codec": "hvc1",
+  "resolution": "512x512",
+  "idle": {
+    "url": "https://midiastory-df6a0.web.app/cdn/maria2/idle.mp4",
+    "bytes": 26333,
+    "sha256": "1c3dd7fc57452604fa6f99bc474ef4995203ac5d2a130d27df884b07c5e3233c"
+  },
+  "locales": {
+    "pt": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/pt/clean.mp4",
+        "bytes": 178505,
+        "sha256": "36dbd80b81baca9524b996e27b1ef3b5c12ece614a38c3bc5d5719d52cec5889"
+      }
+    }
+  }
+}

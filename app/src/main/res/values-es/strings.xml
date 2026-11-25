@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">No se pudo comprimir este formato en hardware. Original intacto.</string>
     <string name="cleaner_home_fallback_similar_title">Fotos Similares</string>
     <string name="cleaner_home_fallback_similar_sub">Mejor guardada</string>
+    <string name="plan_annual_free_trial_cta">Probar 3 días gratis · luego %1$s/año (-56%%)</string>
+    <string name="pro_annual_trial_badge">3 DÍAS GRATIS • PLAN ANUAL (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">Prueba gratis de 3 días para nuevos suscriptores elegibles en el Plan Anual; luego se renueva automáticamente por %1$s/año en Google Play hasta cancelar. Cancela cuando quieras antes de finalizar la prueba sin cargos. Mensual y Vitalicio no incluyen prueba gratis.</string>
+    <string name="weekly_digest_channel_name">Resumen Semanal de Espacio</string>
+    <string name="weekly_digest_channel_desc">Máximo 1 aviso por semana solo si se acumulan más de 300 MB.</string>
+    <string name="weekly_digest_notif_title">%1$s listos para revisar con seguridad</string>
+    <string name="weekly_digest_notif_body">Videos pesados, chats y capturas antiguas se acumularon esta semana. Toca para revisar.</string>
+    <string name="weekly_digest_optin_title">¿Activar aviso semanal inteligente?</string>
+    <string name="weekly_digest_optin_body">Recibe máximo 1 notificación por semana, solo cuando se acumulen más de 300 MB para limpiar. Cero spam.</string>
+    <string name="weekly_digest_optin_allow">Activar aviso 1x/semana</string>
+    <string name="share_freed_result_button">Compartir logro (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Compartir Midiastore (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">Compartir</string>
+    <string name="share_freed_result_message">Acabo de liberar %1$s con seguridad en mi teléfono usando Midiastore (menos de 8 MB en Google Play): %2$s</string>
+    <string name="share_card_chooser_subtitle">Compartir en WhatsApp, Telegram o Instagram</string>
+    <string name="share_card_lightweight_badge">MENOS DE 8 MB • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">LIBERADOS CON SEGURIDAD</string>
+    <string name="share_card_headline_freed">Más espacio libre sin perder tus recuerdos.</string>
+    <string name="share_card_trust_footer">100% en el Dispositivo • Android Scoped Storage</string>
 </resources>

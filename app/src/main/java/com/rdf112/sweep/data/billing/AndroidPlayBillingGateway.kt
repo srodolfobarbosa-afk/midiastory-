@@ -18,6 +18,9 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.rdf112.sweep.domain.billing.BillingStatePolicy
 import com.rdf112.sweep.domain.billing.EvaluatedPurchaseRecord
 import com.rdf112.sweep.domain.billing.ProAccessSummaryState
+import com.rdf112.sweep.domain.billing.RawPricingPhaseCandidate
+import com.rdf112.sweep.domain.billing.RawSubscriptionOfferCandidate
+import com.rdf112.sweep.domain.billing.SubscriptionOfferSelector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,6 +41,9 @@ data class PlayCatalogProductUi(
     val isAvailable: Boolean,
     val priceAmountMicros: Long? = null,
     val priceCurrencyCode: String? = null,
+    val hasFreeTrialOffer: Boolean = false,
+    val freeTrialPeriodIso: String? = null,
+    val preferredOfferToken: String? = null,
 )
 
 /**
@@ -150,21 +156,35 @@ class AndroidPlayBillingGateway(context: Context) {
         val next = _catalog.value.toMutableMap()
         for (pd in detailsResult.productDetailsList) {
             fetchedDetails[pd.productId] = pd
-            val subPhase = pd.subscriptionOfferDetails
-                ?.firstOrNull()
-                ?.pricingPhases
-                ?.pricingPhaseList
-                ?.lastOrNull()
+            val rawOffers = pd.subscriptionOfferDetails.orEmpty().map { offer ->
+                RawSubscriptionOfferCandidate(
+                    offerId = offer.offerId,
+                    offerToken = offer.offerToken,
+                    phases = offer.pricingPhases.pricingPhaseList.map { phase ->
+                        RawPricingPhaseCandidate(
+                            formattedPrice = phase.formattedPrice,
+                            priceAmountMicros = phase.priceAmountMicros,
+                            priceCurrencyCode = phase.priceCurrencyCode,
+                            billingPeriodIso = phase.billingPeriod,
+                        )
+                    },
+                )
+            }
+            val selectedSub = SubscriptionOfferSelector.selectBestOffer(pd.productId, rawOffers)
             val oneTime = pd.oneTimePurchaseOfferDetails ?: pd.oneTimePurchaseOfferDetailsList?.firstOrNull()
-            val price = subPhase?.formattedPrice ?: oneTime?.formattedPrice ?: ""
-            val micros = subPhase?.priceAmountMicros ?: oneTime?.priceAmountMicros
-            val currency = subPhase?.priceCurrencyCode ?: oneTime?.priceCurrencyCode
+            val price = selectedSub?.formattedRecurringPrice ?: oneTime?.formattedPrice ?: ""
+            val micros = selectedSub?.recurringPriceMicros ?: oneTime?.priceAmountMicros
+            val currency = selectedSub?.priceCurrencyCode ?: oneTime?.priceCurrencyCode
+            val preferredToken = selectedSub?.preferredOfferToken ?: oneTime?.offerToken
             next[pd.productId] = PlayCatalogProductUi(
                 productId = pd.productId,
                 formattedPrice = price,
                 isAvailable = price.isNotBlank(),
                 priceAmountMicros = micros,
                 priceCurrencyCode = currency,
+                hasFreeTrialOffer = selectedSub?.hasFreeTrialOffer == true,
+                freeTrialPeriodIso = selectedSub?.freeTrialPeriodIso,
+                preferredOfferToken = preferredToken,
             )
         }
         for (unfetched in detailsResult.unfetchedProductList) {
@@ -195,12 +215,14 @@ class AndroidPlayBillingGateway(context: Context) {
         val paramsBuilder = BillingFlowParams.ProductDetailsParams.newBuilder()
             .setProductDetails(details)
         if (details.productType == BillingClient.ProductType.SUBS) {
-            val offerToken = details.subscriptionOfferDetails?.firstOrNull()?.offerToken
+            val offerToken = _catalog.value[productId]?.preferredOfferToken
+                ?: details.subscriptionOfferDetails?.firstOrNull()?.offerToken
             if (offerToken.isNullOrBlank()) return false
             paramsBuilder.setOfferToken(offerToken)
         } else if (details.productType == BillingClient.ProductType.INAPP) {
-            val offerToken = (details.oneTimePurchaseOfferDetails
-                ?: details.oneTimePurchaseOfferDetailsList?.firstOrNull())?.offerToken
+            val offerToken = _catalog.value[productId]?.preferredOfferToken
+                ?: (details.oneTimePurchaseOfferDetails
+                    ?: details.oneTimePurchaseOfferDetailsList?.firstOrNull())?.offerToken
             if (!offerToken.isNullOrBlank()) {
                 paramsBuilder.setOfferToken(offerToken)
             }

@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">Не удалось аппаратно сжать этот формат. Оригинал не изменён.</string>
     <string name="cleaner_home_fallback_similar_title">Похожие фото</string>
     <string name="cleaner_home_fallback_similar_sub">Лучшее сохранено</string>
+    <string name="plan_annual_free_trial_cta">3 дня бесплатно · затем %1$s/год (-56%%)</string>
+    <string name="pro_annual_trial_badge">3 ДНЯ БЕСПЛАТНО • ГОДОВОЙ (-56%)</string>
+    <string name="pro_annual_trial_terms_disclosure">Бесплатный пробный период 3 дня для новых подписчиков годового плана, затем автопродление за %1$s/год в Google Play до отмены. Отменить можно в любой момент до конца пробного периода без списаний. Месячный и Вечный планы без пробного периода.</string>
+    <string name="weekly_digest_channel_name">Еженедельный отчёт о памяти</string>
+    <string name="weekly_digest_channel_desc">Не чаще 1 раза в неделю и только при накоплении более 300 МБ.</string>
+    <string name="weekly_digest_notif_title">%1$s можно безопасно очистить</string>
+    <string name="weekly_digest_notif_body">За неделю накопились большие видео, чаты и старые скриншоты. Нажмите для проверки.</string>
+    <string name="weekly_digest_optin_title">Включить умное уведомление раз в неделю?</string>
+    <string name="weekly_digest_optin_body">Максимум 1 уведомление в неделю, только если накопилось более 300 МБ для очистки. Без спама.</string>
+    <string name="weekly_digest_optin_allow">Включить (макс. 1 р./нед.)</string>
+    <string name="share_freed_result_button">Поделиться результатом (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Поделиться Midiastore (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">Поделиться</string>
+    <string name="share_freed_result_message">Я только что безопасно освободил(а) %1$s на телефоне с помощью Midiastore (менее 8 МБ в Google Play): %2$s</string>
+    <string name="share_card_chooser_subtitle">Поделиться в WhatsApp, Telegram или Instagram</string>
+    <string name="share_card_lightweight_badge">МЕНЕЕ 8 МБ • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">БЕЗОПАСНО ОЧИЩЕНО</string>
+    <string name="share_card_headline_freed">Больше свободного места без потери фото.</string>
+    <string name="share_card_trust_footer">100% на устройстве • Android Scoped Storage</string>
 </resources>

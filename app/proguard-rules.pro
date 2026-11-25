@@ -8,8 +8,11 @@
 -keep class com.rdf112.sweep.** { *; }
 -keep class com.rdf112.sweep.domain.** { *; }
 
-# Preserva componentes do AndroidX e ViewModels
+# Preserva componentes do AndroidX, WorkManager e ViewModels
 -keepclassmembers class * extends androidx.lifecycle.ViewModel {
     <init>(...);
+}
+-keepclassmembers class * extends androidx.work.ListenableWorker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
 }
 -keep class androidx.lifecycle.** { *; }

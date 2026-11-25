@@ -289,4 +289,23 @@ Total: %3$s</string>
     <string name="video_compress_failed">হার্ডওয়্যারে এই ভিডিও ফরম্যাট কমপ্রেস করা যায়নি। মূল ফাইল অক্ষত আছে।</string>
     <string name="cleaner_home_fallback_similar_title">একই রকম ছবি</string>
     <string name="cleaner_home_fallback_similar_sub">সেরাটি সুরক্ষিত</string>
+    <string name="plan_annual_free_trial_cta">৩ দিন ফ্রি ট্রায়াল · এরপর %1$s/বছর (-56%%)</string>
+    <string name="pro_annual_trial_badge">৩ দিন ফ্রি • বার্ষিক প্ল্যান (-৫৬%)</string>
+    <string name="pro_annual_trial_terms_disclosure">যোগ্য নতুন গ্রাহকদের জন্য বার্ষিক প্ল্যানে ৩ দিনের ফ্রি ট্রায়াল, এরপর বাতিল না করা পর্যন্ত Google Play-তে %1$s/বছর স্বয়ংক্রিয়ভাবে নবায়ন হবে। চার্জ এড়াতে ট্রায়াল শেষ হওয়ার আগে যেকোনো সময় বাতিল করুন। মাসিক ও লাইফটাইম প্ল্যানে ফ্রি ট্রায়াল নেই।</string>
+    <string name="weekly_digest_channel_name">সাপ্তাহিক স্টোরেজ অ্যালার্ট</string>
+    <string name="weekly_digest_channel_desc">শুধুমাত্র ৩০০ MB-এর বেশি জমলে সপ্তাহে সর্বোচ্চ ১টি নোটিফিকেশন।</string>
+    <string name="weekly_digest_notif_title">নিরাপদে পর্যালোচনার জন্য %1$s প্রস্তুত</string>
+    <string name="weekly_digest_notif_body">এই সপ্তাহে বড় ভিডিও, চ্যাট ও পুরনো স্ক্রিনশট জমেছে। পর্যালোচনা করতে ট্যাপ করুন।</string>
+    <string name="weekly_digest_optin_title">স্মার্ট সাপ্তাহিক অ্যালার্ট চালু করবেন?</string>
+    <string name="weekly_digest_optin_body">সপ্তাহে সর্বোচ্চ ১টি নোটিফিকেশন পাবেন, কেবল ৩০০ MB-এর বেশি ফাইল জমলে। কোনো স্প্যাম নেই।</string>
+    <string name="weekly_digest_optin_allow">সপ্তাহে ১ বার অ্যালার্ট চালু করুন</string>
+    <string name="share_freed_result_button">ফলাফল শেয়ার করুন (WhatsApp / Instagram / Telegram)</string>
+    <string name="share_invite_friend_button">Midiastore শেয়ার করুন (WhatsApp · Telegram · Instagram)</string>
+    <string name="share_home_pill_action">শেয়ার</string>
+    <string name="share_freed_result_message">আমি এইমাত্র Midiastore দিয়ে নিরাপদে ফোনের %1$s জায়গা খালি করেছি (Google Play-তে ৮ MB-এর কম): %2$s</string>
+    <string name="share_card_chooser_subtitle">WhatsApp, Telegram বা Instagram-এ শেয়ার করুন</string>
+    <string name="share_card_lightweight_badge">৮ MB-এর কম • GOOGLE PLAY</string>
+    <string name="share_card_freed_label">নিরাপদে খালি হয়েছে</string>
+    <string name="share_card_headline_freed">স্মৃতি না হারিয়েই ফোনে আরও খালি জায়গা।</string>
+    <string name="share_card_trust_footer">১০০% অন-ডিভাইস • Android Scoped Storage</string>
 </resources>
