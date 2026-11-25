@@ -171,7 +171,7 @@ class WeeklyStorageDigestWorker(
             PackageManager.PERMISSION_GRANTED
     }
 
-    private fun estimateRecoverableBytesFast(ctx: Context): Long {
+    private suspend fun estimateRecoverableBytesFast(ctx: Context): Long {
         var total = 0L
         val thirtyDaysAgoSec = (System.currentTimeMillis() / 1000L) - (30L * 24L * 3600L)
 
