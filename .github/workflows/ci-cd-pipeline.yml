@@ -7,6 +7,9 @@ on:
       - 'codex/**'
       - 'fix/**'
       - 'feat/**'
+    paths-ignore:
+      - '.github/workflows/render-maria2-moda-cdn.yml'
+      - 'scripts/render-single-moda-clip.mjs'
   pull_request:
     branches:
       - main

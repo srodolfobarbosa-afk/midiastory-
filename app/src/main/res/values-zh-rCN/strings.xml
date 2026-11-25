@@ -308,4 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">已安全释放</string>
     <string name="share_card_headline_freed">释放更多空间，珍贵回忆零丢失。</string>
     <string name="share_card_trust_footer">100% 本地处理 • Android Scoped Storage</string>
+    <string name="app_language_button">??</string>
+    <string name="app_language_title">????</string>
+    <string name="app_language_system_default">??????</string>
+    <string name="cleanup_dialog_mission_action">???? %1$s</string>
 </resources>

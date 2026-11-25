@@ -308,4 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">নিরাপদে খালি হয়েছে</string>
     <string name="share_card_headline_freed">স্মৃতি না হারিয়েই ফোনে আরও খালি জায়গা।</string>
     <string name="share_card_trust_footer">১০০% অন-ডিভাইস • Android Scoped Storage</string>
+    <string name="app_language_button">????</string>
+    <string name="app_language_title">??????? ????</string>
+    <string name="app_language_system_default">???????? ???? ??????? ????</string>
+    <string name="cleanup_dialog_mission_action">???? %1$s ???? ????</string>
 </resources>

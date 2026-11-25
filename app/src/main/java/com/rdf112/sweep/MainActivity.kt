@@ -52,8 +52,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -727,6 +729,7 @@ class MainActivity : AppCompatActivity() {
                         onOpenPro = { onHomeProSubscribeClicked() },
                         onManagePermissions = { requestMediaPermissions(allowSettingsFallback = true) },
                         onShareResultOrInvite = { bytes -> shareApp(bytes) },
+                        onOpenLanguageSelector = ::showAppLanguagePicker,
                         hasAnnualFreeTrial = hasAnnualTrialNow,
                         isTabActive = activeTabComposeState.value == AppTab.HOME,
                     )
@@ -1822,6 +1825,49 @@ class MainActivity : AppCompatActivity() {
         btn.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
     }
 
+    private fun showAppLanguagePicker() {
+        val locales = listOf(
+            "en" to "English",
+            "pt-BR" to "Português (Brasil)",
+            "es" to "Español",
+            "fr" to "Français",
+            "de" to "Deutsch",
+            "hi" to "हिन्दी",
+            "ja" to "日本語",
+            "zh-CN" to "简体中文",
+            "ar" to "العربية",
+            "ru" to "Русский",
+            "id" to "Bahasa Indonesia",
+            "bn" to "বাংলা",
+            "ko" to "한국어",
+        )
+        val currentTags = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+        val currentIndex = if (currentTags.isBlank()) {
+            0
+        } else {
+            locales.indexOfFirst { (tag, _) ->
+                currentTags.split(',').any { current ->
+                    current.equals(tag, ignoreCase = true) ||
+                        current.substringBefore('-').equals(tag.substringBefore('-'), ignoreCase = true)
+                }
+            }.let { if (it < 0) 0 else it + 1 }
+        }
+        val options = buildList {
+            add(getString(R.string.app_language_system_default))
+            locales.forEach { (_, nativeName) -> add(nativeName) }
+        }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.app_language_title)
+            .setSingleChoiceItems(options, currentIndex) { dialog, selectedIndex ->
+                val languageTag = locales.getOrNull(selectedIndex - 1)?.first.orEmpty()
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTag))
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
     private fun onCleanMissionClick(mission: CleanMission) {
         when (mission) {
             CleanMission.WHATSAPP -> openWhatsAppCleanerFlow()
@@ -2565,7 +2611,11 @@ class MainActivity : AppCompatActivity() {
                 cappedRecords.size,
             )
             deleteActionBtn?.text = if (count > 0 && totalBytes > 0L) {
-                "${getString(R.string.permanent_delete_button)} ($sizeFmt)"
+                if (mission != null) {
+                    getString(R.string.cleanup_dialog_mission_action, sizeFmt)
+                } else {
+                    "${getString(R.string.permanent_delete_button)} ($sizeFmt)"
+                }
             } else {
                 getString(R.string.permanent_delete_button)
             }

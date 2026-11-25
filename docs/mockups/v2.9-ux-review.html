@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midiastore v2.9 — planta visual de UX</title>
+<style>
+  :root { color-scheme: dark; font: 15px/1.45 system-ui, sans-serif; background:#000; color:#f5f5f7; }
+  body { margin:0; padding:24px; display:flex; flex-wrap:wrap; gap:24px; justify-content:center; }
+  .phone { width:min(360px,100%); min-height:720px; box-sizing:border-box; padding:24px 18px; border:1px solid #38383a; border-radius:34px; background:#000; display:flex; flex-direction:column; }
+  h1 { font-size:22px; margin:6px 0 4px; } h2 { font-size:17px; margin:0; }
+  p { color:#a1a1a6; margin:4px 0 16px; }
+  .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+  .brand { font-weight:700; letter-spacing:.2px; } .icon { border:1px solid #38383a; border-radius:50%; padding:9px 12px; color:#0a84ff; }
+  .card { background:#1c1c1e; border:1px solid #303033; border-radius:18px; padding:16px; margin:12px 0; }
+  .language-list { max-height:510px; overflow:auto; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .tag { color:#0a84ff; font-size:12px; font-weight:700; }
+  .item { border-top:1px solid #38383a; padding:13px 0; }
+  .protected { color:#64d2ff; font-size:12px; }
+  button { border:0; border-radius:14px; background:#0a84ff; color:#fff; padding:15px 12px; font-weight:700; font-size:15px; width:100%; margin-top:auto; }
+  .secondary { color:#a1a1a6; text-align:center; font-size:12px; margin:12px 0 0; }
+  .choice { padding:13px 0; border-top:1px solid #38383a; display:flex; justify-content:space-between; }
+  .selected { color:#0a84ff; font-weight:700; }
+  .note { width:min(760px,100%); color:#a1a1a6; }
+</style>
+<body>
+  <section class="phone" aria-label="Fluxo de limpeza proposto">
+    <div class="top"><span class="brand">Midiastore</span><span class="icon">•••</span></div>
+    <span class="tag">REVISÃO DE LIMPEZA</span>
+    <h1>Duplicatas encontradas</h1>
+    <p>Revise os itens antes de continuar. O Android pedirá confirmação antes da exclusão.</p>
+    <div class="card">
+      <div class="row"><h2>3 cópias exatas</h2><span>840 MB</span></div>
+      <div class="item"><div class="row"><span>Vídeo • 420 MB</span><span>Selecionado</span></div><small>SHA-256 confirmado</small></div>
+      <div class="item"><div class="row"><span>Vídeo • 420 MB</span><span>Selecionado</span></div><small>SHA-256 confirmado</small></div>
+      <div class="item"><div class="row"><span>Foto original</span><span class="protected">Melhor foto protegida</span></div></div>
+    </div>
+    <button>Continuar — liberar 840 MB</button>
+    <div class="secondary">Abre a confirmação oficial do Android · Nada é apagado sem consentimento</div>
+  </section>
+  <section class="phone" aria-label="Seletor de idioma proposto">
+    <div class="top"><span class="brand">Midiastore</span><span class="icon">Idioma</span></div>
+    <span class="tag">PREFERÊNCIAS</span>
+    <h1>Idioma do app</h1>
+    <p>Escolha um idioma. A interface muda imediatamente.</p>
+    <div class="card language-list">
+      <div class="choice selected"><span>Português (Brasil)</span><span>✓</span></div>
+      <div class="choice"><span>English</span><span></span></div>
+      <div class="choice"><span>Español</span><span></span></div>
+      <div class="choice"><span>Français</span><span></span></div>
+      <div class="choice"><span>Deutsch</span><span></span></div>
+      <div class="choice"><span>हिन्दी</span><span></span></div>
+      <div class="choice"><span>日本語</span><span></span></div>
+      <div class="choice"><span>简体中文</span><span></span></div>
+      <div class="choice"><span>العربية</span><span></span></div>
+      <div class="choice"><span>Русский</span><span></span></div>
+      <div class="choice"><span>Bahasa Indonesia</span><span></span></div>
+      <div class="choice"><span>বাংলা</span><span></span></div>
+      <div class="choice"><span>한국어</span><span></span></div>
+    </div>
+    <div class="secondary">Um toque em um idioma aplica a preferência do app.</div>
+  </section>
+  <p class="note">Planta visual para aprovação antes de implementação. Identidade OLED preta, grafite e azul; sem alteração da Maria. A missão de duplicatas só pode pré-selecionar cópias com hashes SHA-256 confirmados e cobertura completa. Para cobertura parcial, manter a seleção manual.</p>
+</body>
+</html>

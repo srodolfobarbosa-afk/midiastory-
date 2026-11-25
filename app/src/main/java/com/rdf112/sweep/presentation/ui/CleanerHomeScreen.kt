@@ -23,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -53,6 +54,7 @@ fun CleanerHomeScreen(
     onOpenPro: () -> Unit,
     onManagePermissions: () -> Unit = {},
     onShareResultOrInvite: (Long) -> Unit = {},
+    onOpenLanguageSelector: () -> Unit = {},
     hasAnnualFreeTrial: Boolean = false,
     modifier: Modifier = Modifier,
     /** The host Activity already renders a Pro pill in its top bar; only standalone hosts should enable this. */
@@ -76,6 +78,20 @@ fun CleanerHomeScreen(
             .padding(vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            TextButton(onClick = onOpenLanguageSelector) {
+                Text(
+                    text = stringResource(R.string.app_language_button),
+                    color = MidiastoreColors.AccentBlue,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+
         MariaHeroBanner(
             tabKey = "clean",
             captionText = customCaption ?: defaultCaption,
@@ -165,7 +181,7 @@ fun CleanerHomeScreen(
             },
         )
 
-        // Modelo Pro / IA Nativa sempre disponível lá no final da aba conforme solicitado pelo Rodolfo!
+        // Keep the optional Pro offer after the core cleanup actions.
         SalesPsychologyProCard(
             onOpenPro = onOpenPro,
             hasAnnualFreeTrial = hasAnnualFreeTrial && !isProActive,

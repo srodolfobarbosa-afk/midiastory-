@@ -1,6 +1,6 @@
 # Motor Completo de Produto & Crescimento Orientado a Meta — Midiastore
 
-- **Verificação Ao Vivo:** `2026-11-24T10:35:46.861Z`
+- **Verificação Ao Vivo:** `2026-11-25T04:27:51.380Z`
 - **Meta Financeira:** `R$ 1.000.000,00` (Regra 50/50)
 - **Score de Prontidão Comercial:** **75/100**
 
@@ -22,15 +22,15 @@
 
 ## 3. Receita, Telemetria & Testadores (Supabase Ao Vivo)
 - **Compras validadas (`public.play_purchases`):** `{"total":1}`
-- **Telemetria do Site (`get_prelaunch_stats`):** `{"cta_clicks":0,"updated_at":"2026-11-24T10:35:55.640103+00:00","visits_24h":21,"optin_clicks":0,"share_clicks":0,"total_visits":172,"waitlist_count":2,"closed_test_day":12,"unique_visitors":132,"active_testers_display":23,"official_testers_count":23,"closed_test_target_days":14}`
-- **Uso do Banco Supabase:** `20.29 MB / 500 MB`
+- **Telemetria do Site (`get_prelaunch_stats`):** `{"cta_clicks":0,"updated_at":"2026-11-25T04:27:51.560623+00:00","visits_24h":26,"optin_clicks":0,"share_clicks":0,"total_visits":181,"waitlist_count":2,"closed_test_day":13,"unique_visitors":140,"active_testers_display":23,"official_testers_count":23,"closed_test_target_days":14}`
+- **Uso do Banco Supabase:** `20.50 MB / 500 MB`
 - **E-mails em `public.beta_testers` (2 registros):**
   - `rjvsb22@gmail.com` (2026-11-11 23:17:33.552846+00)
   - `teste.beta.vip@gmail.com` (2026-11-10 06:05:04.465442+00)
 
 ## 4. Site & Funil Web Internacional
 - **URL:** https://midiastory-df6a0.web.app/
-- **HTTP:** `200` (873 ms) | **hreflang:** `14` | **CTAs Play Store:** `9`
+- **HTTP:** `200` (423 ms) | **hreflang:** `14` | **CTAs Play Store:** `5`
 
 ## 5. Anúncios & Aquisição (Google Ads 14 Idiomas)
 - **Fábrica 14 idiomas:** PRONTA | **API Upload:** PRONTA | **Pacote Downloads:** OK (53 arquivos)

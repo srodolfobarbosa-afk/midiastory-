@@ -308,4 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">SAFELY FREED</string>
     <string name="share_card_headline_freed">More free storage without losing memories.</string>
     <string name="share_card_trust_footer">100% On-Device • Android Scoped Storage</string>
+    <string name="app_language_button">Language</string>
+    <string name="app_language_title">App language</string>
+    <string name="app_language_system_default">Use device language</string>
+    <string name="cleanup_dialog_mission_action">Clean %1$s now</string>
 </resources>

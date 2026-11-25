@@ -1,0 +1,88 @@
+name: Render Maria 2.0 Neural MoDA H.265 CDN Pack
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/v2.9.0-motor-app
+    paths:
+      - '.github/workflows/render-maria2-moda-cdn.yml'
+      - 'scripts/render-single-moda-clip.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  render-clip:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        target:
+          - idle
+          - pt/clean
+          - pt/files
+          - pt/pro
+          - pt/dup
+          - pt/videos
+          - pt/whatsapp
+          - pt/screenshots
+          - pt/nano
+          - en/clean
+          - en/files
+          - en/pro
+          - es/clean
+          - fr/clean
+          - de/clean
+          - it/clean
+          - ru/clean
+          - zh/clean
+          - ja/clean
+          - ko/clean
+          - ar/clean
+          - hi/clean
+          - bn/clean
+          - id/clean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install msedge-tts in scripts/
+        working-directory: scripts
+        run: npm install --no-save msedge-tts@2.0.4
+      - name: Render MoDA H.265 neural clip (${{ matrix.target }})
+        run: |
+          out_rel="out_cdn/${{ matrix.target }}.mp4"
+          node scripts/render-single-moda-clip.mjs --target "${{ matrix.target }}" --out "$out_rel"
+      - name: Upload rendered clip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maria2-clip-${{ strategy.job-index }}
+          path: out_cdn/**/*.mp4
+          if-no-files-found: ignore
+          retention-days: 3
+
+  bundle-cdn:
+    needs: render-clip
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all rendered MoDA H.265 clips
+        uses: actions/download-artifact@v4
+        with:
+          pattern: maria2-clip-*
+          path: merged_cdn
+          merge-multiple: true
+      - name: List rendered clips
+        run: |
+          find merged_cdn -type f -name '*.mp4' -exec ls -lh {} +
+      - name: Upload unified Maria 2.0 CDN bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: maria2-cdn-pack
+          path: merged_cdn/**/*.mp4
+          if-no-files-found: warn
+          retention-days: 7

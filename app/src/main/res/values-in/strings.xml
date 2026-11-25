@@ -308,4 +308,8 @@ Total: %3$s</string>
     <string name="share_card_freed_label">DIBERSIHKAN DENGAN AMAN</string>
     <string name="share_card_headline_freed">Ruang lega kembali tanpa kehilangan kenangan.</string>
     <string name="share_card_trust_footer">100% di Perangkat • Android Scoped Storage</string>
+    <string name="app_language_button">Bahasa</string>
+    <string name="app_language_title">Bahasa aplikasi</string>
+    <string name="app_language_system_default">Gunakan bahasa perangkat</string>
+    <string name="cleanup_dialog_mission_action">Bersihkan %1$s sekarang</string>
 </resources>
