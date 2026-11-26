@@ -811,7 +811,9 @@ fun MariaHeroBanner(
                 var elapsedMs = 0L
                 while (isSpeaking && !clipCompleted && elapsedMs < 45_000L) {
                     val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
-                    if (!playing && elapsedMs > 650L) break
+                    // MediaPlayer can report !isPlaying briefly while the first HEVC frame is
+                    // being attached to TextureView. Give the surface time to confirm output.
+                    if (!playing && !videoFrameReady && elapsedMs >= 2_000L) break
                     delay(90L)
                     elapsedMs += 90L
                 }
@@ -1055,7 +1057,11 @@ fun MariaHeroBanner(
                                             return true
                                         }
 
-                                        override fun onSurfaceTextureUpdated(st: SurfaceTexture) = Unit
+                                        override fun onSurfaceTextureUpdated(st: SurfaceTexture) {
+                                            // This is the reliable proof that a decoded video frame
+                                            // reached the visible surface on this device.
+                                            videoFrameReady = true
+                                        }
                                     }
                                 }
                             },
