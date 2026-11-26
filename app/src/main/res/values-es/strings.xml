@@ -3,7 +3,7 @@
     <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Almacenamiento bajo tu control.</string>
     <string name="storage_unavailable">Storage statistics are unavailable on this device.</string>
-    <string name="storage_measurement">%1$s used · %2$s free
+    <string name="storage_measurement">%1$s usados · %2$s libres
 Total: %3$s</string>
     <string name="scan_button">Analizar archivos autorizados</string>
     <string name="permission_continue">Administrar permisos multimedia</string>
@@ -163,7 +163,7 @@ Total: %3$s</string>
     <string name="nav_pro">Pro</string>
     <string name="quick_find_large">Encontrar archivos grandes (más de 10 MB)</string>
     <string name="quick_clean_whatsapp">Clean WhatsApp</string>
-    <string name="storage_used_headline">%1$s used</string>
+    <string name="storage_used_headline">%1$s usados</string>
     <string name="storage_free_subline">%1$s libres en este dispositivo</string>
     <string name="exact_copy_badge"> · Copia exacta</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>

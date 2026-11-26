@@ -71,8 +71,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rdf112.sweep.R
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -636,6 +634,9 @@ fun MariaHeroBanner(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(context.applicationContext) {
+        MariaLocalizedSpeech.warm(context.applicationContext)
+    }
     val prefs = remember(context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
@@ -684,7 +685,8 @@ fun MariaHeroBanner(
         }
     }
 
-    fun stopSpeechAndReturnToIdle() {
+    fun stopSpeechAndReturnToIdle(stopTts: Boolean = true) {
+        if (stopTts) MariaLocalizedSpeech.stop()
         releaseFallbackAudio()
         isSpeaking = false
         isNeuralVideoSpeaking = false
@@ -694,6 +696,7 @@ fun MariaHeroBanner(
 
     LaunchedEffect(surfaceRef, isActive, videoHardwareSupported) {
         if (!isActive) {
+            MariaLocalizedSpeech.stop()
             releaseFallbackAudio()
             releaseVideoPlayer()
             isSpeaking = false
@@ -705,6 +708,7 @@ fun MariaHeroBanner(
     DisposableEffect(lifecycleOwner, isActive) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+                MariaLocalizedSpeech.stop()
                 releaseFallbackAudio()
                 releaseVideoPlayer()
                 isSpeaking = false
@@ -715,6 +719,7 @@ fun MariaHeroBanner(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+            MariaLocalizedSpeech.stop()
             releaseFallbackAudio()
             releaseVideoPlayer()
             runCatching { surfaceRef?.release() }
@@ -722,9 +727,7 @@ fun MariaHeroBanner(
         }
     }
 
-    // Padrão Apple / Gemini Live: fala quando o usuário toca no card ou botão de som.
-    // Toca primeiro o micro-vídeo neural MoDA H.265 sincronizado (do cache local / Firebase CDN),
-    // caindo com segurança para o áudio offline de estúdio se estiver sem internet!
+    // Prepare the silent visual first; audio start callbacks begin both the video and green ring.
     LaunchedEffect(userPlayTrigger, rawAudioResId, isActive) {
         if (!isActive || userPlayTrigger == 0) {
             if (!isActive) stopSpeechAndReturnToIdle()
@@ -733,29 +736,15 @@ fun MariaHeroBanner(
         stopSpeechAndReturnToIdle()
         if (isMuted) return@LaunchedEffect
 
-        isSpeaking = true
         var waitSurfaceMs = 0L
         while (surfaceRef == null && waitSurfaceMs < 800L) { delay(40L); waitSurfaceMs += 40L }
         val surface = surfaceRef
         val canPlayUniversalVisual = videoHardwareSupported && surface != null && surface.isValid
-        var localizedSpeechJob: Job? = null
-        val startLocalizedSpeech = {
-            launch {
-                runCatching {
-                    playLocalizedMariaSpeech(
-                        context,
-                        rawAudioResId,
-                        MariaI18n.localizedSpeechLine(tabKey),
-                    ) { fallbackAudioPlayerRef = it }
-                }
-            }
-        }
-
+        var preparedVideo: MediaPlayer? = null
         if (canPlayUniversalVisual && surface != null && surface.isValid) {
-            var neuralPlaybackFailed = false
             releaseVideoPlayer()
             delay(50L)
-            val startedNeural = runCatching {
+            preparedVideo = runCatching {
                 val mp = MediaPlayer()
                 videoPlayerRef = mp
                 mp.setSurface(surface)
@@ -771,57 +760,38 @@ fun MariaHeroBanner(
                     }
                     mp.setOnErrorListener { _, what, extra ->
                         Log.w("MariaVideo", "Universal neural video error $what/$extra")
-                        neuralPlaybackFailed = true
+                        isNeuralVideoSpeaking = false
+                        releaseVideoPlayer()
                         true
                     }
                     mp.prepare()
-                    mp.start()
                 }
-                isNeuralVideoSpeaking = true
                 mp
             }.onFailure { error ->
                 Log.w("MariaVideo", "Universal neural video setup failed", error)
             }.getOrNull()
-
-            if (startedNeural != null) {
-                var frameWaitMs = 0L
-                while (!videoFrameReady && frameWaitMs < 2_000L) {
-                    delay(40L)
-                    frameWaitMs += 40L
-                }
-                if (videoFrameReady) {
-                    Log.i("MariaVideo", "Universal H.264 first frame confirmed by TextureView")
-                } else {
-                    Log.w("MariaVideo", "TextureView did not confirm a frame within 2 seconds")
-                }
-                localizedSpeechJob = startLocalizedSpeech()
-                var elapsedMs = 0L
-                while (isSpeaking && localizedSpeechJob?.isActive == true) {
-                    val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
-                    // MediaPlayer can report !isPlaying briefly while the first H.264 frame is
-                    // being attached to TextureView. Give the surface time to confirm output.
-                    if (!playing && !videoFrameReady && elapsedMs >= 2_000L) break
-                    delay(90L)
-                    elapsedMs += 90L
-                }
-                if (!neuralPlaybackFailed && videoFrameReady) {
-                    stopSpeechAndReturnToIdle()
-                    return@LaunchedEffect
-                }
-
-                // A decoder failure (or a clip that never rendered a frame) falls back to
-                // the static portrait while localized speech continues.
-                isNeuralVideoSpeaking = false
-                isSpeaking = true
-            } else {
-                isNeuralVideoSpeaking = false
-            }
         }
 
-        if (localizedSpeechJob == null) localizedSpeechJob = startLocalizedSpeech()
-        localizedSpeechJob?.join()
+        runCatching {
+            playLocalizedMariaSpeech(
+                context,
+                rawAudioResId,
+                MariaI18n.localizedSpeechLine(tabKey),
+                onAudioPlayerCreated = { fallbackAudioPlayerRef = it },
+                onAudioStarted = {
+                    isSpeaking = true
+                    val player = preparedVideo
+                    if (player != null) {
+                        runCatching { player.start() }
+                            .onSuccess { isNeuralVideoSpeaking = true }
+                            .onFailure { Log.w("MariaVideo", "Could not start prepared universal video", it) }
+                    }
+                },
+                onAudioFinished = { stopSpeechAndReturnToIdle(stopTts = false) },
+            )
+        }
         fallbackAudioPlayerRef = null
-        stopSpeechAndReturnToIdle()
+        stopSpeechAndReturnToIdle(stopTts = false)
     }
 
     // 60 FPS VSYNC: sincronia do anel/onda sonora + fallback editorial quando necessário

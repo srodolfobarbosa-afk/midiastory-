@@ -3,7 +3,7 @@
     <string name="app_name">Midiastore</string>
     <string name="brand_tagline">Votre stockage, sous votre contrôle.</string>
     <string name="storage_unavailable">Storage statistics are unavailable on this device.</string>
-    <string name="storage_measurement">%1$s used · %2$s free
+    <string name="storage_measurement">%1$s utilisés · %2$s libres
 Total: %3$s</string>
     <string name="scan_button">Analyser les fichiers autorisés</string>
     <string name="permission_continue">Gérer les autorisations multimédias</string>
@@ -163,7 +163,7 @@ Total: %3$s</string>
     <string name="nav_pro">Pro</string>
     <string name="quick_find_large">Trouver les fichiers volumineux (plus de 10 Mo)</string>
     <string name="quick_clean_whatsapp">Clean WhatsApp</string>
-    <string name="storage_used_headline">%1$s used</string>
+    <string name="storage_used_headline">%1$s utilisés</string>
     <string name="storage_free_subline">%1$s libres sur cet appareil</string>
     <string name="exact_copy_badge"> · Copie exacte</string>
     <string name="media_metadata_line">%1$s · %2$s%3$s</string>
@@ -309,7 +309,7 @@ Total: %3$s</string>
     <string name="share_card_headline_freed">Plus d\'espace libre sans perdre vos souvenirs.</string>
     <string name="share_card_trust_footer">100% sur l\'Appareil • Android Scoped Storage</string>
     <string name="app_language_button">Langue</string>
-    <string name="app_language_title">Langue de l?application</string>
-    <string name="app_language_system_default">Utiliser la langue de l?appareil</string>
-    <string name="cleanup_dialog_mission_action">Lib?rer %1$s maintenant</string>
+    <string name="app_language_title">Langue de l’application</string>
+    <string name="app_language_system_default">Utiliser la langue de l’appareil</string>
+    <string name="cleanup_dialog_mission_action">Libérer %1$s maintenant</string>
 </resources>

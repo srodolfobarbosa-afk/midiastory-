@@ -310,6 +310,6 @@ Total: %3$s</string>
     <string name="share_card_trust_footer">100% Lokal • Android Scoped Storage</string>
     <string name="app_language_button">Sprache</string>
     <string name="app_language_title">App-Sprache</string>
-    <string name="app_language_system_default">Ger?tesprache verwenden</string>
+    <string name="app_language_system_default">Gerätesprache verwenden</string>
     <string name="cleanup_dialog_mission_action">Jetzt %1$s freigeben</string>
 </resources>
