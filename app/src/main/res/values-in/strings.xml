@@ -11,7 +11,7 @@ Total: %3$s</string>
     <string name="ready_status">Siap. Semua pemrosesan dilakukan secara lokal dan file asli tetap terlindungi.</string>
     <string name="permission_denied">Izin tidak diberikan. Tidak ada media yang diperiksa.</string>
     <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
-    <string name="starting_scan">Checking the media you\'ve allowed…</string>
+    <string name="starting_scan">Memeriksa media yang Anda izinkan?</string>
     <string name="loading_page">Reading your files…</string>
     <string name="page_ready">File berhasil dimuat.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
@@ -70,7 +70,7 @@ Total: %3$s</string>
     <string name="date_unavailable">Date not provided</string>
     <string name="size_unavailable">Size unavailable</string>
     <string name="pro_card_title">MIDIASTORE PRO</string>
-    <string name="pro_status_free">Paket saat ini: Free · Analisis penting dan pembersihan aman sudah termasuk.</string>
+    <string name="pro_status_free">Paket saat ini: Gratis ? Analisis penting dan pembersihan aman sudah termasuk.</string>
     <string name="pro_status_active">Midiastore Pro aktif</string>
     <string name="pro_status_pending">Pembelian menunggu konfirmasi di Google Play</string>
     <string name="pro_card_subtitle">Pembersihan esensial gratis selamanya. Pilih paket Pro untuk diagnostik lanjutan, aplikasi tak terpakai (+90h) &amp; laporan teraudit.</string>
@@ -128,7 +128,7 @@ Total: %3$s</string>
     <string name="oaas_card_headline">What is taking up space?</string>
     <string name="oaas_card_subtitle">Find what can be safely removed. You review and confirm every cleanup action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">Pertama, kami akan memeriksa media yang Anda izinkan.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">Find exact copies (SHA-256) · Free</string>
     <string name="oaas_mission_old">Find files older than 30 days · Free</string>

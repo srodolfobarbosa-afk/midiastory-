@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Midiastore</string>
-    <string name="brand_tagline">A cleaner phone. More space back.</string>
+    <string name="brand_tagline">Un telefono più pulito. Più spazio a disposizione.</string>
     <string name="storage_unavailable">Le statistiche di archiviazione non sono disponibili su questo dispositivo.</string>
     <string name="storage_measurement">%1$s utilizzati · %2$s disponibili
 Totale: %3$s</string>
@@ -10,16 +10,16 @@ Totale: %3$s</string>
     <string name="cancel_scan">Annulla scansione</string>
     <string name="ready_status">Pronto. Elaborazione locale sul dispositivo e protezione dei riferimenti ai file originali.</string>
     <string name="permission_denied">Autorizzazione negata. Nessun contenuto multimediale è stato consultato.</string>
-    <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
-    <string name="starting_scan">Checking the media you\'ve allowed…</string>
-    <string name="loading_page">Reading your files…</string>
+    <string name="no_access">Consenti l’accesso a foto, video o audio per iniziare l’analisi.</string>
+    <string name="starting_scan">Controllo i contenuti multimediali che hai autorizzato…</string>
+    <string name="loading_page">Lettura dei file…</string>
     <string name="page_ready">File caricati.</string>
-    <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
-    <string name="partial_results">Some files could not be checked. Review the coverage notes.</string>
+    <string name="partial_access_requires_refresh">La selezione dei contenuti autorizzati potrebbe essere cambiata in background. Avvia una nuova scansione per aggiornare i risultati.</string>
+    <string name="partial_results">Non è stato possibile controllare alcuni file. Consulta le note sulla copertura.</string>
     <string name="page_failed">Errore temporaneo durante la lettura di questa pagina. Riprova.</string>
     <string name="pagination_unsupported">Il provider non ha confermato tutti i parametri di paginazione. Risultati parziali.</string>
-    <string name="session_stale">Library or permissions changed. Start a new scan.</string>
-    <string name="scan_cancelled_readonly">Scan cancelled. No files were modified.</string>
+    <string name="session_stale">La raccolta o le autorizzazioni sono cambiate. Avvia una nuova scansione.</string>
+    <string name="scan_cancelled_readonly">Scansione annullata. Nessun file è stato modificato.</string>
     <string name="photos_tab">Foto</string>
     <string name="audio_tab">Audio</string>
     <string name="videos_tab">Video</string>
@@ -43,10 +43,10 @@ Totale: %3$s</string>
     <string name="page_no_visible_rows">Le righe del provider sono state lette, ma escluse dai filtri di stato del sistema (in attesa/nel cestino).</string>
     <string name="previous_page">Pagina precedente</string>
     <string name="next_page">Pagina successiva</string>
-    <string name="nothing_selected">No items prepared for review.</string>
-    <string name="review_count_and_size">%1$d item(s) prepared for review · %2$s</string>
-    <string name="move_to_trash_button">Move to trash</string>
-    <string name="permanent_delete_button">Delete permanently</string>
+    <string name="nothing_selected">Nessun elemento pronto per la revisione.</string>
+    <string name="review_count_and_size">%1$d elementi pronti per la revisione · %2$s</string>
+    <string name="move_to_trash_button">Sposta nel cestino</string>
+    <string name="permanent_delete_button">Elimina definitivamente</string>
     <string name="restore_trash_button">Restore from trash (%1$d)</string>
     <string name="revalidation_none_eligible">No selected items passed pre-execution revalidation (%1$d modified or protected).</string>
     <string name="trash_operation_result">Moved to trash: %1$d of %2$d item(s). These files may continue using storage until permanently deleted.</string>
@@ -54,12 +54,12 @@ Totale: %3$s</string>
     <string name="trash_unsupported_on_device">System trash requires Android 11+ (API 30). Use permanent deletion.</string>
     <string name="delete_operation_result">Deleted and verified: %1$d of %2$d item(s) (%3$s freed).</string>
     <string name="restore_operation_result">Restored and verified: %1$d item(s) · %2$d still pending.</string>
-    <string name="export_review_summary">Export report (Pro)</string>
-    <string name="export_review_subject">Midiastore review report</string>
+    <string name="export_review_summary">Esporta rapporto (Pro)</string>
+    <string name="export_review_subject">Rapporto di revisione Midiastore</string>
     <string name="billing_pending_message">Acquisto in attesa di conferma su Google Play. L’accesso Pro verrà attivato dopo la conferma.</string>
     <string name="billing_pro_required_message">Consulta i piani Midiastore Pro nella scheda Pro per esportare i rapporti verificati.</string>
-    <string name="clear_review">Cancel proposal / Clear selection</string>
-    <string name="remove_review_item">Remove</string>
+    <string name="clear_review">Annulla proposta / Cancella selezione</string>
+    <string name="remove_review_item">Rimuovi</string>
     <string name="more_review_items">%1$d more item(s) in review proposal.</string>
     <string name="select_for_review">Include %1$s in review</string>
     <string name="thumbnail_description">Thumbnail for item %1$d</string>
@@ -70,10 +70,10 @@ Totale: %3$s</string>
     <string name="date_unavailable">Date not provided</string>
     <string name="size_unavailable">Size unavailable</string>
     <string name="pro_card_title">MIDIASTORE PRO</string>
-    <string name="pro_status_free">Piano attuale: Free · Analisi essenziale e pulizia sicura incluse.</string>
+    <string name="pro_status_free">Piano attuale: Gratis · Analisi essenziale e pulizia sicura incluse.</string>
     <string name="pro_status_active">Midiastore Pro è attivo</string>
     <string name="pro_status_pending">Acquisto in attesa di conferma su Google Play</string>
-    <string name="pro_card_subtitle">Essential cleanup is free forever. Choose a Pro plan for 90-day unused apps, blurry photo diagnostics &amp; audited reports.</string>
+    <string name="pro_card_subtitle">La pulizia essenziale è gratis per sempre. Scegli un piano Pro per trovare le app inutilizzate da 90 giorni, rilevare foto sfocate e ottenere rapporti verificati.</string>
     <string name="pro_free_included">FREE FOREVER · WhatsApp, SHA-256 Exact Duplicates, Large Files (&gt;10 MB), Old Screenshots (+30d) &amp; Safe Trash.</string>
     <string name="pro_paid_included">PRO · 90-day Unused Apps Detector, Blurry Photo Diagnostics, Audited Reports &amp; Priority Support.</string>
     <string name="home_cleanup_primary">Scan &amp; Clean</string>
@@ -128,7 +128,7 @@ Totale: %3$s</string>
     <string name="oaas_card_headline">What is taking up space?</string>
     <string name="oaas_card_subtitle">Find what can be safely removed. You review and confirm every cleanup action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">Per prima cosa controlleremo i contenuti multimediali che hai autorizzato.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">Find exact copies (SHA-256) · Free</string>
     <string name="oaas_mission_old">Find files older than 30 days · Free</string>
@@ -235,14 +235,14 @@ Totale: %3$s</string>
     <string name="cleanup_sheet_title">Review &amp; Clean</string>
     <string name="blur_sheet_subtitle">Detected locally via sharpness analysis. Uncheck anything you want to keep.</string>
     <string name="wa_sheet_subtitle">Select WhatsApp media categories to review before Trash or permanent deletion.</string>
-    <string name="cleaner_home_eyebrow">DEVICE STORAGE</string>
+    <string name="cleaner_home_eyebrow">MEMORIA DEL DISPOSITIVO</string>
     <string name="cleaner_home_free_storage">%1$s available</string>
-    <string name="cleaner_home_analyze">Clean My Storage Now</string>
+    <string name="cleaner_home_analyze">Libera spazio sul telefono</string>
     <string name="cleaner_home_scanning">Preparing quick cleanup…</string>
     <string name="cleaner_home_manual_review">Nothing is removed automatically. You choose and confirm every action.</string>
     <string name="cleaner_home_recoverable_eyebrow">ESTIMATED RECOVERABLE SPACE</string>
-    <string name="cleaner_home_used_of_total">%1$s used of %2$s</string>
-    <string name="cleaner_home_items_count">%1$d items</string>
+    <string name="cleaner_home_used_of_total">%1$s utilizzati su %2$s</string>
+    <string name="cleaner_home_items_count">%1$d elementi</string>
     <string name="cleaner_home_fallback_duplicates_title">Duplicates</string>
     <string name="cleaner_home_fallback_duplicates_sub">SHA-256</string>
     <string name="cleaner_home_fallback_large_videos_title">Videos</string>
@@ -257,8 +257,8 @@ Totale: %3$s</string>
     <string name="post_cleanup_relief_title">Space freed successfully!</string>
     <string name="post_cleanup_relief_body">You just safely freed %1$s (%2$d file(s)).\n\nUnlock Midiastore Pro (unused apps 90d+, audited reports &amp; priority support) and save 56%% with the Annual Plan.</string>
     <string name="post_cleanup_relief_cta">Unlock Annual Plan · Save 56%</string>
-    <string name="post_cleanup_relief_later">Not now</string>
-    <string name="limited_access_banner">Partial media access. Tap to allow all photos and videos</string>
+    <string name="post_cleanup_relief_later">Non ora</string>
+    <string name="limited_access_banner">Accesso parziale ai contenuti multimediali. Tocca per consentire tutte le foto e i video</string>
     <string name="limited_access_sheet_title">Midiastore only sees the media you selected</string>
     <string name="limited_access_sheet_body">To find duplicates, large videos and old screenshots across your whole phone, allow access to all photos and videos. Nothing is deleted without your confirmation.</string>
     <string name="limited_access_allow_all">Allow access to all media</string>
@@ -308,8 +308,8 @@ Totale: %3$s</string>
     <string name="share_card_freed_label">SAFELY FREED</string>
     <string name="share_card_headline_freed">More free storage without losing memories.</string>
     <string name="share_card_trust_footer">100% On-Device • Android Scoped Storage</string>
-    <string name="app_language_button">Language</string>
-    <string name="app_language_title">App language</string>
-    <string name="app_language_system_default">Use device language</string>
+    <string name="app_language_button">Lingua</string>
+    <string name="app_language_title">Lingua dell’app</string>
+    <string name="app_language_system_default">Usa la lingua del dispositivo</string>
     <string name="cleanup_dialog_mission_action">Clean %1$s now</string>
 </resources>

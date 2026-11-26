@@ -70,7 +70,7 @@
     <string name="date_unavailable">Date not provided</string>
     <string name="size_unavailable">Size unavailable</string>
     <string name="pro_card_title">MIDIASTORE PRO</string>
-    <string name="pro_status_free">मौजूदा योजना: Free · ज़रूरी विश्लेषण और सुरक्षित सफ़ाई शामिल।</string>
+    <string name="pro_status_free">?????? ?????: ?????? ? ?????? ???????? ?? ???????? ????? ??????</string>
     <string name="pro_status_active">Midiastore Pro सक्रिय है</string>
     <string name="pro_status_pending">Google Play पर खरीद की पुष्टि लंबित है</string>
     <string name="pro_card_subtitle">आवश्यक क्लीनअप हमेशा के लिए निःशुल्क है। उन्नत डायग्नोस्टिक्स, 90+ दिन से अप्रयुक्त ऐप्स और ऑडिट रिपोर्ट के लिए Pro प्लान चुनें।</string>
@@ -128,7 +128,7 @@
     <string name="oaas_card_headline">आप क्या ढूँढना चाहते हैं?</string>
     <string name="oaas_card_subtitle">आपकी फ़ाइलें इसी डिवाइस पर रहती हैं। परिणाम देखें और हर कार्रवाई की अनुमति दें।</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">????, ???? ?????? ????? ?????? ?? ???? ?? ??????</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">सटीक कॉपियाँ ढूँढें (SHA-256) · मुफ़्त</string>
     <string name="oaas_mission_old">30 दिन से पुरानी फ़ाइलें ढूँढें · मुफ़्त</string>
