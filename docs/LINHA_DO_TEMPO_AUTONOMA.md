@@ -3361,3 +3361,33 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #569
 
 ---
+
+### 📍 [25/11/2026, 22:57:23] Concluido 14/14 idiomas da Maria 2.0 neural H.265 (ar,bn,de,en,es,fr,hi,id,it,ja,ko,pt,ru,zh) publicados ao vivo no Firebase CDN (Release 1795658036223000) e salvos no GitHub commit ab1df6d; zero nome pessoal, manifesto atualizado via scripts/update-maria2-manifest.mjs
+- **📖 Estudou / Leu:** N/A
+- **⚙️ Tentou / Executou:** N/A
+- **⚠️ Erros Encontrados:** Nenhum erro registrado
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Concluído com sucesso
+- *Registro Supabase:* Memory #570
+
+---
+
+### 📍 [25/11/2026, 22:57:59] Concluido 14/14 idiomas da Maria 2.0 neural H.265 (ar,bn,de,en,es,fr,hi,id,it,ja,ko,pt,ru,zh) publicados ao vivo no Firebase CDN (Release 1795658036223000) e salvos no GitHub commit ab1df6d; zero nome pessoal, manifesto atualizado via scripts/update-maria2-manifest.mjs
+- **📖 Estudou / Leu:** N/A
+- **⚙️ Tentou / Executou:** N/A
+- **⚠️ Erros Encontrados:** Nenhum erro registrado
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Concluído com sucesso
+- *Registro Supabase:* Memory #571
+
+---
+
+### 📍 [25/11/2026, 23:51:37] Concluido 42/42 videos H.265 da Maria 2.0 (14 idiomas x clean/files/pro) no Firebase CDN (Release 1795661273860000, commit 0998956) + fix auto-play e zero circulo preto (commit b31ab73, Run 45743980767) instalado no Moto G84
+- **📖 Estudou / Leu:** N/A
+- **⚙️ Tentou / Executou:** N/A
+- **⚠️ Erros Encontrados:** Nenhum erro registrado
+- **🔧 Como Corrigiu:** Nenhuma correção necessária
+- **🎯 Conclusão:** Concluído com sucesso
+- *Registro Supabase:* Memory #572
+
+---

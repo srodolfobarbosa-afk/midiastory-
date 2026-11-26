@@ -686,14 +686,12 @@ fun MariaHeroBanner(
             }
             mp.setOnErrorListener { failedMp, _, _ ->
                 videoFrameReady = false
-                videoFrameReady = false
                 runCatching { failedMp.release() }
                 if (videoPlayerRef === failedMp) videoPlayerRef = null
                 true
             }
             mp.prepareAsync()
         }.onFailure {
-            videoFrameReady = false
             videoFrameReady = false
         }
     }
@@ -768,19 +766,21 @@ fun MariaHeroBanner(
         while (surfaceRef == null && waitSurfaceMs < 800L) { delay(40L); waitSurfaceMs += 40L }
         val surface = surfaceRef
         val neuralClipFile: File? = if (videoHardwareSupported && surface != null && surface.isValid) {
-            MariaCdnVideoCache.resolveOrFetchClip(context, lang, clipKey, timeoutMs = 3800L)
+            // The startup prefetch also takes the cache mutex. Give the first cold clip time
+            // to finish instead of immediately switching to the local audio-only fallback.
+            MariaCdnVideoCache.resolveOrFetchClip(context, lang, clipKey, timeoutMs = 12_000L)
         } else {
             null
         }
 
         if (neuralClipFile != null && surface != null && surface.isValid) {
             var clipCompleted = false
+            var neuralPlaybackFailed = false
             releaseVideoPlayer()
             delay(50L)
             val startedNeural = runCatching {
                 val mp = MediaPlayer()
                 videoPlayerRef = mp
-                isNeuralVideoSpeaking = true
                 mp.setSurface(surface)
                 FileInputStream(neuralClipFile).use { fis ->
                     mp.setDataSource(fis.fd)
@@ -797,25 +797,34 @@ fun MariaHeroBanner(
                     clipCompleted = true
                 }
                 mp.setOnErrorListener { _, _, _ ->
+                    neuralPlaybackFailed = true
                     clipCompleted = true
                     true
                 }
                 mp.prepare()
                 mp.start()
+                isNeuralVideoSpeaking = true
                 mp
             }.getOrNull()
 
             if (startedNeural != null) {
                 var elapsedMs = 0L
                 while (isSpeaking && !clipCompleted && elapsedMs < 45_000L) {
-                    if (!videoFrameReady && elapsedMs >= 90L) videoFrameReady = true
                     val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
                     if (!playing && elapsedMs > 650L) break
                     delay(90L)
                     elapsedMs += 90L
                 }
-                stopSpeechAndReturnToIdle()
-                return@LaunchedEffect
+                if (!neuralPlaybackFailed && videoFrameReady) {
+                    stopSpeechAndReturnToIdle()
+                    return@LaunchedEffect
+                }
+
+                // A decoder failure (or a clip that never rendered a frame) falls back to
+                // the bundled speech while keeping video support available for later clips.
+                isNeuralVideoSpeaking = false
+                isSpeaking = true
+                startIdleLoopOnSurface(surface)
             } else {
                 isNeuralVideoSpeaking = false
                 startIdleLoopOnSurface(surface)
@@ -1002,7 +1011,7 @@ fun MariaHeroBanner(
                     }
                     drawCircle(
                         color = when {
-                            isNeuralVideoSpeaking -> Color(0xFF30D158)
+                            isNeuralVideoSpeaking && videoFrameReady -> Color(0xFF30D158)
                             isSpeaking -> Color(0xFF64D2FF)
                             else -> Color(0x660A84FF)
                         },
