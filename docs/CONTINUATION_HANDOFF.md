@@ -431,3 +431,10 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - `ci-cd-governance-audit.mjs` passou com 322 chaves e paridade em `values` + 14 locales; validou UTF-8, apóstrofos AAPT2, escapes Unicode e HTTPS. `git diff --check` passou.
 - Nenhum Gradle local. As alterações ainda aguardam CI/build e reinstalação somente do pacote `.debug` para confirmar UI/fluxos em ADB; não alterar o pacote oficial nem a tag `v2.8.2-carbon-baseline` (`cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4`).
 - CI `45816379909` no SHA `5ff1328`: governança passou; AAPT2 rejeitou a primeira normalização com `&apos;`. A correção passou a usar `’` e será validada por nova execução remota; sem APK nesse run.
+
+### Fechamento 26/11 — gates e instalação debug
+
+- CI run `45817049336` no SHA `71324e22f128cfdfed5c39743e682af29abd7fdc`: `success` (governança, testes, build e artefato `.debug`). Deploy web foi `skipped`.
+- APK identificado como `com.rdf112.midiastore.debug`, SHA-256 `0de3b6e83d5bc3e60babc9d88d4ddde41d2e0f21df816839a066255bc42f53b6`; `adb install -r` foi bloqueado por certificado debug divergente. Não desinstalar nem limpar dados para contornar; combinar uma rota que preserve dados ou obter assinatura compatível antes de continuar o QA visual no Moto G84.
+- URLs de privacidade exatas em HTTPS verificadas por HEAD `200`; `node scripts/ci-cd-governance-audit.mjs` PASS; validação Node independente percorreu 15 catálogos/4.830 textos sem os defeitos pedidos; `git diff --check` PASS.
+- Auditoria e lacunas atualizadas em `docs/QA_AUDITORIA_REAL_V290.md`; não declarar Maria, limpeza rápida, permissão parcial ou mudanças localizadas aprovadas em dispositivo até validar essa revisão.

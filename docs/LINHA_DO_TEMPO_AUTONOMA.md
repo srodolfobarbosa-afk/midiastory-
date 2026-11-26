@@ -3518,3 +3518,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #578
 
 ---
+
+### 📍 [26/11/2026, 09:21:10] fechar gates da auditoria real e registrar limite de assinatura do APK debug
+- **📖 Estudou / Leu:** docs/QA_AUDITORIA_REAL_V290.md, docs/CONTINUATION_HANDOFF.md, URLs de política, 15 catálogos Android e CI 45817049336
+- **⚙️ Tentou / Executou:** Validar as duas URLs HTTPS, Node UTF-8 e AAPT2 nos 15 values strings.xml, governança, git diff check, baixar e identificar APK e instalar apenas o pacote debug no Moto G84
+- **⚠️ Erros Encontrados:** adb install -r foi recusado por INSTALL_FAILED_UPDATE_INCOMPATIBLE porque o certificado do artefato CI difere do app debug instalado; nenhuma desinstalação foi feita para preservar dados
+- **🔧 Como Corrigiu:** Registrados resultados reais do CI, gates HTTPS e strings e bloqueio de assinatura no relatório e handoff; deploy web foi skipped
+- **🎯 Conclusão:** Run 45817049336 success; ambos endpoints exatos retornam 200 em HTTPS; 15 catálogos e 4830 strings passaram UTF-8 e regras de interrogação inicial, escapes Unicode e AAPT2; governance e git diff check passaram; APK com.rdf112.midiastore.debug SHA-256 0de3b6e83d5bc3e60babc9d88d4ddde41d2e0f21df816839a066255bc42f53b6 não foi instalado devido assinatura incompatível. App oficial e dados debug preservados, tag baseline intacta.
+- *Registro Supabase:* Memory #579
+
+---
