@@ -658,6 +658,9 @@ fun MariaHeroBanner(
             mp?.setOnPreparedListener(null)
             mp?.setOnCompletionListener(null)
             if (mp?.isPlaying == true) mp.stop()
+            // A MediaPlayer keeps the SurfaceTexture producer connection alive until its
+            // surface is detached. Tab changes create a new player on the same TextureView.
+            mp?.setSurface(null)
             mp?.release()
         }
     }
