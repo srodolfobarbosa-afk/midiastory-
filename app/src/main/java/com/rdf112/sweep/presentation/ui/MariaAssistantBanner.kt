@@ -3,6 +3,7 @@ package com.rdf112.sweep.presentation.ui
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
+import androidx.appcompat.app.AppCompatDelegate
 import android.os.Environment
 import android.os.StatFs
 import android.view.Surface
@@ -96,7 +97,7 @@ private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
  * (WhatsApp no Brasil/LatAm/Índia/Europa; Chats & Downloads nos EUA/Reino Unido; WeChat na China; LINE no Japão; KakaoTalk na Coreia; Telegram na Rússia).
  */
 object MariaI18n {
-    fun lang(): String = Locale.getDefault().language.lowercase(Locale.ROOT)
+    fun lang(): String = (AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()).language.lowercase(Locale.ROOT)
     fun isPt(): Boolean = lang().startsWith("pt")
 
     fun assistantBadge(): String = when (lang()) {
@@ -770,8 +771,9 @@ fun MariaHeroBanner(
 
         if (neuralClipFile != null && surface != null && surface.isValid) {
             var clipCompleted = false
+            releaseVideoPlayer()
+            delay(50L)
             val startedNeural = runCatching {
-                releaseVideoPlayer()
                 val mp = MediaPlayer()
                 videoPlayerRef = mp
                 isNeuralVideoSpeaking = true

@@ -1,6 +1,7 @@
 package com.rdf112.sweep.data.maria
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.annotation.RawRes
 import com.rdf112.sweep.R
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +51,7 @@ object MariaCdnVideoCache {
     @Volatile
     private var cachedManifestMap: Map<String, Map<String, RemoteClipMeta>>? = null
 
-    fun normalizedLang(locale: Locale = Locale.getDefault()): String {
+    fun normalizedLang(locale: Locale = AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()): String {
         return when (val raw = locale.language.lowercase(Locale.ROOT)) {
             "in", "id" -> "id"
             "pt", "en", "es", "de", "fr", "hi", "ja", "zh", "ar", "ru", "bn", "ko", "it" -> raw
@@ -96,8 +97,10 @@ object MariaCdnVideoCache {
             downloadMutex.withLock {
                 peekCachedClip(context, lang, clipKey)?.let { return@withLock it }
                 val manifest = loadManifest(context)
-                val meta = manifest?.get(lang)?.get(clipKey) ?: return@withLock null
-                downloadAndVerifyClip(context, lang, clipKey, meta)
+                val resolvedKey = if (manifest?.get(lang)?.containsKey(clipKey) == true) clipKey else if (lang != "pt" && manifest?.get(lang)?.containsKey("clean") == true) "clean" else clipKey
+                if (resolvedKey != clipKey) { peekCachedClip(context, lang, resolvedKey)?.let { return@withLock it } }
+                val meta = manifest?.get(lang)?.get(resolvedKey) ?: return@withLock null
+                downloadAndVerifyClip(context, lang, resolvedKey, meta)
             }
         }
     }
