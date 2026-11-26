@@ -1,19 +1,75 @@
 {
-  "version": "2.9.1-moda-hevc",
-  "updatedAt": "2026-11-25T03:27:05.775Z",
+  "version": "2.9.2-moda-hevc",
+  "updatedAt": "2026-11-26T01:34:06.015Z",
   "codec": "hvc1",
-  "resolution": "512x512",
+  "resolution": "480x480",
   "idle": {
     "url": "https://midiastory-df6a0.web.app/cdn/maria2/idle.mp4",
     "bytes": 26333,
     "sha256": "1c3dd7fc57452604fa6f99bc474ef4995203ac5d2a130d27df884b07c5e3233c"
   },
   "locales": {
+    "de": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/de/clean.mp4",
+        "bytes": 196698,
+        "sha256": "3ca5b0c3480cb42be4b293af27a0b6ecd53756bbf0e377738ddb97cbf210e3e2"
+      }
+    },
+    "en": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/en/clean.mp4",
+        "bytes": 155469,
+        "sha256": "0dd5b598ed93deaa746b0d1d392d12566c7fb3d2b6055b04714303f70db68795"
+      }
+    },
+    "es": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/es/clean.mp4",
+        "bytes": 159711,
+        "sha256": "e0a4fdb6a842c59c45ec408a4152b4bac0882278a5ee969b9a6e7269dfb9b641"
+      }
+    },
+    "fr": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/fr/clean.mp4",
+        "bytes": 110067,
+        "sha256": "19da8b4d58f13fde34d0f002bfec989bfd7450283965d38f8c47c6f417a8682c"
+      }
+    },
+    "it": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/it/clean.mp4",
+        "bytes": 149415,
+        "sha256": "67b805cb939600c1beeaff65a7136bf0be8a098c05393b9daf35f911e9039564"
+      }
+    },
+    "ja": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/ja/clean.mp4",
+        "bytes": 183623,
+        "sha256": "ae3336b6b16ee161f467c0fd275214c7227dc4ccde1298115fdf09eea4e6e8f9"
+      }
+    },
     "pt": {
       "clean": {
         "url": "https://midiastory-df6a0.web.app/cdn/maria2/pt/clean.mp4",
-        "bytes": 178505,
-        "sha256": "36dbd80b81baca9524b996e27b1ef3b5c12ece614a38c3bc5d5719d52cec5889"
+        "bytes": 171224,
+        "sha256": "13a82d00d3faa64dc3eaeed6c762471d2e36757811b656f837f9e5bfaedc2bc2"
+      }
+    },
+    "ru": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/ru/clean.mp4",
+        "bytes": 146766,
+        "sha256": "9ac161f84ff2a004b916550af56ab232669c812f08674f438310ba770c223145"
+      }
+    },
+    "zh": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/zh/clean.mp4",
+        "bytes": 164582,
+        "sha256": "cf56edb2d335e73c87346607724e7f73bf4fbb584bf36f87ecd1ce397e57eccc"
       }
     }
   }

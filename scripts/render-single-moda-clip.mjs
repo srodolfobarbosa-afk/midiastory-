@@ -25,6 +25,7 @@ const PORTRAIT_PNG = path.join(projectRoot, ".agents", "avatar", "antigravity-av
 const FFMPEG_WIN = "C:\\Users\\rodolfo\\tools\\ffmpeg\\bin\\ffmpeg.exe";
 const FFMPEG = process.platform === "win32" && fs.existsSync(FFMPEG_WIN) ? FFMPEG_WIN : "ffmpeg";
 
+const hfAuth = process.env.HF_TOKEN ? { Authorization: "Bearer " + process.env.HF_TOKEN } : {};
 const MODA_HOST = "https://multimodalart-moda-fast-talking-head.hf.space";
 
 // 100% Clean Global Commercial Speeches (ZERO "Rodolfo", ZERO "Mediatório", ZERO speed claims)
@@ -161,8 +162,7 @@ async function gradioUpload(baseUrl, localFilePath, mimeType) {
   const form = new FormData();
   form.append("files", new Blob([buf], { type: mimeType }), path.basename(localFilePath));
   const r = await fetch(`${baseUrl}/gradio_api/upload`, {
-    method: "POST",
-    body: form,
+    method: "POST", headers: hfAuth, body: form,
     signal: AbortSignal.timeout(35000),
   });
   if (!r.ok) throw new Error(`Gradio upload HTTP ${r.status}`);
@@ -182,7 +182,7 @@ async function callModaQueue(audioWavPath, emotion = "None", cfgScale = 1.2) {
 
   const joinRes = await fetch(`${MODA_HOST}/gradio_api/queue/join`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...hfAuth },
     body: JSON.stringify({
       data: [imgFile, audFile, emotion, cfgScale],
       fn_index: 0,
@@ -193,7 +193,7 @@ async function callModaQueue(audioWavPath, emotion = "None", cfgScale = 1.2) {
   if (!joinRes.ok) throw new Error(`MoDA queue/join HTTP ${joinRes.status}`);
 
   const dataRes = await fetch(`${MODA_HOST}/gradio_api/queue/data?session_hash=${sessionHash}`, {
-    signal: AbortSignal.timeout(160000),
+    headers: hfAuth, signal: AbortSignal.timeout(160000),
   });
   const sseText = await dataRes.text();
   let videoUrl = null;
@@ -210,7 +210,7 @@ async function callModaQueue(audioWavPath, emotion = "None", cfgScale = 1.2) {
     }
   }
   if (!videoUrl) throw new Error("No video URL returned from MoDA queue");
-  const dl = await fetch(videoUrl, { signal: AbortSignal.timeout(60000) });
+  const dl = await fetch(videoUrl, { headers: hfAuth, signal: AbortSignal.timeout(60000) });
   if (!dl.ok) throw new Error(`Video download HTTP ${dl.status}`);
   return Buffer.from(await dl.arrayBuffer());
 }
