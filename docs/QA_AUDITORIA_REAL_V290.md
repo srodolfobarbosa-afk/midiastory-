@@ -71,5 +71,6 @@ As alterações abaixo estão na branch de evolução; **ainda não foram compil
 ### Validações estáticas desta revisão
 
 - `node scripts/ci-cd-governance-audit.mjs`: **PASS** em 15 catálogos (`values` + 14 idiomas), 322 chaves/paridade, UTF-8, sem string iniciada por `?`, sem `\'`, sem escape `\u` inválido, sem apóstrofo AAPT2 inválido; URLs HTTPS e regras de governança também passaram.
-- A primeira execução encontrou oito catálogos com apóstrofos problemáticos; foram normalizados como `&apos;` e a execução seguinte passou.
+- A primeira execução encontrou oito catálogos com apóstrofos problemáticos. A primeira tentativa de normalização com `&apos;` passou no XML/validador Node, mas o AAPT2 do CI a rejeitou; substituí por apóstrofos tipográficos `’` e acrescentei uma regra para bloquear `&apos;` em futuras validações.
 - `git diff --check`: **PASS**. Resumo desta etapa registrado em `public.memories` (#578). Nenhum Gradle local foi executado; confirmação por CI/APK e novo ADB permanece necessária antes de chamar as mudanças de validadas.
+- CI remoto no SHA `5ff1328`: governança passou; compilação de recursos falhou na tentativa com `&apos;` e não publicou APK. A correção dos caracteres está na revisão seguinte; build e ADB ainda pendentes.

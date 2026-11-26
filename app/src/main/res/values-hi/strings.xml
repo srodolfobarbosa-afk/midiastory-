@@ -137,7 +137,7 @@
     <string name="oaas_card_headline">आप क्या ढूँढना चाहते हैं?</string>
     <string name="oaas_card_subtitle">आपकी फ़ाइलें इसी डिवाइस पर रहती हैं। परिणाम देखें और हर कार्रवाई की अनुमति दें।</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we&apos;ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">First, we’ll check the media you allowed.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">सटीक कॉपियाँ ढूँढें (SHA-256) · मुफ़्त</string>
     <string name="oaas_mission_old">30 दिन से पुरानी फ़ाइलें ढूँढें · मुफ़्त</string>

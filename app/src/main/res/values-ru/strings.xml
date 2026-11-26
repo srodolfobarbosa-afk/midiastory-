@@ -11,7 +11,7 @@
     <string name="ready_status">Готовый. 100% локальная обработка с оригинальной эталонной защитой.</string>
     <string name="permission_denied">Разрешение не получено. Никакие СМИ не были опрошены.</string>
     <string name="no_access">Предоставьте доступ к фотографиям, видео или аудио, чтобы начать анализ.</string>
-    <string name="starting_scan">Проверка носителя, который вы &apos; разрешили…</string>
+    <string name="starting_scan">Проверка носителя, который вы ’ разрешили…</string>
     <string name="loading_page">Чтение файлов…</string>
     <string name="page_ready">Файлы загружены.</string>
     <string name="partial_access_requires_refresh">Выбор авторизованного носителя мог быть изменен в фоновом режиме. Запустите новое сканирование для согласования.</string>
@@ -137,7 +137,7 @@
     <string name="oaas_card_headline">Что занимает место?</string>
     <string name="oaas_card_subtitle">Найдите то, что можно безопасно удалить. Вы просматриваете и подтверждаете каждое действие по очистке.</string>
     <string name="oaas_pipeline_idle">Выберите анализ, чтобы начать.</string>
-    <string name="oaas_starting_scan_first">Сначала мы&apos; проверим разрешенный вами носитель.</string>
+    <string name="oaas_starting_scan_first">Сначала мы’ проверим разрешенный вами носитель.</string>
     <string name="oaas_mission_large">Найти большие файлы (более 10 МБ)</string>
     <string name="oaas_mission_duplicates">Найти точные копии (SHA-256) · Бесплатно</string>
     <string name="oaas_mission_old">Найти файлы старше 30 дней · Бесплатно</string>

@@ -122,6 +122,9 @@ for (const folder of resValuesFolders) {
   const escapedApostrophes = stringBodies
     .filter(([, , val]) => /\\'/.test(val))
     .map(([, name]) => name);
+  const unsupportedAposEntities = stringBodies
+    .filter(([, , val]) => /&apos;/i.test(val))
+    .map(([, name]) => name);
   const invalidUnicodeEscapes = stringBodies
     .filter(([, , val]) => /\\u(?![0-9a-fA-F]{4})/i.test(val))
     .map(([, name]) => name);
@@ -147,10 +150,12 @@ for (const folder of resValuesFolders) {
       noSparkles &&
       startsWithQuestion.length === 0 &&
       escapedApostrophes.length === 0 &&
+      unsupportedAposEntities.length === 0 &&
       invalidUnicodeEscapes.length === 0 &&
       aaptInvalid.length === 0,
     `UTF-8=${utf8Valid}, paridade=${keys.length}/${baseKeySet.size}, ` +
       `começa com ? (${startsWithQuestion.join(", ")}), \\' (${escapedApostrophes.join(", ")}), ` +
+      `&apos; (${unsupportedAposEntities.join(", ")}), ` +
       `\\u inválido (${invalidUnicodeEscapes.join(", ")}), AAPT2 (${aaptInvalid.join(", ")}) em ${folder}/strings.xml.`
   );
 }

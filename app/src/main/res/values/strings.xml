@@ -11,7 +11,7 @@ Total: %3$s</string>
     <string name="ready_status">Ready. 100% local processing with original reference protection.</string>
     <string name="permission_denied">Permission not granted. No media was queried.</string>
     <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
-    <string name="starting_scan">Checking the media you&apos;ve allowed…</string>
+    <string name="starting_scan">Checking the media you’ve allowed…</string>
     <string name="loading_page">Reading your files…</string>
     <string name="page_ready">Files loaded.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
@@ -137,7 +137,7 @@ Total: %3$s</string>
     <string name="oaas_card_headline">What is taking up space?</string>
     <string name="oaas_card_subtitle">Find what can be safely removed. You review and confirm every cleanup action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we&apos;ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">First, we’ll check the media you allowed.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">Find exact copies (SHA-256) · Free</string>
     <string name="oaas_mission_old">Find files older than 30 days · Free</string>
