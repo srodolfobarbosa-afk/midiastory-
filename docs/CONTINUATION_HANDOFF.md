@@ -1,145 +1,160 @@
-# Midiastore — CONTINUIDADE DO PROJETO
-> 🧭 **Navegação Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) | **Checklist Produção (`26/11`):** [**`docs/CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) | **Roadmap `v2.9.0` & Maria 2.0:** [**`docs/CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) | **Histórico Arquivado:** [`docs/archive/`](archive/README.md)
+﻿# Midiastore â€” CONTINUIDADE DO PROJETO
+> ðŸ§­ **NavegaÃ§Ã£o Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) | **Checklist ProduÃ§Ã£o (`26/11`):** [**`docs/CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) | **Roadmap `v2.9.0` & Maria 2.0:** [**`docs/CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) | **HistÃ³rico Arquivado:** [`docs/archive/`](archive/README.md)
 
-## Checkpoint Oficial Verificado Ao Vivo — 2026-11-25 (Maria 2.0 MoDA H.265 CDN + Growth Pack v2.9.1 Concluídos e Instalados no Moto G84 · Baseline 26/11 Intocada)
+## Checkpoint verificado â€” 2026-11-26 (sincronia fala/vÃ­deo Maria)
+
+- Commit Ãºnico `63b27b523996f807e94a78b182b40e40d76d1c4c` em `feat/v2.9.0-motor-app`; GitHub Actions run `45770508505` terminou `success` no SHA exato; compilaÃ§Ã£o feita sÃ³ no runner Linux. Auditoria local de governanÃ§a tambÃ©m passou. Tag `v2.8.2-carbon-baseline` (`cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4`) preservada.
+- `MariaLocalizedSpeech.kt` agora mantÃ©m um TTS singleton aquecido, define o locale corrente antes de cada `QUEUE_FLUSH`, aciona inÃ­cio/fim na Main Thread e nÃ£o chama `shutdown()`. O vÃ­deo universal sÃ³ recebe `start()` no inÃ­cio real do MediaPlayer PT ou `onStart` do TTS; callbacks done/error/stop liberam vÃ­deo/anel. Troca de aba, `ON_PAUSE`/`ON_STOP` e `onDispose` interrompem TTS e os players.
+- Corrigidas quatro strings com `?` corrompido em `values-fr`/`values-de`, alÃ©m de `storage_measurement` e `storage_used_headline` em espanhol e francÃªs. A auditoria encontrou zero `?` dentro de palavras nos 14 diretÃ³rios de idioma.
+- APK CI SHA-256 `00B9ADC2B062C38E879F8B348B005BFBEE7C0681AEF3967B2A6D3DD9AE147AFE`, pacote `.debug` instalado no Moto G84 API 35; pacote oficial continuou instalado. EvidÃªncias em `.tmp/qa/maria-sync-63b27b5/` (`es-start.png`, `es-later.png`, `es-done.png`, `es-background-logcat.txt`, `pt-active.png`, `pt-after-speech.png`, `pt-background-logcat.txt`). ES comeÃ§ou visualmente idle antes do inÃ­cio do Ã¡udio; ao mandar para Home em PT e ES, AudioFlinger ficou com `numTracks=0`. Em PT, captura apÃ³s fala mostrou anel azul/idle e sem trilhas de Ã¡udio. NÃ£o houve compilaÃ§Ã£o Gradle local.
+- MemÃ³ria Supabase registrada como #574 pela rotina `scripts/registrar-memoria.mjs`; linha do tempo autÃ´noma atualizada.
+
+## Checkpoint verificado â€” 2026-11-26 (animaÃ§Ã£o universal muda da Maria)
+
+- **CÃ³digo em `feat/v2.9.0-motor-app`:** commit `6d9afb52eb18cc0085877af2756cbeb91803f9a1`, validado no GitHub Actions run `45767023861` (CI verde; gate de AAB abaixo de 8 MB). Nenhum Gradle foi executado localmente. `v2.8.2-carbon-baseline` permaneceu intacta.
+- **VÃ­deo:** `app/src/main/res/raw/maria_talk_universal.mp4`, H.264, sem faixa de Ã¡udio, 65.176 bytes. O player embutido toca em loop com volume zero junto Ã  fala localizada e Ã© liberado ao terminar/trocar de aba; o idle player concorrente foi removido para evitar disputa pela `TextureView`. O manifesto CDN fica somente com `pt/clean.mp4` como fonte; a animaÃ§Ã£o de runtime nÃ£o depende de CDN.
+- **Moto G84 / evidÃªncia:** APK `.debug` instalado ao lado do pacote oficial, sem alterar este. As capturas `clean-confirm.png`, `files.png` e `pro.png` em `.tmp/qa/maria-one-video-6d9afb5/` mostram o vÃ­deo nas trÃªs abas. Logs daquela sessÃ£o confirmaram o primeiro frame da `TextureView` apÃ³s cada troca e Ã¡udio do vÃ­deo zerado. O dispositivo estÃ¡ desconectado nesta atualizaÃ§Ã£o; nÃ£o foi feita nova coleta ADB.
+- **MemÃ³ria:** resultado registrado em `public.memories` pela rotina do projeto (registro #573); resumo tambÃ©m consta na linha do tempo autÃ´noma.
+
+## Checkpoint Oficial Verificado Ao Vivo â€” 2026-11-25 (Maria 2.0 MoDA H.265 CDN + Growth Pack v2.9.1 ConcluÃ­dos e Instalados no Moto G84 Â· Baseline 26/11 Intocada)
 
 - **Baseline Protegida para Quinta-Feira (`26/11`):** `tag v2.8.2-carbon-baseline` (`cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4`) **100% intocada**; faixas `internal`/`alpha` na Play Console preservadas em `v2.8.0 (vc 32)` com os **23 testadores fechados intactos**.
 - **Maria 2.0 Humana Fotorrealista (MoDA Diffusion H.265 CDN + Cache Local + Fallback Offline) na `feat/v2.9.0-motor-app`:**
   - **CDN Firebase Hosting (`Release 1795577272160000`, `HTTP 200`):** publicado `https://midiastory-df6a0.web.app/cdn/maria2/manifest.json` + `idle.mp4` (`25,7 KB` H.265 `hvc1`) + `pt/clean.mp4` (`174,3 KB`, SHA-256 `36dbd80b...`) + pipeline incremental Node.js em `scripts/generate-maria2-moda-pipeline.mjs` (zero Python, zero 3D, zero boca 2D artificial).
-  - **Player Nativo Leve (`MariaAssistantBanner.kt` + `MariaCdnVideoCache.kt`):** `TextureView` hardware + cache local LRU limitado (`<= 24 MB` em `files/maria2_cdn_cache` com verificação de assinatura `ftyp` e SHA-256) + passagem segura via `FileDescriptor` para `MediaPlayer` no Android 15 + `res/raw/maria2_idle.mp4` (`25,7 KB`) para abertura instantânea (`0 ms`) e fallback seguro offline.
-- **Growth Pack `v2.9.1` (3 Frentes Concluídas nos 14 Idiomas — `307/307` chaves em paridade 100%):**
-  1. **Free Trial 3 Dias Exclusivo no Plano Anual (`sweep_pro_annual`):** `SubscriptionOfferSelector.kt` + `AndroidPlayBillingGateway.kt` + Edge Function `verify-play-purchase` (`v10 ACTIVE` no Supabase) validando `annual-trial-3d` com renovação/expiração `fail-closed`.
-  2. **Notificação Semanal Inteligente (`WeeklyStorageDigestWorker.kt`):** `WorkManager` periódico de 7 dias (`setRequiresBatteryNotLow(true)`), silêncio absoluto se `< 300 MB` (`314.572.800 bytes`) ou app aberto há `< 48h`, e convite `POST_NOTIFICATIONS` somente pós-1ª limpeza.
-  3. **Botão Nativo de Compartilhar + Card OLED `1080x1350` (`ShareAchievementCardRenderer.kt`, `+0 KB`):** renderização pura em `Canvas` com `Precision Storage Ring` + `FileProvider` + preview `ClipData` e link UTM (`?utm_source=app_share&utm_medium=viral_card`) para WhatsApp, Telegram e Instagram Stories/Direct (zero `<intent-filter>` `ACTION_SEND` no manifesto).
-- **CI Linux 7 GB RAM (`Run 45543787553` — `100% verde` em `6df50eb`) + QA Real no Moto G84 (`0085353748`):**
-  - **AAB Release R8 Assinado Medido no CI:** **`6,79 MB`** (`7.120.223 bytes` — **`-470 KB` menor** que os `7,26 MB` da `v2.8.2`, cumprindo com folga o teto `< 8 MB`).
+  - **Player Nativo Leve (`MariaAssistantBanner.kt` + `MariaCdnVideoCache.kt`):** `TextureView` hardware + cache local LRU limitado (`<= 24 MB` em `files/maria2_cdn_cache` com verificaÃ§Ã£o de assinatura `ftyp` e SHA-256) + passagem segura via `FileDescriptor` para `MediaPlayer` no Android 15 + `res/raw/maria2_idle.mp4` (`25,7 KB`) para abertura instantÃ¢nea (`0 ms`) e fallback seguro offline.
+- **Growth Pack `v2.9.1` (3 Frentes ConcluÃ­das nos 14 Idiomas â€” `307/307` chaves em paridade 100%):**
+  1. **Free Trial 3 Dias Exclusivo no Plano Anual (`sweep_pro_annual`):** `SubscriptionOfferSelector.kt` + `AndroidPlayBillingGateway.kt` + Edge Function `verify-play-purchase` (`v10 ACTIVE` no Supabase) validando `annual-trial-3d` com renovaÃ§Ã£o/expiraÃ§Ã£o `fail-closed`.
+  2. **NotificaÃ§Ã£o Semanal Inteligente (`WeeklyStorageDigestWorker.kt`):** `WorkManager` periÃ³dico de 7 dias (`setRequiresBatteryNotLow(true)`), silÃªncio absoluto se `< 300 MB` (`314.572.800 bytes`) ou app aberto hÃ¡ `< 48h`, e convite `POST_NOTIFICATIONS` somente pÃ³s-1Âª limpeza.
+  3. **BotÃ£o Nativo de Compartilhar + Card OLED `1080x1350` (`ShareAchievementCardRenderer.kt`, `+0 KB`):** renderizaÃ§Ã£o pura em `Canvas` com `Precision Storage Ring` + `FileProvider` + preview `ClipData` e link UTM (`?utm_source=app_share&utm_medium=viral_card`) para WhatsApp, Telegram e Instagram Stories/Direct (zero `<intent-filter>` `ACTION_SEND` no manifesto).
+- **CI Linux 7 GB RAM (`Run 45543787553` â€” `100% verde` em `6df50eb`) + QA Real no Moto G84 (`0085353748`):**
+  - **AAB Release R8 Assinado Medido no CI:** **`6,79 MB`** (`7.120.223 bytes` â€” **`-470 KB` menor** que os `7,26 MB` da `v2.8.2`, cumprindo com folga o teto `< 8 MB`).
   - **APK `.debug` (`com.rdf112.midiastore.debug`, SHA-256 `21139805cf1f5587afb0a5125f8fb7cd211341c109ab5983d65668d8de2783b8`):** instalado lado a lado no **Motorola Moto G84 5G (`0085353748`, API 35)** com `pt_clean_v291.mp4` (`178.505 bytes`) confirmado no cache local e `0` erros `AndroidRuntime:E`.
 
 ---
 
-## Checkpoint Oficial Verificado Ao Vivo — 2026-11-24 (Blindagem 360° Carbon Concluída — Pronto para Produção 26/11 + Roadmap v2.9.0/Maria 2.0)
+## Checkpoint Oficial Verificado Ao Vivo â€” 2026-11-24 (Blindagem 360Â° Carbon ConcluÃ­da â€” Pronto para ProduÃ§Ã£o 26/11 + Roadmap v2.9.0/Maria 2.0)
 
-- **Fonte Única de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md), [`docs/CONTINUATION_UPDATE_2026-11-24.md`](CONTINUATION_UPDATE_2026-11-24.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
-- **App Android `v2.8.2 (vc 34)` (Tag `v2.8.2-carbon-baseline` em `cd0a661` / HEAD `6fd8020`, CI `Run 45342358085` + `45343870292` 100% verdes):** AAB assinado **`7,26 MB`** (`7.263.824 bytes`, SHA-256 `5151aa51ac753efb78427d90591d6faaa13d7bdc16038642cda2704f017634f1` em `.tmp/qa/v282-carbon-aab/app-release.aab`) auditado via `bundletool` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, zero `ACTION_SEND`, `631/631` strings válidas nos 14 idiomas) e validado ao vivo em retrato no **Motorola Moto G84 5G (`0085353748`)** (`PT-BR` e `EN-US`).
-- **Google Play Console (Confirmado por Print Oficial em `24/11/2026 19:45 BRT` • Abertura de Produção Quinta 26/11):** `Envio 18 — Detalhes do app` **✅ Publicado** (nova marca `Precision Storage Ring` + 14 fichas no ar); painel oficial marcando **`12 testadores estão participando continuamente há 12 dias`** (faltam **exatos 2 dias** para liberar o botão *"Solicitar a produção"* na quinta-feira `26/11`); `internal`/`alpha` intactos em `v2.8.0 (vc 32)` com 23 testadores preservados. **0 bloqueios P0.**
-- **Supabase & Políticas Web:** `play_console_sync_state` + `get_prelaunch_stats()` corrigidos com relógio dinâmico BRT (`23 testadores`, `Dia 12 de 14`); `/privacidade.html` e `/privacy.html` limpas e publicadas no Firebase (`Release 1795515742674000`, `HTTP 200`, `srodolfobarbosa@gmail.com`).
-- **Score de Prontidão Comercial (`node scripts/goal-growth-engine.mjs`):** **`75/100`** (únicos 25 pontos = clicar em *"Solicitar a produção"* na quinta `26/11`). Evoluções `v2.9.0` e **Laboratório Maria Humana de Última Geração** (**zero 3D — Diretriz 12**) organizadas sob o Protocolo Catraca em [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md).
-- **Avanço `feat/v2.9.0-motor-app` (Etapas 1, 2 e 3 Concluídas em `2026-11-24` — TODOS os 8 Blocos Prontos e Instalados Lado a Lado no Moto G84 `0085353748` + Estudo `docs/ESTUDO_MARIA_2_HUMANA_E_ESCALA.md` Entregue):**
+- **Fonte Ãšnica de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md), [`docs/CONTINUATION_UPDATE_2026-11-24.md`](CONTINUATION_UPDATE_2026-11-24.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
+- **App Android `v2.8.2 (vc 34)` (Tag `v2.8.2-carbon-baseline` em `cd0a661` / HEAD `6fd8020`, CI `Run 45342358085` + `45343870292` 100% verdes):** AAB assinado **`7,26 MB`** (`7.263.824 bytes`, SHA-256 `5151aa51ac753efb78427d90591d6faaa13d7bdc16038642cda2704f017634f1` em `.tmp/qa/v282-carbon-aab/app-release.aab`) auditado via `bundletool` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, zero `ACTION_SEND`, `631/631` strings vÃ¡lidas nos 14 idiomas) e validado ao vivo em retrato no **Motorola Moto G84 5G (`0085353748`)** (`PT-BR` e `EN-US`).
+- **Google Play Console (Confirmado por Print Oficial em `24/11/2026 19:45 BRT` â€¢ Abertura de ProduÃ§Ã£o Quinta 26/11):** `Envio 18 â€” Detalhes do app` **âœ… Publicado** (nova marca `Precision Storage Ring` + 14 fichas no ar); painel oficial marcando **`12 testadores estÃ£o participando continuamente hÃ¡ 12 dias`** (faltam **exatos 2 dias** para liberar o botÃ£o *"Solicitar a produÃ§Ã£o"* na quinta-feira `26/11`); `internal`/`alpha` intactos em `v2.8.0 (vc 32)` com 23 testadores preservados. **0 bloqueios P0.**
+- **Supabase & PolÃ­ticas Web:** `play_console_sync_state` + `get_prelaunch_stats()` corrigidos com relÃ³gio dinÃ¢mico BRT (`23 testadores`, `Dia 12 de 14`); `/privacidade.html` e `/privacy.html` limpas e publicadas no Firebase (`Release 1795515742674000`, `HTTP 200`, `srodolfobarbosa@gmail.com`).
+- **Score de ProntidÃ£o Comercial (`node scripts/goal-growth-engine.mjs`):** **`75/100`** (Ãºnicos 25 pontos = clicar em *"Solicitar a produÃ§Ã£o"* na quinta `26/11`). EvoluÃ§Ãµes `v2.9.0` e **LaboratÃ³rio Maria Humana de Ãšltima GeraÃ§Ã£o** (**zero 3D â€” Diretriz 12**) organizadas sob o Protocolo Catraca em [`docs/CHECKLIST_EVOLUCAO_CARBON.md`](CHECKLIST_EVOLUCAO_CARBON.md).
+- **AvanÃ§o `feat/v2.9.0-motor-app` (Etapas 1, 2 e 3 ConcluÃ­das em `2026-11-24` â€” TODOS os 8 Blocos Prontos e Instalados Lado a Lado no Moto G84 `0085353748` + Estudo `docs/ESTUDO_MARIA_2_HUMANA_E_ESCALA.md` Entregue):**
   1. **Etapa 1 (`Run 45491856092` verde):** removidos `presentation/studio/*`, `ZXing`, `friday-core/avatar-3d/*` e `~3.240` linhas mortas em `MainActivity.kt` (**Maria atual 100% intocada**); `AndroidMediaFingerprintStore` (`SQLite WAL`) integrado ao `SHA-256`; zero estrelinhas/emojis.
-  2. **Etapa 2 (`Run 45496347206` verde em `667be1f`):** `Fotos Parecidas / Burst IA` (`openSimilarPhotosCleanerFlow` + selo `MELHOR FOTO PROTEGIDA` nas abas Limpar e Pro), `Preview Tela Cheia OLED` (`MediaFullscreenPreviewDialog.kt` pinch-zoom + player vídeo), `Compressor de Vídeo H.265/HEVC GPU Pro` (`AndroidHardwareVideoCompressor.kt` + `VideoCompressionPlanner.kt`, `0 KB` bloat, mantendo `< 8 MB`), `GB Acumulados na Home + InAppReview 5 Estrelas` (cooldown 7d) e `288/288` chaves em paridade 100% + auditoria AAPT2 nos 14 idiomas.
+  2. **Etapa 2 (`Run 45496347206` verde em `667be1f`):** `Fotos Parecidas / Burst IA` (`openSimilarPhotosCleanerFlow` + selo `MELHOR FOTO PROTEGIDA` nas abas Limpar e Pro), `Preview Tela Cheia OLED` (`MediaFullscreenPreviewDialog.kt` pinch-zoom + player vÃ­deo), `Compressor de VÃ­deo H.265/HEVC GPU Pro` (`AndroidHardwareVideoCompressor.kt` + `VideoCompressionPlanner.kt`, `0 KB` bloat, mantendo `< 8 MB`), `GB Acumulados na Home + InAppReview 5 Estrelas` (cooldown 7d) e `288/288` chaves em paridade 100% + auditoria AAPT2 nos 14 idiomas.
   3. **Etapa 3 (`Run 45500927976` verde em `c0fbf23`):** APK `.debug` (`com.rdf112.midiastore.debug`, SHA-256 `755c1927...`) compilado no GitHub Actions Linux 7 GB RAM e instalado lado a lado no **Motorola Moto G84 5G (`0085353748`, Android 15 API 35)** sem tocar no `com.rdf112.midiastore` oficial; QA visual real validado (`0` erros `AndroidRuntime:E`) + estudo comparativo completo entregue em [`docs/ESTUDO_MARIA_2_HUMANA_E_ESCALA.md`](ESTUDO_MARIA_2_HUMANA_E_ESCALA.md).
 
 ---
 
-## Checkpoint Oficial Verificado Ao Vivo — 2026-11-23 (Visão Sistêmica Integrada — v2.8.2 vc 34 Pronta para QA USB & Produção 26/11)
+## Checkpoint Oficial Verificado Ao Vivo â€” 2026-11-23 (VisÃ£o SistÃªmica Integrada â€” v2.8.2 vc 34 Pronta para QA USB & ProduÃ§Ã£o 26/11)
 
-- **Fonte Única de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-23.md`](CONTINUATION_UPDATE_2026-11-23.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
-- **App Android `v2.8.2 (vc 34)` (`735dcd3`, CI `Run 45118253546` + `45118253451` 100% verdes):** AAB assinado **`7,26 MB`** (`b0d0fe6e...`) auditado via `bundletool` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, `630/630` strings válidas nos 14 idiomas). Removido modal bloqueador + 9 frames `maria_lip_0..7`/`maria_talk_blink`; nova barra compacta Maria (`76dp`, retrato natural + piscada + respiração + anel neon + ondas 60 FPS sob demanda). APK/AAB em `.tmp/qa/v282-apk/` aguardando reconexão USB do Moto G84 para QA visual final.
-- **Widget Desktop FRIDAY/Maria:** restaurado somando todas as conquistas (16 níveis Optical-Flow F1/F2 60 FPS + crossfade + gate rígido + anel neon + 5 ondas de voz 60 FPS).
-- **Play Console (Dia 10/14 • Previsão 26/11):** `internal`/`alpha` intactos em `v2.8.0 (vc 32)` com 23 testadores preservados; **APTO para solicitar produção em 26/11 (0 bloqueios P0)**.
-- **Score de Prontidão Comercial (`node scripts/goal-growth-engine.mjs`):** **`75/100`** (único gargalo de caixa = abertura de Produção em 26/11).
+- **Fonte Ãšnica de Prioridades:** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-23.md`](CONTINUATION_UPDATE_2026-11-23.md), [`docs/MOTOR_CRESCIMENTO_META.md`](MOTOR_CRESCIMENTO_META.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md).
+- **App Android `v2.8.2 (vc 34)` (`735dcd3`, CI `Run 45118253546` + `45118253451` 100% verdes):** AAB assinado **`7,26 MB`** (`b0d0fe6e...`) auditado via `bundletool` (zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`, `630/630` strings vÃ¡lidas nos 14 idiomas). Removido modal bloqueador + 9 frames `maria_lip_0..7`/`maria_talk_blink`; nova barra compacta Maria (`76dp`, retrato natural + piscada + respiraÃ§Ã£o + anel neon + ondas 60 FPS sob demanda). APK/AAB em `.tmp/qa/v282-apk/` aguardando reconexÃ£o USB do Moto G84 para QA visual final.
+- **Widget Desktop FRIDAY/Maria:** restaurado somando todas as conquistas (16 nÃ­veis Optical-Flow F1/F2 60 FPS + crossfade + gate rÃ­gido + anel neon + 5 ondas de voz 60 FPS).
+- **Play Console (Dia 10/14 â€¢ PrevisÃ£o 26/11):** `internal`/`alpha` intactos em `v2.8.0 (vc 32)` com 23 testadores preservados; **APTO para solicitar produÃ§Ã£o em 26/11 (0 bloqueios P0)**.
+- **Score de ProntidÃ£o Comercial (`node scripts/goal-growth-engine.mjs`):** **`75/100`** (Ãºnico gargalo de caixa = abertura de ProduÃ§Ã£o em 26/11).
 
 ---
 
-## Checkpoint Oficial Verificado Ao Vivo — 2026-11-22 (Parede Única Ativa — Fechamento do Dia v2.8.0 vc 32)
+## Checkpoint Oficial Verificado Ao Vivo â€” 2026-11-22 (Parede Ãšnica Ativa â€” Fechamento do Dia v2.8.0 vc 32)
 
-- **Fonte Única de Prioridades (Parede Única):** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-22.md`](CONTINUATION_UPDATE_2026-11-22.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md). **Regra da Parede Única:** nunca iniciar nova arquitetura paralela sem concluir o tijolo atual; cada sessão e cada mensagem continua diretamente do estado verificado abaixo.
+- **Fonte Ãšnica de Prioridades (Parede Ãšnica):** [`docs/CHECKLIST_PRODUCAO_VIVA.md`](CHECKLIST_PRODUCAO_VIVA.md), [`docs/CONTINUATION_UPDATE_2026-11-22.md`](CONTINUATION_UPDATE_2026-11-22.md) e [`docs/PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md`](PLAY_CONSOLE_PRODUCTION_APPLICATION_READY.md). **Regra da Parede Ãšnica:** nunca iniciar nova arquitetura paralela sem concluir o tijolo atual; cada sessÃ£o e cada mensagem continua diretamente do estado verificado abaixo.
 - **Estado Real na Google Play Console (verificado via `google-auth-library` / Play API v3 em `2026-11-22T08:50:28Z`):**
   - `internal` e `alpha` (Teste Fechado): **`v2.8.0` (`versionCode 32`) `[completed]`** (`Edit 14212325279113978395`, SHA-256 `97035252009b5cf95a7f75892f9d5ab7eeb236d6fc764ca6ea8b804d730a5227`, `7,36 MB` AAB R8 assinado com `sweep-upload.jks`). Lista dos 23 testadores fechados 100% preservada.
-  - `production`: aguardando término do relógio obrigatório de 14 dias do Teste Fechado para clicar em **"Solicitar a produção"** (respostas de 300 caracteres e Data Safety já prontas e auditadas contra `AndroidManifest.xml` — zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`).
-  - **Produtos Billing Ativos (`ACTIVE`):** `sweep_pro_monthly` (`monthly-base:ACTIVE`), `sweep_pro_annual` (`annual-base:ACTIVE`) e `sweep_pro_lifetime` (`oneTimeProducts` `lifetime-buy:ACTIVE` em 170+ países).
+  - `production`: aguardando tÃ©rmino do relÃ³gio obrigatÃ³rio de 14 dias do Teste Fechado para clicar em **"Solicitar a produÃ§Ã£o"** (respostas de 300 caracteres e Data Safety jÃ¡ prontas e auditadas contra `AndroidManifest.xml` â€” zero `MANAGE_EXTERNAL_STORAGE`, zero `AD_ID`).
+  - **Produtos Billing Ativos (`ACTIVE`):** `sweep_pro_monthly` (`monthly-base:ACTIVE`), `sweep_pro_annual` (`annual-base:ACTIVE`) e `sweep_pro_lifetime` (`oneTimeProducts` `lifetime-buy:ACTIVE` em 170+ paÃ­ses).
 - **Novidades Entregues e Validadas no Moto G84 (`0085353748`) na `v2.8.0 (vc 32)`:**
-  - **Assistente Pessoal Maria (`MariaAssistantBanner.kt` + `MariaLipSyncEnvelopes.kt`):** retratos widescreen `720x512` sem corte (`maria_lip_0..7`, `maria_blink_0..2`, `maria_talk_blink`, `maria_smile`), marca `Midiastore` integrada no topo esquerdo do card da Maria, badge limpa `● MARIA • ASSISTENTE IA` sem legenda poluindo a blusa, botão `▲ Recolher` + retorno via `BackHandler`, 8 áudios neurais de estúdio (`pt-BR-FranciscaNeural`, 8,4s a 28,9s) e **dublagem silábica ZCR com detecção de vales consonantais + compensação de `-85ms` do `AudioTrack` a 35,7 FPS**.
-  - **Chat Midiastore IA (White Sheet estilo ChatGPT/Gemini):** modal limpo em fundo branco `#FFFFFF` acionado ao tocar nos quadradinhos da aba Pro, sem caixa inline poluindo o rodapé.
-  - **14 Idiomas (`MariaI18n`) + Limpador Global de Mensageiros (`WhatsAppCleanerDataSource.kt`):** suporte a WhatsApp, Telegram, WeChat/WeiXin, LINE, KakaoTalk, Messenger, Instagram, TikTok e `Download/` com tamanhos reais em `MB / GB` ao vivo em todas as abas e fim do erro `"Não foi possível analisar os arquivos"` sob mudança concorrente do `MediaStore`.
+  - **Assistente Pessoal Maria (`MariaAssistantBanner.kt` + `MariaLipSyncEnvelopes.kt`):** retratos widescreen `720x512` sem corte (`maria_lip_0..7`, `maria_blink_0..2`, `maria_talk_blink`, `maria_smile`), marca `Midiastore` integrada no topo esquerdo do card da Maria, badge limpa `â— MARIA â€¢ ASSISTENTE IA` sem legenda poluindo a blusa, botÃ£o `â–² Recolher` + retorno via `BackHandler`, 8 Ã¡udios neurais de estÃºdio (`pt-BR-FranciscaNeural`, 8,4s a 28,9s) e **dublagem silÃ¡bica ZCR com detecÃ§Ã£o de vales consonantais + compensaÃ§Ã£o de `-85ms` do `AudioTrack` a 35,7 FPS**.
+  - **Chat Midiastore IA (White Sheet estilo ChatGPT/Gemini):** modal limpo em fundo branco `#FFFFFF` acionado ao tocar nos quadradinhos da aba Pro, sem caixa inline poluindo o rodapÃ©.
+  - **14 Idiomas (`MariaI18n`) + Limpador Global de Mensageiros (`WhatsAppCleanerDataSource.kt`):** suporte a WhatsApp, Telegram, WeChat/WeiXin, LINE, KakaoTalk, Messenger, Instagram, TikTok e `Download/` com tamanhos reais em `MB / GB` ao vivo em todas as abas e fim do erro `"NÃ£o foi possÃ­vel analisar os arquivos"` sob mudanÃ§a concorrente do `MediaStore`.
 - **Estado do CI/CD, Supabase, Funil Web e Auto-Start Desktop (`2026-11-22`):**
   - GitHub Actions (`Run 45003986718` + `Run 45003986707`): **`success`** (100% verde).
   - Supabase (`@supabase/supabase-js` direto, zero HTTP 429): `play_purchases = 1` venda testada validada na Edge Function `verify-play-purchase`, `beta_testers = 2`, `memories = 497+`, Grafo de Conhecimento enriquecido (`kg_nodes = 264`, `kg_edges = 60`).
-  - Funil Web (`https://midiastory-df6a0.web.app/`): `HTTP 200`, `14` idiomas (`hreflang`), `145` páginas HTML auditadas com `cheerio` (**0 links quebrados**).
-  - **Auto-Start da Maria/FRIDAY no PC Windows:** script `Maria-FRIDAY-AutoStart.vbs` configurado na pasta `Startup` do Windows (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`) para abrir automaticamente o painel `scripts/antigravity-companion.ps1` ao ligar o PC amanhã.
+  - Funil Web (`https://midiastory-df6a0.web.app/`): `HTTP 200`, `14` idiomas (`hreflang`), `145` pÃ¡ginas HTML auditadas com `cheerio` (**0 links quebrados**).
+  - **Auto-Start da Maria/FRIDAY no PC Windows:** script `Maria-FRIDAY-AutoStart.vbs` configurado na pasta `Startup` do Windows (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`) para abrir automaticamente o painel `scripts/antigravity-companion.ps1` ao ligar o PC amanhÃ£.
 
 ---
 
-## Checkpoint mais recente — 2026-11-07
+## Checkpoint mais recente â€” 2026-11-07
 
-- Rodolfo pediu que o app seja concluído e as atualizações sejam salvas no GitHub. Não mesclar em `main`; manter a PR em Draft.
-- Home está em azul-marinho/rosa, com arte vetorial original, ação principal gratuita, planos Pro e botão de compartilhamento do Android.
-- A ação grátis agora inicia a missão MediaStore de arquivos grandes dentro do Midiastore. No Moto G84 5G/API 35, a varredura encontrou 5 itens para revisão (84,30 MB), e o botão levou à tela interna de revisão. Nenhum arquivo pessoal foi apagado. Esse teste manual não valida o fluxo final de consentimento/exclusão permanente.
-- A ação principal não abre mais o Google Files. A pessoa precisa revisar os candidatos e aprovar a exclusão pelo fluxo Android; o app não promete limpeza silenciosa de cache de outros apps.
+- Rodolfo pediu que o app seja concluÃ­do e as atualizaÃ§Ãµes sejam salvas no GitHub. NÃ£o mesclar em `main`; manter a PR em Draft.
+- Home estÃ¡ em azul-marinho/rosa, com arte vetorial original, aÃ§Ã£o principal gratuita, planos Pro e botÃ£o de compartilhamento do Android.
+- A aÃ§Ã£o grÃ¡tis agora inicia a missÃ£o MediaStore de arquivos grandes dentro do Midiastore. No Moto G84 5G/API 35, a varredura encontrou 5 itens para revisÃ£o (84,30 MB), e o botÃ£o levou Ã  tela interna de revisÃ£o. Nenhum arquivo pessoal foi apagado. Esse teste manual nÃ£o valida o fluxo final de consentimento/exclusÃ£o permanente.
+- A aÃ§Ã£o principal nÃ£o abre mais o Google Files. A pessoa precisa revisar os candidatos e aprovar a exclusÃ£o pelo fluxo Android; o app nÃ£o promete limpeza silenciosa de cache de outros apps.
 - O Sharesheet do Android abriu com o link da Play Store e foi fechado sem compartilhar/publicar.
-- `:app:assembleDebug` passou no Windows e o APK Debug atual foi instalado no Motorola. Produtos mensais/anual/vitalício aparecem indisponíveis; Play Console e backend de validação de purchaseToken continuam gates externos. Preços recomendados e checklist atual estão em `docs/PRICING_AND_PLAN_MATRIX.md` e `docs/FINAL_PUBLICATION_CHECKLIST.md`.
+- `:app:assembleDebug` passou no Windows e o APK Debug atual foi instalado no Motorola. Produtos mensais/anual/vitalÃ­cio aparecem indisponÃ­veis; Play Console e backend de validaÃ§Ã£o de purchaseToken continuam gates externos. PreÃ§os recomendados e checklist atual estÃ£o em `docs/PRICING_AND_PLAN_MATRIX.md` e `docs/FINAL_PUBLICATION_CHECKLIST.md`.
 - In-app localization remains English + pt-BR. No portrait AI asset was generated; current home character is a native vector illustration.
-- Próximo passo: revisar `git diff`, commit somente arquivos intencionais e enviar para a branch existente da PR. Excluir caches, screenshots, keystores, senhas e arquivos de ponte locais do commit. Continuar bloqueando release pública até fechar `docs/RELEASE_BLOCKERS.md`.
+- PrÃ³ximo passo: revisar `git diff`, commit somente arquivos intencionais e enviar para a branch existente da PR. Excluir caches, screenshots, keystores, senhas e arquivos de ponte locais do commit. Continuar bloqueando release pÃºblica atÃ© fechar `docs/RELEASE_BLOCKERS.md`.
 
-## Retomada do objetivo de limpeza rápida — 2026-11-07
+## Retomada do objetivo de limpeza rÃ¡pida â€” 2026-11-07
 
-- O proprietário pediu uma limpeza grátis, fácil e com resultado real em uma ação principal; Pro é opcional e vem depois de valor comprovado. Nenhuma limpeza pode apagar mídia sem revisão e consentimento oficial do Android.
-- Tentativa manual mais recente no Motorola API35: abriu o Midiastore instalado, tocou em “Liberar espaço” e viu “Não foi possível analisar os arquivos”; nenhum arquivo foi apagado. A versão Debug local não atualizou o pacote instalado porque a assinatura Debug é diferente. O erro do build antigo não identifica a causa no source atual.
-- Código local atualizado: exceção global da análise agora registra somente a classe do erro (sem nome/caminho/URI de mídia); planos indisponíveis continuam tocáveis e explicam o bloqueio; restaurar compras confirma a verificação; falha ao abrir gerenciamento da Play Store dá feedback; o nome Midiastore foi sobreposto dentro da arte atual da Home.
-- Validação local do SHA ainda não enviado: Domain/JVM/Lint/Debug/AndroidTest APK completaram `BUILD SUCCESSFUL`; XML JUnit local: 78 testes, 0 falhas, 0 erros, 0 skips. Lint emitiu 222 findings, pois `abortOnError=false`. Não foi execução conectada.
-- A execução `:app:connectedDebugAndroidTest` parou antes dos testes ao instalar `mediaOwnerTest`, por assinatura incompatível com o helper já instalado. Não remover apps nem dados do telefone para contornar. API29 e consentimento de exclusão seguem sem prova runtime.
-- Chaves EN/PT-BR/fallback: 206/206, sincronizadas. ES/FR/DE/HI/JA/zh-CN: 95/206 em cada idioma; 111 chaves faltantes por locale. `docs/CHECKLIST_FINALIZACAO_PT_BR.md` e a seção atual desta matriz registram as pendências.
-- A geração de imagem foi autorizada pelo proprietário, mas a API de imagem respondeu que não há créditos restantes; ferramenta de vídeo de 10 segundos não está disponível nesta sessão. Nenhum asset de foto/vídeo foi adicionado.
-- Não gerar AAB pronto para Play: faltam aprovação instrumentada API29/35, CI verde no SHA atualizado, catálogo/preços e compra real configurados, backend de purchaseToken, traduções e verificação Play Console de versionCode/certificado.
+- O proprietÃ¡rio pediu uma limpeza grÃ¡tis, fÃ¡cil e com resultado real em uma aÃ§Ã£o principal; Pro Ã© opcional e vem depois de valor comprovado. Nenhuma limpeza pode apagar mÃ­dia sem revisÃ£o e consentimento oficial do Android.
+- Tentativa manual mais recente no Motorola API35: abriu o Midiastore instalado, tocou em â€œLiberar espaÃ§oâ€ e viu â€œNÃ£o foi possÃ­vel analisar os arquivosâ€; nenhum arquivo foi apagado. A versÃ£o Debug local nÃ£o atualizou o pacote instalado porque a assinatura Debug Ã© diferente. O erro do build antigo nÃ£o identifica a causa no source atual.
+- CÃ³digo local atualizado: exceÃ§Ã£o global da anÃ¡lise agora registra somente a classe do erro (sem nome/caminho/URI de mÃ­dia); planos indisponÃ­veis continuam tocÃ¡veis e explicam o bloqueio; restaurar compras confirma a verificaÃ§Ã£o; falha ao abrir gerenciamento da Play Store dÃ¡ feedback; o nome Midiastore foi sobreposto dentro da arte atual da Home.
+- ValidaÃ§Ã£o local do SHA ainda nÃ£o enviado: Domain/JVM/Lint/Debug/AndroidTest APK completaram `BUILD SUCCESSFUL`; XML JUnit local: 78 testes, 0 falhas, 0 erros, 0 skips. Lint emitiu 222 findings, pois `abortOnError=false`. NÃ£o foi execuÃ§Ã£o conectada.
+- A execuÃ§Ã£o `:app:connectedDebugAndroidTest` parou antes dos testes ao instalar `mediaOwnerTest`, por assinatura incompatÃ­vel com o helper jÃ¡ instalado. NÃ£o remover apps nem dados do telefone para contornar. API29 e consentimento de exclusÃ£o seguem sem prova runtime.
+- Chaves EN/PT-BR/fallback: 206/206, sincronizadas. ES/FR/DE/HI/JA/zh-CN: 95/206 em cada idioma; 111 chaves faltantes por locale. `docs/CHECKLIST_FINALIZACAO_PT_BR.md` e a seÃ§Ã£o atual desta matriz registram as pendÃªncias.
+- A geraÃ§Ã£o de imagem foi autorizada pelo proprietÃ¡rio, mas a API de imagem respondeu que nÃ£o hÃ¡ crÃ©ditos restantes; ferramenta de vÃ­deo de 10 segundos nÃ£o estÃ¡ disponÃ­vel nesta sessÃ£o. Nenhum asset de foto/vÃ­deo foi adicionado.
+- NÃ£o gerar AAB pronto para Play: faltam aprovaÃ§Ã£o instrumentada API29/35, CI verde no SHA atualizado, catÃ¡logo/preÃ§os e compra real configurados, backend de purchaseToken, traduÃ§Ãµes e verificaÃ§Ã£o Play Console de versionCode/certificado.
 
-## Direção de produto confirmada pelo proprietário — 2026-11-06
+## DireÃ§Ã£o de produto confirmada pelo proprietÃ¡rio â€” 2026-11-06
 
-- Rodolfo confirmou que o objetivo é um phone cleaner simples e confiável, inspirado na facilidade de uso do Files do Google: ajudar pessoas com o telefone cheio de conteúdo a encontrar o que ocupa espaço e liberar armazenamento sem perda acidental.
-- Rodolfo autorizou publicar as atualizações no GitHub, compilar o AAB e enviar ao Play Console quando os gates de release forem comprovados. Ele também autorizou merge em `main` se necessário; a PR permanece Draft enquanto validação e gates estão pendentes.
-- Modelo pretendido: um plano gratuito e três opções pagas. O código-fonte existente nomeia as opções Pro mensal, anual e vitalícia; IDs e preços ainda dependem de confirmação no Play Console. Não inventar preços ou prometer recursos não implementados.
-- Referências públicas pesquisadas: [Android Now in Android](https://github.com/android/nowinandroid) para arquitetura e testes; [SpaceSweep](https://github.com/Dhiva-Labs/SpaceSweep) e [Quarry](https://github.com/tanvirr007/quarry-app) para ideias de apresentação de espaço e revisão de limpeza. São referências de leitura, não dependências nem validação das alegações de seus autores. Manter a arquitetura Android Views existente e adotar somente padrões compatíveis com as permissões e limites do Midiastore.
-- Prioridades até a publicação: confiabilidade da varredura e cobertura parcial explícita; seleção e exclusão sempre revisadas pelo usuário; acessibilidade e português/inglês; CI e testes reais; verificação de compra via backend e configuração Play. Não anunciar limpeza de cache de outros apps, fotos semelhantes, acelerador ou outras funções sem implementação e validação.
+- Rodolfo confirmou que o objetivo Ã© um phone cleaner simples e confiÃ¡vel, inspirado na facilidade de uso do Files do Google: ajudar pessoas com o telefone cheio de conteÃºdo a encontrar o que ocupa espaÃ§o e liberar armazenamento sem perda acidental.
+- Rodolfo autorizou publicar as atualizaÃ§Ãµes no GitHub, compilar o AAB e enviar ao Play Console quando os gates de release forem comprovados. Ele tambÃ©m autorizou merge em `main` se necessÃ¡rio; a PR permanece Draft enquanto validaÃ§Ã£o e gates estÃ£o pendentes.
+- Modelo pretendido: um plano gratuito e trÃªs opÃ§Ãµes pagas. O cÃ³digo-fonte existente nomeia as opÃ§Ãµes Pro mensal, anual e vitalÃ­cia; IDs e preÃ§os ainda dependem de confirmaÃ§Ã£o no Play Console. NÃ£o inventar preÃ§os ou prometer recursos nÃ£o implementados.
+- ReferÃªncias pÃºblicas pesquisadas: [Android Now in Android](https://github.com/android/nowinandroid) para arquitetura e testes; [SpaceSweep](https://github.com/Dhiva-Labs/SpaceSweep) e [Quarry](https://github.com/tanvirr007/quarry-app) para ideias de apresentaÃ§Ã£o de espaÃ§o e revisÃ£o de limpeza. SÃ£o referÃªncias de leitura, nÃ£o dependÃªncias nem validaÃ§Ã£o das alegaÃ§Ãµes de seus autores. Manter a arquitetura Android Views existente e adotar somente padrÃµes compatÃ­veis com as permissÃµes e limites do Midiastore.
+- Prioridades atÃ© a publicaÃ§Ã£o: confiabilidade da varredura e cobertura parcial explÃ­cita; seleÃ§Ã£o e exclusÃ£o sempre revisadas pelo usuÃ¡rio; acessibilidade e portuguÃªs/inglÃªs; CI e testes reais; verificaÃ§Ã£o de compra via backend e configuraÃ§Ã£o Play. NÃ£o anunciar limpeza de cache de outros apps, fotos semelhantes, acelerador ou outras funÃ§Ãµes sem implementaÃ§Ã£o e validaÃ§Ã£o.
 
-### Verificação executada nesta retomada
+### VerificaÃ§Ã£o executada nesta retomada
 
-- `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`: **BUILD SUCCESSFUL** em 7m43s; 114 tarefas (1 executada, 113 up-to-date). Gradle e Android caches foram direcionados para diretórios locais ignorados do repositório.
-- `:app:connectedDebugAndroidTest`: **não executado**; falhou em `:mediaOwnerTest:installDebug` com `No connected devices!`. Isso não é falha dos testes do app e também não é evidência de aprovação instrumentada.
+- `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`: **BUILD SUCCESSFUL** em 7m43s; 114 tarefas (1 executada, 113 up-to-date). Gradle e Android caches foram direcionados para diretÃ³rios locais ignorados do repositÃ³rio.
+- `:app:connectedDebugAndroidTest`: **nÃ£o executado**; falhou em `:mediaOwnerTest:installDebug` com `No connected devices!`. Isso nÃ£o Ã© falha dos testes do app e tambÃ©m nÃ£o Ã© evidÃªncia de aprovaÃ§Ã£o instrumentada.
 - `git diff --check` e `git diff --cached --check`: sem erros de whitespace.
-- Commit local `a8e0335` contém o diff de app, testes e documentos intencionais. Merge commit `c1a313f` integra a branch remota atual `c546b76`, preservando seus commits; ainda não houve push.
+- Commit local `a8e0335` contÃ©m o diff de app, testes e documentos intencionais. Merge commit `c1a313f` integra a branch remota atual `c546b76`, preservando seus commits; ainda nÃ£o houve push.
 
-### Atualização após novo avanço da branch — 2026-11-06
+### AtualizaÃ§Ã£o apÃ³s novo avanÃ§o da branch â€” 2026-11-06
 
-- A branch remota avançou mais uma vez até `c546b76` enquanto o trabalho local era preparado, com 14 commits adicionais. Eles incluem um dashboard de limpeza com hierarquia de ações inspirado no Files do Google e melhorias para MediaStore/API29/API35. Nenhum avanço remoto foi sobrescrito.
-- O merge desses commits foi concluído. Para os conflitos, foram mantidos os testes locais mais completos de proprietário/UID, cancelamento e aceite de consentimento, os testes de cobertura/paginação e o preparo isolado de Selected Photos; a configuração Kotlin/JVM e o manifesto mais recentes do app auxiliar vieram da branch da PR.
-- A suíte completa foi repetida sobre o código combinado: **BUILD SUCCESSFUL** em 8m24s; 117 tarefas (31 executadas, 2 do cache, 84 up-to-date). Incluiu Domain, JVM, Lint, APK Debug, APK AndroidTest e helper.
-- ADB continua sem dispositivo (`adb devices -l` vazio) mesmo após `adb start-server`; o Motorola não está acessível ao host. Não marcar instrumentação física como executada. O CI remoto é necessário para validar API29/API35 enquanto o aparelho não aparece no ADB.
-- `:app:bundleRelease` terminou **BUILD SUCCESSFUL** em 9m03s. AAB local: `app/build/outputs/bundle/release/app-release.aab` (3,601,394 bytes); `jarsigner -verify` confirmou a assinatura e o SHA-1 corresponde ao fingerprint informado pelo proprietário. O SHA-256 real é `B2:74:CC:7E:89:0E:06:D0:F6:6C:64:51:B0:44:3F:2D:E1:3D:E4:6A:B6:42:75:2D:F7:7F:FC:5A:7B:0E:79:01`, divergente do valor informado (`AD:3A:...:B9:06`). Package `com.rdf112.midiastore`, versionCode 17 e versionName 2.2.1 foram confirmados no manifest release mesclado. AAB não está liberado para upload até comparar SHA-256 e versão máxima com Play Console.
-- A senha do upload key foi guardada apenas como SecureString criptografada pelo DPAPI do Windows em `%APPDATA%\Midiastore\secrets\upload-password.dpapi`; nenhum segredo ou keystore foi adicionado ao repositório. O caminho original do keystore continua em Downloads.
-- `PONTE_CODEX_PARA_GEMINI.txt` contém estado técnico sem senhas e foi copiado ao clipboard a pedido do proprietário. Espera-se que Rodolfo cole no Gemini e traga a resposta.
-- Play continua bloqueado pelos gates registrados em `docs/RELEASE_BLOCKERS.md`: consentimento/API29 executado, CI atual, validação Billing no Play Console e verificação server-side do purchaseToken, versionCode/certificado e revisão final de privacidade. A autorização do proprietário não substitui essas provas.
+- A branch remota avanÃ§ou mais uma vez atÃ© `c546b76` enquanto o trabalho local era preparado, com 14 commits adicionais. Eles incluem um dashboard de limpeza com hierarquia de aÃ§Ãµes inspirado no Files do Google e melhorias para MediaStore/API29/API35. Nenhum avanÃ§o remoto foi sobrescrito.
+- O merge desses commits foi concluÃ­do. Para os conflitos, foram mantidos os testes locais mais completos de proprietÃ¡rio/UID, cancelamento e aceite de consentimento, os testes de cobertura/paginaÃ§Ã£o e o preparo isolado de Selected Photos; a configuraÃ§Ã£o Kotlin/JVM e o manifesto mais recentes do app auxiliar vieram da branch da PR.
+- A suÃ­te completa foi repetida sobre o cÃ³digo combinado: **BUILD SUCCESSFUL** em 8m24s; 117 tarefas (31 executadas, 2 do cache, 84 up-to-date). Incluiu Domain, JVM, Lint, APK Debug, APK AndroidTest e helper.
+- ADB continua sem dispositivo (`adb devices -l` vazio) mesmo apÃ³s `adb start-server`; o Motorola nÃ£o estÃ¡ acessÃ­vel ao host. NÃ£o marcar instrumentaÃ§Ã£o fÃ­sica como executada. O CI remoto Ã© necessÃ¡rio para validar API29/API35 enquanto o aparelho nÃ£o aparece no ADB.
+- `:app:bundleRelease` terminou **BUILD SUCCESSFUL** em 9m03s. AAB local: `app/build/outputs/bundle/release/app-release.aab` (3,601,394 bytes); `jarsigner -verify` confirmou a assinatura e o SHA-1 corresponde ao fingerprint informado pelo proprietÃ¡rio. O SHA-256 real Ã© `B2:74:CC:7E:89:0E:06:D0:F6:6C:64:51:B0:44:3F:2D:E1:3D:E4:6A:B6:42:75:2D:F7:7F:FC:5A:7B:0E:79:01`, divergente do valor informado (`AD:3A:...:B9:06`). Package `com.rdf112.midiastore`, versionCode 17 e versionName 2.2.1 foram confirmados no manifest release mesclado. AAB nÃ£o estÃ¡ liberado para upload atÃ© comparar SHA-256 e versÃ£o mÃ¡xima com Play Console.
+- A senha do upload key foi guardada apenas como SecureString criptografada pelo DPAPI do Windows em `%APPDATA%\Midiastore\secrets\upload-password.dpapi`; nenhum segredo ou keystore foi adicionado ao repositÃ³rio. O caminho original do keystore continua em Downloads.
+- `PONTE_CODEX_PARA_GEMINI.txt` contÃ©m estado tÃ©cnico sem senhas e foi copiado ao clipboard a pedido do proprietÃ¡rio. Espera-se que Rodolfo cole no Gemini e traga a resposta.
+- Play continua bloqueado pelos gates registrados em `docs/RELEASE_BLOCKERS.md`: consentimento/API29 executado, CI atual, validaÃ§Ã£o Billing no Play Console e verificaÃ§Ã£o server-side do purchaseToken, versionCode/certificado e revisÃ£o final de privacidade. A autorizaÃ§Ã£o do proprietÃ¡rio nÃ£o substitui essas provas.
 
-## Checkpoint confirmado — 2026-11-06 (continuação)
+## Checkpoint confirmado â€” 2026-11-06 (continuaÃ§Ã£o)
 
-- Estado Git: `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`, remoto de recuperação ainda no mesmo SHA conforme leitura anterior. Há mudanças staged, unstaged e untracked; preservadas. Não houve commit, push, reset, limpeza ou merge.
-- GitHub: PR #3 aberta como Draft; Issue #2 aberta. O workflow `42080940375` está associado ao SHA base anterior e não testa estas mudanças locais.
-- Dispositivo: Motorola moto g84 5G / Android 15 API35 / `0085353748`, reidentificado e online. Debug/helper/teste têm UIDs separados (10475/10476/10477; o auxiliar `.codex.test` ficou em 10478). Prova de UID no aparelho não é prova de API29 nem de owner MediaStore para a fixture estrangeira.
-- Builds locais: suite completa Domain, JVM, Lint, Debug, AndroidTest e helper passou; recompilação final dos testes também passou. Ver comandos/checksums/resultados detalhados no final de `docs/QUALITY_AND_TESTING.md` e `docs/DAILY_STATUS.md`.
-- AndroidJUnitRunner direto com APKs finais: MediaStore `OK (5 tests)`, incluindo acesso visual parcial, áudio independente, paginação/session, hash de conteúdo e ausência de fixtures residuais; classe Main `OK (3 tests)` no protocolo, mas 2 casos API29 foram ignorados, restando 1 caso executado. Isso valida apenas API35.
-- Gradle connected/UTP no mesmo AndroidTest APK falhou novamente sem XML/zero casos coletados (`Failed to receive the UTP test results`), enquanto ADB continuou online e o logcat pós-execução não mostra `AndroidRuntime` fatal. Log debug anterior aponta falha ao carregar chave PEM RSA no Netty/BouncyCastle do listener local gRPC do UTP; hipótese proximate de collector/host, não causa raiz comprovada. Resultado UTP permanece FAIL, runner direto PASS.
-- API29 consent estrangeiro permanece NOT RUN. Fixture auxiliar, confirmação MediaStore de owner, cancelamento, novo consentimento, aceite e confirmação pós-exclusão estão implementados e compilados; requer runner API29 Linux/host com virtualização existente. Não deduzir sucesso da compilação/UID/API35.
-- Artefatos desta sessão: `.local-test-results/2026-11-06/`; nenhuma mudança de assinatura, identidade, versão, pacote produção, compra ou dados pessoais.
-- O relatório `docs/RELATORIO_MIDIASTORE_RETOMADA_2026-11-06.md` não está presente localmente e não havia cópia equivalente encontrada; a missão e handoff existentes forneceram continuidade, sem criar documento duplicado. Consulta GitHub read-only final repetiu PR #3 OPEN/Draft em SHA `16545a4277bcc515660a6516c32fb6c770a4e880`, Issue #2 OPEN e run `42080940375` failure no SHA exato.
+- Estado Git: `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`, remoto de recuperaÃ§Ã£o ainda no mesmo SHA conforme leitura anterior. HÃ¡ mudanÃ§as staged, unstaged e untracked; preservadas. NÃ£o houve commit, push, reset, limpeza ou merge.
+- GitHub: PR #3 aberta como Draft; Issue #2 aberta. O workflow `42080940375` estÃ¡ associado ao SHA base anterior e nÃ£o testa estas mudanÃ§as locais.
+- Dispositivo: Motorola moto g84 5G / Android 15 API35 / `0085353748`, reidentificado e online. Debug/helper/teste tÃªm UIDs separados (10475/10476/10477; o auxiliar `.codex.test` ficou em 10478). Prova de UID no aparelho nÃ£o Ã© prova de API29 nem de owner MediaStore para a fixture estrangeira.
+- Builds locais: suite completa Domain, JVM, Lint, Debug, AndroidTest e helper passou; recompilaÃ§Ã£o final dos testes tambÃ©m passou. Ver comandos/checksums/resultados detalhados no final de `docs/QUALITY_AND_TESTING.md` e `docs/DAILY_STATUS.md`.
+- AndroidJUnitRunner direto com APKs finais: MediaStore `OK (5 tests)`, incluindo acesso visual parcial, Ã¡udio independente, paginaÃ§Ã£o/session, hash de conteÃºdo e ausÃªncia de fixtures residuais; classe Main `OK (3 tests)` no protocolo, mas 2 casos API29 foram ignorados, restando 1 caso executado. Isso valida apenas API35.
+- Gradle connected/UTP no mesmo AndroidTest APK falhou novamente sem XML/zero casos coletados (`Failed to receive the UTP test results`), enquanto ADB continuou online e o logcat pÃ³s-execuÃ§Ã£o nÃ£o mostra `AndroidRuntime` fatal. Log debug anterior aponta falha ao carregar chave PEM RSA no Netty/BouncyCastle do listener local gRPC do UTP; hipÃ³tese proximate de collector/host, nÃ£o causa raiz comprovada. Resultado UTP permanece FAIL, runner direto PASS.
+- API29 consent estrangeiro permanece NOT RUN. Fixture auxiliar, confirmaÃ§Ã£o MediaStore de owner, cancelamento, novo consentimento, aceite e confirmaÃ§Ã£o pÃ³s-exclusÃ£o estÃ£o implementados e compilados; requer runner API29 Linux/host com virtualizaÃ§Ã£o existente. NÃ£o deduzir sucesso da compilaÃ§Ã£o/UID/API35.
+- Artefatos desta sessÃ£o: `.local-test-results/2026-11-06/`; nenhuma mudanÃ§a de assinatura, identidade, versÃ£o, pacote produÃ§Ã£o, compra ou dados pessoais.
+- O relatÃ³rio `docs/RELATORIO_MIDIASTORE_RETOMADA_2026-11-06.md` nÃ£o estÃ¡ presente localmente e nÃ£o havia cÃ³pia equivalente encontrada; a missÃ£o e handoff existentes forneceram continuidade, sem criar documento duplicado. Consulta GitHub read-only final repetiu PR #3 OPEN/Draft em SHA `16545a4277bcc515660a6516c32fb6c770a4e880`, Issue #2 OPEN e run `42080940375` failure no SHA exato.
 
-### Próxima tarefa concreta
+### PrÃ³xima tarefa concreta
 
-Completar revisão integral e segura do diff combinado, preparar commit contendo apenas código/testes/docs intencionais (excluindo caches e capturas locais), e pedir uma autorização única de push para a branch da PR executar a matriz Linux API29/API35. Até essa autorização, continuar validação e correções locais sem push. Manter issue e PR como estão; P0 API29 e UTP continuam abertos.
+Completar revisÃ£o integral e segura do diff combinado, preparar commit contendo apenas cÃ³digo/testes/docs intencionais (excluindo caches e capturas locais), e pedir uma autorizaÃ§Ã£o Ãºnica de push para a branch da PR executar a matriz Linux API29/API35. AtÃ© essa autorizaÃ§Ã£o, continuar validaÃ§Ã£o e correÃ§Ãµes locais sem push. Manter issue e PR como estÃ£o; P0 API29 e UTP continuam abertos.
 
-Nota de validação posterior: teste isolado com `ANDROID_USER_HOME` novo falhou na instalação do helper por keystore Debug diferente, antes da instrumentação. User home original restaurado; APK Debug/helper mantiveram hashes e AndroidTest reempacotado SHA `15344F181D5AAE73BF2945D84BF850220FD30DADE45005AABE91C7223F79DCD1` passou no runner direto (MediaStore 5 testes; Main protocolar 3, dois API29 ignorados). UTP FAIL anterior foi no AndroidTest SHA `D6F1C760...`, igualmente aprovado diretamente; não confundir com a tentativa de instalação incompatível. API29 segue NOT RUN.
+Nota de validaÃ§Ã£o posterior: teste isolado com `ANDROID_USER_HOME` novo falhou na instalaÃ§Ã£o do helper por keystore Debug diferente, antes da instrumentaÃ§Ã£o. User home original restaurado; APK Debug/helper mantiveram hashes e AndroidTest reempacotado SHA `15344F181D5AAE73BF2945D84BF850220FD30DADE45005AABE91C7223F79DCD1` passou no runner direto (MediaStore 5 testes; Main protocolar 3, dois API29 ignorados). UTP FAIL anterior foi no AndroidTest SHA `D6F1C760...`, igualmente aprovado diretamente; nÃ£o confundir com a tentativa de instalaÃ§Ã£o incompatÃ­vel. API29 segue NOT RUN.
 
-## Continuidade atualizada — 2026-11-06, após retomada
+## Continuidade atualizada â€” 2026-11-06, apÃ³s retomada
 
-- Diretório `C:\Users\rodolfo\midiastory-`; branch `codex/midiastore-release-audit`; HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`. Remote `origin` correto. Árvore continua com alterações staged, unstaged e untracked; nenhuma foi descartada. O AndroidTest atual recebeu uma alteração adicional de harness para detectar serviço de auto-click externo.
-- O teste API35 de exclusão/consentimento falhou intermitentemente porque um serviço externo habilitado (`com.truedevelopersstudio.automatictap.autoclicker`) toca na UI do sistema antes do UiAutomator. O log do MediaProvider registrou concessão automática; não é prova de cancelamento controlado. Os testes de consentimento agora ficam SKIP por assumption nesse ambiente, mantendo todas as assertions. Não alterar configuração global do aparelho.
+- DiretÃ³rio `C:\Users\rodolfo\midiastory-`; branch `codex/midiastore-release-audit`; HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`. Remote `origin` correto. Ãrvore continua com alteraÃ§Ãµes staged, unstaged e untracked; nenhuma foi descartada. O AndroidTest atual recebeu uma alteraÃ§Ã£o adicional de harness para detectar serviÃ§o de auto-click externo.
+- O teste API35 de exclusÃ£o/consentimento falhou intermitentemente porque um serviÃ§o externo habilitado (`com.truedevelopersstudio.automatictap.autoclicker`) toca na UI do sistema antes do UiAutomator. O log do MediaProvider registrou concessÃ£o automÃ¡tica; nÃ£o Ã© prova de cancelamento controlado. Os testes de consentimento agora ficam SKIP por assumption nesse ambiente, mantendo todas as assertions. NÃ£o alterar configuraÃ§Ã£o global do aparelho.
 - Build completo atual PASS: Domain, app JVM, Lint, Debug, AndroidTest e helper, 114 tarefas/11 executadas. APKs: Debug SHA-256 `EAE637CEF8F581B65B5D8BCDEEF97ADBC4BA8699D38716BBA4A818AD6045091E`; AndroidTest `55EAA999F40E3F0424A2271A5265AADA08167D3C23611A3F52ABDBD13C20E3CD`; helper `B00066BF7FF33116216619D728453D0E38E8525DA0C6F5FD28C590976F5632A1`.
-- Runner direto atual no Motorola API35: classe MediaStore `OK (5 tests)` no protocolo, quatro métodos executados e o caso partial visual skipped por permissões preexistentes; executado novamente isolado após preparar via ADB visual-selected=true e image/video/audio=false, `OK (1 test)`. O estado original de permissões foi restaurado. Main `OK (4 tests)` no protocolo, com 1 caso funcional executado e 3 assumptions/skips. Não contar consentimento nem API29 como aprovados.
-- UTP mais recente, filtrado para MediaStore e usando APKs atuais, FAIL antes de coletar testes: HTML report `0 tests`, sem XML; `utp.0.log` fatal na inicialização. Investigação anterior de `--debug` registra erro de leitura de RSA PEM no listener gRPC local do AGP/UTP; hipótese de falha do coletor/host, causa raiz não confirmada.
-- API29 permanece NOT RUN. Emulador local não tem aceleração disponível; teste auxiliar precisa de API29 Linux para confirmar UID/owner no MediaStore, RecoverableSecurityException, cancelar, aprovar e verificar estado posterior.
+- Runner direto atual no Motorola API35: classe MediaStore `OK (5 tests)` no protocolo, quatro mÃ©todos executados e o caso partial visual skipped por permissÃµes preexistentes; executado novamente isolado apÃ³s preparar via ADB visual-selected=true e image/video/audio=false, `OK (1 test)`. O estado original de permissÃµes foi restaurado. Main `OK (4 tests)` no protocolo, com 1 caso funcional executado e 3 assumptions/skips. NÃ£o contar consentimento nem API29 como aprovados.
+- UTP mais recente, filtrado para MediaStore e usando APKs atuais, FAIL antes de coletar testes: HTML report `0 tests`, sem XML; `utp.0.log` fatal na inicializaÃ§Ã£o. InvestigaÃ§Ã£o anterior de `--debug` registra erro de leitura de RSA PEM no listener gRPC local do AGP/UTP; hipÃ³tese de falha do coletor/host, causa raiz nÃ£o confirmada.
+- API29 permanece NOT RUN. Emulador local nÃ£o tem aceleraÃ§Ã£o disponÃ­vel; teste auxiliar precisa de API29 Linux para confirmar UID/owner no MediaStore, RecoverableSecurityException, cancelar, aprovar e verificar estado posterior.
 - Logs atualizados: `.local-test-results/2026-11-06/`. PR #3 permanece OPEN/Draft e Issue #2 OPEN; nenhum push/commit/merge nesta retomada.
 - A primeira consulta `gh` dentro do sandbox falhou pelo proxy local `127.0.0.1:9`; consulta read-only autorizada fora do sandbox confirmou novamente PR #3 OPEN/Draft, head `16545a4277bcc515660a6516c32fb6c770a4e880`, Issue #2 OPEN e workflow `42080940375` failure nesse SHA. Windows-script PASS; API29 e API35 FAIL na etapa instrumentada; signed-release SKIPPED.
 
-### Próxima tarefa concreta
+### PrÃ³xima tarefa concreta
 
-Revisar integralmente o diff combinado e separar somente alterações de projeto intencionais dos artefatos locais; depois solicitar autorização específica para push à branch da PR a fim de executar CI Linux/API29. Continuar independentemente a investigação da falha UTP e não fechar os gates de consentimento/API29 antes de resultados executados.
+Revisar integralmente o diff combinado e separar somente alteraÃ§Ãµes de projeto intencionais dos artefatos locais; depois solicitar autorizaÃ§Ã£o especÃ­fica para push Ã  branch da PR a fim de executar CI Linux/API29. Continuar independentemente a investigaÃ§Ã£o da falha UTP e nÃ£o fechar os gates de consentimento/API29 antes de resultados executados.
 
 Atualizado: 04/11/2026
 
@@ -147,62 +162,62 @@ Atualizado: 04/11/2026
 
 - Nome comercial e listing: **Midiastore**.
 - Package/Application ID: `com.rdf112.midiastore`.
-- O proprietário confirmou o package olhando a ficha de teste interno da Play Console.
-- Namespace e pastas Kotlin ainda usam `com.rdf112.sweep`; isso é legado técnico e não altera o Application ID.
-- `versionCode=34` e `versionName=2.8.2` são os valores atualmente configurados no código-fonte (`app/build.gradle.kts`); na Play Console (`internal`/`alpha`), a versão publicada atual é `2.8.0 (vc 32)`.
+- O proprietÃ¡rio confirmou o package olhando a ficha de teste interno da Play Console.
+- Namespace e pastas Kotlin ainda usam `com.rdf112.sweep`; isso Ã© legado tÃ©cnico e nÃ£o altera o Application ID.
+- `versionCode=34` e `versionName=2.8.2` sÃ£o os valores atualmente configurados no cÃ³digo-fonte (`app/build.gradle.kts`); na Play Console (`internal`/`alpha`), a versÃ£o publicada atual Ã© `2.8.0 (vc 32)`.
 - minSdk 29, targetSdk 36, compileSdk 36, JDK 17 e Gradle 8.13.
-- O proprietário informa que habilitou o perfil financeiro/recebimento em 03/11/2026. Isso não confirma cadastro ou ativação dos produtos de Billing.
+- O proprietÃ¡rio informa que habilitou o perfil financeiro/recebimento em 03/11/2026. Isso nÃ£o confirma cadastro ou ativaÃ§Ã£o dos produtos de Billing.
 
-## Branch e revisão de trabalho
+## Branch e revisÃ£o de trabalho
 
-- Branch de recuperação: `fix/p0-sweep-permissions-missions-billing`.
+- Branch de recuperaÃ§Ã£o: `fix/p0-sweep-permissions-missions-billing`.
 - PR em rascunho: https://github.com/srodolfobarbosa-afk/midiastory-/pull/3
-- Issue de recuperação: https://github.com/srodolfobarbosa-afk/midiastory-/issues/2
+- Issue de recuperaÃ§Ã£o: https://github.com/srodolfobarbosa-afk/midiastory-/issues/2
 - Base da PR: `main`.
-- Não fazer merge nem publicar sem autorização do proprietário.
-- Não alterar Application ID, versionCode ou certificado de assinatura sem confirmação explícita.
+- NÃ£o fazer merge nem publicar sem autorizaÃ§Ã£o do proprietÃ¡rio.
+- NÃ£o alterar Application ID, versionCode ou certificado de assinatura sem confirmaÃ§Ã£o explÃ­cita.
 
-## Trabalho já realizado nesta branch
+## Trabalho jÃ¡ realizado nesta branch
 
 1. Removido o caminho fixo `org.gradle.java.home=/usr/lib/jvm/java-17-openjdk-amd64`, permitindo que Gradle utilize o JDK definido pelo ambiente (JAVA_HOME).
-2. Alinhada a marca visível e o ícone interno com Midiastore.
+2. Alinhada a marca visÃ­vel e o Ã­cone interno com Midiastore.
 3. Ajustado o teste instrumentado para o Application ID atual `com.rdf112.midiastore.debug`.
-4. Criada ação de revisão de permissões parciais Android 14+ também na aba Arquivos.
-5. Missão clicada antes da primeira leitura passa a ser retomada depois que a primeira página carrega.
-6. Os botões de plano exibem mensagem quando o Billing não consegue iniciar o fluxo.
-7. O estado de reconciliação do Billing não é apresentado como plano gratuito.
-8. Filtros com texto cortado tiveram altura aumentada; vários rótulos técnicos foram simplificados.
-9. Arquivos do mesmo tamanho sem SHA-256 confirmado não são classificados como duplicatas.
-10. Resposta nula do MediaStore não é interpretada como prova de exclusão.
-11. Arquivos movidos para a Lixeira não são contabilizados como espaço liberado; exclusão só credita bytes após confirmação.
-12. Adicionada uma varredura global cancelável por categorias, volumes e páginas. Duplicatas entre páginas são comparadas via SHA-256 em streaming. Limites: 2 GiB por arquivo e 10 GiB de hash por missão; hashing normal de página: 512 MiB por arquivo e 1 GiB por página. Se qualquer limite ou fonte não verificada for atingido, a cobertura é parcial e duplicatas não são pré-selecionadas para exclusão.
-13. Acrescentados testes de domínio/VM para duplicatas entre páginas e para bloquear seleção automática em cobertura incompleta.
-14. CI agora tenta executar testes instrumentados em emulador Android 35 e guardar relatórios JVM/Android para diagnóstico.
-15. Implementado caminho de exclusão permanente no Android 10/API29 usando RecoverableSecurityException e consentimento oficial do sistema por URI. A verificação pós-exclusão consulta cada URI; bytes só são creditados para itens comprovadamente ausentes. Lixeira/restauração continuam API30+.
+4. Criada aÃ§Ã£o de revisÃ£o de permissÃµes parciais Android 14+ tambÃ©m na aba Arquivos.
+5. MissÃ£o clicada antes da primeira leitura passa a ser retomada depois que a primeira pÃ¡gina carrega.
+6. Os botÃµes de plano exibem mensagem quando o Billing nÃ£o consegue iniciar o fluxo.
+7. O estado de reconciliaÃ§Ã£o do Billing nÃ£o Ã© apresentado como plano gratuito.
+8. Filtros com texto cortado tiveram altura aumentada; vÃ¡rios rÃ³tulos tÃ©cnicos foram simplificados.
+9. Arquivos do mesmo tamanho sem SHA-256 confirmado nÃ£o sÃ£o classificados como duplicatas.
+10. Resposta nula do MediaStore nÃ£o Ã© interpretada como prova de exclusÃ£o.
+11. Arquivos movidos para a Lixeira nÃ£o sÃ£o contabilizados como espaÃ§o liberado; exclusÃ£o sÃ³ credita bytes apÃ³s confirmaÃ§Ã£o.
+12. Adicionada uma varredura global cancelÃ¡vel por categorias, volumes e pÃ¡ginas. Duplicatas entre pÃ¡ginas sÃ£o comparadas via SHA-256 em streaming. Limites: 2 GiB por arquivo e 10 GiB de hash por missÃ£o; hashing normal de pÃ¡gina: 512 MiB por arquivo e 1 GiB por pÃ¡gina. Se qualquer limite ou fonte nÃ£o verificada for atingido, a cobertura Ã© parcial e duplicatas nÃ£o sÃ£o prÃ©-selecionadas para exclusÃ£o.
+13. Acrescentados testes de domÃ­nio/VM para duplicatas entre pÃ¡ginas e para bloquear seleÃ§Ã£o automÃ¡tica em cobertura incompleta.
+14. CI agora tenta executar testes instrumentados em emulador Android 35 e guardar relatÃ³rios JVM/Android para diagnÃ³stico.
+15. Implementado caminho de exclusÃ£o permanente no Android 10/API29 usando RecoverableSecurityException e consentimento oficial do sistema por URI. A verificaÃ§Ã£o pÃ³s-exclusÃ£o consulta cada URI; bytes sÃ³ sÃ£o creditados para itens comprovadamente ausentes. Lixeira/restauraÃ§Ã£o continuam API30+.
 
 ## Limites que continuam abertos
 
-- A varredura global e as novas alterações ainda precisam de CI verde no commit mais recente.
-- O primeiro teste instrumentado do MediaStore falhou no emulador Android 15 e necessita de diagnóstico; não assumir que é apenas instabilidade do emulador.
-- O fluxo de exclusão permanente API29 foi implementado, mas ainda não foi validado em emulador API29 nem aparelho físico; Lixeira/restauração continuam indisponíveis nessa API.
-- O BillingClient está integrado no código, mas os SKUs e ofertas não foram validados na Play Console.
-- O cliente não valida criptograficamente o purchaseToken através de backend confiável. Não anunciar o entitlement como verificação de produção.
-- Nenhum teste de compra real, assinatura, restauração, reembolso ou expiração foi concluído.
-- Não há validação física em Samsung, Xiaomi, Motorola ou cartão SD.
-- Histórico persistente de varreduras, Downloads/documentos via SAF, similaridade visual e compressão não estão implementados.
-- Certificado de upload e maior versionCode publicado ainda precisam de confirmação da Play Console.
-- Nenhum AAB desta branch está aprovado para publicação.
+- A varredura global e as novas alteraÃ§Ãµes ainda precisam de CI verde no commit mais recente.
+- O primeiro teste instrumentado do MediaStore falhou no emulador Android 15 e necessita de diagnÃ³stico; nÃ£o assumir que Ã© apenas instabilidade do emulador.
+- O fluxo de exclusÃ£o permanente API29 foi implementado, mas ainda nÃ£o foi validado em emulador API29 nem aparelho fÃ­sico; Lixeira/restauraÃ§Ã£o continuam indisponÃ­veis nessa API.
+- O BillingClient estÃ¡ integrado no cÃ³digo, mas os SKUs e ofertas nÃ£o foram validados na Play Console.
+- O cliente nÃ£o valida criptograficamente o purchaseToken atravÃ©s de backend confiÃ¡vel. NÃ£o anunciar o entitlement como verificaÃ§Ã£o de produÃ§Ã£o.
+- Nenhum teste de compra real, assinatura, restauraÃ§Ã£o, reembolso ou expiraÃ§Ã£o foi concluÃ­do.
+- NÃ£o hÃ¡ validaÃ§Ã£o fÃ­sica em Samsung, Xiaomi, Motorola ou cartÃ£o SD.
+- HistÃ³rico persistente de varreduras, Downloads/documentos via SAF, similaridade visual e compressÃ£o nÃ£o estÃ£o implementados.
+- Certificado de upload e maior versionCode publicado ainda precisam de confirmaÃ§Ã£o da Play Console.
+- Nenhum AAB desta branch estÃ¡ aprovado para publicaÃ§Ã£o.
 
 ## Artefatos de teste
 
 - O workflow exporta `midiastore-debug-apk-api29` e `midiastore-debug-apk-api35` com SHA-256, quando os jobs chegam ao upload.
-- O APK Debug usa o package `com.rdf112.midiastore.debug` por causa de `applicationIdSuffix = ".debug"`. Ele serve para validar interface e funções locais e pode coexistir com a instalação do Play.
-- O APK Debug não valida compras Google Play e não substitui a instalação assinada do listing `com.rdf112.midiastore`. Para testar Billing, é necessário AAB assinado com a chave de upload oficial, enviado à faixa de teste interno/fechado.
-- Não pedir ao testador para repetir a avaliação do link antigo antes de instalar uma build nova desta branch.
+- O APK Debug usa o package `com.rdf112.midiastore.debug` por causa de `applicationIdSuffix = ".debug"`. Ele serve para validar interface e funÃ§Ãµes locais e pode coexistir com a instalaÃ§Ã£o do Play.
+- O APK Debug nÃ£o valida compras Google Play e nÃ£o substitui a instalaÃ§Ã£o assinada do listing `com.rdf112.midiastore`. Para testar Billing, Ã© necessÃ¡rio AAB assinado com a chave de upload oficial, enviado Ã  faixa de teste interno/fechado.
+- NÃ£o pedir ao testador para repetir a avaliaÃ§Ã£o do link antigo antes de instalar uma build nova desta branch.
 
 ## Como validar no Codespaces
 
-Confirme que está na branch de recuperação:
+Confirme que estÃ¡ na branch de recuperaÃ§Ã£o:
 
 ```bash
 git status --short --branch
@@ -222,52 +237,52 @@ Com emulador/telefone conectado:
 ./gradlew --no-daemon :app:connectedDebugAndroidTest
 ```
 
-Se o Codespace estiver em `main`, o `gradle.properties` antigo pode continuar apontando para um JDK inexistente. A correção está nesta branch, não na main.
+Se o Codespace estiver em `main`, o `gradle.properties` antigo pode continuar apontando para um JDK inexistente. A correÃ§Ã£o estÃ¡ nesta branch, nÃ£o na main.
 
-No computador Windows, `adb: no devices/emulators found` indica que nenhum Android está conectado. Ative Depuração USB e autorize o computador, ou inicie um emulador no Android Studio. Não é evidência de falha do aplicativo.
+No computador Windows, `adb: no devices/emulators found` indica que nenhum Android estÃ¡ conectado. Ative DepuraÃ§Ã£o USB e autorize o computador, ou inicie um emulador no Android Studio. NÃ£o Ã© evidÃªncia de falha do aplicativo.
 
-## Próximas prioridades
+## PrÃ³ximas prioridades
 
 1. Concluir CI e resolver falhas reais de teste.
 2. Executar teste MediaStore em APIs 29, 30, 33, 34, 35 e 36 e dispositivos de fabricantes diferentes.
-3. Corrigir limpeza/API29 ou reavaliar minSdk mediante impacto nos usuários existentes.
-4. Validar o catálogo de Billing, purchase tokens e entitlement seguro.
-5. Adicionar histórico local persistente de análises e reconciliação.
-6. Reestruturar a interface para fluxo de uma ação principal e navegação clara.
-7. Revisar acessibilidade, escalas de fonte, TalkBack, orientação e tablets.
+3. Corrigir limpeza/API29 ou reavaliar minSdk mediante impacto nos usuÃ¡rios existentes.
+4. Validar o catÃ¡logo de Billing, purchase tokens e entitlement seguro.
+5. Adicionar histÃ³rico local persistente de anÃ¡lises e reconciliaÃ§Ã£o.
+6. Reestruturar a interface para fluxo de uma aÃ§Ã£o principal e navegaÃ§Ã£o clara.
+7. Revisar acessibilidade, escalas de fonte, TalkBack, orientaÃ§Ã£o e tablets.
 8. Confirmar package, versionCode e upload certificate no Play Console.
-9. Só então gerar Release/AAB assinado pela chave legítima e publicar primeiro em teste interno.
+9. SÃ³ entÃ£o gerar Release/AAB assinado pela chave legÃ­tima e publicar primeiro em teste interno.
 
 ## Regra de trabalho
 
-Não começar do zero, não descartar código já existente e não confundir documentação, código compilável e funcionalidade comprovada. Cada funcionalidade precisa de teste e evidência. Nunca dizer que a biblioteca foi limpa, que o espaço foi liberado ou que uma compra foi validada sem confirmação técnica do resultado.
+NÃ£o comeÃ§ar do zero, nÃ£o descartar cÃ³digo jÃ¡ existente e nÃ£o confundir documentaÃ§Ã£o, cÃ³digo compilÃ¡vel e funcionalidade comprovada. Cada funcionalidade precisa de teste e evidÃªncia. Nunca dizer que a biblioteca foi limpa, que o espaÃ§o foi liberado ou que uma compra foi validada sem confirmaÃ§Ã£o tÃ©cnica do resultado.
 
-## Continuidade — 04/11/2026
+## Continuidade â€” 04/11/2026
 
 - Posicionamento confirmado: Phone Cleaner / limpador inteligente de celular.
-- Modelo comercial: Freemium com benefício Pro de exportação de relatório, único já implementado no cliente.
-- Medidor: armazenamento compartilhado primário, não espaço privado /data; SD/USB não somados automaticamente.
+- Modelo comercial: Freemium com benefÃ­cio Pro de exportaÃ§Ã£o de relatÃ³rio, Ãºnico jÃ¡ implementado no cliente.
+- Medidor: armazenamento compartilhado primÃ¡rio, nÃ£o espaÃ§o privado /data; SD/USB nÃ£o somados automaticamente.
 - Testes novos: quatro casos para StorageUsageCalculator, aguardando CI.
-- Localização: PT-BR/EN/fallback 152 chaves; outros seis idiomas 63/152 cada (534 faltantes).
-- Pesquisa de mercado e tecnologia atualizada; nenhum código de terceiros foi incorporado.
-- Manter PR #3 em Draft; não mergear, publicar ou gerar release assinado sem gates concluídos.
+- LocalizaÃ§Ã£o: PT-BR/EN/fallback 152 chaves; outros seis idiomas 63/152 cada (534 faltantes).
+- Pesquisa de mercado e tecnologia atualizada; nenhum cÃ³digo de terceiros foi incorporado.
+- Manter PR #3 em Draft; nÃ£o mergear, publicar ou gerar release assinado sem gates concluÃ­dos.
 
-## Estado exato do HEAD — 04/11/2026, 16:22 BRT
+## Estado exato do HEAD â€” 04/11/2026, 16:22 BRT
 
 - Branch `fix/p0-sweep-permissions-missions-billing`, HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`.
-- PR #3: aberta, Draft, base `main`, não merged.
+- PR #3: aberta, Draft, base `main`, nÃ£o merged.
 - `main` permanece no SHA `3759e176c48f340fa576a06455579277e514d9d9`.
-- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, está **queued**. Jobs API29, API35 e Windows também estão queued; não há resultado de build/teste para esse SHA.
-- O último ajuste funcional liga o botão principal da home à missão global de arquivos grandes e retoma a tela de progresso após autorização de mídia. Foi adicionado teste instrumentado da existência/clickabilidade da ação principal; não foi executado ainda.
-- Não declarar compilação, Lint, testes JVM, instrumentação ou APK gerado neste HEAD até obter logs do run exato.
+- GitHub Actions run [41866189110](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/41866189110), associado exatamente ao HEAD acima, estÃ¡ **queued**. Jobs API29, API35 e Windows tambÃ©m estÃ£o queued; nÃ£o hÃ¡ resultado de build/teste para esse SHA.
+- O Ãºltimo ajuste funcional liga o botÃ£o principal da home Ã  missÃ£o global de arquivos grandes e retoma a tela de progresso apÃ³s autorizaÃ§Ã£o de mÃ­dia. Foi adicionado teste instrumentado da existÃªncia/clickabilidade da aÃ§Ã£o principal; nÃ£o foi executado ainda.
+- NÃ£o declarar compilaÃ§Ã£o, Lint, testes JVM, instrumentaÃ§Ã£o ou APK gerado neste HEAD atÃ© obter logs do run exato.
 
-## Jornada principal Phone Cleaner — atualização de 04/11/2026
+## Jornada principal Phone Cleaner â€” atualizaÃ§Ã£o de 04/11/2026
 
-A ação principal da Home agora executa a missão global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e páginas MediaStore acessíveis para propor arquivos grandes. Ela não exclui nada automaticamente. O pedido inicial de permissões preserva a missão pendente e, após autorização, retorna à aba Limpeza para exibir progresso. A navegação de mídia paginada é separada como “Abrir arquivos / Browse files”.
+A aÃ§Ã£o principal da Home agora executa a missÃ£o global `FREE_MAX_SPACE_NOW`, que percorre as categorias, volumes e pÃ¡ginas MediaStore acessÃ­veis para propor arquivos grandes. Ela nÃ£o exclui nada automaticamente. O pedido inicial de permissÃµes preserva a missÃ£o pendente e, apÃ³s autorizaÃ§Ã£o, retorna Ã  aba Limpeza para exibir progresso. A navegaÃ§Ã£o de mÃ­dia paginada Ã© separada como â€œAbrir arquivos / Browse filesâ€.
 
-A melhoria está no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. Há um teste instrumentado da ação principal, ainda sem execução por estar o CI queued. O botão principal não deve ser interpretado como uma análise sem limites: acesso parcial, provider e limites de segurança continuam visíveis na cobertura global.
+A melhoria estÃ¡ no source do HEAD `d60ff8f8c0852ab7c33ce638d662053c028d4916`. HÃ¡ um teste instrumentado da aÃ§Ã£o principal, ainda sem execuÃ§Ã£o por estar o CI queued. O botÃ£o principal nÃ£o deve ser interpretado como uma anÃ¡lise sem limites: acesso parcial, provider e limites de seguranÃ§a continuam visÃ­veis na cobertura global.
 
-## Operating model for AI-assisted execution — 04/11/2026
+## Operating model for AI-assisted execution â€” 04/11/2026
 
 The owner wants the assistant to act as the technical manager of the Midiastore recovery, not to make the owner manually coordinate multiple agents or repeatedly run setup commands.
 
@@ -308,89 +323,98 @@ The owner wants the assistant to act as the technical manager of the Midiastore 
 
 This section is the durable continuity checkpoint for future conversations. Continue from these exact facts and do not make the owner repeat them.
 
-## Retomada local — 2026-11-06
+## Retomada local â€” 2026-11-06
 
-- Workspace preservado na branch `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`, igual ao commit remoto confirmado. Existem alterações staged, unstaged e arquivos locais não rastreados da sessão anterior; nenhum foi descartado. PR #3 permanece Draft e Issue #2 não foi alterada.
-- As alterações anteriores de testes, fixture `mediaOwnerTest`, documentação de pesquisa e atualizações de dependências permanecem locais. A alteração unstaged para Core KTX 1.19.1 impedia o build: exige compileSdk 37 e AGP 9.1, incompatíveis com o SDK 36/AGP 8.13.2 deste projeto. Core KTX foi fixado em 1.17.0, mantendo as demais dependências e a configuração de identidade/versão.
-- Build local Windows passou: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`. Lint concluiu com issues existentes; build não significa relatório limpo.
-- No Motorola moto g84 5G (API 35, serial `0085353748`), `:app:connectedDebugAndroidTest` falhou no UTP sem receber resultados e gerou relatório com zero testes. Executando os APKs instalados pelo `AndroidJUnitRunner` via ADB, a suíte concluiu `OK (7 tests)`.
-- A primeira execução direta observou a geração MediaStore mudar durante consultas e o adapter retornar `SESSION_STALE` com `SOURCE_CHANGED` confirmado, sem registros ambíguos. Os testes de paginação/áudio agora reconhecem esse caso apenas quando a revisão realmente prova a mudança da fonte; resultados inesperados continuam falhando.
-- API29 ainda não foi validado: não há AVD API29 neste ambiente. O teste foi preparado para executar o consentimento com mídia criada por um app auxiliar de UID distinto e conferir a atribuição reportada pelo próprio MediaStore, mas requer execução real em API29. Não inferir resultado API29 a partir do moto g84/API35.
+- Workspace preservado na branch `codex/midiastore-release-audit`, HEAD `16545a4277bcc515660a6516c32fb6c770a4e880`, igual ao commit remoto confirmado. Existem alteraÃ§Ãµes staged, unstaged e arquivos locais nÃ£o rastreados da sessÃ£o anterior; nenhum foi descartado. PR #3 permanece Draft e Issue #2 nÃ£o foi alterada.
+- As alteraÃ§Ãµes anteriores de testes, fixture `mediaOwnerTest`, documentaÃ§Ã£o de pesquisa e atualizaÃ§Ãµes de dependÃªncias permanecem locais. A alteraÃ§Ã£o unstaged para Core KTX 1.19.1 impedia o build: exige compileSdk 37 e AGP 9.1, incompatÃ­veis com o SDK 36/AGP 8.13.2 deste projeto. Core KTX foi fixado em 1.17.0, mantendo as demais dependÃªncias e a configuraÃ§Ã£o de identidade/versÃ£o.
+- Build local Windows passou: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest` e `:mediaOwnerTest:assembleDebug`. Lint concluiu com issues existentes; build nÃ£o significa relatÃ³rio limpo.
+- No Motorola moto g84 5G (API 35, serial `0085353748`), `:app:connectedDebugAndroidTest` falhou no UTP sem receber resultados e gerou relatÃ³rio com zero testes. Executando os APKs instalados pelo `AndroidJUnitRunner` via ADB, a suÃ­te concluiu `OK (7 tests)`.
+- A primeira execuÃ§Ã£o direta observou a geraÃ§Ã£o MediaStore mudar durante consultas e o adapter retornar `SESSION_STALE` com `SOURCE_CHANGED` confirmado, sem registros ambÃ­guos. Os testes de paginaÃ§Ã£o/Ã¡udio agora reconhecem esse caso apenas quando a revisÃ£o realmente prova a mudanÃ§a da fonte; resultados inesperados continuam falhando.
+- API29 ainda nÃ£o foi validado: nÃ£o hÃ¡ AVD API29 neste ambiente. O teste foi preparado para executar o consentimento com mÃ­dia criada por um app auxiliar de UID distinto e conferir a atribuiÃ§Ã£o reportada pelo prÃ³prio MediaStore, mas requer execuÃ§Ã£o real em API29. NÃ£o inferir resultado API29 a partir do moto g84/API35.
 
-## Continuação da validação — 2026-11-06
+## ContinuaÃ§Ã£o da validaÃ§Ã£o â€” 2026-11-06
 
-- Branch `codex/midiastore-release-audit`, HEAD local e base remota `16545a4277bcc515660a6516c32fb6c770a4e880`. Árvore segue com mudanças staged/unstaged e arquivos novos; nada foi descartado ou enviado.
-- Consultas read-only confirmaram PR #3 aberta e Draft, Issue #2 aberta, workflow `42080940375` falho no SHA `16545a4`. Os artefatos locais `.local-ci-42080940375/` mostram que API29 falhou porque MediaStore atribuiu a fixture ao UID do app alvo; API35 falhou ao assumir `external_primary` antes de haver volume disponível e encerrou processo ao revogar permissões durante o teste.
+- Branch `codex/midiastore-release-audit`, HEAD local e base remota `16545a4277bcc515660a6516c32fb6c770a4e880`. Ãrvore segue com mudanÃ§as staged/unstaged e arquivos novos; nada foi descartado ou enviado.
+- Consultas read-only confirmaram PR #3 aberta e Draft, Issue #2 aberta, workflow `42080940375` falho no SHA `16545a4`. Os artefatos locais `.local-ci-42080940375/` mostram que API29 falhou porque MediaStore atribuiu a fixture ao UID do app alvo; API35 falhou ao assumir `external_primary` antes de haver volume disponÃ­vel e encerrou processo ao revogar permissÃµes durante o teste.
 - Fixture API29 agora vem do provider de `:mediaOwnerTest`, pacote/UID separado, e a assertion consulta o owner real do MediaStore. Ainda falta executar em API29.
-- Testes API35 consultam volumes externos realmente anunciados pelo MediaStore. O teste de acesso parcial roda primeiro e exige permissões visuais/áudio negadas antes de conceder Selected Photos Access; não revoga permissão no processo.
-- Corrigida a assertion anterior: `SESSION_STALE` por si só não passa paginação. Imagem/áudio só terminam com sucesso após sessão estável; até três sessões são tentadas, cada invalidação precisa corresponder a `SOURCE_CHANGED`, e falha se todas permanecerem stale. Um resultado estável ainda precisa ser executado no aparelho.
-- `:app:compileDebugAndroidTestKotlin :app:assembleDebugAndroidTest` concluiu `BUILD SUCCESSFUL` após essa alteração (49 tarefas: 4 executadas, 45 up-to-date). O Kotlin daemon recebeu `AccessDeniedException` ao tentar escrever em `AppData\\Local\\kotlin\\daemon`; compilação usou fallback e terminou com sucesso.
-- Repetição `:app:connectedDebugAndroidTest -x :mediaOwnerTest:installDebug` reproduziu `Failed to receive the UTP test results`, com zero testes coletados. A conexão `adb` do serial `0085353748` desapareceu após a execução. O aparelho precisa ser reconectado para repetir o AndroidJUnitRunner direto e separar runner de coleta.
-- A tentativa local de emulador API29 chegou à falha explícita de aceleração x86_64: o driver de hypervisor não está instalado. Não instalar driver nem alterar proteções globais do Windows; API29 permanece bloqueado por ambiente.
-- Próxima tarefa: quando o Motorola retornar ao ADB, confirmar modelo/API/serial, reinstalar/verificar os APKs recém-compilados, limpar/conceder somente permissões do pacote Debug e executar primeiro o caso Selected Photos isolado, depois a suíte direta completa. Obter XML/logcat/códigos de saída do UTP em nova execução; retomar API29 em CI ou máquina com virtualização já habilitada.
+- Testes API35 consultam volumes externos realmente anunciados pelo MediaStore. O teste de acesso parcial roda primeiro e exige permissÃµes visuais/Ã¡udio negadas antes de conceder Selected Photos Access; nÃ£o revoga permissÃ£o no processo.
+- Corrigida a assertion anterior: `SESSION_STALE` por si sÃ³ nÃ£o passa paginaÃ§Ã£o. Imagem/Ã¡udio sÃ³ terminam com sucesso apÃ³s sessÃ£o estÃ¡vel; atÃ© trÃªs sessÃµes sÃ£o tentadas, cada invalidaÃ§Ã£o precisa corresponder a `SOURCE_CHANGED`, e falha se todas permanecerem stale. Um resultado estÃ¡vel ainda precisa ser executado no aparelho.
+- `:app:compileDebugAndroidTestKotlin :app:assembleDebugAndroidTest` concluiu `BUILD SUCCESSFUL` apÃ³s essa alteraÃ§Ã£o (49 tarefas: 4 executadas, 45 up-to-date). O Kotlin daemon recebeu `AccessDeniedException` ao tentar escrever em `AppData\\Local\\kotlin\\daemon`; compilaÃ§Ã£o usou fallback e terminou com sucesso.
+- RepetiÃ§Ã£o `:app:connectedDebugAndroidTest -x :mediaOwnerTest:installDebug` reproduziu `Failed to receive the UTP test results`, com zero testes coletados. A conexÃ£o `adb` do serial `0085353748` desapareceu apÃ³s a execuÃ§Ã£o. O aparelho precisa ser reconectado para repetir o AndroidJUnitRunner direto e separar runner de coleta.
+- A tentativa local de emulador API29 chegou Ã  falha explÃ­cita de aceleraÃ§Ã£o x86_64: o driver de hypervisor nÃ£o estÃ¡ instalado. NÃ£o instalar driver nem alterar proteÃ§Ãµes globais do Windows; API29 permanece bloqueado por ambiente.
+- PrÃ³xima tarefa: quando o Motorola retornar ao ADB, confirmar modelo/API/serial, reinstalar/verificar os APKs recÃ©m-compilados, limpar/conceder somente permissÃµes do pacote Debug e executar primeiro o caso Selected Photos isolado, depois a suÃ­te direta completa. Obter XML/logcat/cÃ³digos de saÃ­da do UTP em nova execuÃ§Ã£o; retomar API29 em CI ou mÃ¡quina com virtualizaÃ§Ã£o jÃ¡ habilitada.
 
-## Auditoria de recuperação — 2026-11-05
+## Auditoria de recuperaÃ§Ã£o â€” 2026-11-05
 
-- Branch local própria: `codex/midiastore-release-audit`, criada do `origin/fix/p0-sweep-permissions-missions-billing` em `16545a4277bcc515660a6516c32fb6c770a4e880`. A árvore estava limpa antes da auditoria. `main` segue em `3759e176c48f340fa576a06455579277e514d9d9`.
-- PR #3 permanece aberta como Draft, base `main`, não integrada. O trabalho local não foi enviado.
-- O último CI inspecionado, [run 42080940375](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/42080940375), passou JVM, Lint task, builds APK Debug/AndroidTest e parsing PowerShell. Instrumentação API29 e API35 falhou.
-- API29 criava a mídia pelo contexto que tinha o mesmo package/UID do Midiastore. Foi criado `:mediaOwnerTest` com package/UID separado, provider de teste protegido por permissão signature, conferência do owner retornado pelo MediaStore, consentimento Android, retry pós-`RESULT_OK` e verificação de ausência. O código compila, mas precisa rodar em API29.
-- API35 consultava `external_primary` enquanto o sistema ainda informava o volume como desmontável e o processo instrumentado acabou encerrado. Os testes e o runner CI agora aguardam a montagem real do volume, com timeout e diagnóstico. A correção ainda precisa de CI/API35 real.
-- Dependências atualizadas para versões estáveis: Core 1.17, AppCompat 1.8, Activity 1.13, Lifecycle 2.11, Coroutines 1.11, Material 1.14, AndroidX Test 1.7 e Billing 8.3. `billing-ktx` virou `billing`, pois o código usa API callback e não extensões KTX. AGP 8.13.2, Kotlin 2.3.21, Gradle 8.13, identidade e versão do app foram preservados.
-- Validação local Windows concluiu com sucesso: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest`, `:mediaOwnerTest:assembleDebug`. O relatório Lint contém 90 erros `MissingTranslation` e 94 warnings; o build segue porque `abortOnError=false`.
-- Não há imagens/AVDs API29 e API35 instaladas localmente e `adb devices` está vazio. Nenhum teste instrumentado foi executado após a correção.
-- Não há `keystore.properties` nem `sweep-upload.jks` local. O Release não foi executado e nenhuma chave foi gerada. A política de privacidade segue como draft sem URL pública; catálogo Billing, versão publicada máxima e certificado ainda dependem da Play Console.
-- Não fazer push, merge, despacho de workflow externo, build AAB de produção ou publicação sem autorização. PR continua Draft e release bloqueado até CI atualizado e gates de aparelho/Play Console.
-## Continuidade remota — 2026-11-06
+- Branch local prÃ³pria: `codex/midiastore-release-audit`, criada do `origin/fix/p0-sweep-permissions-missions-billing` em `16545a4277bcc515660a6516c32fb6c770a4e880`. A Ã¡rvore estava limpa antes da auditoria. `main` segue em `3759e176c48f340fa576a06455579277e514d9d9`.
+- PR #3 permanece aberta como Draft, base `main`, nÃ£o integrada. O trabalho local nÃ£o foi enviado.
+- O Ãºltimo CI inspecionado, [run 42080940375](https://github.com/srodolfobarbosa-afk/midiastory-/actions/runs/42080940375), passou JVM, Lint task, builds APK Debug/AndroidTest e parsing PowerShell. InstrumentaÃ§Ã£o API29 e API35 falhou.
+- API29 criava a mÃ­dia pelo contexto que tinha o mesmo package/UID do Midiastore. Foi criado `:mediaOwnerTest` com package/UID separado, provider de teste protegido por permissÃ£o signature, conferÃªncia do owner retornado pelo MediaStore, consentimento Android, retry pÃ³s-`RESULT_OK` e verificaÃ§Ã£o de ausÃªncia. O cÃ³digo compila, mas precisa rodar em API29.
+- API35 consultava `external_primary` enquanto o sistema ainda informava o volume como desmontÃ¡vel e o processo instrumentado acabou encerrado. Os testes e o runner CI agora aguardam a montagem real do volume, com timeout e diagnÃ³stico. A correÃ§Ã£o ainda precisa de CI/API35 real.
+- DependÃªncias atualizadas para versÃµes estÃ¡veis: Core 1.17, AppCompat 1.8, Activity 1.13, Lifecycle 2.11, Coroutines 1.11, Material 1.14, AndroidX Test 1.7 e Billing 8.3. `billing-ktx` virou `billing`, pois o cÃ³digo usa API callback e nÃ£o extensÃµes KTX. AGP 8.13.2, Kotlin 2.3.21, Gradle 8.13, identidade e versÃ£o do app foram preservados.
+- ValidaÃ§Ã£o local Windows concluiu com sucesso: `:domain:test`, `:app:testDebugUnitTest`, `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest`, `:mediaOwnerTest:assembleDebug`. O relatÃ³rio Lint contÃ©m 90 erros `MissingTranslation` e 94 warnings; o build segue porque `abortOnError=false`.
+- NÃ£o hÃ¡ imagens/AVDs API29 e API35 instaladas localmente e `adb devices` estÃ¡ vazio. Nenhum teste instrumentado foi executado apÃ³s a correÃ§Ã£o.
+- NÃ£o hÃ¡ `keystore.properties` nem `sweep-upload.jks` local. O Release nÃ£o foi executado e nenhuma chave foi gerada. A polÃ­tica de privacidade segue como draft sem URL pÃºblica; catÃ¡logo Billing, versÃ£o publicada mÃ¡xima e certificado ainda dependem da Play Console.
+- NÃ£o fazer push, merge, despacho de workflow externo, build AAB de produÃ§Ã£o ou publicaÃ§Ã£o sem autorizaÃ§Ã£o. PR continua Draft e release bloqueado atÃ© CI atualizado e gates de aparelho/Play Console.
+## Continuidade remota â€” 2026-11-06
 
-### Alteração visual aplicada diretamente no GitHub
+### AlteraÃ§Ã£o visual aplicada diretamente no GitHub
 
-- A branch de recuperação avançou de `16545a4277bcc515660a6516c32fb6c770a4e880` para `ca9ebd04fa11bfba966830ce7f977ab081954ce1`, por fast-forward, sem force-push.
-- Paleta atualizada para identidade premium escura: fundo midnight, superfícies azul-petróleo, ação primária jade/ciano e acento âmbar.
-- Tema Material 3 alinhado à paleta com cores explícitas de superfície, texto, ação e navegação.
+- A branch de recuperaÃ§Ã£o avanÃ§ou de `16545a4277bcc515660a6516c32fb6c770a4e880` para `ca9ebd04fa11bfba966830ce7f977ab081954ce1`, por fast-forward, sem force-push.
+- Paleta atualizada para identidade premium escura: fundo midnight, superfÃ­cies azul-petrÃ³leo, aÃ§Ã£o primÃ¡ria jade/ciano e acento Ã¢mbar.
+- Tema Material 3 alinhado Ã  paleta com cores explÃ­citas de superfÃ­cie, texto, aÃ§Ã£o e navegaÃ§Ã£o.
 - Arquivos: `app/src/main/res/values/colors.xml` e `app/src/main/res/values/styles.xml`.
-- PR #3 permanece aberta em Draft; `main` não foi alterada e nenhuma publicação foi feita.
-- O código visual foi gravado e relido pelo GitHub. Ainda não há execução de CI associada ao novo SHA; portanto, não declarar compilação ou teste aprovados por causa dessa alteração.
+- PR #3 permanece aberta em Draft; `main` nÃ£o foi alterada e nenhuma publicaÃ§Ã£o foi feita.
+- O cÃ³digo visual foi gravado e relido pelo GitHub. Ainda nÃ£o hÃ¡ execuÃ§Ã£o de CI associada ao novo SHA; portanto, nÃ£o declarar compilaÃ§Ã£o ou teste aprovados por causa dessa alteraÃ§Ã£o.
 
-### Workspace local do Codex — reconciliação obrigatória
+### Workspace local do Codex â€” reconciliaÃ§Ã£o obrigatÃ³ria
 
-- A última leitura local mostrou a branch `codex/midiastore-release-audit` no SHA base `16545a4277bcc515660a6516c32fb6c770a4e880`, com alterações staged, unstaged e arquivos novos.
-- Essas alterações locais incluem correções de testes/fixture API29, descoberta dinâmica de volumes MediaStore API35, documentação e pesquisa. Elas ainda não estão incluídas no SHA remoto acima.
-- Evidência local relatada: AndroidJUnitRunner direto no Motorola API35 executou os testes de mídia; os cenários exclusivos de API29 foram ignorados corretamente nesse aparelho. Isso não valida API29 e não substitui CI.
-- O Gradle UTP no Windows falhou antes de coletar resultados, com erro do listener local/Netty; não classificar como falha de assertion do app nem como aprovação.
-- Antes de continuar alterações que toquem os mesmos arquivos, reconciliar cuidadosamente o workspace local com a branch remota. Não descartar, limpar ou sobrescrever o trabalho local.
+- A Ãºltima leitura local mostrou a branch `codex/midiastore-release-audit` no SHA base `16545a4277bcc515660a6516c32fb6c770a4e880`, com alteraÃ§Ãµes staged, unstaged e arquivos novos.
+- Essas alteraÃ§Ãµes locais incluem correÃ§Ãµes de testes/fixture API29, descoberta dinÃ¢mica de volumes MediaStore API35, documentaÃ§Ã£o e pesquisa. Elas ainda nÃ£o estÃ£o incluÃ­das no SHA remoto acima.
+- EvidÃªncia local relatada: AndroidJUnitRunner direto no Motorola API35 executou os testes de mÃ­dia; os cenÃ¡rios exclusivos de API29 foram ignorados corretamente nesse aparelho. Isso nÃ£o valida API29 e nÃ£o substitui CI.
+- O Gradle UTP no Windows falhou antes de coletar resultados, com erro do listener local/Netty; nÃ£o classificar como falha de assertion do app nem como aprovaÃ§Ã£o.
+- Antes de continuar alteraÃ§Ãµes que toquem os mesmos arquivos, reconciliar cuidadosamente o workspace local com a branch remota. NÃ£o descartar, limpar ou sobrescrever o trabalho local.
 
-### Próximas prioridades remotas
+### PrÃ³ximas prioridades remotas
 
-1. Integrar de forma auditável as correções locais de fixture com UID separado, volume MediaStore dinâmico e isolamento do teste de permissões.
-2. Obter CI verde no SHA atual, incluindo API29 e API35; não aceitar testes ignorados como substitutos de cobertura.
-3. Validar visualmente em aparelho real a home, cards, filtros, navegação, fonte ampliada e TalkBack.
-4. Resolver os findings de localização; a última auditoria local relatou 90 erros MissingTranslation e 94 avisos.
-5. Manter API29, Billing seguro, Play Console, assinatura e testes OEM como gates explícitos de release.
+1. Integrar de forma auditÃ¡vel as correÃ§Ãµes locais de fixture com UID separado, volume MediaStore dinÃ¢mico e isolamento do teste de permissÃµes.
+2. Obter CI verde no SHA atual, incluindo API29 e API35; nÃ£o aceitar testes ignorados como substitutos de cobertura.
+3. Validar visualmente em aparelho real a home, cards, filtros, navegaÃ§Ã£o, fonte ampliada e TalkBack.
+4. Resolver os findings de localizaÃ§Ã£o; a Ãºltima auditoria local relatou 90 erros MissingTranslation e 94 avisos.
+5. Manter API29, Billing seguro, Play Console, assinatura e testes OEM como gates explÃ­citos de release.
 
-## Avaliação do proprietário no Motorola — 2026-11-07
+## AvaliaÃ§Ã£o do proprietÃ¡rio no Motorola â€” 2026-11-07
 
-- Impressão geral explícita do proprietário Rodolfo: o app está “mal construído, feio e ruim”. No uso real, relata que não executa limpeza útil, os botões não respondem como esperado e os planos pagos não funcionam. Tratar como falha de aceitação e bloqueio total de release; a avaliação do proprietário prevalece sobre aparência de conclusão em compilações ou testes isolados.
-- A verificação local desta data confirmou que o Motorola moto g84 5G (Android 15) responde ao ADB, abriu `MainActivity` e não mostrou `FATAL EXCEPTION` no trecho de logcat consultado. O AndroidJUnitRunner direto terminou `OK (9 tests)`, mas cenários dependentes de API29, consentimento interativo e permissões visuais isoladas foram ignorados por precondições. Isso **não** prova que a experiência real de limpeza, botões, navegação ou Billing esteja funcional.
-- `:app:connectedDebugAndroidTest` continua sem resultado Gradle/UTP (`Failed to receive the UTP test results`); o runner Android direto foi necessário e é evidência limitada ao que os testes cobrem.
-- Não declarar o app pronto para publicar, não promover a produção e não usar aprovação de testes como resposta à avaliação negativa. Próxima etapa de produto: reproduzir no telefone os fluxos relatados, inspecionar a tela e cada ação da navegação, corrigir interação e feedback visual, verificar permissões MediaStore e pós-estado real da limpeza, e validar a tela/estados de Billing com produtos de teste da Play. Manter cada comportamento não executado como não verificado.
+- ImpressÃ£o geral explÃ­cita do proprietÃ¡rio Rodolfo: o app estÃ¡ â€œmal construÃ­do, feio e ruimâ€. No uso real, relata que nÃ£o executa limpeza Ãºtil, os botÃµes nÃ£o respondem como esperado e os planos pagos nÃ£o funcionam. Tratar como falha de aceitaÃ§Ã£o e bloqueio total de release; a avaliaÃ§Ã£o do proprietÃ¡rio prevalece sobre aparÃªncia de conclusÃ£o em compilaÃ§Ãµes ou testes isolados.
+- A verificaÃ§Ã£o local desta data confirmou que o Motorola moto g84 5G (Android 15) responde ao ADB, abriu `MainActivity` e nÃ£o mostrou `FATAL EXCEPTION` no trecho de logcat consultado. O AndroidJUnitRunner direto terminou `OK (9 tests)`, mas cenÃ¡rios dependentes de API29, consentimento interativo e permissÃµes visuais isoladas foram ignorados por precondiÃ§Ãµes. Isso **nÃ£o** prova que a experiÃªncia real de limpeza, botÃµes, navegaÃ§Ã£o ou Billing esteja funcional.
+- `:app:connectedDebugAndroidTest` continua sem resultado Gradle/UTP (`Failed to receive the UTP test results`); o runner Android direto foi necessÃ¡rio e Ã© evidÃªncia limitada ao que os testes cobrem.
+- NÃ£o declarar o app pronto para publicar, nÃ£o promover a produÃ§Ã£o e nÃ£o usar aprovaÃ§Ã£o de testes como resposta Ã  avaliaÃ§Ã£o negativa. PrÃ³xima etapa de produto: reproduzir no telefone os fluxos relatados, inspecionar a tela e cada aÃ§Ã£o da navegaÃ§Ã£o, corrigir interaÃ§Ã£o e feedback visual, verificar permissÃµes MediaStore e pÃ³s-estado real da limpeza, e validar a tela/estados de Billing com produtos de teste da Play. Manter cada comportamento nÃ£o executado como nÃ£o verificado.
 
-## Estado retomado no Motorola � 2026-11-07 (atualiza��o)
+## Estado retomado no Motorola ï¿½ 2026-11-07 (atualizaï¿½ï¿½o)
 
-- A vers�o em teste � com.rdf112.midiastore.debug (APK Debug usa applicationIdSuffix .debug); n�o confundir com o app Release instalado no telefone.
-- O logo do cabe�alho agora agrupa o s�mbolo e o nome Midiastore; a ilustra��o vetorial anterior da mulher com celular foi preservada, com o nome Midiastore abaixo. Nada foi apagado durante esta valida��o.
-- No moto g84 5G/API35, a a��o Home encontrou 5 itens grandes (84,30 MB), atualizou a CTA para revis�o e abriu a lista. A revis�o mostra consentimento antes de qualquer opera��o. A exclus�o foi deixada intocada.
-- Navegar para Planos Pro funcionou. Mensal/anual/vital�cio continuam indicados como sugeridos e inativos; o app n�o pode concluir compra enquanto Play Console n�o tiver cat�logo ativo e falta backend de purchaseToken.
-- Build :app:assembleDebug p�s-ajustes passou. Testes JVM/Lint est�o em execu��o; o AAB assinado n�o foi gerado. Bloqueios Play Console, versionCode/certificado e valida��o release/API29/CI permanecem.
+- A versï¿½o em teste ï¿½ com.rdf112.midiastore.debug (APK Debug usa applicationIdSuffix .debug); nï¿½o confundir com o app Release instalado no telefone.
+- O logo do cabeï¿½alho agora agrupa o sï¿½mbolo e o nome Midiastore; a ilustraï¿½ï¿½o vetorial anterior da mulher com celular foi preservada, com o nome Midiastore abaixo. Nada foi apagado durante esta validaï¿½ï¿½o.
+- No moto g84 5G/API35, a aï¿½ï¿½o Home encontrou 5 itens grandes (84,30 MB), atualizou a CTA para revisï¿½o e abriu a lista. A revisï¿½o mostra consentimento antes de qualquer operaï¿½ï¿½o. A exclusï¿½o foi deixada intocada.
+- Navegar para Planos Pro funcionou. Mensal/anual/vitalï¿½cio continuam indicados como sugeridos e inativos; o app nï¿½o pode concluir compra enquanto Play Console nï¿½o tiver catï¿½logo ativo e falta backend de purchaseToken.
+- Build :app:assembleDebug pï¿½s-ajustes passou. Testes JVM/Lint estï¿½o em execuï¿½ï¿½o; o AAB assinado nï¿½o foi gerado. Bloqueios Play Console, versionCode/certificado e validaï¿½ï¿½o release/API29/CI permanecem.
 
-## Checkpoint prioritário — 2026-11-18
+## Checkpoint prioritÃ¡rio â€” 2026-11-18
 
-Antes de usar checkpoints antigos, consulte `docs/CONTINUATION_UPDATE_2026-11-18.md`. As decisões já aprovadas nas memórias Supabase #313–#315 prevalecem: limpador puro, abas Limpar/Arquivos/Pro, preto OLED/grafite/azul, sem Studio/jogos/jornal/extras; planta e mockup antes de código de UI. Mockup: `docs/mockups/midiastore-2027-cleaner-puro.html`. Blueprint corrigido: `docs/BLUEPRINT_MIDIASTORE_2027.md`. Uma proposta que adicionava Studio/Explorar contrariou a decisão e foi corrigida; não reabrir decisões já tomadas.
+Antes de usar checkpoints antigos, consulte `docs/CONTINUATION_UPDATE_2026-11-18.md`. As decisÃµes jÃ¡ aprovadas nas memÃ³rias Supabase #313â€“#315 prevalecem: limpador puro, abas Limpar/Arquivos/Pro, preto OLED/grafite/azul, sem Studio/jogos/jornal/extras; planta e mockup antes de cÃ³digo de UI. Mockup: `docs/mockups/midiastore-2027-cleaner-puro.html`. Blueprint corrigido: `docs/BLUEPRINT_MIDIASTORE_2027.md`. Uma proposta que adicionava Studio/Explorar contrariou a decisÃ£o e foi corrigida; nÃ£o reabrir decisÃµes jÃ¡ tomadas.
 
-## Atualização adicional — 2026-11-18: implementação Compose iniciada
+## AtualizaÃ§Ã£o adicional â€” 2026-11-18: implementaÃ§Ã£o Compose iniciada
 
-A planta/mockup respeitando #313/#315 foi seguido pela primeira tela real `CleanerHomeScreen.kt`, conectada à Activity e aos fluxos MediaStore já existentes. A compilação ainda não foi confirmada: o Gradle inicia o daemon e trava antes de reportar tarefas; a execução foi interrompida. Veja `docs/CONTINUATION_UPDATE_2026-11-18.md`. Próxima etapa: destravar build, instalar o Debug separadamente e revisar visual no Moto; depois migrar Arquivos/Pro e navegação, sem adicionar Studio/extras.
+A planta/mockup respeitando #313/#315 foi seguido pela primeira tela real `CleanerHomeScreen.kt`, conectada Ã  Activity e aos fluxos MediaStore jÃ¡ existentes. A compilaÃ§Ã£o ainda nÃ£o foi confirmada: o Gradle inicia o daemon e trava antes de reportar tarefas; a execuÃ§Ã£o foi interrompida. Veja `docs/CONTINUATION_UPDATE_2026-11-18.md`. PrÃ³xima etapa: destravar build, instalar o Debug separadamente e revisar visual no Moto; depois migrar Arquivos/Pro e navegaÃ§Ã£o, sem adicionar Studio/extras.
 
 ## Strategic objective and memory update - 2026-11-20
 
 Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north star, agent mandate, metrics, evidence rules and four-layer memory protocol. The goal is a competitive, trusted Android storage cleaner with sustainable real Google Play sales; R is a target, not an achieved result. The owner wants agents to work proactively across product, operations and sales as model capabilities improve, within current authorization, account access, budgets, law and platform rules. Product decisions remain governed by AGENTS.md: pure cleaner, Limpar/Arquivos/Pro. For current continuity see docs/CONTINUATION_UPDATE_2026-11-20.md. Preserve shared Antigravity changes; check git status before editing.
+
+## Maria replay / localization checkpoint â€” 2026-11-26
+
+- Commit `a33a3b87da511027f43516041b1289fd9a4c8b96` on `feat/v2.9.0-motor-app` updates the Maria avatar to show a centered cropped still while idle and gate video visibility on a fresh decoded frame; Italian (`values-it`) is added to locale config/governance.
+- The single GitHub Actions run `45776260540` failed at `:app:mergeDebugResources`: invalid escaped apostrophes (`\\'`) in `values-ja`, `values-ru`, and `values-zh-rCN` (`starting_scan`, `oaas_starting_scan_first`) trigger AAPT invalid Unicode escape errors. No APK artifact was produced; Moto G84 two-cycle QA was not run. No local Gradle was run.
+- The requested Files labels (empty-page, page counts/navigation, filters, storage used, Current plan) are translated, but full-string translation audit is incomplete: numerous longer secondary strings remain English, especially in French, Hindi, Indonesian, and Italian.
+- Supabase memory was recorded as #575 after one transient HTTP 502; local timeline was updated.
+- Next step: correct AAPT escape sequences, then obtain authorization for another CI compilation before APK/device QA; do not claim completion or alter `v2.8.2-carbon-baseline`.
+

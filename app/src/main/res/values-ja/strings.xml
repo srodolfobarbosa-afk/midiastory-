@@ -128,7 +128,7 @@
     <string name="oaas_card_headline">何を見つけますか？</string>
     <string name="oaas_card_subtitle">ファイルは端末内に保存されます。結果を確認し、操作ごとに許可してください。</string>
     <string name="oaas_pipeline_idle">開始する分析を選択します。</string>
-    <string name="oaas_starting_scan_first">まず、\\' で許可されたメディアを確認します。</string>
+    <string name="oaas_starting_scan_first">まず、\' で許可されたメディアを確認します。</string>
     <string name="oaas_mission_large">大きなファイル (10 MB を超える) を検索する</string>
     <string name="oaas_mission_duplicates">完全なコピーを探す (SHA-256) · 無料</string>
     <string name="oaas_mission_old">30日以上前のファイルを探す · 無料</string>

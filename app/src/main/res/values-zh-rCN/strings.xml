@@ -128,7 +128,7 @@
     <string name="oaas_card_headline">你想查找什么？</string>
     <string name="oaas_card_subtitle">文件保留在本设备上。请检查结果并批准每项操作。</string>
     <string name="oaas_pipeline_idle">选择一个分析开始。</string>
-    <string name="oaas_starting_scan_first">首先，我们\\'会检查您允许的媒体。</string>
+    <string name="oaas_starting_scan_first">首先，我们\'会检查您允许的媒体。</string>
     <string name="oaas_mission_large">查找大文件（超过 10 MB）</string>
     <string name="oaas_mission_duplicates">查找完全相同的副本 (SHA-256) · 免费</string>
     <string name="oaas_mission_old">查找超过 30 天的文件 · 免费</string>

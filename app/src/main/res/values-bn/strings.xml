@@ -105,7 +105,7 @@
     <string name="pro_unused_apps_never_used">গত ৯০ দিনে খোলা হয়নি</string>
     <string name="pro_unused_apps_permission_denied">ব্যবহারের তথ্যে অ্যাক্সেসের অনুমতি দেওয়া হয়নি।</string>
     <string name="pro_purchase_unavailable_notice">এখন Google Play থেকে প্ল্যান লোড করা যায়নি।</string>
-    <string name="plan_annual_default">Midiastore Pro Annual Best Value · See local price</string>
+    <string name="plan_annual_default">Midiastore Pro বার্ষিক · সেরা সাশ্রয় · স্থানীয় মূল্য দেখুন</string>
     <string name="plan_annual_with_price">Midiastore Pro বার্ষিক · %1$s/বছর</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro বার্ষিক (-%2$d%% প্রকৃত সাশ্রয়) · %1$s/বছর</string>
     <string name="plan_monthly_default">Midiastore Pro মাসিক · Play Store-এ স্থানীয় মূল্য দেখুন</string>
@@ -180,19 +180,21 @@
     <string name="cleanup_dialog_subtitle_candidates">নিচে পাওয়া ফাইল পর্যালোচনা করুন। রাখতে চান এমন ফাইলের টিক তুলে দিন, তারপর ট্র্যাশে সরানো বা Android-এর নিশ্চিতকরণসহ স্থায়ীভাবে মুছে ফেলা বেছে নিন।</string>
     <string name="cleanup_dialog_subtitle_fallback">১০ MB-এর বেশি কোনো একক ফাইল পাওয়া যায়নি। এখন পর্যালোচনা করে জায়গা খালি করতে ফোনের বড় মিডিয়া ফাইলগুলো দেখুন:</string>
     <string name="cleanup_dialog_selected_summary">ক্লিনআপের জন্য নির্বাচিত: %2$dটির মধ্যে %1$dটি ফাইল (%3$s)</string>
-    <string name="cleanup_dialog_select_all">☑ Select All (%1$d)</string>
-    <string name="cleanup_dialog_deselect_all">⬜ Deselect All</string>
+    <string name="cleanup_dialog_select_all">☑ সব নির্বাচন (%1$d)</string>
+    <string name="cleanup_dialog_deselect_all">⬜ সব নির্বাচন বাতিল</string>
     <string name="cleanup_dialog_select_none_toast">ক্লিনআপের জন্য অন্তত ১টি ফাইল বেছে নিন।</string>
     <string name="cleanup_dialog_open_files_tab">Files ট্যাবে দেখুন</string>
     <string name="cleanup_dialog_empty_title">ক্লিনআপ করার মতো মিডিয়া পাওয়া যায়নি</string>
     <string name="cleanup_dialog_empty_body">এই স্ক্যানে অ্যাক্সেসযোগ্য কোনো মিডিয়া পাওয়া যায়নি। গ্যালারি রিফ্রেশ করুন, WhatsApp Cleaner খুলুন বা মিডিয়া অনুমতি পর্যালোচনা করুন।</string>
     <string name="cleanup_scan_in_progress_toast">ডিভাইসের ফাইল স্ক্যান হচ্ছে… একটু অপেক্ষা করুন।</string>
-    <string name="select_all_page_button">☑ Select page (%1$d)</string>
+    <string name="select_all_page_button">☑ পৃষ্ঠা নির্বাচন (%1$d)</string>
     <string name="tester_vip_activate_button">ফ্রি Pro প্ল্যান চালু করুন (টেস্টার বোনাস)</string>
     <string name="tester_vip_active_button">টেস্টার VIP বোনাস সক্রিয় (Pro প্ল্যান আনলক হয়েছে)</string>
-    <string name="tester_vip_status_badge">Pro VIP Plan Active (Official Tester Bonus)</string>
-    <string name="whatsapp_cleaner_title">Smart WhatsApp Cleaner</string>
-    <string name="whatsapp_cleaner_empty">No WhatsApp media files were found in authorized folders on this device.\n\nYou can scan for Large Files or browse all files in the Files tab.</string>
+    <string name="tester_vip_status_badge">Pro VIP পরিকল্পনা সক্রিয় (অফিশিয়াল পরীক্ষকের পুরস্কার)</string>
+    <string name="whatsapp_cleaner_title">স্মার্ট WhatsApp ক্লিনার</string>
+    <string name="whatsapp_cleaner_empty">এই ডিভাইসের অনুমোদিত ফোল্ডারে WhatsApp মিডিয়া ফাইল পাওয়া যায়নি।
+
+বড় ফাইল স্ক্যান করুন অথবা Files ট্যাবে সব ফাইল দেখুন।</string>
     <string name="whatsapp_cat_videos">WhatsApp ভিডিও</string>
     <string name="whatsapp_cat_images">WhatsApp ছবি</string>
     <string name="whatsapp_cat_voice">ভয়েস নোট ও অডিও</string>
@@ -200,7 +202,7 @@
     <string name="wa_found_title">WhatsApp মিডিয়া পাওয়া গেছে</string>
     <string name="wa_cat_audio">প্রাপ্ত অডিও</string>
     <string name="wa_cat_gifs">অ্যানিমেটেড GIF</string>
-    <string name="wa_cat_docs">Indexed Documents</string>
+    <string name="wa_cat_docs">সূচিবদ্ধ নথি</string>
     <string name="wa_cat_other">অন্যান্য মিডিয়া</string>
     <string name="wa_cat_item_count">%1$s (%2$dটি আইটেম · %3$s)</string>
     <string name="wa_select_category_toast">অন্তত একটি বিভাগ বেছে নিন।</string>

@@ -105,7 +105,7 @@
     <string name="pro_unused_apps_never_used">لم يُفتح خلال آخر 90 يومًا</string>
     <string name="pro_unused_apps_permission_denied">لم يُسمح بالوصول إلى بيانات الاستخدام.</string>
     <string name="pro_purchase_unavailable_notice">تعذر تحميل الخطط من Google Play الآن.</string>
-    <string name="plan_annual_default">Midiastore Pro Annual Best Value · See local price</string>
+    <string name="plan_annual_default">Midiastore Pro سنوي · أفضل قيمة · راجع السعر المحلي</string>
     <string name="plan_annual_with_price">Midiastore Pro سنوي · %1$s/سنة</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro سنوي (توفير حقيقي %2$d%%-) · %1$s/سنة</string>
     <string name="plan_monthly_default">Midiastore Pro شهريًا · راجع السعر المحلي في Play Store</string>
@@ -180,19 +180,21 @@
     <string name="cleanup_dialog_subtitle_candidates">راجع الملفات أدناه. أزل التحديد عما تريد الاحتفاظ به، ثم اختر النقل إلى المهملات أو الحذف النهائي بتأكيد Android الرسمي.</string>
     <string name="cleanup_dialog_subtitle_fallback">لم يتم العثور على ملف منفرد أكبر من 10 MB. هذه أكبر ملفات الوسائط على هاتفك لتراجعها وتحرر مساحة الآن:</string>
     <string name="cleanup_dialog_selected_summary">المحدد للتنظيف: %1$d من %2$d ملفًا (%3$s)</string>
-    <string name="cleanup_dialog_select_all">☑ Select All (%1$d)</string>
-    <string name="cleanup_dialog_deselect_all">⬜ Deselect All</string>
+    <string name="cleanup_dialog_select_all">☑ تحديد الكل (%1$d)</string>
+    <string name="cleanup_dialog_deselect_all">⬜ إلغاء تحديد الكل</string>
     <string name="cleanup_dialog_select_none_toast">حدد ملفًا واحدًا على الأقل لتنظيفه.</string>
     <string name="cleanup_dialog_open_files_tab">عرض في تبويب الملفات</string>
     <string name="cleanup_dialog_empty_title">لم يتم العثور على وسائط لتنظيفها</string>
     <string name="cleanup_dialog_empty_body">لم يتم العثور على وسائط يمكن الوصول إليها في هذا الفحص. يمكنك تحديث المعرض أو فتح منظف WhatsApp أو مراجعة أذونات الوسائط.</string>
     <string name="cleanup_scan_in_progress_toast">جارٍ فحص ملفات الجهاز… يرجى الانتظار.</string>
-    <string name="select_all_page_button">☑ Select page (%1$d)</string>
+    <string name="select_all_page_button">☑ تحديد الصفحة (%1$d)</string>
     <string name="tester_vip_activate_button">تفعيل خطة Pro المجانية (مكافأة المختبر)</string>
     <string name="tester_vip_active_button">مكافأة VIP للمختبر مفعلة (تم فتح خطة Pro)</string>
-    <string name="tester_vip_status_badge">Pro VIP Plan Active (Official Tester Bonus)</string>
-    <string name="whatsapp_cleaner_title">Smart WhatsApp Cleaner</string>
-    <string name="whatsapp_cleaner_empty">No WhatsApp media files were found in authorized folders on this device.\n\nYou can scan for Large Files or browse all files in the Files tab.</string>
+    <string name="tester_vip_status_badge">خطة Pro VIP نشطة (مكافأة المختبر الرسمي)</string>
+    <string name="whatsapp_cleaner_title">منظف WhatsApp الذكي</string>
+    <string name="whatsapp_cleaner_empty">لم يتم العثور على ملفات وسائط WhatsApp في المجلدات المصرح بها على هذا الجهاز.
+
+يمكنك البحث عن الملفات الكبيرة أو تصفح جميع الملفات في علامة تبويب الملفات.</string>
     <string name="whatsapp_cat_videos">فيديوهات WhatsApp</string>
     <string name="whatsapp_cat_images">صور WhatsApp</string>
     <string name="whatsapp_cat_voice">رسائل صوتية وملفات صوتية</string>
@@ -200,7 +202,7 @@
     <string name="wa_found_title">تم العثور على وسائط WhatsApp</string>
     <string name="wa_cat_audio">صوت مستلم</string>
     <string name="wa_cat_gifs">صور GIF متحركة</string>
-    <string name="wa_cat_docs">Indexed Documents</string>
+    <string name="wa_cat_docs">مستندات مفهرسة</string>
     <string name="wa_cat_other">وسائط أخرى</string>
     <string name="wa_cat_item_count">%1$s (%2$d عناصر · %3$s)</string>
     <string name="wa_select_category_toast">حدد فئة واحدة على الأقل.</string>

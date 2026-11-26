@@ -11,7 +11,7 @@
     <string name="ready_status">준비가 된. 원래 참조 보호 기능을 갖춘 100% 로컬 처리.</string>
     <string name="permission_denied">권한이 부여되지 않았습니다. 쿼리된 미디어가 없습니다.</string>
     <string name="no_access">분석을 시작하려면 사진, 비디오, 오디오에 대한 액세스 권한을 부여하세요.</string>
-    <string name="starting_scan">\\'가 허용한 미디어를 확인하는 중…</string>
+    <string name="starting_scan">\'가 허용한 미디어를 확인하는 중…</string>
     <string name="loading_page">파일을 읽는 중…</string>
     <string name="page_ready">파일이 로드되었습니다.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. 조정하려면 새 스캔을 시작하세요.</string>
@@ -128,7 +128,7 @@
     <string name="oaas_card_headline">공간을 차지하는 것은 무엇입니까?</string>
     <string name="oaas_card_subtitle">안전하게 제거할 수 있는 것을 찾으십시오. 모든 정리 작업을 검토하고 확인합니다.</string>
     <string name="oaas_pipeline_idle">시작하려면 분석을 선택하세요.</string>
-    <string name="oaas_starting_scan_first">먼저, 허용한 미디어를 \\' 확인해 보겠습니다.</string>
+    <string name="oaas_starting_scan_first">먼저, 허용한 미디어를 \' 확인해 보겠습니다.</string>
     <string name="oaas_mission_large">대용량 파일(10MB 이상) 찾기</string>
     <string name="oaas_mission_duplicates">정확한 사본 찾기(SHA-256) · 무료</string>
     <string name="oaas_mission_old">30일이 지난 파일 찾기 · 무료</string>

@@ -3391,3 +3391,43 @@ Este documento registra a evolução contínua, os experimentos, erros e correç
 - *Registro Supabase:* Memory #572
 
 ---
+
+### 📍 [26/11/2026, 03:24:22] Trocado vídeo da Maria por um H.264 universal embutido no APK (65.176 bytes, sem áudio) e validado nas três abas do Moto G84
+- **📖 Estudou / Leu:** MariaAssistantBanner.kt, MariaLocalizedSpeech.kt, TextureView e player MediaPlayer; CI 45767023861 no SHA 6d9afb5; arquivo fonte pt/clean.mp4
+- **⚙️ Tentou / Executou:** Gerado maria_talk_universal.mp4 com FFmpeg H.264 sem áudio; removida dependência de CDN/cache e vídeo idle concorrente; player em loop mudo, stop ao fim da fala, setSurface(null) na troca e confirmação do primeiro frame pelo TextureView; audit CI e QA ADB nas abas Limpar, Arquivos e Pro
+- **⚠️ Erros Encontrados:** O Moto G84 não confirmava vídeo com o player anterior e registrava SurfaceUtils -22; a competição com o segundo player idle foi identificada e removida
+- **🔧 Como Corrigiu:** Embutido somente o vídeo H.264 universal; removidos os clipes CDN não usados e o idle MP4; mantidos os áudios PT e voz TTS localizada para demais idiomas; SurfaceUtils sem erro e log MariaVideo confirma primeiro frame nas três abas
+- **🎯 Conclusão:** CI verde com testes e gate AAB abaixo de 8 MB; APK debug instalado lado a lado sem alterar o app oficial; Moto G84 mostra vídeo animado, looping e volume 0 nas três abas; baseline v2.8.2-carbon-baseline preservada
+- *Registro Supabase:* Memory #573
+
+---
+
+### 📍 [26/11/2026, 03:59:42] Corrigida a sincronizacao fala-video da Maria e strings ES/FR
+- **📖 Estudou / Leu:** MariaAssistantBanner.kt, MariaLocalizedSpeech.kt, 14 recursos Android e ciclo de vida Compose; CI 45770508505 no SHA 63b27b5; QA Moto G84 API35
+- **⚙️ Tentou / Executou:** TTS singleton pre-aquecido; setLanguage por fala + QUEUE_FLUSH; video preparado e inicio no callback de audio; parada em onDone/onError/onStop, troca de aba, ON_STOP e onDispose; strings ES/FR usadas e mojibake de FR/DE corrigidos; validacao PT/ES no Moto G84
+- **⚠️ Erros Encontrados:** Video anterior comecava 2-3s antes do TTS; polling de 90ms atrasava parada; TTS instanciado por utterance e nao cancelado no ciclo de vida; valores-fr/de tinham ? corruptos e storage ES/FR vazava used
+- **🔧 Como Corrigiu:** MediaPlayer visual fica preparado mudo ate MediaPlayer.start real em PT ou onStart do TTS; onDone/onError/onStop finalizam video/anel na Main; TTS singleton reutilizado sem shutdown; ON_PAUSE/ON_STOP/onDispose param TTS e players; traduzido storage_measurement/storage_used_headline
+- **🎯 Conclusão:** Um commit 63b27b5; um run CI 45770508505 success; audit de governanca 100%; APK .debug CI instalado no Moto G84 mantendo pacote oficial; screenshots PT e ES mostram estado idle/animado coerente; ao sair para Home em PT e ES AudioFlinger ficou com numTracks=0; tag v2.8.2-carbon-baseline intacta; zero Gradle local; QA limitado deliberadamente a PT e ES
+- *Registro Supabase:* Memory #574
+
+---
+
+### 📍 [26/11/2026, 04:36:14] Corrigir replay visual da Maria e auditoria de strings Android em 14 idiomas
+- **📖 Estudou / Leu:** MariaAssistantBanner.kt, recursos values-* (311 chaves por idioma), logs do GitHub Actions run 45776260540; baseline v2.8.2-carbon-baseline permaneceu no SHA cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4
+- **⚙️ Tentou / Executou:** Centralizar/crop da TextureView, manter foto em idle, recriar MediaPlayer e aguardar frame novo; registrar italiano no locale config e governança; executar uma pipeline CI no SHA a33a3b87da511027f43516041b1289fd9a4c8b96
+- **⚠️ Erros Encontrados:** CI falhou em :app:mergeDebugResources por invalid unicode escape causado por \u005c\\' em starting_scan e oaas_starting_scan_first dos valores ja, ru e zh-rCN. APK não foi gerado; QA físico Moto G84 não realizado. Tradução completa das strings secundárias ainda pendente em fr/hi/in/it e outros valores.
+- **🔧 Como Corrigiu:** Código do avatar e fluxo de frame novo foi commitado em a33a3b8; exemplos de arquivos/paginação citados possuem traduções nos 14 idiomas; auditoria de governança passou.
+- **🎯 Conclusão:** Exatamente um commit e uma execução Actions foram feitos, sem Gradle local. Não declarar compilação ou QA concluídos. Necessário corrigir escapes XML/AAPT e depois nova validação, com nova autorização para ultrapassar limite de uma compilação.
+- *Registro Supabase:* Memory #Local
+
+---
+
+### 📍 [26/11/2026, 04:37:13] Registrar resultado parcial da correção Maria e localização
+- **📖 Estudou / Leu:** CI run 45776260540 para commit a33a3b87da511027f43516041b1289fd9a4c8b96
+- **⚙️ Tentou / Executou:** Uma pipeline Actions; governança passou; compile :app:mergeDebugResources falhou no AAPT; sem Gradle local e sem APK para QA Moto G84
+- **⚠️ Erros Encontrados:** Invalid unicode escape por \u005c\\' em valores ja/ru/zh-rCN; centenas de strings longas continuam sem tradução; API Supabase retornou HTTP 502 na gravação anterior
+- **🔧 Como Corrigiu:** Commit a33a3b8 contém o ajuste de avatar/frame e inclusão de values-it; auditoria de governança aprovou as 14 pastas
+- **🎯 Conclusão:** Sem APK e sem validação física. Necessária correção de escapes e nova compilação/QA; baseline inalterada.
+- *Registro Supabase:* Memory #575
+
+---

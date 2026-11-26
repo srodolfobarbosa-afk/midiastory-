@@ -26,7 +26,7 @@ Total: %3$s</string>
     <string name="filter_all">Todos los archivos</string>
     <string name="filter_large_10mb">Grandes (más de 10 MB)</string>
     <string name="filter_same_size">Copias exactas (SHA-256)</string>
-    <string name="filter_screenshots_30d">Capturas (+30d)</string>
+    <string name="filter_screenshots_30d">Capturas de pantalla (+30 días)</string>
     <string name="filter_older_30d">Más de 30 días</string>
     <string name="smart_filter_empty_in_page">No hay archivos que coincidan con este filtro en esta página. Ve a otra página para revisar más.</string>
     <string name="protected_reference_badge">Original protegido</string>
@@ -105,7 +105,7 @@ Total: %3$s</string>
     <string name="pro_unused_apps_never_used">No se abrió en los últimos 90 días</string>
     <string name="pro_unused_apps_permission_denied">No se permitió el acceso al uso de apps.</string>
     <string name="pro_purchase_unavailable_notice">No se pudieron cargar los planes de Google Play.</string>
-    <string name="plan_annual_default">Midiastore Pro Anual Mejor Opción · Ver precio local</string>
+    <string name="plan_annual_default">Midiastore Pro anual · mejor precio · consulta el precio local</string>
     <string name="plan_annual_with_price">Midiastore Pro Anual · %1$s/año</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro Anual (-%2$d%% de ahorro real) · %1$s/año</string>
     <string name="plan_monthly_default">Midiastore Pro mensual · Consulta el precio local de Play Store</string>
@@ -180,8 +180,8 @@ Total: %3$s</string>
     <string name="cleanup_dialog_subtitle_candidates">Revisa los archivos encontrados. Desmarca lo que quieras conservar y elige mover a la papelera o eliminar definitivamente con la confirmación oficial de Android.</string>
     <string name="cleanup_dialog_subtitle_fallback">No se encontró ningún archivo individual de más de 10 MB. Estos son los archivos multimedia más grandes para que los revises y liberes espacio:</string>
     <string name="cleanup_dialog_selected_summary">Seleccionados para limpiar: %1$d de %2$d archivos (%3$s)</string>
-    <string name="cleanup_dialog_select_all">☑ Marcar Todos (%1$d)</string>
-    <string name="cleanup_dialog_deselect_all">⬜ Desmarcar Todos</string>
+    <string name="cleanup_dialog_select_all">☑ Seleccionar todo (%1$d)</string>
+    <string name="cleanup_dialog_deselect_all">⬜ Deseleccionar todo</string>
     <string name="cleanup_dialog_select_none_toast">Selecciona al menos 1 archivo para limpiar.</string>
     <string name="cleanup_dialog_open_files_tab">Ver en la pestaña Archivos</string>
     <string name="cleanup_dialog_empty_title">No se encontraron archivos multimedia para limpiar</string>
@@ -190,9 +190,11 @@ Total: %3$s</string>
     <string name="select_all_page_button">☑ Seleccionar página (%1$d)</string>
     <string name="tester_vip_activate_button">Activar plan Pro gratis (bono de tester)</string>
     <string name="tester_vip_active_button">Bono VIP de tester activo (plan Pro desbloqueado)</string>
-    <string name="tester_vip_status_badge">Plan Pro VIP Activo (Bono de Probador Oficial)</string>
-    <string name="whatsapp_cleaner_title">Limpiador Inteligente de WhatsApp</string>
-    <string name="whatsapp_cleaner_empty">No se encontraron archivos de WhatsApp en las carpetas autorizadas.</string>
+    <string name="tester_vip_status_badge">Plan Pro VIP activo (recompensa para testers oficiales)</string>
+    <string name="whatsapp_cleaner_title">Limpieza inteligente de WhatsApp</string>
+    <string name="whatsapp_cleaner_empty">No se encontraron archivos multimedia de WhatsApp en las carpetas autorizadas de este dispositivo.
+
+Puedes buscar archivos grandes o explorar todos los archivos en la pestaña Archivos.</string>
     <string name="whatsapp_cat_videos">Videos de WhatsApp</string>
     <string name="whatsapp_cat_images">Imágenes y fotos de WhatsApp</string>
     <string name="whatsapp_cat_voice">Notas de voz y audio</string>
@@ -200,7 +202,7 @@ Total: %3$s</string>
     <string name="wa_found_title">Archivos multimedia de WhatsApp encontrados</string>
     <string name="wa_cat_audio">Audio recibido</string>
     <string name="wa_cat_gifs">GIF animados</string>
-    <string name="wa_cat_docs">Documentos Indexados</string>
+    <string name="wa_cat_docs">Documentos indexados</string>
     <string name="wa_cat_other">Otros archivos multimedia</string>
     <string name="wa_cat_item_count">%1$s (%2$d elementos · %3$s)</string>
     <string name="wa_select_category_toast">Selecciona al menos una categoría.</string>
@@ -228,7 +230,7 @@ Total: %3$s</string>
     <string name="quick_clean_screenshots_desc">Capturas antiguas</string>
     <string name="quick_clean_blur_title">Fotos borrosas</string>
     <string name="quick_clean_blur_desc">Comprobación de nitidez en el dispositivo</string>
-    <string name="storage_legend_summary">Fotos: %1$s · Videos: %2$s · Audio: %3$s</string>
+    <string name="storage_legend_summary">Fotos: %1$s · Vídeos: %2$s · Archivos de audio: %3$s</string>
     <string name="blur_scan_title">Fotos borrosas</string>
     <string name="blur_scan_progress">Analizando nitidez en el dispositivo… %1$d fotos (%2$d borrosas)</string>
     <string name="blur_scan_empty">No se detectaron fotos borrosas entre las %1$d fotos recientes analizadas.</string>

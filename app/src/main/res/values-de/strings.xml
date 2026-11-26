@@ -26,7 +26,7 @@ Gesamt: %3$s</string>
     <string name="filter_all">Alle Dateien</string>
     <string name="filter_large_10mb">Groß (über 10 MB)</string>
     <string name="filter_same_size">Exakte Kopien (SHA-256)</string>
-    <string name="filter_screenshots_30d">Screenshots (+30T)</string>
+    <string name="filter_screenshots_30d">Bildschirmfotos (+30 Tage)</string>
     <string name="filter_older_30d">Älter als 30 Tage</string>
     <string name="smart_filter_empty_in_page">Auf dieser Seite gibt es keine Dateien, die dem Filter entsprechen. Wechsle zur nächsten Seite, um weitere Dateien zu prüfen.</string>
     <string name="protected_reference_badge">Geschütztes Original</string>
@@ -105,7 +105,7 @@ Gesamt: %3$s</string>
     <string name="pro_unused_apps_never_used">In den letzten 90 Tagen nicht geöffnet</string>
     <string name="pro_unused_apps_permission_denied">Der Zugriff auf Nutzungsdaten wurde nicht erlaubt.</string>
     <string name="pro_purchase_unavailable_notice">Tarife konnten gerade nicht von Google Play geladen werden.</string>
-    <string name="plan_annual_default">Midiastore Pro Jährlich Top-Tipp · Lokalen Preis ansehen</string>
+    <string name="plan_annual_default">Midiastore Pro Jahresabo · bestes Preis-Leistungs-Verhältnis · Lokalen Preis ansehen</string>
     <string name="plan_annual_with_price">Midiastore Pro Jährlich · %1$s/Jahr</string>
     <string name="plan_annual_with_price_and_discount">Midiastore Pro Jährlich (-%2$d%% echte Ersparnis) · %1$s/Jahr</string>
     <string name="plan_monthly_default">Midiastore Pro monatlich · Lokalen Preis im Play Store ansehen</string>
@@ -190,9 +190,11 @@ Gesamt: %3$s</string>
     <string name="select_all_page_button">☑ Seite auswählen (%1$d)</string>
     <string name="tester_vip_activate_button">Kostenlosen Pro-Tarif aktivieren (Tester-Bonus)</string>
     <string name="tester_vip_active_button">Tester-VIP-Bonus aktiv (Pro-Tarif freigeschaltet)</string>
-    <string name="tester_vip_status_badge">Pro-VIP-Plan Aktiv (Offizieller Tester-Bonus)</string>
-    <string name="whatsapp_cleaner_title">Intelligenter WhatsApp-Reiniger</string>
-    <string name="whatsapp_cleaner_empty">Keine WhatsApp-Mediendateien in den freigegebenen Ordnern gefunden.</string>
+    <string name="tester_vip_status_badge">Pro-VIP-Tarif aktiv (Belohnung für offizielle Tester)</string>
+    <string name="whatsapp_cleaner_title">Intelligente WhatsApp-Bereinigung</string>
+    <string name="whatsapp_cleaner_empty">In den freigegebenen Ordnern auf diesem Gerät wurden keine WhatsApp-Mediendateien gefunden.
+
+Du kannst nach großen Dateien suchen oder alle Dateien im Dateien-Tab durchsuchen.</string>
     <string name="whatsapp_cat_videos">WhatsApp-Videos</string>
     <string name="whatsapp_cat_images">WhatsApp-Bilder und Fotos</string>
     <string name="whatsapp_cat_voice">Sprachnachrichten und Audiodateien</string>
@@ -200,7 +202,7 @@ Gesamt: %3$s</string>
     <string name="wa_found_title">WhatsApp-Medien gefunden</string>
     <string name="wa_cat_audio">Empfangene Audiodateien</string>
     <string name="wa_cat_gifs">Animierte GIFs</string>
-    <string name="wa_cat_docs">Indexierte Dokumente</string>
+    <string name="wa_cat_docs">Indizierte Dokumente</string>
     <string name="wa_cat_other">Weitere Medien</string>
     <string name="wa_cat_item_count">%1$s (%2$d Elemente · %3$s)</string>
     <string name="wa_select_category_toast">Wähle mindestens eine Kategorie aus.</string>
@@ -228,7 +230,7 @@ Gesamt: %3$s</string>
     <string name="quick_clean_screenshots_desc">Alte Screenshots</string>
     <string name="quick_clean_blur_title">Unscharfe Fotos</string>
     <string name="quick_clean_blur_desc">Schärfeprüfung auf dem Gerät</string>
-    <string name="storage_legend_summary">Fotos: %1$s · Videos: %2$s · Audio: %3$s</string>
+    <string name="storage_legend_summary">Fotos: %1$s · Videos: %2$s · Audiodateien: %3$s</string>
     <string name="blur_scan_title">Unscharfe Fotos</string>
     <string name="blur_scan_progress">Schärfe wird lokal geprüft… %1$d Fotos (%2$d unscharf)</string>
     <string name="blur_scan_empty">Keine unscharfen Fotos unter den %1$d geprüften aktuellen Fotos gefunden.</string>
