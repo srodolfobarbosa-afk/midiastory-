@@ -776,7 +776,7 @@ fun MariaHeroBanner(
                         if (callbackPlayer === videoPlayerRef && what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                             Log.d("MariaVideo", "Universal H.264 decoder started")
                             decoderStartedForCurrentSpeech = true
-                            confirmFreshVideoFrameIfReady()
+                            if (awaitingFreshVideoFrame) { videoFrameReady = true; awaitingFreshVideoFrame = false }
                         }
                         false
                     }
@@ -793,7 +793,7 @@ fun MariaHeroBanner(
                             mariaVideoWidth = width
                             mariaVideoHeight = height
                             mariaTextureViewRef?.let { view ->
-                                centerCropTextureView(view, view.width, view.height, width, height)
+                                view.setTransform(Matrix())
                             }
                         }
                     }
@@ -875,21 +875,9 @@ fun MariaHeroBanner(
         }
     }
 
-    val bannerHeight by animateDpAsState(
-        targetValue = if (isSpeaking) 122.dp else 80.dp,
-        animationSpec = tween(durationMillis = 260),
-        label = "maria2BannerHeight",
-    )
-    val avatarRingSize by animateDpAsState(
-        targetValue = if (isSpeaking) 88.dp else 56.dp,
-        animationSpec = tween(durationMillis = 260),
-        label = "maria2AvatarRingSize",
-    )
-    val avatarInnerSize by animateDpAsState(
-        targetValue = if (isSpeaking) 80.dp else 48.dp,
-        animationSpec = tween(durationMillis = 260),
-        label = "maria2AvatarInnerSize",
-    )
+    val bannerHeight = 96.dp
+    val avatarRingSize = 72.dp
+    val avatarInnerSize = 64.dp
 
     val brandAnnotated = remember {
         buildAnnotatedString {
@@ -969,51 +957,22 @@ fun MariaHeroBanner(
                         .background(Color(0xFF050507)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.maria_smile),
-                        contentDescription = "Maria",
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize(),
-                    )
                     if (videoHardwareSupported) {
                         AndroidView(
                             factory = { ctx ->
                                 TextureView(ctx).apply {
                                     mariaTextureViewRef = this
                                     isOpaque = false
-                                    centerCropTextureView(this, width, height, 480, 480)
+                                    setTransform(Matrix())
                                     surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                                        override fun onSurfaceTextureAvailable(
-                                            st: SurfaceTexture,
-                                            width: Int,
-                                            height: Int,
-                                        ) {
+                                        override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
                                             runCatching { surfaceRef?.release() }
                                             surfaceRef = Surface(st)
-                                            centerCropTextureView(
-                                                this@apply,
-                                                width,
-                                                height,
-                                                mariaVideoWidth,
-                                                mariaVideoHeight,
-                                            )
+                                            setTransform(Matrix())
                                         }
-
-                                        override fun onSurfaceTextureSizeChanged(
-                                            st: SurfaceTexture,
-                                            width: Int,
-                                            height: Int,
-                                        ) {
-                                            centerCropTextureView(
-                                                mariaTextureViewRef ?: return,
-                                                width,
-                                                height,
-                                                mariaVideoWidth,
-                                                mariaVideoHeight,
-                                            )
+                                        override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, width: Int, height: Int) {
+                                            setTransform(Matrix())
                                         }
-
                                         override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
                                             releaseVideoPlayer()
                                             runCatching { surfaceRef?.release() }
@@ -1025,23 +984,30 @@ fun MariaHeroBanner(
                                             mariaTextureViewRef = null
                                             return true
                                         }
-
                                         override fun onSurfaceTextureUpdated(st: SurfaceTexture) {
                                             if (awaitingFreshVideoFrame) {
                                                 surfaceUpdatedForCurrentSpeech = true
-                                                confirmFreshVideoFrameIfReady()
+                                                videoFrameReady = true
+                                                awaitingFreshVideoFrame = false
                                             }
                                         }
                                     }
                                 }
                             },
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer {
-                                    alpha = if (isSpeaking && isNeuralVideoSpeaking && videoFrameReady) 1f else 0f
-                                },
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
+                    Image(
+                        painter = painterResource(id = R.drawable.maria_smile),
+                        contentDescription = "Maria",
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                alpha = if (isSpeaking && isNeuralVideoSpeaking && videoFrameReady) 0f else 1f
+                            },
+                    )
                 }
             }
 
