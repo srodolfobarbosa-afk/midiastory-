@@ -684,56 +684,16 @@ fun MariaHeroBanner(
         }
     }
 
-    fun startIdleLoopOnSurface(surface: Surface?) {
-        if (!isActive || !videoHardwareSupported || surface == null || !surface.isValid) return
-        releaseVideoPlayer()
-        runCatching {
-            val afd = context.resources.openRawResourceFd(R.raw.maria2_idle) ?: return
-            val mp = MediaPlayer()
-            videoPlayerRef = mp
-            mp.setSurface(surface)
-            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-            afd.close()
-            mp.isLooping = true
-            mp.setVolume(0f, 0f)
-            mp.setOnInfoListener { _, what, _ ->
-                if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-                    Log.d("MariaVideo", "Idle video decoder started")
-                }
-                false
-            }
-            mp.setOnPreparedListener { prepared ->
-                runCatching {
-                    prepared.start()
-                }
-            }
-            mp.setOnErrorListener { failedMp, _, _ ->
-                videoFrameReady = false
-                runCatching { failedMp.release() }
-                if (videoPlayerRef === failedMp) videoPlayerRef = null
-                true
-            }
-            mp.prepareAsync()
-        }.onFailure {
-            videoFrameReady = false
-        }
-    }
-
     fun stopSpeechAndReturnToIdle() {
         releaseFallbackAudio()
-        val wasNeural = isNeuralVideoSpeaking
         isSpeaking = false
         isNeuralVideoSpeaking = false
         voiceEnergy = 0f
-        if (wasNeural) {
-            startIdleLoopOnSurface(surfaceRef)
-        }
+        releaseVideoPlayer()
     }
 
     LaunchedEffect(surfaceRef, isActive, videoHardwareSupported) {
-        if (isActive && videoHardwareSupported && surfaceRef != null && !isNeuralVideoSpeaking) {
-            startIdleLoopOnSurface(surfaceRef)
-        } else if (!isActive) {
+        if (!isActive) {
             releaseFallbackAudio()
             releaseVideoPlayer()
             isSpeaking = false
@@ -750,8 +710,6 @@ fun MariaHeroBanner(
                 isSpeaking = false
                 isNeuralVideoSpeaking = false
                 voiceEnergy = 0f
-            } else if (event == Lifecycle.Event.ON_RESUME && isActive && surfaceRef != null && !isSpeaking) {
-                startIdleLoopOnSurface(surfaceRef)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -840,7 +798,7 @@ fun MariaHeroBanner(
                 var elapsedMs = 0L
                 while (isSpeaking && localizedSpeechJob?.isActive == true) {
                     val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
-                    // MediaPlayer can report !isPlaying briefly while the first HEVC frame is
+                    // MediaPlayer can report !isPlaying briefly while the first H.264 frame is
                     // being attached to TextureView. Give the surface time to confirm output.
                     if (!playing && !videoFrameReady && elapsedMs >= 2_000L) break
                     delay(90L)
@@ -852,13 +810,11 @@ fun MariaHeroBanner(
                 }
 
                 // A decoder failure (or a clip that never rendered a frame) falls back to
-                // the idle animation while localized speech continues.
+                // the static portrait while localized speech continues.
                 isNeuralVideoSpeaking = false
                 isSpeaking = true
-                startIdleLoopOnSurface(surface)
             } else {
                 isNeuralVideoSpeaking = false
-                startIdleLoopOnSurface(surface)
             }
         }
 

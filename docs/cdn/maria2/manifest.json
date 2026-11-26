@@ -1,13 +1,8 @@
 {
   "version": "2.9.2-moda-hevc",
-  "updatedAt": "2026-11-26T05:46:46.818Z",
+  "updatedAt": "2026-11-26T06:15:18.295Z",
   "codec": "hvc1",
   "resolution": "480x480",
-  "idle": {
-    "url": "https://midiastory-df6a0.web.app/cdn/maria2/idle.mp4",
-    "bytes": 26333,
-    "sha256": "1c3dd7fc57452604fa6f99bc474ef4995203ac5d2a130d27df884b07c5e3233c"
-  },
   "locales": {
     "pt": {
       "clean": {
