@@ -28,10 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rdf112.sweep.R
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 
 @Composable
@@ -79,7 +81,7 @@ fun FilesScreen(
             if (state.isPartialCoverage) {
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    text = "Cobertura parcial: apenas itens verificados e selecionados por você podem ser movidos.",
+                    text = stringResource(R.string.files_partial_coverage),
                     color = MidiastoreColors.AmberSegment,
                     fontSize = 11.sp,
                 )
@@ -94,7 +96,13 @@ fun FilesScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Nenhum candidato encontrado neste filtro. Execute uma análise na aba Limpar.",
+                    text = stringResource(
+                        if (state.isPartialCoverage) {
+                            R.string.files_empty_state_partial_access
+                        } else {
+                            R.string.files_empty_state_full_access
+                        },
+                    ),
                     color = MidiastoreColors.TextMuted,
                     fontSize = 14.sp,
                 )
@@ -198,15 +206,19 @@ private fun TrackMediaRow(
     }
 }
 
-private fun filterLabel(filter: FilesFilter): String = when (filter) {
-    FilesFilter.ALL -> "Todos"
-    FilesFilter.DUPLICATES -> "Duplicatas"
-    FilesFilter.LARGE -> "Grandes"
-    FilesFilter.SCREENSHOTS -> "Capturas"
-    FilesFilter.WHATSAPP -> "WhatsApp"
-}
+@Composable
+private fun filterLabel(filter: FilesFilter): String = stringResource(
+    when (filter) {
+        FilesFilter.ALL -> R.string.files_filter_all
+        FilesFilter.DUPLICATES -> R.string.files_filter_duplicates
+        FilesFilter.LARGE -> R.string.files_filter_large
+        FilesFilter.SCREENSHOTS -> R.string.files_filter_screenshots
+        FilesFilter.WHATSAPP -> R.string.files_filter_whatsapp
+    },
+)
 
+@Composable
 private fun mediaBadge(item: MediaItemUiModel): String {
     val ext = item.displayName.substringAfterLast('.', "").uppercase()
-    return if (ext.length in 2..4) ext else "MID"
+    return if (ext.length in 2..4) ext else stringResource(R.string.files_media_badge)
 }

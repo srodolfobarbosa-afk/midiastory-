@@ -11,7 +11,7 @@ Total: %3$s</string>
     <string name="ready_status">Ready. 100% local processing with original reference protection.</string>
     <string name="permission_denied">Permission not granted. No media was queried.</string>
     <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
-    <string name="starting_scan">Checking the media you\'ve allowed…</string>
+    <string name="starting_scan">Checking the media you&apos;ve allowed…</string>
     <string name="loading_page">Reading your files…</string>
     <string name="page_ready">Files loaded.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
@@ -28,6 +28,15 @@ Total: %3$s</string>
     <string name="filter_same_size">Exact copies (SHA-256)</string>
     <string name="filter_screenshots_30d">Screenshots (+30d)</string>
     <string name="filter_older_30d">Older (+30 days)</string>
+    <string name="files_filter_all">All</string>
+    <string name="files_filter_duplicates">Duplicates</string>
+    <string name="files_filter_large">Large</string>
+    <string name="files_filter_screenshots">Screenshots</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">Partial access: only media you selected can be reviewed or moved.</string>
+    <string name="files_empty_state_full_access">No items match this filter. Run a scan in Clean to find candidates.</string>
+    <string name="files_empty_state_partial_access">No matching items in the media selected for Midiastore. Your library may include files that are not available to the app.</string>
+    <string name="files_media_badge">Media</string>
     <string name="smart_filter_empty_in_page">No files on this page match the filter. Move to another page to check more files.</string>
     <string name="protected_reference_badge">Protected original</string>
     <string name="volume_title">STORAGE</string>
@@ -128,7 +137,7 @@ Total: %3$s</string>
     <string name="oaas_card_headline">What is taking up space?</string>
     <string name="oaas_card_subtitle">Find what can be safely removed. You review and confirm every cleanup action.</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">First, we&apos;ll check the media you allowed.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">Find exact copies (SHA-256) · Free</string>
     <string name="oaas_mission_old">Find files older than 30 days · Free</string>
@@ -176,6 +185,8 @@ Total: %3$s</string>
     <string name="pro_unused_apps_disclosure_continue">Continue to settings</string>
     <string name="pro_unused_apps_disclosure_not_now">Not now</string>
     <string name="pro_billing_terms_disclosure">Monthly and Annual plans are subscriptions with automatic renewal via Google Play until cancelled. You can cancel anytime in Google Play Store before the renewal date. The Lifetime plan is a one-time payment.</string>
+    <string name="pro_all_plans_include">All Pro plans include:</string>
+    <string name="pro_benefit_h265_local">On-device H.265 video compression</string>
     <string name="quick_clean_title">Quick Cleanup</string>
     <string name="cleanup_dialog_subtitle_candidates">Review the files found below. Uncheck anything you want to keep and choose Move to Trash or Delete Permanently (with official Android confirmation).</string>
     <string name="cleanup_dialog_subtitle_fallback">No single file over 10 MB was found. Here are the largest media files on your phone so you can check and free up space right now:</string>
@@ -302,7 +313,7 @@ Total: %3$s</string>
     <string name="share_freed_result_button">Share achievement (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Share Midiastore (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">Share</string>
-    <string name="share_freed_result_message">I just safely freed %1$s on my phone with Midiastore (under 8 MB on Google Play): %2$s</string>
+    <string name="share_freed_result_message">I’ve safely reclaimed a total of %1$s on my phone with Midiastore (under 8 MB on Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">Share via WhatsApp, Telegram or Instagram</string>
     <string name="share_card_lightweight_badge">UNDER 8 MB • GOOGLE PLAY</string>
     <string name="share_card_freed_label">SAFELY FREED</string>
@@ -311,5 +322,5 @@ Total: %3$s</string>
     <string name="app_language_button">Language</string>
     <string name="app_language_title">App language</string>
     <string name="app_language_system_default">Use device language</string>
-    <string name="cleanup_dialog_mission_action">Clean %1$s now</string>
+    <string name="cleanup_dialog_mission_action">Move %1$s to trash</string>
 </resources>

@@ -28,6 +28,15 @@
     <string name="filter_same_size">হুবহু কপি (SHA-256)</string>
     <string name="filter_screenshots_30d">স্ক্রিনশট (+৩০ দিন)</string>
     <string name="filter_older_30d">30 দিনের বেশি পুরোনো</string>
+    <string name="files_filter_all">সব</string>
+    <string name="files_filter_duplicates">ডুপ্লিকেট</string>
+    <string name="files_filter_large">বড় ফাইল</string>
+    <string name="files_filter_screenshots">স্ক্রিনশট</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">সীমিত অ্যাক্সেস: শুধু আপনার বেছে নেওয়া মিডিয়া পর্যালোচনা বা সরানো যাবে।</string>
+    <string name="files_empty_state_full_access">এই ফিল্টারে মেলে এমন কোনো আইটেম নেই। প্রার্থী খুঁজতে Clean ট্যাবে স্ক্যান চালান।</string>
+    <string name="files_empty_state_partial_access">Midiastore-এর জন্য বেছে নেওয়া মিডিয়ায় কোনো মিলে যাওয়া আইটেম নেই। আপনার লাইব্রেরিতে অ্যাপের অনুপলব্ধ ফাইল থাকতে পারে।</string>
+    <string name="files_media_badge">মিডিয়া</string>
     <string name="smart_filter_empty_in_page">এই পৃষ্ঠায় ফিল্টারের সঙ্গে মেলে এমন ফাইল নেই। আরও ফাইল দেখতে অন্য পৃষ্ঠায় যান।</string>
     <string name="protected_reference_badge">মূল ফাইল সুরক্ষিত</string>
     <string name="volume_title">স্টোরেজ</string>
@@ -176,6 +185,8 @@
     <string name="pro_unused_apps_disclosure_continue">সেটিংসে যান</string>
     <string name="pro_unused_apps_disclosure_not_now">এখন নয়</string>
     <string name="pro_billing_terms_disclosure">মাসিক ও বার্ষিক প্ল্যান হলো সাবস্ক্রিপশন যা বাতিল না করা পর্যন্ত Google Play-এর মাধ্যমে স্বয়ংক্রিয়ভাবে নবায়ন হয়। নবায়নের তারিখের আগে যেকোনো সময় Google Play Store থেকে বাতিল করতে পারবেন। লাইফটাইম প্ল্যান এককালীন পেমেন্ট।</string>
+    <string name="pro_all_plans_include">সব Pro প্ল্যানে রয়েছে:</string>
+    <string name="pro_benefit_h265_local">ডিভাইসে H.265 ভিডিও কমপ্রেশন</string>
     <string name="quick_clean_title">দ্রুত ক্লিনআপ</string>
     <string name="cleanup_dialog_subtitle_candidates">নিচে পাওয়া ফাইল পর্যালোচনা করুন। রাখতে চান এমন ফাইলের টিক তুলে দিন, তারপর ট্র্যাশে সরানো বা Android-এর নিশ্চিতকরণসহ স্থায়ীভাবে মুছে ফেলা বেছে নিন।</string>
     <string name="cleanup_dialog_subtitle_fallback">১০ MB-এর বেশি কোনো একক ফাইল পাওয়া যায়নি। এখন পর্যালোচনা করে জায়গা খালি করতে ফোনের বড় মিডিয়া ফাইলগুলো দেখুন:</string>
@@ -304,7 +315,7 @@
     <string name="share_freed_result_button">ফলাফল শেয়ার করুন (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Midiastore শেয়ার করুন (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">শেয়ার</string>
-    <string name="share_freed_result_message">আমি এইমাত্র Midiastore দিয়ে নিরাপদে ফোনের %1$s জায়গা খালি করেছি (Google Play-তে ৮ MB-এর কম): %2$s</string>
+    <string name="share_freed_result_message">Midiastore দিয়ে আমার ফোনে মোট %1$s জায়গা নিরাপদে খালি করেছি (Google Play-তে অ্যাপটি ৮ MB-এর কম): %2$s</string>
     <string name="share_card_chooser_subtitle">WhatsApp, Telegram বা Instagram-এ শেয়ার করুন</string>
     <string name="share_card_lightweight_badge">৮ MB-এর কম • GOOGLE PLAY</string>
     <string name="share_card_freed_label">নিরাপদে খালি হয়েছে</string>
@@ -313,5 +324,5 @@
     <string name="app_language_button">ভাষা</string>
     <string name="app_language_title">অ্যাপের ভাষা</string>
     <string name="app_language_system_default">ডিভাইসের ভাষা ব্যবহার করুন</string>
-    <string name="cleanup_dialog_mission_action">এখনই %1$s পরিষ্কার করুন</string>
+    <string name="cleanup_dialog_mission_action">%1$s ট্র্যাশে সরান</string>
 </resources>

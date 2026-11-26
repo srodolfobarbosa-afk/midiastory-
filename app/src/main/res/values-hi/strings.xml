@@ -28,6 +28,15 @@
     <string name="filter_same_size">सटीक कॉपियाँ (SHA-256)</string>
     <string name="filter_screenshots_30d">पुराने स्क्रीनशॉट (+30 दिन)</string>
     <string name="filter_older_30d">पुरानी (+30 दिन)</string>
+    <string name="files_filter_all">सभी</string>
+    <string name="files_filter_duplicates">डुप्लिकेट</string>
+    <string name="files_filter_large">बड़ी फ़ाइलें</string>
+    <string name="files_filter_screenshots">स्क्रीनशॉट</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">सीमित एक्सेस: केवल चुने गए मीडिया की समीक्षा या उसे हटाया जा सकता है।</string>
+    <string name="files_empty_state_full_access">इस फ़िल्टर से मेल खाने वाली कोई फ़ाइल नहीं है। उम्मीदवार ढूँढने के लिए साफ़ करें टैब में स्कैन करें।</string>
+    <string name="files_empty_state_partial_access">Midiastore के लिए चुने गए मीडिया में कोई मेल नहीं मिला। आपकी लाइब्रेरी में ऐसी फ़ाइलें हो सकती हैं जिन्हें ऐप नहीं देख सकता।</string>
+    <string name="files_media_badge">मीडिया</string>
     <string name="smart_filter_empty_in_page">इस पेज पर कोई फ़ाइल फ़िल्टर से मेल नहीं खाती। अन्य फ़ाइलें देखने के लिए अगले पेज पर जाएँ।</string>
     <string name="protected_reference_badge">मूल फ़ाइल सुरक्षित</string>
     <string name="volume_title">स्टोरेज</string>
@@ -128,7 +137,7 @@
     <string name="oaas_card_headline">आप क्या ढूँढना चाहते हैं?</string>
     <string name="oaas_card_subtitle">आपकी फ़ाइलें इसी डिवाइस पर रहती हैं। परिणाम देखें और हर कार्रवाई की अनुमति दें।</string>
     <string name="oaas_pipeline_idle">Choose an analysis to begin.</string>
-    <string name="oaas_starting_scan_first">First, we\'ll check the media you allowed.</string>
+    <string name="oaas_starting_scan_first">First, we&apos;ll check the media you allowed.</string>
     <string name="oaas_mission_large">Find large files (over 10 MB)</string>
     <string name="oaas_mission_duplicates">सटीक कॉपियाँ ढूँढें (SHA-256) · मुफ़्त</string>
     <string name="oaas_mission_old">30 दिन से पुरानी फ़ाइलें ढूँढें · मुफ़्त</string>
@@ -176,6 +185,8 @@
     <string name="pro_unused_apps_disclosure_continue">सेटिंग्स पर जाएँ</string>
     <string name="pro_unused_apps_disclosure_not_now">अभी नहीं</string>
     <string name="pro_billing_terms_disclosure">मासिक और वार्षिक प्लान Google Play के माध्यम से रद्द किए जाने तक स्वतः नवीनीकृत होने वाली सदस्यताएँ हैं। आप नवीनीकरण तिथि से पहले कभी भी Google Play Store में रद्द कर सकते हैं। लाइफटाइम प्लान एक बार का भुगतान है।</string>
+    <string name="pro_all_plans_include">सभी Pro प्लान में शामिल है:</string>
+    <string name="pro_benefit_h265_local">डिवाइस पर H.265 वीडियो कंप्रेशन</string>
     <string name="quick_clean_title">त्वरित सफ़ाई</string>
     <string name="cleanup_dialog_subtitle_candidates">नीचे मिली फ़ाइलों की समीक्षा करें। जिन्हें रखना है उन्हें अनचेक करें और ट्रैश या स्थायी रूप से हटाएँ चुनें।</string>
     <string name="cleanup_dialog_subtitle_fallback">10 MB से बड़ी कोई फ़ाइल नहीं मिली। तुरंत जगह खाली करने के लिए आपके फ़ोन की सबसे बड़ी मीडिया फ़ाइलें यहाँ हैं:</string>
@@ -302,7 +313,7 @@
     <string name="share_freed_result_button">उपलब्धि साझा करें (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Midiastore साझा करें (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">शेयर</string>
-    <string name="share_freed_result_message">मैंने अभी Midiastore से अपने फ़ोन में सुरक्षित रूप से %1$s स्पेस खाली किया (Google Play पर 8 MB से कम): %2$s</string>
+    <string name="share_freed_result_message">Midiastore से मैंने अपने फ़ोन में कुल %1$s जगह सुरक्षित रूप से खाली की है (Google Play पर ऐप 8 MB से कम है): %2$s</string>
     <string name="share_card_chooser_subtitle">WhatsApp, Telegram या Instagram पर साझा करें</string>
     <string name="share_card_lightweight_badge">8 MB से कम • GOOGLE PLAY</string>
     <string name="share_card_freed_label">सुरक्षित रूप से खाली किया</string>
@@ -311,5 +322,5 @@
     <string name="app_language_button">भाषा</string>
     <string name="app_language_title">ऐप की भाषा</string>
     <string name="app_language_system_default">डिवाइस की भाषा उपयोग करें</string>
-    <string name="cleanup_dialog_mission_action">अभी %1$s साफ़ करें</string>
+    <string name="cleanup_dialog_mission_action">%1$s को ट्रैश में भेजें</string>
 </resources>

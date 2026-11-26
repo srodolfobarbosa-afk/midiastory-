@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -84,6 +85,41 @@ private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
 object MariaI18n {
     fun lang(): String = (AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()).language.lowercase(Locale.ROOT)
     fun isPt(): Boolean = lang().startsWith("pt")
+
+    fun playbackActionLabel(isSpeaking: Boolean): String = when (lang()) {
+        "pt" -> if (isSpeaking) "Parar fala da Maria" else "Ouvir a Maria"
+        "es" -> if (isSpeaking) "Detener la voz de María" else "Escuchar a María"
+        "fr" -> if (isSpeaking) "Arrêter la voix de Maria" else "Écouter Maria"
+        "de" -> if (isSpeaking) "Maria stoppen" else "Maria anhören"
+        "it" -> if (isSpeaking) "Interrompi la voce di Maria" else "Ascolta Maria"
+        "ru" -> if (isSpeaking) "Остановить речь Марии" else "Слушать Марию"
+        "zh" -> if (isSpeaking) "停止玛丽亚语音" else "收听玛丽亚"
+        "ja" -> if (isSpeaking) "マリアの音声を停止" else "マリアの音声を聞く"
+        "ko" -> if (isSpeaking) "마리아 음성 중지" else "마리아 음성 듣기"
+        "ar" -> if (isSpeaking) "إيقاف صوت ماريا" else "استمع إلى ماريا"
+        "hi" -> if (isSpeaking) "मारिया की आवाज़ रोकें" else "मारिया को सुनें"
+        "bn" -> if (isSpeaking) "মারিয়ার কণ্ঠ থামান" else "মারিয়ার কথা শুনুন"
+        "in", "id" -> if (isSpeaking) "Hentikan suara Maria" else "Dengarkan Maria"
+        else -> if (isSpeaking) "Stop Maria's voice" else "Listen to Maria"
+    }
+
+    fun muteActionLabel(isMuted: Boolean): String = when (lang()) {
+        "pt" -> if (isMuted) "Ativar som da Maria" else "Silenciar Maria"
+        "es" -> if (isMuted) "Activar sonido de María" else "Silenciar a María"
+        "fr" -> if (isMuted) "Activer le son de Maria" else "Couper le son de Maria"
+        "de" -> if (isMuted) "Maria wieder einschalten" else "Maria stummschalten"
+        "it" -> if (isMuted) "Attiva l'audio di Maria" else "Disattiva l'audio di Maria"
+        "ru" -> if (isMuted) "Включить звук Марии" else "Отключить звук Марии"
+        "zh" -> if (isMuted) "开启玛丽亚声音" else "静音玛丽亚"
+        "ja" -> if (isMuted) "マリアの音声をオン" else "マリアをミュート"
+        "ko" -> if (isMuted) "마리아 소리 켜기" else "마리아 음소거"
+        "ar" -> if (isMuted) "تشغيل صوت ماريا" else "كتم صوت ماريا"
+        "hi" -> if (isMuted) "मारिया की आवाज़ चालू करें" else "मारिया को म्यूट करें"
+        "bn" -> if (isMuted) "মারিয়ার শব্দ চালু করুন" else "মারিয়াকে নীরব করুন"
+        "in", "id" -> if (isMuted) "Aktifkan suara Maria" else "Bisukan Maria"
+        else -> if (isMuted) "Unmute Maria" else "Mute Maria"
+    }
+
     fun localizedSpeechLine(tabKey: String): String = when (tabKey.lowercase(Locale.ROOT)) {
         "clean" -> homeDefaultGreeting(null)
         "files" -> filesDefaultGreeting()
@@ -724,7 +760,7 @@ fun MariaHeroBanner(
         }
     }
 
-    DisposableEffect(lifecycleOwner, isActive) {
+    DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
                 MariaLocalizedSpeech.stop()
@@ -906,7 +942,10 @@ fun MariaHeroBanner(
                 shape = RoundedCornerShape(18.dp),
             )
             .clip(RoundedCornerShape(18.dp))
-            .clickable {
+            .clickable(
+                onClickLabel = MariaI18n.playbackActionLabel(isSpeaking),
+                role = Role.Button,
+            ) {
                 if (isSpeaking) {
                     stopSpeechAndReturnToIdle()
                 } else {
@@ -1069,7 +1108,7 @@ fun MariaHeroBanner(
             // Onda sonora viva 60 FPS quando falando ou botão discreto de áudio sob demanda
             Box(
                 modifier = Modifier
-                    .size(38.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
                     .background(if (isSpeaking) Color(0x2E0A84FF) else MidiastoreColors.CardSurfaceAlt)
                     .border(
@@ -1077,16 +1116,14 @@ fun MariaHeroBanner(
                         color = if (isSpeaking) MidiastoreColors.AccentBlue else Color(0x28FFFFFF),
                         shape = CircleShape,
                     )
-                    .clickable {
-                        if (isSpeaking) {
-                            stopSpeechAndReturnToIdle()
-                        } else {
-                            if (isMuted) {
-                                isMuted = false
-                                prefs.edit().putBoolean(KEY_MARIA_MUTED, false).apply()
-                            }
-                            userPlayTrigger++
-                        }
+                    .clickable(
+                        onClickLabel = MariaI18n.muteActionLabel(isMuted),
+                        role = Role.Button,
+                    ) {
+                        val shouldMute = !isMuted
+                        isMuted = shouldMute
+                        prefs.edit().putBoolean(KEY_MARIA_MUTED, shouldMute).apply()
+                        if (shouldMute) stopSpeechAndReturnToIdle()
                     },
                 contentAlignment = Alignment.Center,
             ) {

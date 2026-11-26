@@ -170,7 +170,13 @@ class MainActivity : AppCompatActivity() {
         val elapsedMs = SystemClock.elapsedRealtime() - permissionRequestStartedAtMs
         val accessUnchanged = hasFullVisualAccess() == permissionRequestHadFullAccess &&
             hasAnyMediaPermission() == permissionRequestHadAnyAccess
-        if (accessUnchanged && !hasFullVisualAccess() && elapsedMs in 0..SYSTEM_PERMISSION_DIALOG_SKIPPED_MS) {
+        val hasPartialVisualGrant = Build.VERSION.SDK_INT >= 34 &&
+            isGranted(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) &&
+            !hasFullVisualAccess()
+        if (
+            accessUnchanged && !hasFullVisualAccess() && !hasPartialVisualGrant &&
+            elapsedMs in 0..SYSTEM_PERMISSION_DIALOG_SKIPPED_MS
+        ) {
             awaitingPermissionSettingsReturn = true
             Toast.makeText(this, R.string.limited_access_settings_hint, Toast.LENGTH_LONG).show()
             openAppDetailsSettings()
@@ -1606,16 +1612,17 @@ class MainActivity : AppCompatActivity() {
         addView(proStatusBadge, top(2))
         addView(label(getString(R.string.pro_card_subtitle), 12.5f, R.color.sweep_muted, false), top(4))
 
-        // Cartões antigos ocultos para que os 3 Planos Google Play fiquem visíveis logo acima e o Modelo IA fique no final
+        // Benefits are shown after the three purchase choices so plan prices remain the first priority.
         val freeIncludedCard = card()
         freeIncludedCard.addView(label(getString(R.string.pro_free_included), 13f, R.color.sweep_text, false))
-        addView(wrap(freeIncludedCard).apply { visibility = View.GONE }, top(8))
 
         val benefitsCard = card()
+        benefitsCard.addView(label(getString(R.string.pro_all_plans_include), 12f, R.color.google_blue_primary, true))
         val benefits = listOf(
-            getString(R.string.pro_unused_apps_button),
+            getString(R.string.pro_benefit_h265_local),
+            getString(R.string.pro_unused_apps_title),
+            getString(R.string.blur_scan_title),
             getString(R.string.export_review_summary),
-            getString(R.string.pro_paid_included),
         )
         benefits.forEachIndexed { idx, lineText ->
             val row = LinearLayout(this@MainActivity).apply {
@@ -1630,8 +1637,6 @@ class MainActivity : AppCompatActivity() {
             row.addView(label(lineText, 13.5f, R.color.sweep_text, false), LinearLayout.LayoutParams(0, -2, 1f))
             benefitsCard.addView(row, top(if (idx == 0) 0 else 10))
         }
-        addView(wrap(benefitsCard).apply { visibility = View.GONE }, top(8))
-
         val annualBadge = TextView(this@MainActivity).apply {
             text = getString(R.string.pro_annual_savings_badge)
             textSize = 10.5f
@@ -1673,6 +1678,9 @@ class MainActivity : AppCompatActivity() {
         }
         stylePlanPurchaseButton(planLifetimeButton, isProductAvailable = false)
         addView(planLifetimeButton, top(10))
+
+        addView(wrap(freeIncludedCard), top(8))
+        addView(wrap(benefitsCard), top(8))
 
         val videoCompressProButton = button(getString(R.string.video_compress_pro_button)) {
             runWithProAccess { openVideoCompressorCandidatesSheet() }
@@ -1746,7 +1754,9 @@ class MainActivity : AppCompatActivity() {
         addView(linksRow, top(12))
 
         val privacyPolicyButton = button(getString(R.string.privacy_policy_button)) {
-            val isPt = Locale.getDefault().language.startsWith("pt", ignoreCase = true)
+            val appLanguage = AppCompatDelegate.getApplicationLocales().get(0)?.language
+                ?: Locale.getDefault().language
+            val isPt = appLanguage.startsWith("pt", ignoreCase = true)
             val privacyUrl = if (isPt) {
                 "https://midiastory-df6a0.web.app/privacidade.html"
             } else {
@@ -2595,6 +2605,8 @@ class MainActivity : AppCompatActivity() {
         var deleteActionBtn: MaterialButton? = null
         val itemBoxes = ArrayList<CheckBox>(cappedRecords.size)
 
+        val supportsTrash = trashCoordinator.supportsSystemTrash()
+
         fun refreshSummary() {
             var count = 0
             var totalBytes = 0L
@@ -2612,7 +2624,7 @@ class MainActivity : AppCompatActivity() {
                 cappedRecords.size,
             )
             deleteActionBtn?.text = if (count > 0 && totalBytes > 0L) {
-                if (mission != null) {
+                if (mission != null && supportsTrash) {
                     getString(R.string.cleanup_dialog_mission_action, sizeFmt)
                 } else {
                     "${getString(R.string.permanent_delete_button)} ($sizeFmt)"
@@ -2731,7 +2743,6 @@ class MainActivity : AppCompatActivity() {
         fun selectedFromDialog(): List<MediaRecord> =
             cappedRecords.indices.filter { initialChecked[it] }.map { cappedRecords[it] }
 
-        val supportsTrash = trashCoordinator.supportsSystemTrash()
         deleteActionBtn = button(getString(R.string.permanent_delete_button)) {
             val chosen = selectedFromDialog()
             if (chosen.isEmpty()) {
@@ -2740,18 +2751,27 @@ class MainActivity : AppCompatActivity() {
             }
             dialog.dismiss()
             viewModel.prepareExternalReviewSelection(chosen)
-            requestPermanentDeleteSelected(chosen)
+            if (mission != null && supportsTrash) {
+                requestMoveSelectedToTrash(chosen)
+            } else {
+                requestPermanentDeleteSelected(chosen)
+            }
         }.apply {
             minHeight = dp(52)
             setTextColor(Color.WHITE)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(color(R.color.sweep_danger))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(
+                color(if (mission != null && supportsTrash) R.color.google_blue_primary else R.color.sweep_danger),
+            )
         }
         root.addView(deleteActionBtn, top(12))
         refreshSummary()
 
         val secondaryBtn = button(
-            if (supportsTrash) getString(R.string.move_to_trash_button)
-            else getString(R.string.cleanup_dialog_open_files_tab),
+            when {
+                mission != null && supportsTrash -> getString(R.string.permanent_delete_button)
+                supportsTrash -> getString(R.string.move_to_trash_button)
+                else -> getString(R.string.cleanup_dialog_open_files_tab)
+            },
         ) {
             val chosen = selectedFromDialog()
             if (chosen.isEmpty()) {
@@ -2760,7 +2780,9 @@ class MainActivity : AppCompatActivity() {
             }
             dialog.dismiss()
             viewModel.prepareExternalReviewSelection(chosen)
-            if (supportsTrash) {
+            if (mission != null && supportsTrash) {
+                requestPermanentDeleteSelected(chosen)
+            } else if (supportsTrash) {
                 requestMoveSelectedToTrash(chosen)
             } else {
                 switchTab(AppTab.FILES)

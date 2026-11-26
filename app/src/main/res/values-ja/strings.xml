@@ -28,6 +28,15 @@
     <string name="filter_same_size">完全なコピー (SHA-256)</string>
     <string name="filter_screenshots_30d">スクショ (+30日)</string>
     <string name="filter_older_30d">30日以上前</string>
+    <string name="files_filter_all">すべて</string>
+    <string name="files_filter_duplicates">重複</string>
+    <string name="files_filter_large">大きいファイル</string>
+    <string name="files_filter_screenshots">スクリーンショット</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">アクセス制限中：選択したメディアのみ確認・移動できます。</string>
+    <string name="files_empty_state_full_access">このフィルターに一致する項目はありません。クリーン画面でスキャンすると候補を確認できます。</string>
+    <string name="files_empty_state_partial_access">Midiastoreに選択されたメディアに一致する項目はありません。ライブラリにはアプリから見えないファイルがある場合があります。</string>
+    <string name="files_media_badge">メディア</string>
     <string name="smart_filter_empty_in_page">このページにはフィルターに一致するファイルがありません。さらに多くのファイルを確認するには、別のページに移動します。</string>
     <string name="protected_reference_badge">元のファイルを保護</string>
     <string name="volume_title">ストレージ</string>
@@ -128,7 +137,7 @@
     <string name="oaas_card_headline">何を見つけますか？</string>
     <string name="oaas_card_subtitle">ファイルは端末内に保存されます。結果を確認し、操作ごとに許可してください。</string>
     <string name="oaas_pipeline_idle">開始する分析を選択します。</string>
-    <string name="oaas_starting_scan_first">まず、\' で許可されたメディアを確認します。</string>
+    <string name="oaas_starting_scan_first">まず、&apos; で許可されたメディアを確認します。</string>
     <string name="oaas_mission_large">大きなファイル (10 MB を超える) を検索する</string>
     <string name="oaas_mission_duplicates">完全なコピーを探す (SHA-256) · 無料</string>
     <string name="oaas_mission_old">30日以上前のファイルを探す · 無料</string>
@@ -176,6 +185,8 @@
     <string name="pro_unused_apps_disclosure_continue">設定へ進む</string>
     <string name="pro_unused_apps_disclosure_not_now">今はしない</string>
     <string name="pro_billing_terms_disclosure">月額プランと年額プランは、解約するまでGoogle Play経由で自動更新される定期購入です。更新日前であればいつでもGoogle Playストアから解約できます。買い切り（ライフタイム）プランは1回払いのみです。</string>
+    <string name="pro_all_plans_include">すべてのProプランに含まれる機能：</string>
+    <string name="pro_benefit_h265_local">端末内でのH.265動画圧縮</string>
     <string name="quick_clean_title">クイック整理</string>
     <string name="cleanup_dialog_subtitle_candidates">以下の検出ファイルを確認してください。残したい項目のチェックを外し、ゴミ箱移動または完全削除（Android公式確認付き）を選択できます。</string>
     <string name="cleanup_dialog_subtitle_fallback">10 MBを超える単一ファイルは見つかりませんでした。今すぐ容量を空けられるよう、端末内の大きいメディアファイルを表示しています：</string>
@@ -302,7 +313,7 @@
     <string name="share_freed_result_button">結果をシェア (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Midiastoreを紹介 (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">共有</string>
-    <string name="share_freed_result_message">Midiastoreでスマートフォンの空き容量を安全に %1$s 増やしました（Google Playで8MB未満）: %2$s</string>
+    <string name="share_freed_result_message">Midiastoreでスマートフォンの空き容量を合計 %1$s 安全に確保しました（Google Playでアプリサイズは8 MB未満）: %2$s</string>
     <string name="share_card_chooser_subtitle">WhatsApp、Telegram、Instagramで共有</string>
     <string name="share_card_lightweight_badge">8 MB未満 • GOOGLE PLAY</string>
     <string name="share_card_freed_label">安全に解放済み</string>
@@ -311,5 +322,5 @@
     <string name="app_language_button">言語</string>
     <string name="app_language_title">アプリの言語</string>
     <string name="app_language_system_default">端末の言語を使用</string>
-    <string name="cleanup_dialog_mission_action">今すぐ %1$s を削除</string>
+    <string name="cleanup_dialog_mission_action">%1$s をゴミ箱に移動</string>
 </resources>

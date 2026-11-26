@@ -28,6 +28,15 @@
     <string name="filter_same_size">نسخ مطابقة تمامًا (SHA-256)</string>
     <string name="filter_screenshots_30d">لقطات الشاشة (+30ي)</string>
     <string name="filter_older_30d">أقدم من 30 يومًا</string>
+    <string name="files_filter_all">الكل</string>
+    <string name="files_filter_duplicates">المكررات</string>
+    <string name="files_filter_large">ملفات كبيرة</string>
+    <string name="files_filter_screenshots">لقطات الشاشة</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">وصول جزئي: يمكن مراجعة الوسائط التي اخترتها أو نقلها فقط.</string>
+    <string name="files_empty_state_full_access">لا توجد عناصر تطابق هذا الفلتر. ابدأ فحصًا من تبويب التنظيف للعثور على عناصر للمراجعة.</string>
+    <string name="files_empty_state_partial_access">لا توجد عناصر مطابقة ضمن الوسائط التي اخترتها لـ Midiastore. قد تحتوي مكتبتك على ملفات لا يمكن للتطبيق الوصول إليها.</string>
+    <string name="files_media_badge">وسائط</string>
     <string name="smart_filter_empty_in_page">لا توجد ملفات تطابق هذا الفلتر في هذه الصفحة. انتقل إلى صفحة أخرى لمراجعة المزيد.</string>
     <string name="protected_reference_badge">الملف الأصلي محمي</string>
     <string name="volume_title">وحدة التخزين</string>
@@ -176,6 +185,8 @@
     <string name="pro_unused_apps_disclosure_continue">المتابعة إلى الإعدادات</string>
     <string name="pro_unused_apps_disclosure_not_now">ليس الآن</string>
     <string name="pro_billing_terms_disclosure">الخطتان الشهرية والسنوية هما اشتراكان يتجددان تلقائياً عبر Google Play حتى يتم إلغاؤهما. يمكنك الإلغاء في أي وقت من متجر Google Play قبل تاريخ التجديد. خطة مدى الحياة تُدفع لمرة واحدة فقط.</string>
+    <string name="pro_all_plans_include">تتضمن جميع خطط Pro:</string>
+    <string name="pro_benefit_h265_local">ضغط الفيديو محليًا بتنسيق H.265</string>
     <string name="quick_clean_title">تنظيف سريع</string>
     <string name="cleanup_dialog_subtitle_candidates">راجع الملفات أدناه. أزل التحديد عما تريد الاحتفاظ به، ثم اختر النقل إلى المهملات أو الحذف النهائي بتأكيد Android الرسمي.</string>
     <string name="cleanup_dialog_subtitle_fallback">لم يتم العثور على ملف منفرد أكبر من 10 MB. هذه أكبر ملفات الوسائط على هاتفك لتراجعها وتحرر مساحة الآن:</string>
@@ -304,7 +315,7 @@
     <string name="share_freed_result_button">مشاركة الإنجاز (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">مشاركة Midiastore (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">مشاركة</string>
-    <string name="share_freed_result_message">حررت للتو %1$s من مساحة هاتفي بأمان باستخدام Midiastore (أقل من 8 ميجابايت على Google Play): %2$s</string>
+    <string name="share_freed_result_message">استعدت بأمان إجمالي مساحة قدره %1$s على هاتفي باستخدام Midiastore (حجم التطبيق أقل من 8 ميجابايت على Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">المشاركة عبر WhatsApp أو Telegram أو Instagram</string>
     <string name="share_card_lightweight_badge">أقل من 8 ميجابايت • GOOGLE PLAY</string>
     <string name="share_card_freed_label">تم تحريرها بأمان</string>
@@ -313,5 +324,5 @@
     <string name="app_language_button">اللغة</string>
     <string name="app_language_title">لغة التطبيق</string>
     <string name="app_language_system_default">استخدام لغة الجهاز</string>
-    <string name="cleanup_dialog_mission_action">تنظيف %1$s الآن</string>
+    <string name="cleanup_dialog_mission_action">نقل %1$s إلى المهملات</string>
 </resources>

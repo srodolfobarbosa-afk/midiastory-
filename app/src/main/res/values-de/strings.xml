@@ -28,6 +28,15 @@ Gesamt: %3$s</string>
     <string name="filter_same_size">Exakte Kopien (SHA-256)</string>
     <string name="filter_screenshots_30d">Bildschirmfotos (+30 Tage)</string>
     <string name="filter_older_30d">Älter als 30 Tage</string>
+    <string name="files_filter_all">Alle</string>
+    <string name="files_filter_duplicates">Duplikate</string>
+    <string name="files_filter_large">Große Dateien</string>
+    <string name="files_filter_screenshots">Screenshots</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">Eingeschränkter Zugriff: Nur ausgewählte Medien können geprüft oder verschoben werden.</string>
+    <string name="files_empty_state_full_access">Keine Elemente entsprechen diesem Filter. Starte unter „Bereinigen“ einen Scan, um Kandidaten zu finden.</string>
+    <string name="files_empty_state_partial_access">Keine passenden Elemente in den für Midiastore ausgewählten Medien. Deine Mediathek kann weitere, für die App nicht zugängliche Dateien enthalten.</string>
+    <string name="files_media_badge">Medien</string>
     <string name="smart_filter_empty_in_page">Auf dieser Seite gibt es keine Dateien, die dem Filter entsprechen. Wechsle zur nächsten Seite, um weitere Dateien zu prüfen.</string>
     <string name="protected_reference_badge">Geschütztes Original</string>
     <string name="volume_title">SPEICHER</string>
@@ -176,6 +185,8 @@ Gesamt: %3$s</string>
     <string name="pro_unused_apps_disclosure_continue">Weiter zu den Einstellungen</string>
     <string name="pro_unused_apps_disclosure_not_now">Nicht jetzt</string>
     <string name="pro_billing_terms_disclosure">Monats- und Jahres-Tarife sind Abonnements mit automatischer Verlängerung über Google Play bis zur Kündigung. Sie können jederzeit vor dem Verlängerungsdatum im Google Play Store kündigen. Der Lifetime-Tarif ist eine Einmalzahlung.</string>
+    <string name="pro_all_plans_include">Alle Pro-Tarife enthalten:</string>
+    <string name="pro_benefit_h265_local">H.265-Videokomprimierung auf dem Gerät</string>
     <string name="quick_clean_title">Schnellreinigung</string>
     <string name="cleanup_dialog_subtitle_candidates">Prüfe die gefundenen Dateien. Entferne das Häkchen bei Dateien, die du behalten willst, und wähle „In Papierkorb“ oder „Endgültig löschen“ mit offizieller Android-Bestätigung.</string>
     <string name="cleanup_dialog_subtitle_fallback">Keine einzelne Datei über 10 MB gefunden. Hier sind die größten Mediendateien auf deinem Smartphone, die du jetzt prüfen und entfernen kannst:</string>
@@ -304,7 +315,7 @@ Du kannst nach großen Dateien suchen oder alle Dateien im Dateien-Tab durchsuch
     <string name="share_freed_result_button">Erfolg teilen (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Midiastore empfehlen (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">Teilen</string>
-    <string name="share_freed_result_message">Ich habe gerade sicher %1$s Speicherplatz mit Midiastore freigegeben (unter 8 MB bei Google Play): %2$s</string>
+    <string name="share_freed_result_message">Mit Midiastore habe ich insgesamt %1$s Speicherplatz auf meinem Smartphone sicher freigegeben (App-Größe unter 8 MB bei Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">Über WhatsApp, Telegram oder Instagram teilen</string>
     <string name="share_card_lightweight_badge">UNTER 8 MB • GOOGLE PLAY</string>
     <string name="share_card_freed_label">SICHER FREIGEGEBEN</string>
@@ -313,5 +324,5 @@ Du kannst nach großen Dateien suchen oder alle Dateien im Dateien-Tab durchsuch
     <string name="app_language_button">Sprache</string>
     <string name="app_language_title">App-Sprache</string>
     <string name="app_language_system_default">Gerätesprache verwenden</string>
-    <string name="cleanup_dialog_mission_action">Jetzt %1$s freigeben</string>
+    <string name="cleanup_dialog_mission_action">%1$s in den Papierkorb verschieben</string>
 </resources>

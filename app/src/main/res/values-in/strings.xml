@@ -10,12 +10,12 @@ Total: %3$s</string>
     <string name="cancel_scan">Batalkan pemindaian</string>
     <string name="ready_status">Siap. Semua pemrosesan dilakukan secara lokal dan file asli tetap terlindungi.</string>
     <string name="permission_denied">Izin tidak diberikan. Tidak ada media yang diperiksa.</string>
-    <string name="no_access">Grant access to photos, videos, or audio to start analysis.</string>
+    <string name="no_access">Izinkan akses ke foto, video, atau audio untuk memulai analisis.</string>
     <string name="starting_scan">Memeriksa media yang Anda izinkan?</string>
-    <string name="loading_page">Reading your files…</string>
+    <string name="loading_page">Membaca file Anda…</string>
     <string name="page_ready">File berhasil dimuat.</string>
-    <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. Start a new scan to reconcile.</string>
-    <string name="partial_results">Some files could not be checked. Review the coverage notes.</string>
+    <string name="partial_access_requires_refresh">Pilihan media yang diizinkan mungkin berubah di latar belakang. Mulai pemindaian baru untuk menyelaraskan daftar.</string>
+    <string name="partial_results">Sebagian file tidak dapat diperiksa. Tinjau catatan cakupan.</string>
     <string name="page_failed">Terjadi kesalahan sementara saat membaca halaman ini. Coba lagi.</string>
     <string name="pagination_unsupported">Penyedia tidak mengonfirmasi semua parameter halaman. Hasil sebagian.</string>
     <string name="session_stale">Library or permissions changed. Start a new scan.</string>
@@ -28,12 +28,21 @@ Total: %3$s</string>
     <string name="filter_same_size">Salinan persis (SHA-256)</string>
     <string name="filter_screenshots_30d">Tangkapan layar lama (+30 hari)</string>
     <string name="filter_older_30d">Lebih lama (+30 hari)</string>
+    <string name="files_filter_all">Semua</string>
+    <string name="files_filter_duplicates">Duplikat</string>
+    <string name="files_filter_large">Besar</string>
+    <string name="files_filter_screenshots">Tangkapan layar</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">Akses terbatas: hanya media yang Anda pilih yang dapat ditinjau atau dipindahkan.</string>
+    <string name="files_empty_state_full_access">Tidak ada item yang cocok dengan filter ini. Jalankan pemindaian di tab Bersihkan untuk menemukan kandidat.</string>
+    <string name="files_empty_state_partial_access">Tidak ada item yang cocok dalam media yang Anda pilih untuk Midiastore. Perpustakaan Anda mungkin berisi file yang tidak tersedia bagi aplikasi.</string>
+    <string name="files_media_badge">Media</string>
     <string name="smart_filter_empty_in_page">Tidak ada file di halaman ini yang cocok dengan filter. Buka halaman lain untuk memeriksa file lainnya.</string>
     <string name="protected_reference_badge">Protected original</string>
     <string name="volume_title">STORAGE</string>
     <string name="internal_volume">Primary shared storage</string>
     <string name="external_volume">External volume · %1$s</string>
-    <string name="not_scanned">No page scanned</string>
+    <string name="not_scanned">Belum ada halaman yang dipindai</string>
     <string name="page_results_hint">Maksimal 100 file ditampilkan sekaligus. Lanjutkan untuk melihat file lainnya.</string>
     <string name="page_range">File %1$d–%2$d %3$s</string>
     <string name="of_total">dari %1$d yang dilaporkan penyedia</string>
@@ -176,6 +185,8 @@ Total: %3$s</string>
     <string name="pro_unused_apps_disclosure_continue">Lanjutkan ke pengaturan</string>
     <string name="pro_unused_apps_disclosure_not_now">Nanti saja</string>
     <string name="pro_billing_terms_disclosure">Paket Bulanan dan Tahunan adalah langganan dengan perpanjangan otomatis melalui Google Play hingga dibatalkan. Anda dapat membatalkan kapan saja di Google Play Store sebelum tanggal perpanjangan. Paket Selamanya adalah pembayaran sekali beli.</string>
+    <string name="pro_all_plans_include">Semua paket Pro mencakup:</string>
+    <string name="pro_benefit_h265_local">Kompresi video H.265 di perangkat</string>
     <string name="quick_clean_title">Pembersihan Cepat</string>
     <string name="cleanup_dialog_subtitle_candidates">Review the files found below. Uncheck anything you want to keep and choose Move to Trash or Delete Permanently (with official Android confirmation).</string>
     <string name="cleanup_dialog_subtitle_fallback">No single file over 10 MB was found. Here are the largest media files on your phone so you can check and free up space right now:</string>
@@ -187,7 +198,7 @@ Total: %3$s</string>
     <string name="cleanup_dialog_empty_title">No Media Found to Clean</string>
     <string name="cleanup_dialog_empty_body">No accessible media files were found in this scan. You can refresh the gallery, open the WhatsApp Cleaner, or review media permissions.</string>
     <string name="cleanup_scan_in_progress_toast">Scanning device files… please wait a moment.</string>
-    <string name="select_all_page_button">☑ Select page (%1$d)</string>
+    <string name="select_all_page_button">☑ Pilih halaman (%1$d)</string>
     <string name="tester_vip_activate_button">Activate Free Pro Plan (Tester Bonus)</string>
     <string name="tester_vip_active_button">Tester VIP Bonus Active (Pro Plan Unlocked)</string>
     <string name="tester_vip_status_badge">Pro VIP Plan Active (Official Tester Bonus)</string>
@@ -220,8 +231,8 @@ Total: %3$s</string>
     <string name="family_shield_title">Family Photos Protected</string>
     <string name="quick_clean_whatsapp_title">WhatsApp</string>
     <string name="quick_clean_whatsapp_desc">Media &amp; voice notes</string>
-    <string name="quick_clean_duplicates_title">Duplicates</string>
-    <string name="quick_clean_duplicates_desc">Repeated copies</string>
+    <string name="quick_clean_duplicates_title">Duplikat</string>
+    <string name="quick_clean_duplicates_desc">Salinan yang sama</string>
     <string name="quick_clean_large_title">Large</string>
     <string name="quick_clean_large_desc">Videos &gt;10MB</string>
     <string name="quick_clean_screenshots_title">Screenshots &gt;30d</string>
@@ -302,7 +313,7 @@ Total: %3$s</string>
     <string name="share_freed_result_button">Bagikan hasil (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Bagikan Midiastore (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">Bagikan</string>
-    <string name="share_freed_result_message">Saya baru saja membebaskan %1$s dengan aman di ponsel memakai Midiastore (di bawah 8 MB di Google Play): %2$s</string>
+    <string name="share_freed_result_message">Dengan Midiastore, saya telah mengosongkan total %1$s ruang di ponsel dengan aman (ukuran aplikasi kurang dari 8 MB di Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">Bagikan lewat WhatsApp, Telegram, atau Instagram</string>
     <string name="share_card_lightweight_badge">DI BAWAH 8 MB • GOOGLE PLAY</string>
     <string name="share_card_freed_label">DIBERSIHKAN DENGAN AMAN</string>
@@ -311,5 +322,5 @@ Total: %3$s</string>
     <string name="app_language_button">Bahasa</string>
     <string name="app_language_title">Bahasa aplikasi</string>
     <string name="app_language_system_default">Gunakan bahasa perangkat</string>
-    <string name="cleanup_dialog_mission_action">Bersihkan %1$s sekarang</string>
+    <string name="cleanup_dialog_mission_action">Pindahkan %1$s ke Sampah</string>
 </resources>

@@ -11,7 +11,7 @@
     <string name="ready_status">준비가 된. 원래 참조 보호 기능을 갖춘 100% 로컬 처리.</string>
     <string name="permission_denied">권한이 부여되지 않았습니다. 쿼리된 미디어가 없습니다.</string>
     <string name="no_access">분석을 시작하려면 사진, 비디오, 오디오에 대한 액세스 권한을 부여하세요.</string>
-    <string name="starting_scan">\'가 허용한 미디어를 확인하는 중…</string>
+    <string name="starting_scan">&apos;가 허용한 미디어를 확인하는 중…</string>
     <string name="loading_page">파일을 읽는 중…</string>
     <string name="page_ready">파일이 로드되었습니다.</string>
     <string name="partial_access_requires_refresh">Authorized media selection may have changed in background. 조정하려면 새 스캔을 시작하세요.</string>
@@ -28,6 +28,15 @@
     <string name="filter_same_size">정확한 사본(SHA-256)</string>
     <string name="filter_screenshots_30d">스크린샷 (+30일)</string>
     <string name="filter_older_30d">이전(+30일)</string>
+    <string name="files_filter_all">전체</string>
+    <string name="files_filter_duplicates">중복</string>
+    <string name="files_filter_large">대용량</string>
+    <string name="files_filter_screenshots">스크린샷</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">일부 접근만 허용됨: 선택한 미디어만 검토하거나 이동할 수 있습니다.</string>
+    <string name="files_empty_state_full_access">이 필터와 일치하는 항목이 없습니다. 정리 탭에서 스캔해 후보를 찾아보세요.</string>
+    <string name="files_empty_state_partial_access">Midiastore에 선택한 미디어 중 일치하는 항목이 없습니다. 앱에서 볼 수 없는 파일이 라이브러리에 더 있을 수 있습니다.</string>
+    <string name="files_media_badge">미디어</string>
     <string name="smart_filter_empty_in_page">이 페이지에는 필터와 일치하는 파일이 없습니다. 더 많은 파일을 확인하시려면 다른 페이지로 이동하세요.</string>
     <string name="protected_reference_badge">보호된 원본</string>
     <string name="volume_title">저장</string>
@@ -128,7 +137,7 @@
     <string name="oaas_card_headline">공간을 차지하는 것은 무엇입니까?</string>
     <string name="oaas_card_subtitle">안전하게 제거할 수 있는 것을 찾으십시오. 모든 정리 작업을 검토하고 확인합니다.</string>
     <string name="oaas_pipeline_idle">시작하려면 분석을 선택하세요.</string>
-    <string name="oaas_starting_scan_first">먼저, 허용한 미디어를 \' 확인해 보겠습니다.</string>
+    <string name="oaas_starting_scan_first">먼저, 허용한 미디어를 &apos; 확인해 보겠습니다.</string>
     <string name="oaas_mission_large">대용량 파일(10MB 이상) 찾기</string>
     <string name="oaas_mission_duplicates">정확한 사본 찾기(SHA-256) · 무료</string>
     <string name="oaas_mission_old">30일이 지난 파일 찾기 · 무료</string>
@@ -176,6 +185,8 @@
     <string name="pro_unused_apps_disclosure_continue">설정으로 이동</string>
     <string name="pro_unused_apps_disclosure_not_now">나중에</string>
     <string name="pro_billing_terms_disclosure">월간 및 연간 플랜은 해지할 때까지 Google Play를 통해 자동 갱신되는 정기 결제 상품입니다. 갱신일 전에 언제든지 Google Play 스토어에서 해지할 수 있습니다. 평생 소장 플랜은 1회 결제 상품입니다.</string>
+    <string name="pro_all_plans_include">모든 Pro 요금제에 포함:</string>
+    <string name="pro_benefit_h265_local">기기 내 H.265 동영상 압축</string>
     <string name="quick_clean_title">빠른 정리</string>
     <string name="cleanup_dialog_subtitle_candidates">아래에 있는 파일을 검토하세요. 보관하고 싶은 항목을 선택 취소하고 휴지통으로 이동 또는 영구 삭제(공식 Android 확인 포함)를 선택하세요.</string>
     <string name="cleanup_dialog_subtitle_fallback">10MB를 초과하는 단일 파일을 찾을 수 없습니다. 지금 당장 공간을 확인하고 확보할 수 있도록 휴대전화에 있는 가장 큰 미디어 파일은 다음과 같습니다.</string>
@@ -302,7 +313,7 @@
     <string name="share_freed_result_button">정리 결과 공유 (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Midiastore 추천하기 (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">공유</string>
-    <string name="share_freed_result_message">방금 Midiastore로 휴대폰 저장공간 %1$s를 안전하게 확보했어요 (Google Play 8MB 미만): %2$s</string>
+    <string name="share_freed_result_message">Midiastore로 휴대폰 저장공간을 총 %1$s 안전하게 확보했어요 (Google Play에서 앱 크기 8MB 미만): %2$s</string>
     <string name="share_card_chooser_subtitle">WhatsApp, Telegram 또는 Instagram으로 공유</string>
     <string name="share_card_lightweight_badge">8MB 미만 • GOOGLE PLAY</string>
     <string name="share_card_freed_label">안전하게 확보됨</string>
@@ -311,5 +322,5 @@
     <string name="app_language_button">언어</string>
     <string name="app_language_title">앱 언어</string>
     <string name="app_language_system_default">기기 언어 사용</string>
-    <string name="cleanup_dialog_mission_action">지금 %1$s 정리</string>
+    <string name="cleanup_dialog_mission_action">%1$s을(를) 휴지통으로 이동</string>
 </resources>

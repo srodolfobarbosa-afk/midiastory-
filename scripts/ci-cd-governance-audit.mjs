@@ -8,6 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { TextDecoder } from "node:util";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -52,6 +53,18 @@ check(
   "Biblioteca do Google Play Billing ausente ou não configurada."
 );
 
+// Privacy policy must remain HTTPS and follow the app's selected locale.
+const mainActivityPath = path.join(projectRoot, "app", "src", "main", "java", "com", "rdf112", "sweep", "MainActivity.kt");
+const mainActivityContent = fs.readFileSync(mainActivityPath, "utf8");
+check(
+  "Privacy Policy HTTPS + app locale routing",
+  mainActivityContent.includes("https://midiastory-df6a0.web.app/privacidade.html") &&
+    mainActivityContent.includes("https://midiastory-df6a0.web.app/privacy.html") &&
+    !/http:\/\/[^\s\"']*(?:privacidade|privacy)\.html/i.test(mainActivityContent) &&
+    mainActivityContent.includes("AppCompatDelegate.getApplicationLocales()"),
+  "Privacy policy URLs must be HTTPS and route using the app's selected locale."
+);
+
 // 4. Verificação dos 8 Idiomas no Funil Web
 const requiredLocales = ["en", "es", "de", "fr", "hi", "ja", "zh"];
 for (const loc of requiredLocales) {
@@ -90,11 +103,28 @@ const baseKeySet = new Set(extractKeys(baseStringsRaw));
 
 for (const folder of resValuesFolders) {
   const stringsPath = path.join(projectRoot, "app", "src", "main", "res", folder, "strings.xml");
-  const raw = fs.existsSync(stringsPath) ? fs.readFileSync(stringsPath, "utf8") : "";
+  const bytes = fs.existsSync(stringsPath) ? fs.readFileSync(stringsPath) : Buffer.alloc(0);
+  let utf8Valid = false;
+  let raw = "";
+  try {
+    raw = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    utf8Valid = true;
+  } catch {
+    // Keep the audit running so the locale is reported as a failure below.
+  }
   const keys = extractKeys(raw);
   const exactParity = keys.length === baseKeySet.size && keys.every((k) => baseKeySet.has(k));
   const noSparkles = !/[\u2728\u2726\u2727]/u.test(raw);
   const stringBodies = [...raw.matchAll(/<string\s+name="([^"]+)"[^>]*>([\s\S]*?)<\/string>/g)];
+  const startsWithQuestion = stringBodies
+    .filter(([, , val]) => val.trimStart().startsWith("?"))
+    .map(([, name]) => name);
+  const escapedApostrophes = stringBodies
+    .filter(([, , val]) => /\\'/.test(val))
+    .map(([, name]) => name);
+  const invalidUnicodeEscapes = stringBodies
+    .filter(([, , val]) => /\\u(?![0-9a-fA-F]{4})/i.test(val))
+    .map(([, name]) => name);
   const aaptInvalid = stringBodies
     .filter(([, , val]) => {
       const trimmed = val.trim();
@@ -112,10 +142,16 @@ for (const folder of resValuesFolders) {
       raw.includes("nav_files") &&
       raw.includes("nav_pro") &&
       raw.includes("pro_billing_terms_disclosure") &&
+      utf8Valid &&
       exactParity &&
       noSparkles &&
+      startsWithQuestion.length === 0 &&
+      escapedApostrophes.length === 0 &&
+      invalidUnicodeEscapes.length === 0 &&
       aaptInvalid.length === 0,
-    `Chaves obrigatórias ausentes, divergência de paridade (${keys.length}/${baseKeySet.size}), estrelinha legada ou escape inválido AAPT2 (${aaptInvalid.join(", ")}) em ${folder}/strings.xml.`
+    `UTF-8=${utf8Valid}, paridade=${keys.length}/${baseKeySet.size}, ` +
+      `começa com ? (${startsWithQuestion.join(", ")}), \\' (${escapedApostrophes.join(", ")}), ` +
+      `\\u inválido (${invalidUnicodeEscapes.join(", ")}), AAPT2 (${aaptInvalid.join(", ")}) em ${folder}/strings.xml.`
   );
 }
 

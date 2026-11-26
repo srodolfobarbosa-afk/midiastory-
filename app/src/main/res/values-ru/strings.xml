@@ -11,7 +11,7 @@
     <string name="ready_status">Готовый. 100% локальная обработка с оригинальной эталонной защитой.</string>
     <string name="permission_denied">Разрешение не получено. Никакие СМИ не были опрошены.</string>
     <string name="no_access">Предоставьте доступ к фотографиям, видео или аудио, чтобы начать анализ.</string>
-    <string name="starting_scan">Проверка носителя, который вы \' разрешили…</string>
+    <string name="starting_scan">Проверка носителя, который вы &apos; разрешили…</string>
     <string name="loading_page">Чтение файлов…</string>
     <string name="page_ready">Файлы загружены.</string>
     <string name="partial_access_requires_refresh">Выбор авторизованного носителя мог быть изменен в фоновом режиме. Запустите новое сканирование для согласования.</string>
@@ -28,6 +28,15 @@
     <string name="filter_same_size">Точные копии (SHA-256)</string>
     <string name="filter_screenshots_30d">Скриншоты (+30д)</string>
     <string name="filter_older_30d">Старее (+30 дней)</string>
+    <string name="files_filter_all">Все</string>
+    <string name="files_filter_duplicates">Дубликаты</string>
+    <string name="files_filter_large">Большие файлы</string>
+    <string name="files_filter_screenshots">Скриншоты</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">Частичный доступ: проверять и перемещать можно только выбранные файлы.</string>
+    <string name="files_empty_state_full_access">Нет элементов по этому фильтру. Запустите сканирование на вкладке «Очистка», чтобы найти кандидатов.</string>
+    <string name="files_empty_state_partial_access">Среди выбранных для Midiastore файлов совпадений нет. В библиотеке могут быть файлы, недоступные приложению.</string>
+    <string name="files_media_badge">Медиа</string>
     <string name="smart_filter_empty_in_page">На этой странице нет файлов, соответствующих фильтру. Перейдите на другую страницу, чтобы проверить больше файлов.</string>
     <string name="protected_reference_badge">Защищенный оригинал</string>
     <string name="volume_title">ХРАНИЛИЩЕ</string>
@@ -128,7 +137,7 @@
     <string name="oaas_card_headline">Что занимает место?</string>
     <string name="oaas_card_subtitle">Найдите то, что можно безопасно удалить. Вы просматриваете и подтверждаете каждое действие по очистке.</string>
     <string name="oaas_pipeline_idle">Выберите анализ, чтобы начать.</string>
-    <string name="oaas_starting_scan_first">Сначала мы\' проверим разрешенный вами носитель.</string>
+    <string name="oaas_starting_scan_first">Сначала мы&apos; проверим разрешенный вами носитель.</string>
     <string name="oaas_mission_large">Найти большие файлы (более 10 МБ)</string>
     <string name="oaas_mission_duplicates">Найти точные копии (SHA-256) · Бесплатно</string>
     <string name="oaas_mission_old">Найти файлы старше 30 дней · Бесплатно</string>
@@ -176,6 +185,8 @@
     <string name="pro_unused_apps_disclosure_continue">Перейти в настройки</string>
     <string name="pro_unused_apps_disclosure_not_now">Не сейчас</string>
     <string name="pro_billing_terms_disclosure">Месячный и Годовой тарифы — это подписки с автоматическим продлением через Google Play до момента отмены. Отменить подписку можно в любое время в Google Play Store до даты продления. Тариф «Навсегда» оплачивается один раз.</string>
+    <string name="pro_all_plans_include">Во все планы Pro входят:</string>
+    <string name="pro_benefit_h265_local">Сжатие видео H.265 на устройстве</string>
     <string name="quick_clean_title">Быстрая Очистка</string>
     <string name="cleanup_dialog_subtitle_candidates">Просмотрите файлы, найденные ниже. Снимите флажки со всего, что хотите сохранить, и выберите «Переместить в корзину» или «Удалить навсегда» (с официальным подтверждением Android).</string>
     <string name="cleanup_dialog_subtitle_fallback">Ни одного файла размером более 10 МБ не обнаружено. Вот самые большие медиафайлы на вашем телефоне, которые вы можете проверить и освободить место прямо сейчас:</string>
@@ -302,7 +313,7 @@
     <string name="share_freed_result_button">Поделиться результатом (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Поделиться Midiastore (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">Поделиться</string>
-    <string name="share_freed_result_message">Я только что безопасно освободил(а) %1$s на телефоне с помощью Midiastore (менее 8 МБ в Google Play): %2$s</string>
+    <string name="share_freed_result_message">С помощью Midiastore я безопасно освободил(а) в общей сложности %1$s на телефоне (приложение занимает менее 8 МБ в Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">Поделиться в WhatsApp, Telegram или Instagram</string>
     <string name="share_card_lightweight_badge">МЕНЕЕ 8 МБ • GOOGLE PLAY</string>
     <string name="share_card_freed_label">БЕЗОПАСНО ОЧИЩЕНО</string>
@@ -311,5 +322,5 @@
     <string name="app_language_button">Язык</string>
     <string name="app_language_title">Язык приложения</string>
     <string name="app_language_system_default">Язык устройства</string>
-    <string name="cleanup_dialog_mission_action">Очистить %1$s сейчас</string>
+    <string name="cleanup_dialog_mission_action">Переместить %1$s в корзину</string>
 </resources>

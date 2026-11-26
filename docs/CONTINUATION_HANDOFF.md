@@ -418,3 +418,15 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - Supabase memory was recorded as #575 after one transient HTTP 502; local timeline was updated.
 - Next step: correct AAPT escape sequences, then obtain authorization for another CI compilation before APK/device QA; do not claim completion or alter `v2.8.2-carbon-baseline`.
 
+
+## Auditoria real no Moto G84 — 2026-11-26
+
+- Relatório da sessão: [docs/QA_AUDITORIA_REAL_V290.md](QA_AUDITORIA_REAL_V290.md). Validado exclusivamente `com.rdf112.midiastore.debug` v2.8.2 no serial `0085353748`; sem Gradle e sem alteração de código. Pacote oficial preservado.
+- Reproduzido o retorno da Maria com retrato/anel azul na segunda visita; nenhum crash/ANR observado no trecho monitorado. Permissão parcial impediu concluir os fluxos de Arquivos, lixeira/restauração/exclusão, compressor e compras; relatório registra lacunas sem inferir sucesso.
+- Fixtures de QA removidos e diretórios `MidiastoreQA` confirmados ausentes. Não tocar em `/sdcard/DCIM/Camera`.
+
+## Implementação dos achados da auditoria — 2026-11-26
+
+- Branch `feat/v2.9.0-motor-app`: melhorias na limpeza em dois estágios com lixeira segura, permissão parcial Android 14+, retorno da Maria com Surface persistente, controles acessíveis de fala/mudo, resumo grátis/Pro comum aos três planos, strings i18n e roteamento da Política de Privacidade pelo locale do app.
+- `ci-cd-governance-audit.mjs` passou com 322 chaves e paridade em `values` + 14 locales; validou UTF-8, apóstrofos AAPT2, escapes Unicode e HTTPS. `git diff --check` passou.
+- Nenhum Gradle local. As alterações ainda aguardam CI/build e reinstalação somente do pacote `.debug` para confirmar UI/fluxos em ADB; não alterar o pacote oficial nem a tag `v2.8.2-carbon-baseline` (`cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4`).

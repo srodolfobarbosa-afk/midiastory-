@@ -28,6 +28,15 @@ Total: %3$s</string>
     <string name="filter_same_size">Copias exactas (SHA-256)</string>
     <string name="filter_screenshots_30d">Capturas de pantalla (+30 días)</string>
     <string name="filter_older_30d">Más de 30 días</string>
+    <string name="files_filter_all">Todos</string>
+    <string name="files_filter_duplicates">Duplicados</string>
+    <string name="files_filter_large">Archivos grandes</string>
+    <string name="files_filter_screenshots">Capturas</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">Acceso parcial: solo puedes revisar o mover los archivos multimedia que seleccionaste.</string>
+    <string name="files_empty_state_full_access">Ningún elemento coincide con este filtro. Inicia un análisis en Limpiar para encontrar candidatos.</string>
+    <string name="files_empty_state_partial_access">No hay coincidencias entre los archivos que seleccionaste para Midiastore. Puede haber otros archivos de tu biblioteca a los que la app no tiene acceso.</string>
+    <string name="files_media_badge">Multimedia</string>
     <string name="smart_filter_empty_in_page">No hay archivos que coincidan con este filtro en esta página. Ve a otra página para revisar más.</string>
     <string name="protected_reference_badge">Original protegido</string>
     <string name="volume_title">ALMACENAMIENTO</string>
@@ -176,6 +185,8 @@ Total: %3$s</string>
     <string name="pro_unused_apps_disclosure_continue">Continuar a ajustes</string>
     <string name="pro_unused_apps_disclosure_not_now">Ahora no</string>
     <string name="pro_billing_terms_disclosure">Los planes Mensual y Anual son suscripciones con renovación automática a través de Google Play hasta que se cancelen. Puedes cancelar en cualquier momento en Google Play Store antes de la fecha de renovación. El plan Vitalicio es un pago único.</string>
+    <string name="pro_all_plans_include">Todos los planes Pro incluyen:</string>
+    <string name="pro_benefit_h265_local">Compresión de vídeo H.265 en el dispositivo</string>
     <string name="quick_clean_title">Limpieza Rápida</string>
     <string name="cleanup_dialog_subtitle_candidates">Revisa los archivos encontrados. Desmarca lo que quieras conservar y elige mover a la papelera o eliminar definitivamente con la confirmación oficial de Android.</string>
     <string name="cleanup_dialog_subtitle_fallback">No se encontró ningún archivo individual de más de 10 MB. Estos son los archivos multimedia más grandes para que los revises y liberes espacio:</string>
@@ -304,7 +315,7 @@ Puedes buscar archivos grandes o explorar todos los archivos en la pestaña Arch
     <string name="share_freed_result_button">Compartir logro (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Compartir Midiastore (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">Compartir</string>
-    <string name="share_freed_result_message">Acabo de liberar %1$s con seguridad en mi teléfono usando Midiastore (menos de 8 MB en Google Play): %2$s</string>
+    <string name="share_freed_result_message">Con Midiastore he liberado de forma segura un total de %1$s en mi teléfono (la app ocupa menos de 8 MB en Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">Compartir en WhatsApp, Telegram o Instagram</string>
     <string name="share_card_lightweight_badge">MENOS DE 8 MB • GOOGLE PLAY</string>
     <string name="share_card_freed_label">LIBERADOS CON SEGURIDAD</string>
@@ -313,5 +324,5 @@ Puedes buscar archivos grandes o explorar todos los archivos en la pestaña Arch
     <string name="app_language_button">Idioma</string>
     <string name="app_language_title">Idioma de la aplicación</string>
     <string name="app_language_system_default">Usar idioma del dispositivo</string>
-    <string name="cleanup_dialog_mission_action">Limpiar %1$s ahora</string>
+    <string name="cleanup_dialog_mission_action">Mover %1$s a la papelera</string>
 </resources>

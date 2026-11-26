@@ -28,6 +28,15 @@ Total: %3$s</string>
     <string name="filter_same_size">Cópias exatas (SHA-256)</string>
     <string name="filter_screenshots_30d">Prints (+30d)</string>
     <string name="filter_older_30d">Antigos (+30 dias)</string>
+    <string name="files_filter_all">Todos</string>
+    <string name="files_filter_duplicates">Duplicatas</string>
+    <string name="files_filter_large">Grandes</string>
+    <string name="files_filter_screenshots">Capturas</string>
+    <string name="files_filter_whatsapp">WhatsApp</string>
+    <string name="files_partial_coverage">Acesso parcial: só as mídias que você selecionou podem ser revisadas ou movidas.</string>
+    <string name="files_empty_state_full_access">Nenhum item corresponde a este filtro. Faça uma varredura em Limpar para encontrar candidatos.</string>
+    <string name="files_empty_state_partial_access">Nenhum item correspondente nas mídias selecionadas para o Midiastore. Sua biblioteca pode ter arquivos que o app não consegue acessar.</string>
+    <string name="files_media_badge">Mídia</string>
     <string name="smart_filter_empty_in_page">Nenhum arquivo nesta página corresponde ao filtro. Avance para consultar outros arquivos.</string>
     <string name="protected_reference_badge">Original protegido</string>
     <string name="volume_title">ARMAZENAMENTO</string>
@@ -176,6 +185,8 @@ Total: %3$s</string>
     <string name="pro_unused_apps_disclosure_continue">Continuar para ajustes</string>
     <string name="pro_unused_apps_disclosure_not_now">Agora não</string>
     <string name="pro_billing_terms_disclosure">Os planos Mensal e Anual são assinaturas com renovação automática pela Google Play até o cancelamento. Você pode cancelar a qualquer momento na Google Play Store antes da data de renovação. O plano Vitalício é pagamento único.</string>
+    <string name="pro_all_plans_include">Todos os planos Pro incluem:</string>
+    <string name="pro_benefit_h265_local">Compressão de vídeo H.265 no aparelho</string>
     <string name="quick_clean_title">Limpeza Rápida</string>
     <string name="cleanup_dialog_subtitle_candidates">Revise os arquivos encontrados abaixo. Desmarque o que quiser manter e escolha Lixeira ou Exclusão Definitiva (com confirmação oficial do Android).</string>
     <string name="cleanup_dialog_subtitle_fallback">Nenhum arquivo único acima de 10 MB foi encontrado. Listamos as maiores mídias do seu aparelho para você marcar e liberar espaço agora:</string>
@@ -302,7 +313,7 @@ Total: %3$s</string>
     <string name="share_freed_result_button">Compartilhar conquista (WhatsApp / Instagram / Telegram)</string>
     <string name="share_invite_friend_button">Indicar Midiastore (WhatsApp · Telegram · Instagram)</string>
     <string name="share_home_pill_action">Compartilhar</string>
-    <string name="share_freed_result_message">Acabei de liberar %1$s com segurança no meu celular usando o Midiastore (menos de 8 MB na Google Play): %2$s</string>
+    <string name="share_freed_result_message">Já liberei com segurança um total de %1$s no meu celular usando o Midiastore (app com menos de 8 MB na Google Play): %2$s</string>
     <string name="share_card_chooser_subtitle">Compartilhar no WhatsApp, Telegram ou Instagram</string>
     <string name="share_card_lightweight_badge">MENOS DE 8 MB • GOOGLE PLAY</string>
     <string name="share_card_freed_label">LIBERADOS COM SEGURANÇA</string>
@@ -311,5 +322,5 @@ Total: %3$s</string>
     <string name="app_language_button">Idioma</string>
     <string name="app_language_title">Idioma do app</string>
     <string name="app_language_system_default">Usar idioma do dispositivo</string>
-    <string name="cleanup_dialog_mission_action">Limpar %1$s agora</string>
+    <string name="cleanup_dialog_mission_action">Mover %1$s para a lixeira</string>
 </resources>
