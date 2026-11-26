@@ -3528,3 +3528,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #579
 
 ---
+
+### 📍 [26/11/2026, 10:17:36] revisar integralmente as strings italianas idênticas ao inglês e fechar CI
+- **📖 Estudou / Leu:** values-it e values-en com 322 chaves, catálogo italiano, AGENTS e status da baseline; CI 45826259245
+- **⚙️ Tentou / Executou:** Traduzir 202 strings visíveis, comparar chaves e placeholders, executar Node governance e git diff check, publicar commit e instalar APK debug
+- **⚠️ Erros Encontrados:** APK novo tem assinatura diferente da versão instalada; adb install -r falhou e adb uninstall -k foi recusado para preservar dados; localização na tela não pôde ser verificada
+- **🔧 Como Corrigiu:** Italiano revisado no commit de4ec43; governança, diff check, verificador Node e CI passaram; relatório e handoff atualizados
+- **🎯 Conclusão:** Somente marcas/siglas permitidas e tokens de formatação/números permanecem idênticos ao inglês; CI verde no SHA de4ec43; APK c83d06c8... validado como com.rdf112.midiastore.debug; versão existente e pacote oficial permaneceram intactos; instalação com assinatura nova aguarda autorização para apagar dados internos do debug.
+- *Registro Supabase:* Memory #580
+
+---

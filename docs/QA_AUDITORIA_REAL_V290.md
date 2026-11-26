@@ -84,3 +84,12 @@ As alterações abaixo estão na branch de evolução; **ainda não foram compil
 - O APK foi recusado antes da atualização; não foram criados fixtures novos no dispositivo nesta etapa. As pastas QA seguem ausentes. O pacote oficial continuou instalado/intocado; `/sdcard/DCIM/Camera` não foi acessado.
 - **Próximo passo bloqueante:** obter/usar o certificado debug compatível com o instalado, ou combinar preservação dos dados e reinstalação do pacote `.debug`; então executar QA focado de Maria (segunda visita), mudo/pausa, locais IT/ID/PT, política, permissão parcial e fluxo de revisão/lixeira com somente fixtures sintéticos.
 - Registro Supabase desta atualização: memória **#579**; o relatório integral anterior permanece na memória **#577** e o resumo de implementação em **#578**.
+
+### Revisão italiana final — 26/11/2026
+
+- Commit `de4ec43d7ee1dac70cb5b2d9d92327711291f517` altera exclusivamente `app/src/main/res/values-it/strings.xml`: 202 strings iguais ao Inglês receberam tradução italiana. Permanecem iguais apenas marca/sigla, placeholders e rótulos numéricos/técnicos (`Midiastore`, `Pro`, `WhatsApp`, `SHA-256`, `Aa+`, formatos e limites).
+- Conferidos em especial: navegação Pulisci/File/Pro, duplicados/foto simili/foto sfocate, foto melhor protegida, nitidezza ridotta, app inutilizzate, GRATIS PER SEMPRE, controllo foto sfocate, compressão H.265, restauração de compras, assinaturas, Informativa sulla privacy e termos do período grátis de 3 dias. Placeholders preservados.
+- `node scripts/ci-cd-governance-audit.mjs`: PASS; `git diff --check`: PASS; verificador Node específico confirmou 322 chaves, nenhum texto idêntico ao Inglês fora marcas/siglas/formatos permitidos e placeholders equivalentes.
+- CI run `45826259245` no SHA `de4ec43d7ee1dac70cb5b2d9d92327711291f517`: verde (governança, testes, compilação e APK). Deploy Web pulado.
+- APK `.debug` validado: `com.rdf112.midiastore.debug`, SHA-256 `c83d06c8befb0c4cbcaefda80bc1e74785e60ea081aab03e1a075e7d824d88a4`. `adb install -r` falhou com `INSTALL_FAILED_UPDATE_INCOMPATIBLE` por assinatura divergente. `adb uninstall -k` foi recusado pelo ADB com aviso de que a reinstalação dos dados retidos exige a assinatura antiga; o app e seus dados permaneceram intactos. Não foi possível validar a tela italiana nesta build.
+- Permanece instalada a v2.8.2-debug; pacote oficial `com.rdf112.midiastore` e tag `v2.8.2-carbon-baseline` preservados. Instalação da nova assinatura aguarda autorização para remover apenas os dados locais do debug.

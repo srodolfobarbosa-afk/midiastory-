@@ -439,3 +439,10 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - URLs de privacidade exatas em HTTPS verificadas por HEAD `200`; `node scripts/ci-cd-governance-audit.mjs` PASS; validação Node independente percorreu 15 catálogos/4.830 textos sem os defeitos pedidos; `git diff --check` PASS.
 - Auditoria e lacunas atualizadas em `docs/QA_AUDITORIA_REAL_V290.md`; não declarar Maria, limpeza rápida, permissão parcial ou mudanças localizadas aprovadas em dispositivo até validar essa revisão.
 - Memória Supabase final: **#579** (gates HTTPS/strings, CI verde e bloqueio de assinatura); relatório integral anterior **#577**, implementação **#578**.
+
+## Revisão final do catálogo italiano — 26/11/2026
+
+- Commit de recursos `de4ec43d7ee1dac70cb5b2d9d92327711291f517`: 202 strings ainda idênticas ao inglês foram traduzidas; comparação das 322 chaves deixou igual somente marca/sigla, placeholder e token numérico/técnico. Copy cobre abas, cards, planos, compra, política e trial de 3 dias. Placeholders preservados.
+- Governance, `git diff --check` e verificador Node italiano passaram. CI `45826259245` verde no SHA do commit de recurso; deploy web skipped.
+- APK `com.rdf112.midiastore.debug` SHA-256 `c83d06c8befb0c4cbcaefda80bc1e74785e60ea081aab03e1a075e7d824d88a4`. Instalação recusada por assinatura diferente. A tentativa `adb uninstall -k` não removeu o app; ADB alertou que os dados retidos só podem ser reusados com a assinatura anterior. A versão existente permaneceu intacta, assim como o pacote oficial e a baseline.
+- QA visual da localização italiana aguarda autorização explícita para desinstalar normalmente somente o `.debug` (apaga dados internos/configurações locais) e instalar o APK novo.
