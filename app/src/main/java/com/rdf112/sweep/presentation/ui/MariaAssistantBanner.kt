@@ -625,7 +625,7 @@ fun MariaHeroBanner(
     }
     var isSpeaking by remember { mutableStateOf(false) }
     var isNeuralVideoSpeaking by remember { mutableStateOf(false) }
-    var userPlayTrigger by remember { mutableIntStateOf(0) }
+    var userPlayTrigger by remember { mutableIntStateOf(1) }
     var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
     var voiceEnergy by remember { mutableFloatStateOf(0f) }
     var wavePhase by remember { mutableFloatStateOf(0f) }
@@ -656,6 +656,7 @@ fun MariaHeroBanner(
             }
         }
         videoPlayerRef = null
+        videoFrameReady = false
     }
 
     fun startIdleLoopOnSurface(surface: Surface?) {
@@ -679,7 +680,6 @@ fun MariaHeroBanner(
             mp.setOnPreparedListener { prepared ->
                 runCatching {
                     prepared.start()
-                    videoFrameReady = true
                 }
             }
             mp.setOnErrorListener { failedMp, _, _ ->
@@ -762,6 +762,8 @@ fun MariaHeroBanner(
         isSpeaking = true
         val lang = MariaCdnVideoCache.normalizedLang()
         val clipKey = MariaCdnVideoCache.clipKeyForAudioRes(rawAudioResId)
+        var waitSurfaceMs = 0L
+        while (surfaceRef == null && waitSurfaceMs < 800L) { delay(40L); waitSurfaceMs += 40L }
         val surface = surfaceRef
         val neuralClipFile: File? = if (videoHardwareSupported && surface != null && surface.isValid) {
             MariaCdnVideoCache.resolveOrFetchClip(context, lang, clipKey, timeoutMs = 3800L)
@@ -798,7 +800,6 @@ fun MariaHeroBanner(
                 }
                 mp.prepare()
                 mp.start()
-                videoFrameReady = true
                 mp
             }.getOrNull()
 
