@@ -1,6 +1,6 @@
 {
   "version": "2.9.2-moda-hevc",
-  "updatedAt": "2026-11-26T01:34:06.015Z",
+  "updatedAt": "2026-11-26T01:53:40.276Z",
   "codec": "hvc1",
   "resolution": "480x480",
   "idle": {
@@ -9,6 +9,20 @@
     "sha256": "1c3dd7fc57452604fa6f99bc474ef4995203ac5d2a130d27df884b07c5e3233c"
   },
   "locales": {
+    "ar": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/ar/clean.mp4",
+        "bytes": 204330,
+        "sha256": "b87b94809f71da6583705123145330932cecde0b390bf2de79716e7ef6dd546a"
+      }
+    },
+    "bn": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/bn/clean.mp4",
+        "bytes": 157409,
+        "sha256": "35ca7ef92672d26489fb93f9a10d47dc4371fb08be244992803d96a1817c023c"
+      }
+    },
     "de": {
       "clean": {
         "url": "https://midiastory-df6a0.web.app/cdn/maria2/de/clean.mp4",
@@ -37,6 +51,20 @@
         "sha256": "19da8b4d58f13fde34d0f002bfec989bfd7450283965d38f8c47c6f417a8682c"
       }
     },
+    "hi": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/hi/clean.mp4",
+        "bytes": 196918,
+        "sha256": "7dccb081b7db74f76fb67bf52c242b8b9a9b9c3d67ce16f1da88ab65859954b7"
+      }
+    },
+    "id": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/id/clean.mp4",
+        "bytes": 203269,
+        "sha256": "2a33f52c438c8215b199647d5dc9cef6822367fe425aa42694abf9767987c94f"
+      }
+    },
     "it": {
       "clean": {
         "url": "https://midiastory-df6a0.web.app/cdn/maria2/it/clean.mp4",
@@ -49,6 +77,13 @@
         "url": "https://midiastory-df6a0.web.app/cdn/maria2/ja/clean.mp4",
         "bytes": 183623,
         "sha256": "ae3336b6b16ee161f467c0fd275214c7227dc4ccde1298115fdf09eea4e6e8f9"
+      }
+    },
+    "ko": {
+      "clean": {
+        "url": "https://midiastory-df6a0.web.app/cdn/maria2/ko/clean.mp4",
+        "bytes": 187944,
+        "sha256": "3650b1d96a8f749870ae31f041807f2d2a6085776f83059b2b4e9654e0058f98"
       }
     },
     "pt": {
