@@ -72,6 +72,8 @@ import com.rdf112.sweep.R
 import com.rdf112.sweep.data.maria.MariaCdnVideoCache
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.util.Locale
@@ -711,10 +713,10 @@ fun MariaHeroBanner(
         }
     }
 
-    // Background pre-warm of primary CDN neural clips (<= 24 MB local cache)
+    // Background pre-warm of the single shared Maria speech video.
     LaunchedEffect(isActive) {
         if (isActive) {
-            MariaCdnVideoCache.prefetchPrimaryClips(context)
+            MariaCdnVideoCache.prefetchUniversalVisualClip(context)
         }
     }
 
@@ -764,21 +766,26 @@ fun MariaHeroBanner(
         if (isMuted) return@LaunchedEffect
 
         isSpeaking = true
-        val lang = MariaCdnVideoCache.normalizedLang()
-        val clipKey = MariaCdnVideoCache.clipKeyForAudioRes(rawAudioResId)
         var waitSurfaceMs = 0L
         while (surfaceRef == null && waitSurfaceMs < 800L) { delay(40L); waitSurfaceMs += 40L }
         val surface = surfaceRef
         val neuralClipFile: File? = if (videoHardwareSupported && surface != null && surface.isValid) {
             // The startup prefetch also takes the cache mutex. Give the first cold clip time
             // to finish instead of immediately switching to the local audio-only fallback.
-            MariaCdnVideoCache.resolveOrFetchClip(context, lang, clipKey, timeoutMs = 12_000L)
+            MariaCdnVideoCache.resolveUniversalVisualClip(context, timeoutMs = 12_000L)
         } else {
             null
         }
+        var localizedSpeechJob: Job? = null
+        val startLocalizedSpeech = {
+            launch {
+                runCatching {
+                    playLocalizedMariaSpeech(context, rawAudioResId, captionText) { fallbackAudioPlayerRef = it }
+                }
+            }
+        }
 
         if (neuralClipFile != null && surface != null && surface.isValid) {
-            var clipCompleted = false
             var neuralPlaybackFailed = false
             releaseVideoPlayer()
             delay(50L)
@@ -790,21 +797,17 @@ fun MariaHeroBanner(
                     // Keep the descriptor open through prepare; MediaPlayer may defer reading
                     // the private cached file until its decoder is initialized.
                     mp.setDataSource(fis.fd)
-                    mp.isLooping = false
-                    mp.setVolume(1f, 1f)
+                    mp.isLooping = true
+                    mp.setVolume(0f, 0f)
                     mp.setOnInfoListener { _, what, _ ->
                         if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                             videoFrameReady = true
                         }
                         false
                     }
-                    mp.setOnCompletionListener {
-                        clipCompleted = true
-                    }
                     mp.setOnErrorListener { _, what, extra ->
-                        Log.w("MariaVideo", "Neural video error $what/$extra for $lang/$clipKey")
+                        Log.w("MariaVideo", "Universal neural video error $what/$extra")
                         neuralPlaybackFailed = true
-                        clipCompleted = true
                         true
                     }
                     mp.prepare()
@@ -813,12 +816,13 @@ fun MariaHeroBanner(
                 isNeuralVideoSpeaking = true
                 mp
             }.onFailure { error ->
-                Log.w("MariaVideo", "Neural video setup failed for $lang/$clipKey", error)
+                Log.w("MariaVideo", "Universal neural video setup failed", error)
             }.getOrNull()
 
             if (startedNeural != null) {
+                localizedSpeechJob = startLocalizedSpeech()
                 var elapsedMs = 0L
-                while (isSpeaking && !clipCompleted && elapsedMs < 45_000L) {
+                while (isSpeaking && localizedSpeechJob?.isActive == true) {
                     val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
                     // MediaPlayer can report !isPlaying briefly while the first HEVC frame is
                     // being attached to TextureView. Give the surface time to confirm output.
@@ -832,7 +836,7 @@ fun MariaHeroBanner(
                 }
 
                 // A decoder failure (or a clip that never rendered a frame) falls back to
-                // the bundled speech while keeping video support available for later clips.
+                // the idle animation while localized speech continues.
                 isNeuralVideoSpeaking = false
                 isSpeaking = true
                 startIdleLoopOnSurface(surface)
@@ -842,48 +846,10 @@ fun MariaHeroBanner(
             }
         }
 
-        // Safe Offline Fallback: local bundled studio audio (PT-BR) + idle breathing H.265 / editorial portrait
-        if (MariaI18n.isPt()) {
-            val mpInstance = runCatching {
-                val mp = MediaPlayer.create(context, rawAudioResId)
-                if (mp != null) {
-                    fallbackAudioPlayerRef = mp
-                    mp.setOnCompletionListener {
-                        isSpeaking = false
-                        voiceEnergy = 0f
-                        runCatching { it.release() }
-                        if (fallbackAudioPlayerRef === it) fallbackAudioPlayerRef = null
-                    }
-                    mp.setOnErrorListener { player, _, _ ->
-                        isSpeaking = false
-                        voiceEnergy = 0f
-                        runCatching { player.release() }
-                        if (fallbackAudioPlayerRef === player) fallbackAudioPlayerRef = null
-                        true
-                    }
-                    mp.start()
-                    mp
-                } else {
-                    null
-                }
-            }.getOrNull()
-
-            if (mpInstance != null) {
-                var elapsedMs = 0L
-                while (isSpeaking && elapsedMs < 40_000L) {
-                    val stillPlaying = runCatching { mpInstance.isPlaying }.getOrDefault(false)
-                    if (!stillPlaying && elapsedMs > 500L) break
-                    delay(120L)
-                    elapsedMs += 120L
-                }
-                if (isSpeaking) stopSpeechAndReturnToIdle()
-                return@LaunchedEffect
-            }
-        }
-
-        delay(3200L)
-        isSpeaking = false
-        voiceEnergy = 0f
+        if (localizedSpeechJob == null) localizedSpeechJob = startLocalizedSpeech()
+        localizedSpeechJob?.join()
+        fallbackAudioPlayerRef = null
+        stopSpeechAndReturnToIdle()
     }
 
     // 60 FPS VSYNC: sincronia do anel/onda sonora + fallback editorial quando necessário

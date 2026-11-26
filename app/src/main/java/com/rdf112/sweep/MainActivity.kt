@@ -1840,6 +1840,7 @@ class MainActivity : AppCompatActivity() {
             "id" to "Bahasa Indonesia",
             "bn" to "বাংলা",
             "ko" to "한국어",
+            "it" to "Italiano",
         )
         val currentTags = AppCompatDelegate.getApplicationLocales().toLanguageTags()
         val currentIndex = if (currentTags.isBlank()) {

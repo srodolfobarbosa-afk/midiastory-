@@ -32,6 +32,8 @@ object MariaCdnVideoCache {
     private const val MANIFEST_URL = "$CDN_BASE_URL/manifest.json"
     private const val CACHE_FOLDER = "maria2_cdn_cache"
     private const val MANIFEST_CACHE_FILE = "manifest_v291.json"
+    private const val UNIVERSAL_VISUAL_LANG = "pt"
+    private const val UNIVERSAL_VISUAL_CLIP = "clean"
     private const val MANIFEST_TTL_MS = 20L * 60L * 1000L // 20 minutes
     private const val MAX_CACHE_BYTES = 24L * 1024L * 1024L // 24 MB cap
     private const val CONNECT_TIMEOUT_MS = 3500
@@ -57,18 +59,6 @@ object MariaCdnVideoCache {
             "pt", "en", "es", "de", "fr", "hi", "ja", "zh", "ar", "ru", "bn", "ko", "it" -> raw
             else -> "en"
         }
-    }
-
-    fun clipKeyForAudioRes(@RawRes rawAudioResId: Int): String = when (rawAudioResId) {
-        R.raw.maria_clean -> "clean"
-        R.raw.maria_files -> "files"
-        R.raw.maria_pro -> "pro"
-        R.raw.maria_dup -> "dup"
-        R.raw.maria_videos -> "videos"
-        R.raw.maria_whatsapp -> "whatsapp"
-        R.raw.maria_screenshots -> "screenshots"
-        R.raw.maria_nano -> "nano"
-        else -> "clean"
     }
 
     /** Fast non-blocking check if a valid neural MP4 clip is already on disk. */
@@ -105,23 +95,24 @@ object MariaCdnVideoCache {
         }
     }
 
+    /** One shared visual animation for Maria speech in every tab and app locale. */
+    suspend fun resolveUniversalVisualClip(context: Context, timeoutMs: Long = 12_000L): File? =
+        resolveOrFetchClip(context, UNIVERSAL_VISUAL_LANG, UNIVERSAL_VISUAL_CLIP, timeoutMs)
+
     /**
-     * Pre-warms the primary tab clips (`clean`, `files`, `pro`) in background I/O for the user's
-     * active language so tapping Maria plays with 0ms network latency.
+     * Pre-warms the single shared Maria speech animation, independent of the app locale.
      */
-    suspend fun prefetchPrimaryClips(context: Context, lang: String = normalizedLang()) = withContext(Dispatchers.IO) {
-        runCatching {
-            val manifest = loadManifest(context) ?: return@withContext
-            val langClips = manifest[lang] ?: return@withContext
-            for (priorityKey in listOf("clean", "files", "pro")) {
-                val meta = langClips[priorityKey] ?: continue
-                if (peekCachedClip(context, lang, priorityKey) != null) continue
-                downloadMutex.withLock {
-                    if (peekCachedClip(context, lang, priorityKey) == null) {
-                        downloadAndVerifyClip(context, lang, priorityKey, meta)
-                    }
-                }
-            }
+    suspend fun prefetchUniversalVisualClip(context: Context) = withContext(Dispatchers.IO) {
+        pruneUnusedCachedVideos(context)
+        runCatching { resolveUniversalVisualClip(context) }
+    }
+
+    private fun pruneUnusedCachedVideos(context: Context) {
+        val universalName = "${UNIVERSAL_VISUAL_LANG}_${UNIVERSAL_VISUAL_CLIP}_v291.mp4"
+        cacheDir(context).listFiles()?.forEach { file ->
+            val isUnusedVideo = file.isFile && file.extension.equals("mp4", ignoreCase = true) && file.name != universalName
+            val isAbandonedDownload = file.isFile && file.name.endsWith(".part", ignoreCase = true)
+            if (isUnusedVideo || isAbandonedDownload) file.delete()
         }
     }
 
