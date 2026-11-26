@@ -3,6 +3,7 @@ package com.rdf112.sweep.presentation.ui
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import android.os.Environment
 import android.os.StatFs
@@ -783,28 +784,33 @@ fun MariaHeroBanner(
                 videoPlayerRef = mp
                 mp.setSurface(surface)
                 FileInputStream(neuralClipFile).use { fis ->
+                    // Keep the descriptor open through prepare; MediaPlayer may defer reading
+                    // the private cached file until its decoder is initialized.
                     mp.setDataSource(fis.fd)
-                }
-                mp.isLooping = false
-                mp.setVolume(1f, 1f)
-                mp.setOnInfoListener { _, what, _ ->
-                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-                        videoFrameReady = true
+                    mp.isLooping = false
+                    mp.setVolume(1f, 1f)
+                    mp.setOnInfoListener { _, what, _ ->
+                        if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                            videoFrameReady = true
+                        }
+                        false
                     }
-                    false
+                    mp.setOnCompletionListener {
+                        clipCompleted = true
+                    }
+                    mp.setOnErrorListener { _, what, extra ->
+                        Log.w("MariaVideo", "Neural video error $what/$extra for $lang/$clipKey")
+                        neuralPlaybackFailed = true
+                        clipCompleted = true
+                        true
+                    }
+                    mp.prepare()
+                    mp.start()
                 }
-                mp.setOnCompletionListener {
-                    clipCompleted = true
-                }
-                mp.setOnErrorListener { _, _, _ ->
-                    neuralPlaybackFailed = true
-                    clipCompleted = true
-                    true
-                }
-                mp.prepare()
-                mp.start()
                 isNeuralVideoSpeaking = true
                 mp
+            }.onFailure { error ->
+                Log.w("MariaVideo", "Neural video setup failed for $lang/$clipKey", error)
             }.getOrNull()
 
             if (startedNeural != null) {
