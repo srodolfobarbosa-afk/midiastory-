@@ -649,14 +649,16 @@ fun MariaHeroBanner(
     }
 
     fun releaseVideoPlayer() {
-        runCatching {
-            videoPlayerRef?.let { mp ->
-                if (mp.isPlaying) mp.stop()
-                mp.release()
-            }
-        }
+        val mp = videoPlayerRef
         videoPlayerRef = null
         videoFrameReady = false
+        runCatching {
+            mp?.setOnErrorListener(null)
+            mp?.setOnPreparedListener(null)
+            mp?.setOnCompletionListener(null)
+            if (mp?.isPlaying == true) mp.stop()
+            mp?.release()
+        }
     }
 
     fun startIdleLoopOnSurface(surface: Surface?) {
@@ -683,7 +685,7 @@ fun MariaHeroBanner(
                 }
             }
             mp.setOnErrorListener { failedMp, _, _ ->
-                videoHardwareSupported = false
+                videoFrameReady = false
                 videoFrameReady = false
                 runCatching { failedMp.release() }
                 if (videoPlayerRef === failedMp) videoPlayerRef = null
@@ -691,7 +693,7 @@ fun MariaHeroBanner(
             }
             mp.prepareAsync()
         }.onFailure {
-            videoHardwareSupported = false
+            videoFrameReady = false
             videoFrameReady = false
         }
     }
@@ -806,6 +808,7 @@ fun MariaHeroBanner(
             if (startedNeural != null) {
                 var elapsedMs = 0L
                 while (isSpeaking && !clipCompleted && elapsedMs < 45_000L) {
+                    if (!videoFrameReady && elapsedMs >= 90L) videoFrameReady = true
                     val playing = runCatching { startedNeural.isPlaying }.getOrDefault(false)
                     if (!playing && elapsedMs > 650L) break
                     delay(90L)
