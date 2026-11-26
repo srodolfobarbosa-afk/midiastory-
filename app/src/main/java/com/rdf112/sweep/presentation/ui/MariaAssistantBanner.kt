@@ -69,13 +69,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rdf112.sweep.R
-import com.rdf112.sweep.data.maria.MariaCdnVideoCache
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileInputStream
 import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -102,6 +99,12 @@ private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
 object MariaI18n {
     fun lang(): String = (AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()).language.lowercase(Locale.ROOT)
     fun isPt(): Boolean = lang().startsWith("pt")
+    fun localizedSpeechLine(tabKey: String): String = when (tabKey.lowercase(Locale.ROOT)) {
+        "clean" -> homeDefaultGreeting(null)
+        "files" -> filesDefaultGreeting()
+        "pro" -> proDefaultGreeting()
+        else -> assistantBadge()
+    }
 
     fun assistantBadge(): String = when (lang()) {
         "pt" -> "MARIA • ASSISTENTE IA"
@@ -188,6 +191,16 @@ object MariaI18n {
     }
 
     fun homeDefaultGreeting(recoverableLabel: String?): String = when (lang()) {
+        "it" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Ciao! Sono Maria. Ho trovato $recoverableLabel da liberare in sicurezza."
+        } else {
+            "Ciao! Sono Maria. Ho analizzato il tuo telefono per liberare spazio in sicurezza."
+        }
+        "it" -> if (!recoverableLabel.isNullOrBlank()) {
+            "Ciao! Sono Maria. Ho trovato $recoverableLabel da liberare in sicurezza."
+        } else {
+            "Ciao! Sono Maria. Ho analizzato il tuo telefono per liberare spazio in sicurezza."
+        }
         "pt" -> if (!recoverableLabel.isNullOrBlank()) {
             "Olá! Eu sou a Maria! Encontrei $recoverableLabel prontos para liberar com segurança."
         } else {
@@ -256,6 +269,8 @@ object MariaI18n {
     }
 
     fun filesDefaultGreeting(): String = when (lang()) {
+        "it" -> "Ciao! Foto, video, audio e download sono ordinati dal più grande al più piccolo."
+        "it" -> "Ciao! Foto, video, audio e download sono ordinati dal più grande al più piccolo."
         "pt" -> "Olá! Suas fotos, vídeos, áudios e downloads organizados dos maiores para os menores."
         "es" -> "¡Hola! Tus fotos, videos, audios y descargas ordenados de mayor a menor."
         "fr" -> "Vos photos, vidéos, audios et téléchargements triés par taille."
@@ -272,6 +287,8 @@ object MariaI18n {
     }
 
     fun proDefaultGreeting(): String = when (lang()) {
+        "it" -> "Ciao! Scopri app inutilizzate, foto sfocate e report verificati con il 56% di sconto sul piano annuale!"
+        "it" -> "Ciao! Scopri app inutilizzate, analisi delle foto sfocate e report verificati con il 56% di sconto sul piano annuale!"
         "pt" -> "Olá! Eu sou a Maria! Destrave Apps sem uso (+90d), Fotos Borradas e Relatórios Auditados com 56% OFF no Anual!"
         "es" -> "¡Hola! Soy Maria. ¡Desbloquea Apps sin uso (+90d), Fotos Borrosas e Informes Auditados con 56% OFF anual!"
         "fr" -> "Bonjour ! Débloquez Apps inutilisées (+90j), Photos floues et Rapports audités (-56% sur l'annuel) !"
@@ -634,7 +651,7 @@ fun MariaHeroBanner(
     var wavePhase by remember { mutableFloatStateOf(0f) }
     var breathScale by remember { mutableFloatStateOf(1.01f) }
 
-    // Maria 2.0 Native H.265 Player State (Hardware TextureView + CDN Cache + Offline Safe Fallback)
+    // Maria universal silent H.264 video (embedded resource + hardware TextureView).
     var surfaceRef by remember { mutableStateOf<Surface?>(null) }
     var videoPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
     var fallbackAudioPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
@@ -681,7 +698,7 @@ fun MariaHeroBanner(
             mp.setVolume(0f, 0f)
             mp.setOnInfoListener { _, what, _ ->
                 if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-                    videoFrameReady = true
+                    Log.d("MariaVideo", "Idle video decoder started")
                 }
                 false
             }
@@ -710,13 +727,6 @@ fun MariaHeroBanner(
         voiceEnergy = 0f
         if (wasNeural) {
             startIdleLoopOnSurface(surfaceRef)
-        }
-    }
-
-    // Background pre-warm of the single shared Maria speech video.
-    LaunchedEffect(isActive) {
-        if (isActive) {
-            MariaCdnVideoCache.prefetchUniversalVisualClip(context)
         }
     }
 
@@ -769,23 +779,21 @@ fun MariaHeroBanner(
         var waitSurfaceMs = 0L
         while (surfaceRef == null && waitSurfaceMs < 800L) { delay(40L); waitSurfaceMs += 40L }
         val surface = surfaceRef
-        val neuralClipFile: File? = if (videoHardwareSupported && surface != null && surface.isValid) {
-            // The startup prefetch also takes the cache mutex. Give the first cold clip time
-            // to finish instead of immediately switching to the local audio-only fallback.
-            MariaCdnVideoCache.resolveUniversalVisualClip(context, timeoutMs = 12_000L)
-        } else {
-            null
-        }
+        val canPlayUniversalVisual = videoHardwareSupported && surface != null && surface.isValid
         var localizedSpeechJob: Job? = null
         val startLocalizedSpeech = {
             launch {
                 runCatching {
-                    playLocalizedMariaSpeech(context, rawAudioResId, captionText) { fallbackAudioPlayerRef = it }
+                    playLocalizedMariaSpeech(
+                        context,
+                        rawAudioResId,
+                        MariaI18n.localizedSpeechLine(tabKey),
+                    ) { fallbackAudioPlayerRef = it }
                 }
             }
         }
 
-        if (neuralClipFile != null && surface != null && surface.isValid) {
+        if (canPlayUniversalVisual && surface != null && surface.isValid) {
             var neuralPlaybackFailed = false
             releaseVideoPlayer()
             delay(50L)
@@ -793,15 +801,13 @@ fun MariaHeroBanner(
                 val mp = MediaPlayer()
                 videoPlayerRef = mp
                 mp.setSurface(surface)
-                FileInputStream(neuralClipFile).use { fis ->
-                    // Keep the descriptor open through prepare; MediaPlayer may defer reading
-                    // the private cached file until its decoder is initialized.
-                    mp.setDataSource(fis.fd)
+                context.resources.openRawResourceFd(R.raw.maria_talk_universal).use { afd ->
+                    mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     mp.isLooping = true
                     mp.setVolume(0f, 0f)
                     mp.setOnInfoListener { _, what, _ ->
                         if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-                            videoFrameReady = true
+                            Log.d("MariaVideo", "Universal H.264 decoder started")
                         }
                         false
                     }
@@ -820,6 +826,16 @@ fun MariaHeroBanner(
             }.getOrNull()
 
             if (startedNeural != null) {
+                var frameWaitMs = 0L
+                while (!videoFrameReady && frameWaitMs < 2_000L) {
+                    delay(40L)
+                    frameWaitMs += 40L
+                }
+                if (videoFrameReady) {
+                    Log.i("MariaVideo", "Universal H.264 first frame confirmed by TextureView")
+                } else {
+                    Log.w("MariaVideo", "TextureView did not confirm a frame within 2 seconds")
+                }
                 localizedSpeechJob = startLocalizedSpeech()
                 var elapsedMs = 0L
                 while (isSpeaking && localizedSpeechJob?.isActive == true) {
@@ -971,7 +987,7 @@ fun MariaHeroBanner(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Avatar Maria 2.0 (Vídeo Neural MoDA H.265 em TextureView + Fallback Editorial Zero-Flash)
+            // Universal silent H.264 animation on TextureView + zero-flash portrait fallback.
             Box(
                 modifier = Modifier.size(avatarRingSize),
                 contentAlignment = Alignment.Center,
