@@ -92,7 +92,7 @@ Total: %3$s</string>
     <string name="home_cleanup_no_candidates_partial">Não encontramos candidatos nos arquivos acessíveis. A análise foi parcial.</string>
     <string name="home_cleanup_permission_denied">Acesso à mídia não autorizado. Nenhum arquivo foi alterado.</string>
     <string name="home_cleanup_scan_failed">Não foi possível analisar os arquivos. Tente novamente.</string>
-    <string name="premium_area_button">Pro</string>
+    <string name="premium_area_button">Pró</string>
     <string name="plan_monthly_unavailable">Plano Mensal · carregando preço local na Google Play…</string>
     <string name="plan_annual_unavailable">Plano Anual · carregando preço local na Google Play…</string>
     <string name="plan_lifetime_unavailable">Plano Vitalício · carregando preço local na Google Play…</string>
@@ -160,7 +160,7 @@ Total: %3$s</string>
     <string name="oaas_global_scan_limit">Limite de segurança atingido. O resultado é parcial. Reduza a busca ou tente uma análise mais específica.</string>
     <string name="nav_home">Limpar</string>
     <string name="nav_files">Arquivos</string>
-    <string name="nav_pro">Pro</string>
+    <string name="nav_pro">Pró</string>
     <string name="quick_find_large">Arquivos grandes</string>
     <string name="quick_clean_whatsapp">Limpar WhatsApp</string>
     <string name="storage_used_headline">%1$s usados</string>
@@ -213,10 +213,10 @@ Total: %3$s</string>
     <string name="quick_pro_dialog_subtitle">Escolha seu plano abaixo para iniciar a assinatura oficial via Google Play Store:</string>
     <string name="quick_pro_open_tab_btn">Ver Planos Pro</string>
     <string name="quick_pro_restore_btn">Restaurar Compra</string>
-    <string name="top_pro_active_pill">Pro</string>
+    <string name="top_pro_active_pill">Pró</string>
     <string name="brand_tagline_pro">MIDIASTORE PRO · ATIVO</string>
     <string name="easy_mode_btn_off">Aa+</string>
-    <string name="easy_mode_btn_on">+ ON</string>
+    <string name="easy_mode_btn_on">+ LIGADO</string>
     <string name="family_shield_title">Memórias de Família Protegidas</string>
     <string name="quick_clean_whatsapp_title">WhatsApp</string>
     <string name="quick_clean_whatsapp_desc">Mídias e áudios</string>
@@ -246,7 +246,7 @@ Total: %3$s</string>
     <string name="cleaner_home_fallback_duplicates_title">Duplicatas</string>
     <string name="cleaner_home_fallback_duplicates_sub">SHA-256</string>
     <string name="cleaner_home_fallback_large_videos_title">Vídeos</string>
-    <string name="cleaner_home_fallback_large_videos_sub">&gt; 10 MB</string>
+    <string name="cleaner_home_fallback_large_videos_sub">&gt; 10MB</string>
     <string name="cleaner_home_fallback_whatsapp_title">WhatsApp</string>
     <string name="cleaner_home_fallback_whatsapp_sub">Mídias</string>
     <string name="cleaner_home_fallback_screenshots_title">Capturas</string>

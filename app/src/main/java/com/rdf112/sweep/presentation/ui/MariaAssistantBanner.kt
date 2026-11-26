@@ -1,6 +1,7 @@
 package com.rdf112.sweep.presentation.ui
 
 import android.content.Context
+import android.graphics.Matrix
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.util.Log
@@ -72,21 +73,7 @@ import com.rdf112.sweep.R
 import com.rdf112.sweep.presentation.ui.theme.MidiastoreColors
 import kotlinx.coroutines.delay
 import java.util.Locale
-import kotlin.math.cos
-import kotlin.math.roundToInt
 import kotlin.math.sin
-import kotlin.random.Random
-
-private val MARIA_IDLE_BLINK_SEQUENCE = intArrayOf(
-    R.drawable.maria_blink_0,
-    R.drawable.maria_blink_1,
-    R.drawable.maria_blink_2,
-    R.drawable.maria_blink_2,
-    R.drawable.maria_blink_2,
-    R.drawable.maria_blink_1,
-    R.drawable.maria_blink_0,
-)
-
 private const val PREFS_NAME = "midiastore_prefs"
 private const val KEY_MARIA_MUTED = "maria_voice_muted_v280"
 
@@ -647,17 +634,44 @@ fun MariaHeroBanner(
     var isSpeaking by remember { mutableStateOf(false) }
     var isNeuralVideoSpeaking by remember { mutableStateOf(false) }
     var userPlayTrigger by remember { mutableIntStateOf(1) }
-    var currentFrameRes by remember { mutableIntStateOf(R.drawable.maria_smile) }
     var voiceEnergy by remember { mutableFloatStateOf(0f) }
     var wavePhase by remember { mutableFloatStateOf(0f) }
-    var breathScale by remember { mutableFloatStateOf(1.01f) }
 
     // Maria universal silent H.264 video (embedded resource + hardware TextureView).
     var surfaceRef by remember { mutableStateOf<Surface?>(null) }
     var videoPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
     var fallbackAudioPlayerRef by remember { mutableStateOf<MediaPlayer?>(null) }
     var videoFrameReady by remember { mutableStateOf(false) }
+    var awaitingFreshVideoFrame by remember { mutableStateOf(false) }
+    var decoderStartedForCurrentSpeech by remember { mutableStateOf(false) }
+    var surfaceUpdatedForCurrentSpeech by remember { mutableStateOf(false) }
+    var mariaTextureViewRef by remember { mutableStateOf<TextureView?>(null) }
+    var mariaVideoWidth by remember { mutableIntStateOf(480) }
+    var mariaVideoHeight by remember { mutableIntStateOf(480) }
     var videoHardwareSupported by remember { mutableStateOf(true) }
+
+    fun centerCropTextureView(view: TextureView, width: Int, height: Int, videoWidth: Int, videoHeight: Int) {
+        if (width <= 0 || height <= 0 || videoWidth <= 0 || videoHeight <= 0) return
+        val scale = maxOf(width.toFloat() / videoWidth, height.toFloat() / videoHeight)
+        val dx = (width - videoWidth * scale) / 2f
+        val dy = (height - videoHeight * scale) / 2f
+        val transform = Matrix().apply {
+            setValues(floatArrayOf(scale, 0f, dx, 0f, scale, dy, 0f, 0f, 1f))
+        }
+        view.setTransform(transform)
+    }
+
+    fun confirmFreshVideoFrameIfReady() {
+        val activePlayer = videoPlayerRef ?: return
+        if (
+            awaitingFreshVideoFrame && decoderStartedForCurrentSpeech && surfaceUpdatedForCurrentSpeech &&
+            isSpeaking && isNeuralVideoSpeaking && runCatching { activePlayer.isPlaying }.getOrDefault(false)
+        ) {
+            awaitingFreshVideoFrame = false
+            videoFrameReady = true
+            Log.i("MariaVideo", "Fresh H.264 frame confirmed after current speech start")
+        }
+    }
 
     fun releaseFallbackAudio() {
         runCatching {
@@ -673,8 +687,13 @@ fun MariaHeroBanner(
         val mp = videoPlayerRef
         videoPlayerRef = null
         videoFrameReady = false
+        awaitingFreshVideoFrame = false
+        decoderStartedForCurrentSpeech = false
+        surfaceUpdatedForCurrentSpeech = false
         runCatching {
             mp?.setOnErrorListener(null)
+            mp?.setOnInfoListener(null)
+            mp?.setOnVideoSizeChangedListener(null)
             mp?.setOnPreparedListener(null)
             mp?.setOnCompletionListener(null)
             if (mp?.isPlaying == true) mp.stop()
@@ -745,6 +764,7 @@ fun MariaHeroBanner(
             releaseVideoPlayer()
             delay(50L)
             preparedVideo = runCatching {
+                check(surfaceRef === surface && surface.isValid) { "Maria TextureView surface is no longer valid" }
                 val mp = MediaPlayer()
                 videoPlayerRef = mp
                 mp.setSurface(surface)
@@ -752,17 +772,30 @@ fun MariaHeroBanner(
                     mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     mp.isLooping = true
                     mp.setVolume(0f, 0f)
-                    mp.setOnInfoListener { _, what, _ ->
-                        if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                    mp.setOnInfoListener { callbackPlayer, what, _ ->
+                        if (callbackPlayer === videoPlayerRef && what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
                             Log.d("MariaVideo", "Universal H.264 decoder started")
+                            decoderStartedForCurrentSpeech = true
+                            confirmFreshVideoFrameIfReady()
                         }
                         false
                     }
-                    mp.setOnErrorListener { _, what, extra ->
-                        Log.w("MariaVideo", "Universal neural video error $what/$extra")
-                        isNeuralVideoSpeaking = false
-                        releaseVideoPlayer()
+                    mp.setOnErrorListener { callbackPlayer, what, extra ->
+                        if (callbackPlayer === videoPlayerRef) {
+                            Log.w("MariaVideo", "Universal neural video error $what/$extra")
+                            isNeuralVideoSpeaking = false
+                            releaseVideoPlayer()
+                        }
                         true
+                    }
+                    mp.setOnVideoSizeChangedListener { callbackPlayer, width, height ->
+                        if (callbackPlayer === videoPlayerRef) {
+                            mariaVideoWidth = width
+                            mariaVideoHeight = height
+                            mariaTextureViewRef?.let { view ->
+                                centerCropTextureView(view, view.width, view.height, width, height)
+                            }
+                        }
                     }
                     mp.prepare()
                 }
@@ -780,11 +813,25 @@ fun MariaHeroBanner(
                 onAudioPlayerCreated = { fallbackAudioPlayerRef = it },
                 onAudioStarted = {
                     isSpeaking = true
+                    videoFrameReady = false
+                    awaitingFreshVideoFrame = false
+                    decoderStartedForCurrentSpeech = false
+                    surfaceUpdatedForCurrentSpeech = false
+                    mariaVideoWidth = 480
+                    mariaVideoHeight = 480
+                    isNeuralVideoSpeaking = false
                     val player = preparedVideo
                     if (player != null) {
+                        awaitingFreshVideoFrame = true
                         runCatching { player.start() }
-                            .onSuccess { isNeuralVideoSpeaking = true }
-                            .onFailure { Log.w("MariaVideo", "Could not start prepared universal video", it) }
+                            .onSuccess {
+                                isNeuralVideoSpeaking = true
+                                confirmFreshVideoFrameIfReady()
+                            }
+                            .onFailure {
+                                awaitingFreshVideoFrame = false
+                                Log.w("MariaVideo", "Could not start prepared universal video", it)
+                            }
                     }
                 },
                 onAudioFinished = { stopSpeechAndReturnToIdle(stopTts = false) },
@@ -797,39 +844,16 @@ fun MariaHeroBanner(
     // 60 FPS VSYNC: sincronia do anel/onda sonora + fallback editorial quando necessário
     LaunchedEffect(isActive, rawAudioResId) {
         if (!isActive) {
-            currentFrameRes = R.drawable.maria_smile
             voiceEnergy = 0f
             return@LaunchedEffect
         }
         val visemeTrack = MariaLipSyncEnvelopes.trackForAudioRes(rawAudioResId)
-        var blinkTimerMs = -1L
-        var nextBlinkAtMs = System.currentTimeMillis() + 2600L
         var lastFrameNs = 0L
 
         while (true) {
             withFrameNanos { frameNs ->
                 val dtMs = if (lastFrameNs == 0L) 16.67f else ((frameNs - lastFrameNs) / 1_000_000f).coerceIn(1f, 50f)
                 lastFrameNs = frameNs
-                val now = System.currentTimeMillis()
-                breathScale = 1.015f + (sin(now / 900.0).toFloat() * 0.012f)
-
-                if (now >= nextBlinkAtMs && blinkTimerMs < 0L) {
-                    blinkTimerMs = 0L
-                    nextBlinkAtMs = now + Random.nextLong(2800L, 4800L)
-                }
-
-                if (blinkTimerMs >= 0L) {
-                    val stepIdx = (blinkTimerMs / 34L).toInt()
-                    blinkTimerMs += dtMs.roundToInt().toLong()
-                    if (stepIdx < MARIA_IDLE_BLINK_SEQUENCE.size) {
-                        currentFrameRes = MARIA_IDLE_BLINK_SEQUENCE[stepIdx]
-                    } else {
-                        blinkTimerMs = -1L
-                        currentFrameRes = R.drawable.maria_smile
-                    }
-                } else {
-                    currentFrameRes = R.drawable.maria_smile
-                }
 
                 if (isSpeaking) {
                     wavePhase += dtMs * 0.013f
@@ -913,7 +937,7 @@ fun MariaHeroBanner(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Universal silent H.264 animation on TextureView + zero-flash portrait fallback.
+            // Keep the still portrait underneath; only expose fresh decoded video while speaking.
             Box(
                 modifier = Modifier.size(avatarRingSize),
                 contentAlignment = Alignment.Center,
@@ -945,11 +969,20 @@ fun MariaHeroBanner(
                         .background(Color(0xFF050507)),
                     contentAlignment = Alignment.Center,
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.maria_smile),
+                        contentDescription = "Maria",
+                        contentScale = ContentScale.Crop,
+                        alignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize(),
+                    )
                     if (videoHardwareSupported) {
                         AndroidView(
                             factory = { ctx ->
                                 TextureView(ctx).apply {
+                                    mariaTextureViewRef = this
                                     isOpaque = false
+                                    centerCropTextureView(this, width, height, 480, 480)
                                     surfaceTextureListener = object : TextureView.SurfaceTextureListener {
                                         override fun onSurfaceTextureAvailable(
                                             st: SurfaceTexture,
@@ -958,44 +991,54 @@ fun MariaHeroBanner(
                                         ) {
                                             runCatching { surfaceRef?.release() }
                                             surfaceRef = Surface(st)
+                                            centerCropTextureView(
+                                                this@apply,
+                                                width,
+                                                height,
+                                                mariaVideoWidth,
+                                                mariaVideoHeight,
+                                            )
                                         }
 
                                         override fun onSurfaceTextureSizeChanged(
                                             st: SurfaceTexture,
                                             width: Int,
                                             height: Int,
-                                        ) = Unit
+                                        ) {
+                                            centerCropTextureView(
+                                                mariaTextureViewRef ?: return,
+                                                width,
+                                                height,
+                                                mariaVideoWidth,
+                                                mariaVideoHeight,
+                                            )
+                                        }
 
                                         override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
                                             releaseVideoPlayer()
                                             runCatching { surfaceRef?.release() }
                                             surfaceRef = null
                                             videoFrameReady = false
+                                            awaitingFreshVideoFrame = false
+                                            decoderStartedForCurrentSpeech = false
+                                            surfaceUpdatedForCurrentSpeech = false
+                                            mariaTextureViewRef = null
                                             return true
                                         }
 
                                         override fun onSurfaceTextureUpdated(st: SurfaceTexture) {
-                                            // This is the reliable proof that a decoded video frame
-                                            // reached the visible surface on this device.
-                                            videoFrameReady = true
+                                            if (awaitingFreshVideoFrame) {
+                                                surfaceUpdatedForCurrentSpeech = true
+                                                confirmFreshVideoFrameIfReady()
+                                            }
                                         }
                                     }
                                 }
                             },
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-                    if (!videoFrameReady || !videoHardwareSupported) {
-                        Image(
-                            painter = painterResource(id = currentFrameRes),
-                            contentDescription = "Maria",
-                            contentScale = ContentScale.Crop,
-                            alignment = Alignment.TopCenter,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .graphicsLayer {
-                                    scaleX = breathScale
-                                    scaleY = breathScale
+                                    alpha = if (isSpeaking && isNeuralVideoSpeaking && videoFrameReady) 1f else 0f
                                 },
                         )
                     }

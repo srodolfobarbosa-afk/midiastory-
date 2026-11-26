@@ -79,6 +79,7 @@ const resValuesFolders = [
   "values-in",
   "values-bn",
   "values-ko",
+  "values-it",
 ];
 const extractKeys = (xml) => [...xml.matchAll(/<string\s+name="([^"]+)"/g)].map((m) => m[1]);
 const baseStringsRaw = fs.readFileSync(

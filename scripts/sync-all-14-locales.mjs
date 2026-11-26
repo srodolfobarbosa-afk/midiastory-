@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * sync-all-14-locales.mjs
- * Garante 100% de cobertura (630/630 chaves) nos 14 diretórios res/values* do app Android,
+ * Garante 100% de cobertura nos 14 idiomas Android (mais values/ fallback),
  * incluindo as traduções nativas de cleaner_home_analyze ("Limpar Meu Espaço Agora"),
  * cleanup_sheet_title, filter_screenshots_30d e o Card de Psicologia de Vendas (sales_psych_*).
  */
@@ -168,6 +168,20 @@ const NATIVE_OVERRIDES = {
     trash_unsupported_on_device: "시스템 휴지통은 Android 11 이상에서 지원됩니다.",
     oaas_mission_screenshots: "오래된 스크린샷 정리 (+30일)",
     quick_clean_title: "빠른 정리",
+  },
+  "values-it": {
+    cleaner_home_analyze: "Pulisci subito la memoria",
+    cleaner_home_scanning: "Preparazione della pulizia rapida…",
+    sales_psych_badge: "MODALITÀ PRO • RISPARMIA IL 56% CON L’ANNUALE",
+    sales_psych_title: "Libera spazio dalle app inutilizzate (90+ giorni) e sblocca i report Pro",
+    sales_psych_subtitle: "Meno di 0,05 $/giorno con il piano annuale • Protezione ufficiale Google Play (annulla quando vuoi).",
+    sales_psych_cta: "Sblocca subito la modalità Pro",
+    cleanup_sheet_title: "Controlla e pulisci",
+    wa_sheet_subtitle: "Seleziona le categorie WhatsApp da controllare prima di spostarle nel cestino o eliminarle.",
+    filter_screenshots_30d: "Screenshot meno recenti (+30 giorni)",
+    trash_unsupported_on_device: "Il cestino di sistema richiede Android 11+; su questo dispositivo usa l’eliminazione definitiva.",
+    oaas_mission_screenshots: "Pulisci gli screenshot meno recenti (+30 giorni)",
+    quick_clean_title: "Pulizia rapida",
   },
   "values-en": {
     cleaner_home_analyze: "Clean My Storage Now",
