@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -327,7 +327,7 @@
         Array.from(dotsEl.children).forEach((d, i) => d.classList.toggle('active', i === index));
       }
 
-      function start() { timer = setInterval(() => go(index + 1), 5000); }
+      function start() { timer = setInterval(() => go(index + 1), 9000); }
       function stop() { clearInterval(timer); }
 
       document.getElementById('prevBtn').onclick = () => { stop(); go(index - 1); start(); };
@@ -339,3 +339,4 @@
   </script>
 </body>
 </html>
+
