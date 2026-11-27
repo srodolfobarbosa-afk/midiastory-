@@ -17,3 +17,4 @@ User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://midiastory-df6a0.web.app/sitemap.xml
+Sitemap: https://midiastory-df6a0.web.app/image-sitemap.xml
