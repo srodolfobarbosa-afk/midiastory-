@@ -3538,3 +3538,23 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #580
 
 ---
+
+### 📍 [26/11/2026, 11:00:14] Upload oficial do AAB Midiastore v2.9.0 vc35 na faixa alpha
+- **📖 Estudou / Leu:** Estado da Android Publisher API, scripts Play Console, release atual, painel Supabase de testadores e relogio de teste fechado
+- **⚙️ Tentou / Executou:** Validado AAB 6912480 bytes SHA256 D8AF42030D612072713310DAEAA5C0F74D6DB47605B8F655639DB77D052ADAF8; criado edit transacional; enviado bundle vc35; atualizado somente alpha com release notes pt-BR/en-US; consultados tracks e bundles apos commit
+- **⚠️ Erros Encontrados:** Nenhum erro no upload; endpoint de testadores alpha retornou recurso vazio, sem escrita nas listas
+- **🔧 Como Corrigiu:** Nao aplicavel
+- **🎯 Conclusão:** Play confirmou alpha 2.9.0 (35) completed; internal segue 2.8.0 (32); production e beta vazias; 23 testadores oficiais e dia 14/14 preservados; sem Gradle local; tag baseline inalterada
+- *Registro Supabase:* Memory #581
+
+---
+
+### 📍 [27/11/2026, 03:29:44] Marco Fase 1 SEO e Criativos Prime v2.9.0
+- **📖 Estudou / Leu:** AGENTS.md, docs/INDICE_MESTRE.md, estado 360°, docs/ site atual, hreflangs, schema, sitemap e projeto Firebase
+- **⚙️ Tentou / Executou:** Criados marketing/criativos-v2.9.0/README.md e três guias PT-BR em public/ e docs/; harmonizados os 14 hreflangs + x-default; schema MobileApplication sem aggregateRating; atualizados robots.txt/sitemap.xml; deploy Hosting e HTTP 200 validado nas páginas, sitemap, robots e /it/
+- **⚠️ Erros Encontrados:** Firebase CLI rejeitou inicialmente config em .tmp por public fora do diretório do projeto; API de serviceusage exibiu aviso de permissão, mas deploy seguiu com sucesso
+- **🔧 Como Corrigiu:** Usada configuração temporária na raiz com Hosting public=docs, mantendo todas as 474 páginas/arquivos do site; removidos arquivos temporários após validação
+- **🎯 Conclusão:** Deploy Firebase concluído; páginas/guias e recursos SEO respondem HTTP 200; app/ sem alterações e Gradle não executado
+- *Registro Supabase:* Memory #582
+
+---

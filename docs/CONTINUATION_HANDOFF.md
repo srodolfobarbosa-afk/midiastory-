@@ -1,4 +1,24 @@
-﻿# Midiastore â€” CONTINUIDADE DO PROJETO
+## Checkpoint 2026-11-27 — Fase 1 SEO e Criativos Prime v2.9.0
+
+- Site hospedado atualizado em `docs/` (raiz efetiva do Firebase Hosting) e espelhado em `public/`; publicação Hosting concluída para `midiastory-df6a0`.
+- Home e 13 páginas localizadas apontam para o conjunto recíproco exato `pt-BR`, `en`, `es`, `fr`, `de`, `it`, `hi`, `ja`, `zh-Hans`, `ar`, `ru`, `id`, `bn`, `ko` e `x-default`; `/it/` foi criado.
+- Home usa JSON-LD `MobileApplication` / `UtilitiesApplication`, preço `0` e nenhum `aggregateRating`. `robots.txt`, sitemap com 143 URLs HTTPS e três guias PT-BR com CTA oficial foram publicados.
+- HTTP 200 validado em `/limpar-armazenamento-android.html`, `/apagar-fotos-duplicadas-android.html`, `/comprimir-videos-android.html`, `/sitemap.xml`, `/robots.txt` e `/it/`.
+- Criativos Prime v2.9.0: README registra dimensões 1200×628, 1200×1200, 1200×1500 e 1080×1920 e exige preservação de nitidez da tela original.
+- Memória Supabase #582. `app/` sem diff nesta tarefa; Gradle não executado.
+
+---
+
+## Checkpoint verificado - 2026-11-26 (AAB v2.9.0 enviado para alpha)
+
+- Upload oficial pela Android Publisher API concluido para com.rdf112.midiastore na faixa alpha. Release 2.9.0 (35), versionCode 35, status completed, com notas pt-BR e en-US.
+- Faixas apos o commit: alpha=35; internal permanece em 2.8.0 (32); production e beta vazias. Nenhuma escrita nas listas de testadores. Painel Supabase: 23 testadores oficiais, dia 14/14.
+- AAB: 6.912.480 bytes; SHA-256 D8AF42030D612072713310DAEAA5C0F74D6DB47605B8F655639DB77D052ADAF8. Sem Gradle local. Tag v2.8.2-carbon-baseline preservada em cd0a6612fd4038eeb3d2ffb1db6f85fbd73954b4. Sem publicacao em producao.
+- Memoria Supabase #581; linha do tempo autonoma atualizada.
+
+---
+
+# Midiastore â€” CONTINUIDADE DO PROJETO
 > ðŸ§­ **NavegaÃ§Ã£o Central:** [**`docs/INDICE_MESTRE.md`**](INDICE_MESTRE.md) | **Checklist ProduÃ§Ã£o (`26/11`):** [**`docs/CHECKLIST_PRODUCAO_VIVA.md`**](CHECKLIST_PRODUCAO_VIVA.md) | **Roadmap `v2.9.0` & Maria 2.0:** [**`docs/CHECKLIST_EVOLUCAO_CARBON.md`**](CHECKLIST_EVOLUCAO_CARBON.md) | **HistÃ³rico Arquivado:** [`docs/archive/`](archive/README.md)
 
 ## Checkpoint verificado â€” 2026-11-26 (sincronia fala/vÃ­deo Maria)
