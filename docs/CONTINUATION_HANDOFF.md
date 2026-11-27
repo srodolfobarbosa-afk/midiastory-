@@ -1,11 +1,11 @@
 ## Checkpoint 2026-11-27 — Fase 1 SEO e Criativos Prime v2.9.0
 
-- Site hospedado atualizado em `docs/` (raiz efetiva do Firebase Hosting) e espelhado em `public/`; publicação Hosting concluída para `midiastory-df6a0`.
+- Hosting efetivo usa `docs/` como raiz e os arquivos SEO também estão em `public/`; publicação final incluiu 161 arquivos do site e excluiu `docs/archive/`, Markdown interno e diretórios operacionais.
 - Home e 13 páginas localizadas apontam para o conjunto recíproco exato `pt-BR`, `en`, `es`, `fr`, `de`, `it`, `hi`, `ja`, `zh-Hans`, `ar`, `ru`, `id`, `bn`, `ko` e `x-default`; `/it/` foi criado.
 - Home usa JSON-LD `MobileApplication` / `UtilitiesApplication`, preço `0` e nenhum `aggregateRating`. `robots.txt`, sitemap com 143 URLs HTTPS e três guias PT-BR com CTA oficial foram publicados.
 - HTTP 200 validado em `/limpar-armazenamento-android.html`, `/apagar-fotos-duplicadas-android.html`, `/comprimir-videos-android.html`, `/sitemap.xml`, `/robots.txt` e `/it/`.
 - Criativos Prime v2.9.0: README registra dimensões 1200×628, 1200×1200, 1200×1500 e 1080×1920 e exige preservação de nitidez da tela original.
-- Memória Supabase #582. `app/` sem diff nesta tarefa; Gradle não executado.
+- Memórias Supabase #582 (marco) e #583 (ajuste de escopo do Hosting). `app/` sem diff nesta tarefa; Gradle não executado.
 
 ---
 

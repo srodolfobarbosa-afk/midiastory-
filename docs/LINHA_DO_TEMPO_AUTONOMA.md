@@ -3551,10 +3551,20 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 
 ### 📍 [27/11/2026, 03:29:44] Marco Fase 1 SEO e Criativos Prime v2.9.0
 - **📖 Estudou / Leu:** AGENTS.md, docs/INDICE_MESTRE.md, estado 360°, docs/ site atual, hreflangs, schema, sitemap e projeto Firebase
-- **⚙️ Tentou / Executou:** Criados marketing/criativos-v2.9.0/README.md e três guias PT-BR em public/ e docs/; harmonizados os 14 hreflangs + x-default; schema MobileApplication sem aggregateRating; atualizados robots.txt/sitemap.xml; deploy Hosting e HTTP 200 validado nas páginas, sitemap, robots e /it/
+- **⚙️ Tentou / Executou:** Criados marketing/criativos-v2.9.0/README.md e três guias PT-BR em public/ e docs/; harmonizados os 14 hreflangs + x-default; schema MobileApplication sem aggregateRating; atualizados robots.txt/sitemap.xml; deploy Hosting e HTTP 200 validado nas páginas, sitemap, robots e /it/; exclusão de docs/archive/ e Markdown interno do deploy final
 - **⚠️ Erros Encontrados:** Firebase CLI rejeitou inicialmente config em .tmp por public fora do diretório do projeto; API de serviceusage exibiu aviso de permissão, mas deploy seguiu com sucesso
-- **🔧 Como Corrigiu:** Usada configuração temporária na raiz com Hosting public=docs, mantendo todas as 474 páginas/arquivos do site; removidos arquivos temporários após validação
+- **🔧 Como Corrigiu:** Usada configuração temporária na raiz com Hosting public=docs e exclusões para docs/archive/, arquivos Markdown internos e diretórios operacionais; versão final incluiu 161 arquivos e rotas internas verificadas retornaram 404
 - **🎯 Conclusão:** Deploy Firebase concluído; páginas/guias e recursos SEO respondem HTTP 200; app/ sem alterações e Gradle não executado
 - *Registro Supabase:* Memory #582
+
+---
+
+### 📍 [27/11/2026, 03:42:29] Ajuste do escopo do Firebase Hosting na Fase 1 SEO v2.9.0
+- **📖 Estudou / Leu:** docs/INDICE_MESTRE.md, regra de exclusão docs/archive, conteúdo servido após o deploy e configuração Firebase Hosting
+- **⚙️ Tentou / Executou:** Inspecionadas rotas públicas e arquivos internos; refeito deploy com exclusão de docs/archive, Markdown interno e pastas audits, aso, campaigns, datasets, knowledge, mockups e research; validados os 3 guias, sitemap, robots, hreflangs, schema, handoff e arquivo histórico
+- **⚠️ Erros Encontrados:** Primeiro deploy usando docs como raiz publicou 474 arquivos e tornou Markdown/histórico acessíveis
+- **🔧 Como Corrigiu:** Deploy final incluiu 161 arquivos; /archive/README.md, /CONTINUATION_HANDOFF.md e /MOTOR_CRESCIMENTO_META.md agora respondem 404; páginas públicas pedidas continuam HTTP 200
+- **🎯 Conclusão:** Hosting final preserva o site e exclui arquivo histórico e documentação operacional; registros corrigidos no handoff e linha do tempo; app/ intacta
+- *Registro Supabase:* Memory #583
 
 ---
