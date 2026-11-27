@@ -1,8 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="TZ7C84zj0IM2kssn00VSnuVDcfDTk7OoXfCh9dQWxhU">
   <title>Midiastore — Celular travando? Libere espaço em 2 toques</title>
   <meta name="description" content="Telefone pesado ou memória cheia no Android? Libere espaço em 2 toques com o Midiastore. Rápido, fácil e grátis na Google Play.">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -76,14 +77,7 @@
       },
       {
         "@type": "ImageObject",
-        "contentUrl": "https://midiastory-df6a0.web.app/assets/prime/midiastore-carrossel-02-comprimir-videos-16x9.png",
-        "creator": { "@type": "Organization", "name": "Midiastore" },
-        "creditText": "Midiastore",
-        "copyrightNotice": "Midiastore"
-      },
-      {
-        "@type": "ImageObject",
-        "contentUrl": "https://midiastory-df6a0.web.app/assets/prime/midiastore-carrossel-03-telefone-pesado-16x9.png",
+        "contentUrl": "https://midiastory-df6a0.web.app/assets/prime/midiastore-app-android-telefone-pesado-4x5.png",
         "creator": { "@type": "Organization", "name": "Midiastore" },
         "creditText": "Midiastore",
         "copyrightNotice": "Midiastore"
@@ -160,53 +154,18 @@
     .btn-prime:hover { transform: translateY(-1px); box-shadow: 0 16px 40px rgba(30, 136, 229, 0.52); }
     .btn-sm { padding: 9px 18px; font-size: 13px; }
 
-    main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 28px 0 36px; }
+    main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 26px 0 36px; }
 
-    .carousel-shell {
-      position: relative;
+    .hero-static {
       border-radius: 26px;
       overflow: hidden;
       border: 1px solid var(--border);
       background: #080C12;
       box-shadow: 0 30px 90px rgba(0, 0, 0, 0.72), 0 0 70px rgba(30, 136, 229, 0.14);
-      aspect-ratio: 16 / 9;
-      max-height: 600px;
-      margin: 0 auto;
       width: 100%;
+      margin: 0 auto;
     }
-    .slides {
-      display: flex;
-      width: 100%; height: 100%;
-      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .slide { min-width: 100%; height: 100%; }
-    .slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .nav-btn {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(5, 7, 10, 0.48);
-      backdrop-filter: blur(8px);
-      color: #FFFFFF; font-size: 22px; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s ease, transform 0.15s ease;
-    }
-    .nav-btn:hover { background: rgba(30, 136, 229, 0.85); transform: translateY(-50%) scale(1.06); }
-    .nav-btn.prev { left: 16px; }
-    .nav-btn.next { right: 16px; }
-
-    .dots {
-      position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
-      display: flex; gap: 8px; padding: 6px 12px; border-radius: 999px;
-      background: rgba(5, 7, 10, 0.48); backdrop-filter: blur(8px);
-    }
-    .dot {
-      width: 8px; height: 8px; border-radius: 999px; border: 0;
-      background: rgba(255,255,255,0.38); cursor: pointer;
-      transition: width 0.25s ease, background 0.25s ease;
-    }
-    .dot.active { width: 24px; background: #29B6F6; }
+    .hero-static img { width: 100%; height: auto; display: block; }
 
     .hero-cta {
       margin-top: 26px; text-align: center;
@@ -225,7 +184,8 @@
 
     @media (max-width: 680px) {
       .nav-actions .btn-sm { display: none; }
-      .nav-btn { width: 36px; height: 36px; font-size: 18px; }
+      main.wrap { padding: 14px 12px 28px; }
+      .hero-static { border-radius: 20px; }
     }
   </style>
 </head>
@@ -265,22 +225,11 @@
   </header>
 
   <main class="wrap">
-    <section class="carousel-shell" id="carousel" aria-label="Destaques Midiastore">
-      <div class="slides" id="slides">
-        <div class="slide">
-          <img src="https://midiastory-df6a0.web.app/assets/prime/midiastore-app-android-limpar-celular-16x9.png" alt="Midiastore app Android com Maria — Celular travando? Libere espaço em 2 toques">
-        </div>
-        <div class="slide">
-          <img src="https://midiastory-df6a0.web.app/assets/prime/midiastore-carrossel-02-comprimir-videos-16x9.png" alt="Midiastore app Android com Maria — Memória cheia? Comprima vídeos sem apagar">
-        </div>
-        <div class="slide">
-          <img src="https://midiastory-df6a0.web.app/assets/prime/midiastore-carrossel-03-telefone-pesado-16x9.png" alt="Midiastore app Android com Maria — Telefone pesado? Limpe fotos e WhatsApp já">
-        </div>
-      </div>
-
-      <button class="nav-btn prev" id="prevBtn" aria-label="Anterior">&#8249;</button>
-      <button class="nav-btn next" id="nextBtn" aria-label="Próximo">&#8250;</button>
-      <div class="dots" id="dots" role="tablist" aria-label="Slides"></div>
+    <section class="hero-static" aria-label="Destaque Midiastore">
+      <picture>
+        <source media="(max-width: 680px)" srcset="https://midiastory-df6a0.web.app/assets/prime/midiastore-app-android-telefone-pesado-4x5.png">
+        <img src="https://midiastory-df6a0.web.app/assets/prime/midiastore-app-android-limpar-celular-16x9.png" alt="Midiastore app Android com Maria — Celular travando? Libere espaço em 2 toques">
+      </picture>
     </section>
 
     <div class="hero-cta">
@@ -303,40 +252,5 @@
       </div>
     </div>
   </footer>
-
-  <script>
-    (function () {
-      const track = document.getElementById('slides');
-      const total = track.children.length;
-      const dotsEl = document.getElementById('dots');
-      const shell = document.getElementById('carousel');
-      let index = 0;
-      let timer;
-
-      for (let i = 0; i < total; i++) {
-        const b = document.createElement('button');
-        b.className = 'dot' + (i === 0 ? ' active' : '');
-        b.setAttribute('aria-label', 'Slide ' + (i + 1));
-        b.onclick = () => go(i);
-        dotsEl.appendChild(b);
-      }
-
-      function go(n) {
-        index = (n + total) % total;
-        track.style.transform = 'translateX(-' + (index * 100) + '%)';
-        Array.from(dotsEl.children).forEach((d, i) => d.classList.toggle('active', i === index));
-      }
-
-      function start() { timer = setInterval(() => go(index + 1), 9000); }
-      function stop() { clearInterval(timer); }
-
-      document.getElementById('prevBtn').onclick = () => { stop(); go(index - 1); start(); };
-      document.getElementById('nextBtn').onclick = () => { stop(); go(index + 1); start(); };
-      shell.addEventListener('mouseenter', stop);
-      shell.addEventListener('mouseleave', start);
-      start();
-    })();
-  </script>
 </body>
 </html>
-
