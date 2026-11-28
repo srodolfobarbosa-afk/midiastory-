@@ -38,17 +38,17 @@ object ShareAchievementCardRenderer {
     private const val SHARE_SUBDIR = "share_cards"
     private const val SHARE_FILENAME = "midiastore_achievement_card.png"
 
-    const val UTM_VIRAL_CARD_URL =
-        "https://midiastory-df6a0.web.app/?utm_source=app_share&utm_medium=viral_card"
-    const val UTM_INVITE_URL =
-        "https://midiastory-df6a0.web.app/?utm_source=app_share&utm_medium=invite_friend"
+    const val PLAY_STORE_VIRAL_CARD_URL =
+        "https://play.google.com/store/apps/details?id=com.rdf112.midiastore&referrer=utm_source%3Dapp_share%26utm_medium%3Dviral_card"
+    const val PLAY_STORE_INVITE_URL =
+        "https://play.google.com/store/apps/details?id=com.rdf112.midiastore&referrer=utm_source%3Dapp_share%26utm_medium%3Dinvite_friend"
 
     suspend fun shareFreedSpaceOrInvite(
         activity: Activity,
         freedBytes: Long,
     ) {
         val isAchievement = freedBytes > 0L
-        val targetUrl = if (isAchievement) UTM_VIRAL_CARD_URL else UTM_INVITE_URL
+        val targetUrl = if (isAchievement) PLAY_STORE_VIRAL_CARD_URL else PLAY_STORE_INVITE_URL
         val freedLabel = if (isAchievement) Formatter.formatFileSize(activity, freedBytes) else ""
 
         val shareText = if (isAchievement) {

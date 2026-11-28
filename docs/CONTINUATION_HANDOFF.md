@@ -483,3 +483,11 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - Deploy final pelo `firebase.cmd` no projeto `midiastory-df6a0`: 171 arquivos publicados. As 14 rotas, os dois PNGs, `image-sitemap.xml` e a verificação Google responderam HTTP 200. O aviso de permissão `serviceusage` não impediu a publicação.
 - SHA-256 de `docs/google7f3bae0a2f8f091c.html` e `docs/image-sitemap.xml` permaneceu inalterado. `app/` não foi tocada e Gradle não foi executado.
 - Commit `96bd449` enviado para `feat/v2.9.0-motor-app`; alteração preexistente em `docs/MOTOR_CRESCIMENTO_META.md` e cache `.firebase/` ficaram fora do commit.
+
+## Handoff v2.9.1 — Loop Viral e base modular — 2026-11-28
+
+- A branch `feat/v2.9.1-hub-viral` parte do commit `5e569b2` em worktree isolado; a tag `v2.8.2-carbon-baseline` continua em `cd0a661`.
+- Novo roadmap: `docs/ROADMAP_SUPERAPP_V3.md`. Contrato Kotlin inicial: `app/src/main/java/com/rdf112/sweep/tools/ToolRegistry.kt`.
+- `ShareAchievementCardRenderer.kt` já existia; foi ajustado para compartilhar links Play Store com `referrer` viral/convite distinto.
+- Gradle local não executado conforme instrução. A validação Android/visual real permanece pendente de CI e dispositivo.
+- Worktree anterior preservado com alterações preexistentes em `docs/MOTOR_CRESCIMENTO_META.md` e `.firebase/`.

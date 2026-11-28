@@ -37,3 +37,7 @@
 
 ## 🗄️ 4. Arquivo Histórico Organizado (`docs/archive/`)
 Documentos históricos, snapshots diários antigos (`17/11` a `23/11`), ciclos autônomos iniciais e rascunhos substituídos foram preservados integralmente (zero perda de histórico) em [`docs/archive/README.md`](archive/README.md), excluídos do deploy público do Firebase Hosting.
+
+## Roadmap modular v3
+
+- [ROADMAP_SUPERAPP_V3.md](ROADMAP_SUPERAPP_V3.md) — fases `v2.9.1` a `v4.0`, contratos locais, gates de segurança e evolução híbrida sob demanda.

@@ -3588,3 +3588,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #585
 
 ---
+
+### 📍 [28/11/2026, 01:30:41] Iniciar v2.9.1 Loop Viral WhatsApp e base modular Superapp
+- **📖 Estudou / Leu:** AGENTS.md e hub documental; memória Supabase #346; estado 360; baseline v2.8.2-carbon-baseline; plano de compartilhamento e renderer existente
+- **⚙️ Tentou / Executou:** Criar branch isolada feat/v2.9.1-hub-viral; escrever roadmap v2.9.1-v4.0; criar contrato Kotlin ToolRegistry; direcionar card de GB para Play Store com referrer
+- **⚠️ Erros Encontrados:** Branch feat/v2.9.0-motor-app tinha docs/MOTOR_CRESCIMENTO_META.md modificado e .firebase não rastreado; preservados no worktree original. Gradle local não executado por instrução.
+- **🔧 Como Corrigiu:** Worktree limpo criado do commit 5e569b2; tag v2.8.2-carbon-baseline cd0a661 intacta; renderer existente reutilizado e links separados para campanha viral/convite
+- **🎯 Conclusão:** Roadmap e contrato base preparados; diff check passou; implementação Kotlin aguarda CI e QA em dispositivo; não alegar build/teste. Branch será commitada e enviada após revisão final.
+- *Registro Supabase:* Memory #590
+
+---
