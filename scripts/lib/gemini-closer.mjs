@@ -18,12 +18,38 @@ export function buildGoPlayUrl(utmSource = "ig_dm", utmCampaign = "private_reply
   return u.toString();
 }
 
-export function isLimparKeyword(message) {
-  const clean = String(message || "")
+export const DOWNLOAD_INTENT_KEYWORDS = [
+  "eu quero",
+  "limpar",
+  "link",
+  "app",
+  "quero",
+  "baixar",
+  "manda",
+  "espaco",
+  "memoria",
+  "download",
+];
+
+const DOWNLOAD_INTENT_REGEX =
+  /(?<![a-z0-9])(?:eu\s+quero|limpar|link|app|quero|baixar|manda|espaco|memoria|download)(?![a-z0-9])/i;
+
+export function normalizeIntentText(message) {
+  return String(message || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
     .trim();
-  return /\blimpar\b/i.test(clean);
+}
+
+export function matchDownloadIntentKeyword(message) {
+  const clean = normalizeIntentText(message);
+  const m = clean.match(DOWNLOAD_INTENT_REGEX);
+  return m ? m[0].replace(/\s+/g, " ") : null;
+}
+
+export function isLimparKeyword(message) {
+  return Boolean(matchDownloadIntentKeyword(message));
 }
 
 export async function replyInstagramDm(userMessage, options = {}) {

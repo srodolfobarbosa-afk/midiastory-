@@ -1,3 +1,10 @@
+## Checkpoint 2026-11-28 — Sentinela Dia D (`dia-d-sentinel.mjs`) + 10 Gatilhos de Intenção no IG Closer
+
+- **10 Gatilhos de Intenção Ativos (`scripts/ig-viral-dm-closer.mjs` + `scripts/lib/gemini-closer.mjs`):** ampliado para `["limpar", "link", "app", "quero", "eu quero", "baixar", "manda", "espaco", "memoria", "download"]` (case-insensitive e sem acento), mantendo teto `60 DMs/h`, cooldown `24h/usuário` e disjuntor (`368/613/2534001/2534041/500`). Re-teste ao vivo (`03:46 BRT`) confirmou que `errorSubcode: 2534041` ainda persiste até ativar a ponte na Página `CRBnotícias` (`1242723582252912`) no Meta Business Suite.
+- **Sentinela Dia D Criado e Validado (`scripts/dia-d-sentinel.mjs --once --dry-run`):** tabela `public.dia_d_sentinel_state` criada no Supabase com RLS ativo e lock atômico; checa a cada 10 min o HTTP 200 anônimo na Play Store (hoje `404` -> `WAITING_FOR_HTTP_200`) e, ao virar `200`, dispara **1 única vez** `node scripts/play-aso-15-idiomas.mjs --commit` (`ERROR_IF_IN_REVIEW`), registra em `public.memories` e avisa no terminal para ligar `ig-viral-dm-closer.mjs --live`. `app/` 100% intocado, zero Gradle.
+
+---
+
 ## Checkpoint 2026-11-28 — Motor Orgânico Blindado (Zero LLM Gratuita, `/go/play` Tap-First, IG DM Closer & ASO 15 Idiomas Dry-Run)
 
 - **Blindagem da Conta Google:** Chaves gratuitas `AQ.*` removidas de `.env`, `.secrets/ai-media-keys.json` e desativadas em `.secrets/gemini-atendimento.json`; `scripts/lib/gemini-closer.mjs` convertido para 100% templates determinísticos (zero chamadas de LLM gratuita). `app/` 100% intocado e sem execução de Gradle.

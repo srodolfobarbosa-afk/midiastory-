@@ -20,7 +20,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { runSupabaseSql } from "./lib/cognitive-memory.mjs";
-import { buildGoPlayUrl, isLimparKeyword } from "./lib/gemini-closer.mjs";
+import {
+  buildGoPlayUrl,
+  DOWNLOAD_INTENT_KEYWORDS,
+  matchDownloadIntentKeyword,
+} from "./lib/gemini-closer.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -282,7 +286,8 @@ async function fetchLimparCandidates(igId, userToken) {
     for (const c of cJson.data || []) {
       const username = String(c.username || c.from?.username || "").toLowerCase();
       if (!username || username === "aconteceunobr") continue;
-      if (!isLimparKeyword(c.text || "")) continue;
+      const matchedKeyword = matchDownloadIntentKeyword(c.text || "");
+      if (!matchedKeyword) continue;
 
       const commentTs = c.timestamp ? new Date(c.timestamp).getTime() : 0;
       if (!commentTs || now - commentTs > PRIVATE_REPLY_MAX_AGE_MS) continue;
@@ -294,6 +299,7 @@ async function fetchLimparCandidates(igId, userToken) {
         username,
         mediaId: String(post.id),
         permalink: post.permalink || null,
+        matchedKeyword,
         commentText: String(c.text || "").slice(0, 140),
         timestamp: c.timestamp,
       });
@@ -469,8 +475,9 @@ async function main() {
         quotaAndCircuit: quotaState,
         metaAccessAudit: accessAudit,
         scanSummary: {
+          keywordsConfigured: DOWNLOAD_INTENT_KEYWORDS,
           postsWithCommentsScanned: scan.postsScanned,
-          limparCommentsMatched: scan.candidates.length,
+          intentCommentsMatched: scan.candidates.length,
           sentCountThisRun,
         },
         sampleActions: actions.slice(0, 10),

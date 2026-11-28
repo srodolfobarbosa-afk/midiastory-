@@ -3598,3 +3598,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #591
 
 ---
+
+### 📍 [28/11/2026, 03:59:47] Sentinela Dia D (dia-d-sentinel.mjs) + Expansao de 10 Gatilhos de Download no ig-viral-dm-closer.mjs
+- **📖 Estudou / Leu:** Gatilhos de intencao de download sem acento e fluxo de abertura publica HTTP 200 da Google Play
+- **⚙️ Tentou / Executou:** Expansao das 10 keywords no closer, criacao do dia-d-sentinel.mjs com lock atomico em public.dia_d_sentinel_state e teste --once --dry-run
+- **⚠️ Erros Encontrados:** errorSubcode 2534041 ainda retornado pela Meta Graph API em /conversations (falta chave da Pagina CRBnoticias no Meta Business Suite)
+- **🔧 Como Corrigiu:** Lock atomico no Supabase para disparo unico de play-aso-15-idiomas.mjs --commit (ERROR_IF_IN_REVIEW) assim que Play Store retornar HTTP 200
+- **🎯 Conclusão:** Validado em dry-run, app/ intocado e commitado na feat/v2.9.0-motor-app
+- *Registro Supabase:* Memory #Local
+
+---
