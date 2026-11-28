@@ -3598,3 +3598,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #590
 
 ---
+
+### 📍 [28/11/2026, 03:26:38] Preparar distribuição externa v2.9.0
+- **📖 Estudou / Leu:** Hub documental; workflow Android; build_signed_aab.sh; applicationId/version; estado 360
+- **⚙️ Tentou / Executou:** Separar artifact opcional do APK universal assinado e criar pacote de metadados/portais de cadastro de seis lojas
+- **⚠️ Erros Encontrados:** SUPABASE_ACCESS_TOKEN ausente; registro online em public.memories indisponível
+- **🔧 Como Corrigiu:** Adicionar input workflow_dispatch include_universal_apk e artifact separado com APK e SHA-256; registrar limitação no handoff local
+- **🎯 Conclusão:** Workflow pronto para execução manual com secrets play-release; descrição/título dentro dos limites; Gradle local não executado
+- *Registro Supabase:* Memory #Local
+
+---

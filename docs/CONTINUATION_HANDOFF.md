@@ -492,3 +492,11 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - Commit `c91cf53` (`feat: add v2.9.1 viral share and modular tool registry`) enviado para `origin/feat/v2.9.1-hub-viral`; marco registrado na memória Supabase #590.
 - Gradle local não executado conforme instrução. A validação Android/visual real permanece pendente de CI e dispositivo.
 - Worktree anterior preservado com alterações preexistentes em `docs/MOTOR_CRESCIMENTO_META.md` e `.firebase/`.
+
+## Distribuição externa v2.9.0 — 2026-11-28
+
+- Em `feat/v2.9.1-hub-viral`, o workflow manual `Android` mantém o job `signed-release` com gates do environment `play-release` e validação do certificado. O script `scripts/build_signed_aab.sh` já gera e verifica AAB e APK da versão 2.9.0; como não há splits por ABI, `app-release.apk` é universal.
+- `workflow_dispatch` ganhou a opção `include_universal_apk` (padrão `true`) para publicar o APK e SHA-256 em `midiastore-release-universal-apk-v2.9.0`, separadamente do artifact `midiastore-release-aab`.
+- Criado `docs/distribuicao-lojas/PACOTE_6_LOJAS.md` com metadados en-US e portais oficiais de cadastro das seis lojas e AlternativeTo.
+- Leitura Supabase caiu em `offline_fallback`: `SUPABASE_ACCESS_TOKEN` não está disponível. `goal-growth-engine.mjs` reportou app 2.9.0/vc35, site HTTP 200 e readiness 40; Play Console não confirmado e token Supabase ausente.
+- Não executar Gradle localmente; a validação do release permanece no workflow manual. Nenhum build foi acionado neste trabalho.

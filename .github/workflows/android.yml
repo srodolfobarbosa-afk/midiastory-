@@ -20,6 +20,12 @@ on:
       - 'README.md'
       - 'AGENTS.md'
   workflow_dispatch:
+    inputs:
+      include_universal_apk:
+        description: 'Publicar também o APK universal assinado como artifact separado'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -198,6 +204,14 @@ jobs:
           path: |
             app-release.aab
             app-release.aab.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload signed universal APK
+        if: ${{ inputs.include_universal_apk }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: midiastore-release-universal-apk-v2.9.0
+          path: |
             app-release.apk
             app-release.apk.sha256
           if-no-files-found: error
