@@ -3578,3 +3578,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #584
 
 ---
+
+### 📍 [28/11/2026, 01:07:14] Corrigir definitivamente o Hero Prime em 14 idiomas
+- **📖 Estudou / Leu:** AGENTS.md, hub documental, memória #584, handoff, gerador Prime, páginas e PNGs do site
+- **⚙️ Tentou / Executou:** Remover 28 SVGs; converter o hero para PNG responsivo e overlay HTML/CSS nativo nas 13 páginas; proteger a marca; publicar Hosting e validar HTTP
+- **⚠️ Erros Encontrados:** Firebase CLI não pôde consultar ativação da API por ausência de serviceusage.serviceUsageConsumer; o deploy completou normalmente
+- **🔧 Como Corrigiu:** Gerador usa PNGs diretos; Home PT-BR sem overlay; outras 13 línguas com overlay claro e árabe RTL; marca notranslate; SVGs removidos
+- **🎯 Conclusão:** 14 rotas, 2 PNGs, image-sitemap e Google verification em HTTP 200; hashes protegidos preservados; commit 96bd449 enviado; app intacta e Gradle não executado
+- *Registro Supabase:* Memory #585
+
+---

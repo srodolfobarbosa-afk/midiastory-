@@ -475,3 +475,11 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - Firebase Hosting: deploy concluído no projeto `midiastory-df6a0`, 70 arquivos. URLs pedidas, sitemap, image-sitemap, verificação do Google e artes SVG responderam HTTP 200; `/guides/**` redireciona com 301 para `/`.
 - `docs/google7f3bae0a2f8f091c.html` e `docs/image-sitemap.xml` mantiveram os hashes SHA-256 anteriores. `app/` permaneceu intacta; Gradle não foi executado.
 - Memória Supabase #584. Branch: `feat/v2.9.0-motor-app`; publicar somente arquivos do site e `scripts/build-site-prime-14-idiomas.mjs`, sem incluir alterações preexistentes em `docs/MOTOR_CRESCIMENTO_META.md` ou `.firebase/`.
+
+## Correção definitiva do Hero Prime — 2026-11-28
+
+- Removidas as 28 artes SVG `midiastore-prime-*.svg`; o gerador agora usa diretamente os PNGs 16:9 no desktop e 4:5 no mobile.
+- Home PT-BR mantém somente o PNG no hero. As outras 13 páginas recebem overlay HTML/CSS localizado em azul-marinho sobre degradê azul-claro; árabe usa `dir="rtl"`. Marca no cabeçalho e rodapé está protegida com `notranslate`/`translate="no"`.
+- Deploy final pelo `firebase.cmd` no projeto `midiastory-df6a0`: 171 arquivos publicados. As 14 rotas, os dois PNGs, `image-sitemap.xml` e a verificação Google responderam HTTP 200. O aviso de permissão `serviceusage` não impediu a publicação.
+- SHA-256 de `docs/google7f3bae0a2f8f091c.html` e `docs/image-sitemap.xml` permaneceu inalterado. `app/` não foi tocada e Gradle não foi executado.
+- Commit `96bd449` enviado para `feat/v2.9.0-motor-app`; alteração preexistente em `docs/MOTOR_CRESCIMENTO_META.md` e cache `.firebase/` ficaram fora do commit.
