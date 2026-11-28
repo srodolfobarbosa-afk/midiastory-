@@ -489,5 +489,6 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - A branch `feat/v2.9.1-hub-viral` parte do commit `5e569b2` em worktree isolado; a tag `v2.8.2-carbon-baseline` continua em `cd0a661`.
 - Novo roadmap: `docs/ROADMAP_SUPERAPP_V3.md`. Contrato Kotlin inicial: `app/src/main/java/com/rdf112/sweep/tools/ToolRegistry.kt`.
 - `ShareAchievementCardRenderer.kt` já existia; foi ajustado para compartilhar links Play Store com `referrer` viral/convite distinto.
+- Commit `c91cf53` (`feat: add v2.9.1 viral share and modular tool registry`) enviado para `origin/feat/v2.9.1-hub-viral`; marco registrado na memória Supabase #590.
 - Gradle local não executado conforme instrução. A validação Android/visual real permanece pendente de CI e dispositivo.
 - Worktree anterior preservado com alterações preexistentes em `docs/MOTOR_CRESCIMENTO_META.md` e `.firebase/`.
