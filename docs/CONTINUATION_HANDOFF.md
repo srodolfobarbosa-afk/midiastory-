@@ -1,3 +1,12 @@
+## Checkpoint 2026-11-28 — Motor Orgânico Blindado (Zero LLM Gratuita, `/go/play` Tap-First, IG DM Closer & ASO 15 Idiomas Dry-Run)
+
+- **Blindagem da Conta Google:** Chaves gratuitas `AQ.*` removidas de `.env`, `.secrets/ai-media-keys.json` e desativadas em `.secrets/gemini-atendimento.json`; `scripts/lib/gemini-closer.mjs` convertido para 100% templates determinísticos (zero chamadas de LLM gratuita). `app/` 100% intocado e sem execução de Gradle.
+- **Rota `/go/play` Tap-First no Ar (`firebase.cmd deploy --only hosting --project midiastory-df6a0`):** Apenas 1 arquivo novo enviado (`docs/go/play/index.html`, espelhado em `public/go/play/index.html`), sem `window.location` automático, com `<a href="intent://details?id=com.rdf112.midiastore&referrer=...;package=com.android.vending;S.browser_fallback_url=...;end">`, link HTTPS direto e dica `⋮ > Abrir no navegador`. HTTP 200 confirmado ao vivo em `/go/play`, `/google7f3bae0a2f8f091c.html`, `/image-sitemap.xml`, `/sitemap.xml` e `/it/`.
+- **`scripts/ig-viral-dm-closer.mjs` Validado em `--dry-run`:** Tabelas `public.ig_dm_closer_dispatches` e `public.ig_dm_closer_circuit` criadas no Supabase com RLS ativo e índices; 4 travas ativas (checa HTTP 200 anônimo na Play Store — hoje `404` enquanto `production` não está pública, bloqueando disparo automaticamente; teto `60 DMs/h` + cooldown `24h/usuário`; Private Reply exclusivo para `"LIMPAR"` sem spam público; disjuntor em códigos `368/613/2534001/2534041/500`). Auditoria Meta detectou `errorSubcode: 2534041` (`Permitir acesso às mensagens` desligado no app Instagram do `@aconteceunobr` — basta ligar quando a Produção abrir).
+- **`scripts/play-aso-15-idiomas.mjs` Validado em `--dry-run` (Edit `03780746045476488764` descartado via `DELETE`):** `changesInReviewBehavior=ERROR_IF_IN_REVIEW` obrigatório, Linter Unicode aprovado nos 15 idiomas (`0` violações; `pt-BR` preservado em 25 chars + `13` títulos expandidos `<=30` chars + nova ficha `it-IT` + `fullDescription` `v2.9.0` `< 7 MB`) e roteador determinístico de reviews (`4-5★` templates nativos `<=350` chars; `1-3★` fila manual em `docs/aso/play-reviews-manual-queue.json`).
+
+---
+
 ## Checkpoint 2026-11-27 — Fase 1 SEO e Criativos Prime v2.9.0
 
 - Hosting efetivo usa `docs/` como raiz e os arquivos SEO também estão em `public/`; publicação final incluiu 161 arquivos do site e excluiu `docs/archive/`, Markdown interno e diretórios operacionais.

@@ -3588,3 +3588,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #585
 
 ---
+
+### 📍 [28/11/2026, 03:16:54] Implantacao Blindada Motor Organico Deterministico (/go/play Tap-First + ig-viral-dm-closer + play-aso-15-idiomas dry-run)
+- **📖 Estudou / Leu:** Escopos Meta Graph v27 (@aconteceunobr), 14 fichas ao vivo Play API v3, cache Hosting .firebase/hosting.ZG9jcw.cache e regras de seguranca da conta Google
+- **⚙️ Tentou / Executou:** Criacao de docs/go/play/index.html Tap-First, scripts/ig-viral-dm-closer.mjs e scripts/play-aso-15-idiomas.mjs 100% deterministicos (sem LLM), deploy Hosting via firebase.cmd e testes --dry-run
+- **⚠️ Erros Encontrados:** 1) Regex ASCII \\b acusou falso positivo Best em Bestatigung (de-DE); 2) HTTP 502 transiente Cloudflare no SQL Supabase; 3) Sonda Meta detectou subcode 2534041 (toggle Permitir acesso as mensagens desligado no app Instagram)
+- **🔧 Como Corrigiu:** 1) Fronteiras Unicode (?<![\\p{L}\\p{N}]) no linter ASO; 2) Retry exponencial execSql no Supabase; 3) Subcode 2534041 adicionado ao disjuntor e reportado ao fundador
+- **🎯 Conclusão:** Deploy /go/play concluido (1 arquivo novo, HTTP 200 preservando google7f3bae0a2f8f091c.html e image-sitemap.xml), 15 fichas ASO aprovadas no linter em dry-run (edit descartado), chaves gratuitas Gemini desativadas e zero alteracao em app/
+- *Registro Supabase:* Memory #591
+
+---

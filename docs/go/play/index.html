@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#000000" />
+  <title>Midiastore na Google Play (&lt; 7 MB)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      color: #f5f5f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: #1c1c1e;
+      border: 1px solid #2c2c2e;
+      border-radius: 22px;
+      padding: 28px 22px 24px;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+    }
+    .ring {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 14px;
+      border-radius: 16px;
+      background: #000000;
+      border: 1px solid #2c2c2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: #0a84ff;
+      background: rgba(10, 132, 255, 0.14);
+      border: 1px solid rgba(10, 132, 255, 0.32);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 22px;
+      line-height: 1.25;
+      margin: 0 0 8px;
+      color: #ffffff;
+    }
+    .sub {
+      font-size: 14px;
+      line-height: 1.45;
+      color: #a1a1a6;
+      margin: 0 0 22px;
+    }
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background: #0a84ff;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 15px 18px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      transition: opacity 0.15s ease;
+    }
+    .btn-primary:active { opacity: 0.85; }
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      background: #2c2c2e;
+      color: #f5f5f7;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .tip {
+      font-size: 12px;
+      line-height: 1.45;
+      color: #8e8e93;
+      border-top: 1px solid #2c2c2e;
+      padding-top: 14px;
+      margin: 0;
+    }
+    .tip strong { color: #d1d1d6; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="ring" aria-hidden="true">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="12" stroke="#2C2C2E" stroke-width="3.5" />
+        <path d="M16 4 A12 12 0 1 1 6.2 22.9" stroke="#0A84FF" stroke-width="3.5" stroke-linecap="round" />
+        <path d="M12.2 16.3L15 19.1L20.3 13.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <span class="badge">OFICIAL GOOGLE PLAY • &lt; 7 MB</span>
+    <h1>Midiastore: Limpar Espaço</h1>
+    <p class="sub">Duplicatas exatas SHA-256, vídeos grandes e revisão 100% segura com sua confirmação.</p>
+
+    <a
+      id="btn-intent"
+      class="btn-primary"
+      href="intent://details?id=com.rdf112.midiastore&amp;referrer=utm_source%3Dig_dm%26utm_medium%3Dprivate_reply%26utm_campaign%3Dgo_play#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.rdf112.midiastore%26referrer%3Dutm_source%253Dig_dm%2526utm_medium%253Dprivate_reply%2526utm_campaign%253Dgo_play;end"
+    >Abrir direto no App Google Play</a>
+
+    <a
+      id="btn-https"
+      class="btn-secondary"
+      href="https://play.google.com/store/apps/details?id=com.rdf112.midiastore&amp;referrer=utm_source%3Dig_dm%26utm_medium%3Dprivate_reply%26utm_campaign%3Dgo_play"
+      rel="noopener"
+    >Link HTTPS direto da Play Store</a>
+
+    <p class="tip">
+      No Instagram/TikTok? Se não abrir de primeira, toque em <strong>&#8942; &gt; Abrir no navegador</strong>.
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      var q = new URLSearchParams(window.location.search);
+      var src = (q.get("src") || q.get("utm_source") || "ig_dm").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "ig_dm";
+      var med = (q.get("med") || q.get("utm_medium") || "private_reply").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40) || "private_reply";
+      var cmp = (q.get("cmp") || q.get("utm_campaign") || "go_play").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "go_play";
+      var refRaw = "utm_source=" + src + "&utm_medium=" + med + "&utm_campaign=" + cmp;
+      var refEnc = encodeURIComponent(refRaw);
+      var httpsUrl = "https://play.google.com/store/apps/details?id=com.rdf112.midiastore&referrer=" + refEnc;
+      var intentUrl =
+        "intent://details?id=com.rdf112.midiastore&referrer=" +
+        refEnc +
+        "#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=" +
+        encodeURIComponent(httpsUrl) +
+        ";end";
+
+      var btnIntent = document.getElementById("btn-intent");
+      var btnHttps = document.getElementById("btn-https");
+      var isAndroid = /Android/i.test(navigator.userAgent || "");
+
+      if (btnIntent) btnIntent.href = isAndroid ? intentUrl : httpsUrl;
+      if (btnHttps) btnHttps.href = httpsUrl;
+
+      function trackTap(targetType) {
+        try {
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(
+              "https://usmqtnlsaavxqguwrtix.supabase.co/functions/v1/ingest-product-event",
+              new Blob(
+                [
+                  JSON.stringify({
+                    event_name: "play_store_click",
+                    properties: {
+                      utm_source: src,
+                      utm_medium: med,
+                      utm_campaign: cmp,
+                      route: "/go/play",
+                      tap_target: targetType,
+                      is_android: isAndroid
+                    }
+                  })
+                ],
+                { type: "application/json" }
+              )
+            );
+          }
+        } catch (_) {}
+      }
+
+      if (btnIntent) btnIntent.addEventListener("click", function () { trackTap("intent_primary"); });
+      if (btnHttps) btnHttps.addEventListener("click", function () { trackTap("https_fallback"); });
+    })();
+  </script>
+</body>
+</html>

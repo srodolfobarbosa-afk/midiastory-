@@ -1,0 +1,43 @@
+{
+  "hosting": {
+    "public": "docs",
+    "cleanUrls": true,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.md",
+      "**/*.bak",
+      "**/*.json",
+      "!ab-config.json",
+      "!live-activity.json",
+      "!cdn/maria2/manifest.json",
+      "archive/**",
+      "aso/**",
+      "audit/**",
+      "audits/**",
+      "campaigns/**",
+      "datasets/**",
+      "ebook/**",
+      "ebook-en/**",
+      "knowledge/**",
+      "mockups/**",
+      "reports/**",
+      "research/**",
+      "store/**",
+      "painel.html",
+      "terminal.html",
+      "ferramentas.html",
+      "livros.html"
+    ],
+    "headers": [
+      {
+        "source": "/cdn/maria2/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=604800" },
+          { "key": "Access-Control-Allow-Origin", "value": "*" }
+        ]
+      }
+    ]
+  }
+}
