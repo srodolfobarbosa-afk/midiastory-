@@ -52,6 +52,76 @@ export function isLimparKeyword(message) {
   return Boolean(matchDownloadIntentKeyword(message));
 }
 
+const PHONE_PAIN_REGEX =
+  /(?<![a-z0-9])(?:pesado|travando|lento|cheio|cheia|lotado|lotada|armazenamento|whatsapp|videos?\s+grandes?|duplicad[oa]s?)(?![a-z0-9])/i;
+const VIDEO_TOPIC_REGEX =
+  /(?<![a-z0-9])(?:video|reel|reels|noticia|post|reportagem|historia|caso|materia|vi\s+aqui|assist[ii])(?![a-z0-9])/i;
+const NEGATIVE_OR_IOS_REGEX =
+  /(?<![a-z0-9])(?:iphone|ios|apple|nao\s+quero|nao\s+preciso|pare|parar)(?![a-z0-9])/i;
+
+/**
+ * Funil Conversacional de 3 Mensagens da Maria do Midiastore (100% Determinístico, Zero LLM):
+ * - Turno 1: "Olá, tudo bem!" + pergunta aberta acolhedora.
+ * - Turno 2: Responde o assunto da pessoa + apresenta "Eu sou a Maria do Midiastore" + puxa a dor do telefone pesado.
+ * - Turno 3 (ou atalho imediato se já pedir link/app/limpar): Manda baixar na Play Store + benefícios reais (< 7 MB, SHA-256, confirmação).
+ */
+export function buildMariaInboxTurnReply({ userMessage = "", nextTurn = 1 }) {
+  const clean = normalizeIntentText(userMessage);
+  const directKeyword = matchDownloadIntentKeyword(clean);
+  const hasPhonePain = PHONE_PAIN_REGEX.test(clean);
+  const isNegativeOrIos = NEGATIVE_OR_IOS_REGEX.test(clean);
+  const inboxLink = buildGoPlayUrl("ig_inbox", "maria_3msg");
+
+  if (isNegativeOrIos && nextTurn >= 2) {
+    return {
+      effectiveTurn: 3,
+      closeConversation: true,
+      intentDetected: "IOS_OR_OPT_OUT",
+      reply:
+        `Sem problemas! Muito obrigada por acompanhar o @aconteceunobr 💙 Se alguém da família usar Android com memória cheia, o Midiastore (< 7 MB) fica disponível na Google Play: ${inboxLink}`,
+    };
+  }
+
+  // Atalho agressivo: se já pediu app/link/limpar ou falou de telefone pesado/travando, já fecha na hora!
+  if (directKeyword || hasPhonePain || nextTurn >= 3) {
+    return {
+      effectiveTurn: 3,
+      closeConversation: true,
+      intentDetected: directKeyword ? `DIRECT_INTENT:${directKeyword}` : hasPhonePain ? "PHONE_HEAVY_PAIN" : "TURN_3_CLOSER",
+      reply:
+        `Prazer, eu sou a Maria do Midiastore! Já baixa nosso app oficial na Google Play 👇\n${inboxLink}\n\n` +
+        `Por que vale baixar no telefone pesado:\n` +
+        `• Ultraleve (< 7 MB): instala rápido até com memória quase cheia\n` +
+        `• Acha vídeos grandes e cópias exatas (SHA-256) sem apagar suas conversas\n` +
+        `• 100% seguro: só apaga o que você confirmar!`,
+    };
+  }
+
+  if (nextTurn === 1) {
+    return {
+      effectiveTurn: 1,
+      closeConversation: false,
+      intentDetected: "ICEBREAKER_TURN_1",
+      reply:
+        `Olá, tudo bem? 😊 Que bom receber sua mensagem aqui no @aconteceunobr! Me conta rapidinho: você mandou sobre algum vídeo que viu aqui ou precisa de uma ajuda?`,
+    };
+  }
+
+  // Turno 2: responde o contexto da pessoa + apresenta a Maria do Midiastore + gancho do telefone pesado
+  const contextAck = VIDEO_TOPIC_REGEX.test(clean)
+    ? `Entendi! Esse conteúdo repercutiu bastante por aqui, obrigada por acompanhar e comentar com a gente!`
+    : `Perfeito, obrigada por falar com a gente e acompanhar a página!`;
+
+  return {
+    effectiveTurn: 2,
+    closeConversation: false,
+    intentDetected: VIDEO_TOPIC_REGEX.test(clean) ? "TURN_2_VIDEO_ACK" : "TURN_2_GENERAL_ACK",
+    reply:
+      `${contextAck}\n\n` +
+      `Aproveitando, prazer: eu sou a Maria, do Midiastore! Quem recebe vídeos todo dia no WhatsApp e Instagram quase sempre fica com o telefone pesado e sem espaço. O seu celular também anda ficando com a memória cheia?`,
+  };
+}
+
 export async function replyInstagramDm(userMessage, options = {}) {
   const targetUrl = buildGoPlayUrl(options.utmSource || "ig_dm", options.utmCampaign || "private_reply");
   return {

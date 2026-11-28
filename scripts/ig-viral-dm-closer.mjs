@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 import { runSupabaseSql } from "./lib/cognitive-memory.mjs";
 import {
   buildGoPlayUrl,
+  buildMariaInboxTurnReply,
   DOWNLOAD_INTENT_KEYWORDS,
   matchDownloadIntentKeyword,
 } from "./lib/gemini-closer.mjs";
@@ -100,6 +101,20 @@ async function ensureSupabaseSafetyTables() {
     INSERT INTO public.ig_dm_closer_circuit (id, is_paused)
     VALUES (1, false)
     ON CONFLICT (id) DO NOTHING;
+
+    CREATE TABLE IF NOT EXISTS public.ig_dm_maria_threads (
+      thread_id TEXT PRIMARY KEY,
+      ig_sender_id TEXT NOT NULL,
+      ig_username TEXT,
+      current_turn SMALLINT NOT NULL DEFAULT 0,
+      last_user_msg_id TEXT,
+      status TEXT NOT NULL DEFAULT 'OPEN',
+      pitched_at TIMESTAMPTZ,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    ALTER TABLE public.ig_dm_maria_threads ENABLE ROW LEVEL SECURITY;
+    CREATE INDEX IF NOT EXISTS idx_ig_dm_maria_sender
+      ON public.ig_dm_maria_threads (ig_sender_id, updated_at DESC);
   `);
 }
 
@@ -309,6 +324,53 @@ async function fetchLimparCandidates(igId, userToken) {
   return { postsScanned: posts.length, candidates };
 }
 
+/**
+ * Busca conversas ativas (<24h — janela oficial Meta) na Inbox do Instagram Direct onde a última mensagem veio do usuário.
+ */
+async function fetchInboxConversationsForMaria(pageId, igId, pageToken) {
+  const url = new URL(`${GRAPH_BASE}/${pageId}/conversations`);
+  url.searchParams.set("platform", "instagram");
+  url.searchParams.set("fields", "id,updated_time,messages.limit(4){id,created_time,from,message}");
+  url.searchParams.set("limit", "20");
+  url.searchParams.set("access_token", pageToken);
+
+  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  const json = await res.json();
+  if (!res.ok || json.error) {
+    return { threadsScanned: 0, inboxCandidates: [], error: json.error?.message || `HTTP ${res.status}` };
+  }
+
+  const threads = json.data || [];
+  const inboxCandidates = [];
+  const now = Date.now();
+  const WINDOW_24H_MS = 23.5 * 60 * 60 * 1000; // Margem segura dentro da janela oficial de 24h da Meta
+
+  for (const t of threads) {
+    const msgs = t.messages?.data || [];
+    if (msgs.length === 0) continue;
+    const latest = msgs[0];
+    const senderId = String(latest.from?.id || "");
+    const senderUsername = String(latest.from?.username || "").toLowerCase();
+
+    // Só responde quando a última mensagem foi enviada pelo seguidor (nunca manda 2 seguidas sozinha)
+    if (!senderId || senderId === String(igId) || senderUsername === "aconteceunobr") continue;
+
+    const msgTs = latest.created_time ? new Date(latest.created_time).getTime() : 0;
+    if (!msgTs || now - msgTs > WINDOW_24H_MS) continue;
+
+    inboxCandidates.push({
+      threadId: String(t.id),
+      senderId,
+      senderUsername: senderUsername || null,
+      lastMsgId: String(latest.id),
+      lastMsgText: String(latest.message || "").slice(0, 280),
+      lastMsgAt: latest.created_time,
+    });
+  }
+
+  return { threadsScanned: threads.length, inboxCandidates, error: null };
+}
+
 async function main() {
   loadDotEnv();
   const args = new Set(process.argv.slice(2));
@@ -337,7 +399,12 @@ async function main() {
   const pageId = process.env.FACEBOOK_PAGE_ID.trim();
   const igId = process.env.INSTAGRAM_USER_ID.trim();
 
-  const scan = await fetchLimparCandidates(igId, userToken);
+  const [scan, inboxScan] = await Promise.all([
+    fetchLimparCandidates(igId, userToken),
+    accessAudit.messagingEndpointProbe?.ok
+      ? fetchInboxConversationsForMaria(pageId, igId, pageToken)
+      : Promise.resolve({ threadsScanned: 0, inboxCandidates: [], error: "Inbox probe indisponivel" }),
+  ]);
 
   const gates = {
     playStorePublicHttp200: playCheck.isPublicLive,
@@ -463,6 +530,141 @@ async function main() {
     actions.push({ ...cand, decision: "PRIVATE_REPLY_SENT", messageId: sendJson.message_id || null });
   }
 
+  // === FUNIL CONVERSACIONAL DE 3 MENSAGENS DA MARIA NA INBOX DIRECT ===
+  const inboxActions = [];
+  for (const item of inboxScan.inboxCandidates) {
+    if (remainingHourlyBudget <= 0) {
+      inboxActions.push({ ...item, decision: "STOP_HOURLY_CAP_60_REACHED" });
+      break;
+    }
+
+    const stRows = await execSql(`
+      SELECT current_turn, last_user_msg_id, status, pitched_at
+      FROM public.ig_dm_maria_threads
+      WHERE thread_id = ${sqlLiteral(item.threadId)};
+    `);
+    const st = stRows?.[0] || null;
+
+    if (st?.last_user_msg_id === item.lastMsgId) {
+      inboxActions.push({ ...item, decision: "SKIP_ALREADY_ANSWERED_MSG" });
+      continue;
+    }
+
+    // Se já fechou os 3 turnos nos últimos 7 dias, respeita cooldown para não virar spam
+    if (st?.status === "CLOSED" && st?.pitched_at) {
+      const pitchedAgeHours = (Date.now() - new Date(st.pitched_at).getTime()) / 3_600_000;
+      if (pitchedAgeHours < 24 * 7) {
+        inboxActions.push({ ...item, decision: "SKIP_ALREADY_PITCHED_7D_COOLDOWN" });
+        continue;
+      }
+    }
+
+    const prevTurn = st?.status === "CLOSED" ? 0 : Number(st?.current_turn || 0);
+    const nextTurn = Math.min(3, prevTurn + 1);
+    const mariaStep = buildMariaInboxTurnReply({
+      userMessage: item.lastMsgText,
+      nextTurn,
+    });
+
+    if (!isLiveMode || !allGatesGreen) {
+      inboxActions.push({
+        threadId: item.threadId,
+        senderUsername: item.senderUsername,
+        userMessagePreview: item.lastMsgText.slice(0, 80),
+        mariaTurn: mariaStep.effectiveTurn,
+        intentDetected: mariaStep.intentDetected,
+        decision: !isLiveMode ? "DRY_RUN_MARIA_WOULD_REPLY_DM" : "BLOCKED_BY_SAFETY_GATE",
+        mariaReplyPreview: mariaStep.reply,
+      });
+      continue;
+    }
+
+    const dmRes = await fetch(`${GRAPH_BASE}/${pageId}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${pageToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        recipient: { id: item.senderId },
+        messaging_type: "RESPONSE",
+        message: { text: mariaStep.reply },
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    const dmJson = await dmRes.json();
+    const errCode = Number(dmJson?.error?.code || 0);
+    const errSubcode = Number(dmJson?.error?.error_subcode || 0);
+
+    if (!dmRes.ok || dmJson.error) {
+      const triggerCode = CIRCUIT_BREAKER_CODES.has(errCode)
+        ? errCode
+        : CIRCUIT_BREAKER_CODES.has(errSubcode)
+          ? errSubcode
+          : dmRes.status >= 500
+            ? 500
+            : errCode || dmRes.status;
+
+      if (CIRCUIT_BREAKER_CODES.has(triggerCode) || dmRes.status === 429) {
+        const reason = `Disjuntor Inbox Maria acionado HTTP ${dmRes.status} / code=${errCode} subcode=${errSubcode}: ${dmJson?.error?.message || "erro"}`;
+        await tripCircuitBreaker(triggerCode || 500, reason);
+        inboxActions.push({ threadId: item.threadId, decision: "CIRCUIT_TRIPPED_ABORT", errorCode: triggerCode, reason });
+        break;
+      }
+
+      inboxActions.push({
+        threadId: item.threadId,
+        decision: "FAILED_NON_CRITICAL",
+        errorCode: triggerCode,
+        errorMessage: dmJson?.error?.message?.slice(0, 140) || null,
+      });
+      continue;
+    }
+
+    const newStatus = mariaStep.closeConversation ? "CLOSED" : "OPEN";
+    await execSql(`
+      INSERT INTO public.ig_dm_maria_threads (thread_id, ig_sender_id, ig_username, current_turn, last_user_msg_id, status, pitched_at, updated_at)
+      VALUES (
+        ${sqlLiteral(item.threadId)},
+        ${sqlLiteral(item.senderId)},
+        ${sqlLiteral(item.senderUsername)},
+        ${Number(mariaStep.effectiveTurn)},
+        ${sqlLiteral(item.lastMsgId)},
+        ${sqlLiteral(newStatus)},
+        ${mariaStep.closeConversation ? "now()" : "NULL"},
+        now()
+      )
+      ON CONFLICT (thread_id) DO UPDATE SET
+        current_turn = EXCLUDED.current_turn,
+        last_user_msg_id = EXCLUDED.last_user_msg_id,
+        status = EXCLUDED.status,
+        pitched_at = COALESCE(EXCLUDED.pitched_at, public.ig_dm_maria_threads.pitched_at),
+        updated_at = now();
+
+      INSERT INTO public.ig_dm_closer_dispatches (ig_comment_id, ig_user_id, ig_username, media_id, comment_text, status)
+      VALUES (
+        ${sqlLiteral(`dm_${item.lastMsgId}`)},
+        ${sqlLiteral(item.senderId)},
+        ${sqlLiteral(item.senderUsername)},
+        'INBOX_MARIA_3STEP',
+        ${sqlLiteral(item.lastMsgText.slice(0, 140))},
+        'SENT'
+      )
+      ON CONFLICT (ig_comment_id) DO NOTHING;
+    `);
+
+    remainingHourlyBudget--;
+    sentCountThisRun++;
+    inboxActions.push({
+      threadId: item.threadId,
+      senderUsername: item.senderUsername,
+      mariaTurn: mariaStep.effectiveTurn,
+      decision: "MARIA_DM_SENT",
+      messageId: dmJson.message_id || null,
+    });
+  }
+
   console.log(
     JSON.stringify(
       {
@@ -478,9 +680,12 @@ async function main() {
           keywordsConfigured: DOWNLOAD_INTENT_KEYWORDS,
           postsWithCommentsScanned: scan.postsScanned,
           intentCommentsMatched: scan.candidates.length,
+          inboxThreadsScanned: inboxScan.threadsScanned,
+          inboxActive24hAwaitingMaria: inboxScan.inboxCandidates.length,
           sentCountThisRun,
         },
-        sampleActions: actions.slice(0, 10),
+        sampleCommentActions: actions.slice(0, 8),
+        sampleMariaInboxActions: inboxActions.slice(0, 8),
       },
       null,
       2

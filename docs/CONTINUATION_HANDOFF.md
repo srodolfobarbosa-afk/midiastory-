@@ -1,3 +1,14 @@
+## Checkpoint 2026-11-28 (Atualização 2) — Erro Meta `2534041` Resolvido (`200 OK`) + Funil Maria 3-Mensagens na Inbox Direct
+
+- **Meta Graph API `/conversations?platform=instagram` Destravada (`HTTP 200 OK`):** após o fundador ativar *Permitir acesso às mensagens* no `@aconteceunobr`, o `errorSubcode: 2534041` desapareceu (`messagingEndpointProbe.ok = true`).
+- **Funil Conversacional de 3 Mensagens da Maria Integrado (`scripts/ig-viral-dm-closer.mjs` + `scripts/lib/gemini-closer.mjs`):** tabela `public.ig_dm_maria_threads` criada no Supabase com RLS ativo; opera dentro da janela oficial de 24h da Meta apenas quando a última mensagem é do seguidor, compartilhando o teto global de `60 DMs/hora` e o disjuntor (`368/613/2534001/2534041/500`):
+  - **1ª mensagem:** *"Olá, tudo bem?"* + pergunta acolhedora sobre o vídeo/ajuda;
+  - **2ª mensagem:** responde o contexto + apresenta *"Eu sou a Maria, do Midiastore"* + gancho da dor do telefone pesado/memória cheia;
+  - **3ª mensagem (ou atalho imediato se já pedir link/app/limpar/pesado):** fechamento direto enviando `https://midiastory-df6a0.web.app/go/play?src=ig_inbox&cmp=maria_3msg` + benefícios reais (`< 7 MB`, `SHA-256`, confirmação do usuário) e cooldown de 7 dias pós-pitch.
+- **Sentinela Dia D (`scripts/dia-d-sentinel.mjs --once --dry-run`):** revalidado (`WAITING_FOR_HTTP_200`), pronto para disparar 1x `play-aso-15-idiomas.mjs --commit` (`ERROR_IF_IN_REVIEW`) assim que a URL pública da Play Store virar `HTTP 200`. `app/` e `.secrets/` 100% intocados.
+
+---
+
 ## Checkpoint 2026-11-28 — Sentinela Dia D (`dia-d-sentinel.mjs`) + 10 Gatilhos de Intenção no IG Closer
 
 - **10 Gatilhos de Intenção Ativos (`scripts/ig-viral-dm-closer.mjs` + `scripts/lib/gemini-closer.mjs`):** ampliado para `["limpar", "link", "app", "quero", "eu quero", "baixar", "manda", "espaco", "memoria", "download"]` (case-insensitive e sem acento), mantendo teto `60 DMs/h`, cooldown `24h/usuário` e disjuntor (`368/613/2534001/2534041/500`). Re-teste ao vivo (`03:46 BRT`) confirmou que `errorSubcode: 2534041` ainda persiste até ativar a ponte na Página `CRBnotícias` (`1242723582252912`) no Meta Business Suite.

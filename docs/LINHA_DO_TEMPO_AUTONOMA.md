@@ -3608,3 +3608,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #Local
 
 ---
+
+### 📍 [28/11/2026, 05:40:40] Meta 2534041 Resolvido (HTTP 200) + Funil Conversacional Maria 3-Mensagens na Inbox Direct (@aconteceunobr)
+- **📖 Estudou / Leu:** Endpoint /conversations?platform=instagram (20 threads reais lidas) e psicologia de conversao em 3 mensagens da Maria do Midiastore
+- **⚙️ Tentou / Executou:** Integracao da maquina de estados public.ig_dm_maria_threads (Turnos 1, 2 e 3 + atalho imediato por dor de telefone pesado) em scripts/ig-viral-dm-closer.mjs e teste dry-run ao vivo
+- **⚠️ Erros Encontrados:** Nenhum (erro 2534041 eliminado apos ativacao no Instagram)
+- **🔧 Como Corrigiu:** Atalho direto para Turno 3 validado ao vivo na DM real de @rodolfo_thalhes ('Meu telefone esta pesado...')
+- **🎯 Conclusão:** Inbox Direct 100% operacional em dry-run (4 conversas ativas <24h detectadas), sentinel validado e codigo enviado na feat/v2.9.0-motor-app sem tocar em app/
+- *Registro Supabase:* Memory #592
+
+---
