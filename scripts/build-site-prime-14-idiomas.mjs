@@ -31,9 +31,10 @@ const esc = (s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll
 const hrefFor = (l) => l.folder ? `/${l.folder}/` : '/';
 const html = (l) => {
   const url = `${origin}${hrefFor(l)}`;
-  const artId = l.folder || 'pt-BR';
-  const desktop = `${origin}/assets/prime/midiastore-prime-${artId}-16x9.svg`;
-  const mobile = `${origin}/assets/prime/midiastore-prime-${artId}-4x5.svg`;
+  const desktop = `${origin}/assets/prime/${desktopBase}`;
+  const mobile = `${origin}/assets/prime/${mobileBase}`;
+  const localized = Boolean(l.folder);
+  const heroCopy = localized ? `<div class="hero-copy" dir="${l.dir}"><p class="hero-eyebrow">${esc(l.eyebrow)}</p><h1>${esc(l.title)}</h1><p class="hero-lead">${esc(l.lead)}</p><span class="hero-badge">${esc(l.cta)}</span></div>` : '';
   const langLinks = languages.map((x) => `<a${x.code === l.code ? ' class="active" aria-current="page"' : ''} href="${hrefFor(x)}" lang="${x.code}" hreflang="${x.code}">${esc(x.native)}</a>`).join('\n            ');
   const alternates = languages.map((x) => `  <link rel="alternate" hreflang="${x.code}" href="${origin}${hrefFor(x)}">`).join('\n') + `\n  <link rel="alternate" hreflang="x-default" href="${origin}/">`;
   const graph = { '@context': 'https://schema.org', '@graph': [
@@ -69,50 +70,29 @@ ${alternates}
     .button{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2196F3,#1565C0);color:#fff;font-weight:750;padding:13px 24px;border-radius:999px;box-shadow:0 12px 32px var(--glow);text-align:center}.button:hover{filter:brightness(1.1)}main{flex:1;padding:26px 0 40px}.hero{overflow:hidden;border:1px solid var(--border);border-radius:26px;background:#080C12;box-shadow:0 30px 90px #000b,0 0 70px rgba(30,136,229,.14)}.hero img{display:block;width:100%;height:auto}.intro{text-align:center;max-width:820px;margin:28px auto 0}.eyebrow{color:#64b5f6;font-size:.8rem;font-weight:750;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}h1{font-size:clamp(1.65rem,4vw,2.5rem);line-height:1.16;letter-spacing:-.025em;margin:0 auto 10px}.lead{color:var(--muted);font-size:1.02rem;max-width:760px;margin:0 auto 20px}.meta{color:var(--muted);font-size:.88rem;margin-top:12px}.features{max-width:900px;margin:50px auto 0}.features h2{text-align:center;font-size:1.45rem;margin-bottom:20px}.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.feature{padding:16px 18px;border:1px solid var(--border);border-radius:16px;background:rgba(28,28,30,.72);color:#d8dee8}.feature:before{content:"✓";color:#64b5f6;font-weight:800;margin-inline-end:10px}
     footer{border-top:1px solid var(--border);padding:20px 0 28px;font-size:13px;color:var(--muted)}.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}.foot-links{display:flex;flex-wrap:wrap;gap:16px}.foot-links a:hover{color:#fff}html[dir=rtl] .feature:before{margin-inline-start:10px;margin-inline-end:0}
     @media(max-width:680px){.wrap{padding-inline:16px}.nav{height:62px}.brand{font-size:18px}.brand img{width:30px;height:30px}.button{padding:11px 16px;font-size:14px}.nav .button{display:none}main.wrap{padding:14px 12px 30px}.hero{border-radius:20px}.intro{margin-top:22px}.feature-grid{grid-template-columns:1fr}.features{margin-top:36px}.foot{justify-content:center;text-align:center}}
+    .hero{position:relative;background:#e4f4f8}.hero-copy{position:absolute;inset:0 auto 0 0;width:50%;padding:clamp(20px,4vw,64px);display:flex;flex-direction:column;justify-content:center;gap:clamp(8px,1.3vw,18px);color:#08284b;text-align:start;background:linear-gradient(90deg,rgba(216,243,250,.98),rgba(225,245,249,.94) 83%,rgba(225,245,249,.34))}.hero-copy[dir=rtl]{inset:0 0 0 auto;text-align:right;background:linear-gradient(270deg,rgba(216,243,250,.98),rgba(225,245,249,.94) 83%,rgba(225,245,249,.34))}.hero-eyebrow{font-size:clamp(.68rem,1.2vw,1rem);font-weight:750;color:#14558b}.hero-copy h1{margin:0;font-size:clamp(1.2rem,3.5vw,2.8rem);line-height:1.14;color:#08284b}.hero-lead{max-width:30em;font-size:clamp(.72rem,1.35vw,1.05rem);line-height:1.45;color:#163b61}.hero-badge{align-self:flex-start;max-width:100%;padding:8px 16px;border:1px solid #fff;border-radius:999px;background:rgba(255,255,255,.6);font-size:clamp(.68rem,1.1vw,.92rem);font-weight:750;color:#08284b;text-align:center}.hero-copy[dir=rtl] .hero-badge{align-self:flex-end}
+    @media(max-width:680px){.hero-copy,.hero-copy[dir=rtl]{inset:70% 0 0;width:100%;padding:10px 16px;justify-content:center;gap:4px;text-align:center;background:linear-gradient(180deg,rgba(210,239,248,.78),rgba(210,239,248,.97) 30%,rgba(210,239,248,.99))}.hero-eyebrow{font-size:.56rem}.hero-copy h1{font-size:clamp(.86rem,4vw,1.2rem);line-height:1.1}.hero-lead{font-size:clamp(.58rem,2.5vw,.72rem);line-height:1.22;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.hero-badge,.hero-copy[dir=rtl] .hero-badge{align-self:center;padding:3px 10px;font-size:.58rem;line-height:1.2}}
   </style>
 </head>
 <body>
   <header><div class="wrap nav">
-    <a class="brand" href="${hrefFor(l)}" aria-label="Midiastore"><img src="${logo}" alt=""><span>Midia<span class="store">store</span></span></a>
+    <a class="brand notranslate" translate="no" href="${hrefFor(l)}" aria-label="Midiastore"><img src="${logo}" alt=""><span>Midia<span class="store">store</span></span></a>
     <div class="actions"><details class="language"><summary>${esc(l.languageLabel)}</summary><nav class="menu" aria-label="${esc(l.languageLabel)}">${langLinks}</nav></details><a class="button" href="${play}" target="_blank" rel="noopener">Google Play</a></div>
   </div></header>
   <main class="wrap">
-    <section class="hero" aria-label="${esc(l.title)}"><picture><source media="(max-width:680px)" srcset="${mobile}"><img src="${desktop}" alt="${esc(l.imageAlt)}" fetchpriority="high"></picture></section>
-    <section class="intro"><p class="eyebrow">${esc(l.eyebrow)}</p><h1>${esc(l.title)}</h1><p class="lead">${esc(l.lead)}</p><a class="button" href="${play}" target="_blank" rel="noopener">${esc(l.cta)}</a><p class="meta">${esc(l.meta)}</p></section>
+    <section class="hero${localized ? ' localized' : ''}" aria-label="${esc(l.title)}"><picture><source media="(max-width:680px)" srcset="${mobile}"><img src="${desktop}" alt="${esc(l.imageAlt.replaceAll('Midiastore', '').trim())}" fetchpriority="high"></picture>${heroCopy}</section>
+${localized ? '' : `    <section class="intro"><p class="eyebrow">${esc(l.eyebrow)}</p><h1>${esc(l.title)}</h1><p class="lead">${esc(l.lead)}</p><a class="button" href="${play}" target="_blank" rel="noopener">${esc(l.cta)}</a><p class="meta">${esc(l.meta)}</p></section>`}
     <section class="features"><h2>${esc(l.featuresTitle)}</h2><div class="feature-grid">${l.features.map((x) => `<p class="feature">${esc(x)}</p>`).join('')}</div><p class="meta" style="text-align:center;margin-top:16px">${esc(l.privacy)}</p></section>
   </main>
-  <footer><div class="wrap foot"><span>© 2026 Midiastore</span><nav class="foot-links" aria-label="${esc(l.footerGuides)}"><a href="/limpar-armazenamento-android.html">${esc(l.storage)}</a><a href="/apagar-fotos-duplicadas-android.html">${esc(l.duplicates)}</a><a href="/comprimir-videos-android.html">${esc(l.videos)}</a><a href="/privacidade.html">${esc(l.privacyLink)}</a></nav></div></footer>
+  <footer><div class="wrap foot"><span>© 2026 <span class="notranslate" translate="no">Midiastore</span></span><nav class="foot-links" aria-label="${esc(l.footerGuides)}"><a href="/limpar-armazenamento-android.html">${esc(l.storage)}</a><a href="/apagar-fotos-duplicadas-android.html">${esc(l.duplicates)}</a><a href="/comprimir-videos-android.html">${esc(l.videos)}</a><a href="/privacidade.html">${esc(l.privacyLink)}</a></nav></div></footer>
 </body>
 </html>
 `;
 };
 
-function localizedArt(language, mobileArt) {
-  const width = mobileArt ? 1200 : 1600;
-  const height = mobileArt ? 1500 : 900;
-  const source = mobileArt ? mobileBase : desktopBase;
-  const textBox = mobileArt
-    ? { x: 92, y: 1050, width: 1016, height: 420, font: 58, small: 34 }
-    : { x: 86, y: 270, width: 700, height: 570, font: 54, small: 30 };
-  const titleSize = mobileArt ? 65 : 56;
-  const baseY = mobileArt ? 1160 : 365;
-  const direction = language.dir === 'rtl' ? 'rtl' : 'ltr';
-  const align = language.dir === 'rtl' ? 'right' : 'left';
-  const x = language.dir === 'rtl' ? textBox.x + textBox.width : textBox.x;
-  const heroText = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;gap:${mobileArt ? 18 : 16}px;text-align:${align};direction:${direction};font-family:Arial,'Noto Sans',sans-serif;color:#08284b;text-shadow:0 1px 0 #ffffff80"><div style="font-size:${mobileArt ? 30 : 24}px;font-weight:750;letter-spacing:.4px;color:#14558b">${esc(language.eyebrow)}</div><div style="font-size:${titleSize}px;font-weight:800;line-height:1.12;letter-spacing:-1.4px">${esc(language.title)}</div><div style="align-self:${language.dir === 'rtl' ? 'flex-end' : 'flex-start'};padding:12px 22px;border:2px solid #ffffffb8;border-radius:999px;background:#ffffff70;font-size:${textBox.small - 3}px;font-weight:700">${esc(language.cta)}</div><div style="font-size:${mobileArt ? 26 : 22}px;font-weight:600;color:#163b61">${esc(language.meta)}</div></div>`;
-  const patch = mobileArt
-    ? `<defs><linearGradient id="wash" x2="0" y2="1"><stop stop-color="#147acb" stop-opacity=".75"/><stop offset="1" stop-color="#147acb" stop-opacity=".97"/></linearGradient><filter id="soft"><feGaussianBlur stdDeviation="18"/></filter></defs><clipPath id="copy"><rect x="0" y="1015" width="1200" height="485"/></clipPath><image href="${source}" width="1200" height="1500" filter="url(#soft)" clip-path="url(#copy)"/><rect x="0" y="1015" width="1200" height="485" fill="url(#wash)"/>`
-    : `<defs><linearGradient id="wash" x2="1" y2="0"><stop stop-color="#b8e9f8" stop-opacity=".98"/><stop offset=".82" stop-color="#e4f4f8" stop-opacity=".96"/><stop offset="1" stop-color="#e4f4f8" stop-opacity=".25"/></linearGradient><filter id="soft"><feGaussianBlur stdDeviation="18"/></filter></defs><clipPath id="copy"><rect x="64" y="250" width="740" height="610" rx="24"/></clipPath><image href="${source}" width="1600" height="900" filter="url(#soft)" clip-path="url(#copy)"/><rect x="64" y="250" width="740" height="610" rx="24" fill="url(#wash)"/>`;
-  const foreignObject = `<foreignObject x="${textBox.x}" y="${mobileArt ? 1038 : 270}" width="${textBox.width}" height="${mobileArt ? 440 : 570}">${heroText}</foreignObject>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><image href="${source}" width="${width}" height="${height}"/>${patch}${foreignObject}</svg>\n`;
-}
-
 for (const language of languages) {
   const dir = path.join(docs, language.folder);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'index.html'), html(language), 'utf8');
-  const artId = language.folder || 'pt-BR';
-  fs.writeFileSync(path.join(docs, 'assets', 'prime', `midiastore-prime-${artId}-16x9.svg`), localizedArt(language, false), 'utf8');
-  fs.writeFileSync(path.join(docs, 'assets', 'prime', `midiastore-prime-${artId}-4x5.svg`), localizedArt(language, true), 'utf8');
   console.log(`Generated ${language.code}: ${path.relative(root, path.join(dir, 'index.html'))}`);
 }
