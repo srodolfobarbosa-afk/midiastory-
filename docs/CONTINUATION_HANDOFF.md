@@ -466,3 +466,12 @@ Read docs/OBJETIVO_ESTRATEGICO_E_MEMORIA.md first for the current business north
 - Governance, `git diff --check` e verificador Node italiano passaram. CI `45826259245` verde no SHA do commit de recurso; deploy web skipped.
 - APK `com.rdf112.midiastore.debug` SHA-256 `c83d06c8befb0c4cbcaefda80bc1e74785e60ea081aab03e1a075e7d824d88a4`. Instalação recusada por assinatura diferente. A tentativa `adb uninstall -k` não removeu o app; ADB alertou que os dados retidos só podem ser reusados com a assinatura anterior. A versão existente permaneceu intacta, assim como o pacote oficial e a baseline.
 - QA visual da localização italiana aguarda autorização explícita para desinstalar normalmente somente o `.debug` (apaga dados internos/configurações locais) e instalar o APK novo.
+
+## Site Prime — 14 idiomas e artes localizadas — 2026-11-28
+
+- Gerador reproduzível: `scripts/build-site-prime-14-idiomas.mjs`. Atualizadas as 14 páginas nativas, com canonicals próprias, 15 hreflangs recíprocos, dados estruturados `WebSite`/`Organization`/`MobileApplication`/`ImageObject`, CTA Google Play e árabe em RTL.
+- Criadas 28 artes SVG responsivas (16:9 e 4:5), preservando as fotografias PNG originais e a identidade visual, com chamada e CTA traduzidos em cada idioma. Os PNGs de origem não foram alterados.
+- Guias PT-BR reformulados no padrão Prime; sitemap contém somente 14 páginas de idioma, 3 guias e 2 páginas de privacidade (19 URLs).
+- Firebase Hosting: deploy concluído no projeto `midiastory-df6a0`, 70 arquivos. URLs pedidas, sitemap, image-sitemap, verificação do Google e artes SVG responderam HTTP 200; `/guides/**` redireciona com 301 para `/`.
+- `docs/google7f3bae0a2f8f091c.html` e `docs/image-sitemap.xml` mantiveram os hashes SHA-256 anteriores. `app/` permaneceu intacta; Gradle não foi executado.
+- Memória Supabase #584. Branch: `feat/v2.9.0-motor-app`; publicar somente arquivos do site e `scripts/build-site-prime-14-idiomas.mjs`, sem incluir alterações preexistentes em `docs/MOTOR_CRESCIMENTO_META.md` ou `.firebase/`.

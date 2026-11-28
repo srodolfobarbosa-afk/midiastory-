@@ -3568,3 +3568,13 @@ Checklist executado antes das interações: `.tmp/qa/full-real-user-20261126/che
 - *Registro Supabase:* Memory #583
 
 ---
+
+### 📍 [28/11/2026, 00:33:10] Publicar site Prime v2.9.0 com 14 idiomas e artes localizadas
+- **📖 Estudou / Leu:** AGENTS.md e hub documental; memórias Supabase #582 e #583; site Prime, assets, hreflangs, schema, sitemap e Firebase Hosting
+- **⚙️ Tentou / Executou:** Gerador Node; 14 páginas, 28 artes SVG responsivas com texto traduzido, três guias PT-BR, sitemap restrito; deploy Hosting; validação HTTP e redirect 301
+- **⚠️ Erros Encontrados:** PowerShell bloqueou firebase.ps1; chamada inicial firebase falhou. firebase.cmd executou; aviso de permissão serviceusage 403 não impediu publicação
+- **🔧 Como Corrigiu:** Usado firebase.cmd; config temporária na raiz com docs/ como public e exclusões de archive, guides, Markdown e diretórios internos
+- **🎯 Conclusão:** Firebase Hosting publicou 70 arquivos; /, /en/, /es/, /ja/, /ar/, sitemap.xml, image-sitemap.xml, verificação Google e artes SVG retornaram 200; sitemap tem 19 URLs; /guides/** retorna 301 para /; hashes dos arquivos protegidos preservados; app/ intacta e Gradle não executado
+- *Registro Supabase:* Memory #584
+
+---
